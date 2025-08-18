@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ar.edu.itba.paw</groupId>
+  <artifactId>PAW-2024b-14</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <properties>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+
+    <!-- Versión Spring 5.x compatible con Tomcat 9 (Servlet 4.0) -->
+    <org.springframework.version>5.3.33</org.springframework.version>
+    <jstl.version>1.2</jstl.version>
+    <servlet-api.version>4.0.1</servlet-api.version>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-webmvc</artifactId>
+        <version>${org.springframework.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+</project>
