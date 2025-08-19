@@ -1,5 +1,7 @@
+<%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
+
 <html>
-<body>
-<h2>${greeting}</h2>
-</body>
+    <body>
+        <paw:button text="Primary" size="lg"/>
+    </body>
 </html>
