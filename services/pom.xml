@@ -7,7 +7,6 @@
     <version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>ar.edu.itba.paw</groupId>
   <artifactId>services</artifactId>
   <version>1.0-SNAPSHOT</version>
 
@@ -54,6 +53,7 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
+      <version>5.3.33</version>
     </dependency>
   </dependencies>
 

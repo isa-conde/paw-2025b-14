@@ -11,10 +11,9 @@ import org.springframework.web.servlet.view.JstlView;
 @EnableWebMvc
 @Configuration
 @ComponentScan({
-        "ar.edu.itba.paw.webapp.controller",   // controllers
-        // Agregá estos si ya tenés services/daos en otros módulos:
-        // "ar.edu.itba.paw.service",
-        // "ar.edu.itba.paw.persistence"
+        "ar.edu.itba.paw.webapp.controller",
+        "ar.edu.itba.paw.services",
+        "ar.edu.itba.paw.persistence"
 })
 public class WebConfig {
 
