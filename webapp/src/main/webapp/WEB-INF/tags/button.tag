@@ -13,5 +13,5 @@
 <button type="button"
         class="${classes}"
         <c:if test="${btnDisabled}">disabled</c:if>>
-    ${text}
+    <c:out value="${text}"/>
 </button>
