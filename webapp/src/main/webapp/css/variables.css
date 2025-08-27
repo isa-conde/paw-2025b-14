@@ -1,7 +1,28 @@
 :root {
-    --background-color: #00070E;
-    --primary-color: #005B99;
-    --secondary-color: #E6F7FF;
+    --background: #00070E;
+    --background-secondary: #001124;
+    --background-card: #00244D;
+    
+    --primary-button: #005B99;
+    --primary-button-hover: #1971B8;
+    
+    --primary-details: #005B99;
+    --secondary-details: #334A5C;
+    
     --primary-text: #E6F7FF;
+    --secondary-text: #B3C9D6;
+    
     --font-main: 'Montserrat', sans-serif;
+    --font-titles: 'Russo One', sans-serif;
+    
+    --text-12: 0.75rem;
+    --text-14: 0.875rem;
+    --text-15: 0.9375rem;
+    --text-18: 1.125rem;
+    --text-20: 1.25rem;
+    --text-24: 1.5rem;
+    --text-26: 1.625rem;
+    --text-32: 2rem;
+    --text-40: 2.5rem;
+    --text-64: 4rem;
 }
