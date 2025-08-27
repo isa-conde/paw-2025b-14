@@ -27,7 +27,7 @@ import javax.sql.DataSource;
 })
 public class WebConfig implements WebMvcConfigurer {
 
-    @Value("classpath:db/schema.sql")
+    @Value("classpath:db/initdb/schema.sql")
     private Resource schemaSql;
 
     @Bean
@@ -45,9 +45,9 @@ public class WebConfig implements WebMvcConfigurer {
     public DataSource dataSource() {
         final SimpleDriverDataSource ds = new SimpleDriverDataSource();
         ds.setDriverClass(org.postgresql.Driver.class);
-        ds.setUrl("jdbc:postgresql://localhost/paw");
-        ds.setUsername("postgres");
-        ds.setPassword("postgres");
+        ds.setUrl("jdbc:postgresql://localhost:5433/paw");
+        ds.setUsername("paw");
+        ds.setPassword("paw");
 
         return ds;
     }

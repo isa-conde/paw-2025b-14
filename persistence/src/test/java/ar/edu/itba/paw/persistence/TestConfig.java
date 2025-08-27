@@ -12,7 +12,6 @@ import org.springframework.jdbc.datasource.init.DatabasePopulator;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
 import javax.sql.DataSource;
-import javax.xml.crypto.Data;
 
 @Configuration
 @ComponentScan("ar.edu.itba.paw.persistence")
@@ -21,7 +20,7 @@ public class TestConfig {
     @Value("classpath:db/init.sql")
     private Resource initSql;
 
-    @Value("classpath:db/schema.sql")
+    @Value("classpath:db/initdb/schema.sql")
     private Resource schemaSql;
 
     @Bean
