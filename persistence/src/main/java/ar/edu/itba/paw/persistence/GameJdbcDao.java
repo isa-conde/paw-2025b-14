@@ -22,7 +22,7 @@ public class GameJdbcDao implements GameDao {
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
 
-    private static final RowMapper<Game> ROW_MAPPER = (rs, rowNum) -> new Game(rs.getLong("id"), rs.getString("name"), rs.getObject("genre", Genre.class));
+    private static final RowMapper<Game> ROW_MAPPER = (rs, rowNum) -> new Game(rs.getLong("id"), rs.getString("name"), Genre.valueOf(rs.getString("genre")));
 
     @Autowired
     public GameJdbcDao(final DataSource ds) {
@@ -55,11 +55,13 @@ public class GameJdbcDao implements GameDao {
 
     @Override
     public Game create(String name, Genre genre) {
-        Map<String, Object> params = new HashMap<String, Object>();
-        params.put("name", name);
-        params.put("genre", genre);
-
-        Number id = jdbcInsert.executeAndReturnKey(params);
-        return new Game(id.longValue(), name, genre);
+        final String sql = "INSERT INTO game (name, genre) VALUES (?, ?::genre_enum) RETURNING id";
+        Long id = jdbcTemplate.queryForObject(
+                sql,
+                new Object[]{name, genre.name()},
+                Long.class
+        );
+        return new Game(id, name, genre);
     }
+
 }

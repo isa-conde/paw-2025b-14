@@ -8,12 +8,14 @@ import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Genre;
 import ar.edu.itba.paw.webapp.form.GameForm;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.tags.Param;
 
 import javax.validation.Valid;
+import java.util.Optional;
 
 @Controller
 public class HelloWorldController {
@@ -42,11 +44,11 @@ public class HelloWorldController {
 
     @RequestMapping(value = "/game/create", method = { RequestMethod.POST })
     public ModelAndView createGame(@Valid @ModelAttribute("gameForm") final GameForm form, final BindingResult errors) {
-        if (errors.hasErrors()) {
+        /*if (errors.hasErrors()) {
             return createGameForm(form);
-        }
+        }*/
         final Game g = gs.create(form.getName(), form.getGenre());
-        return new ModelAndView("redirect:/user?userId=" + g.getId());
+        return new ModelAndView("redirect:/game?gameId=" + g.getId());
     }
 
     @RequestMapping(value = "/game/create", method = {RequestMethod.GET})
@@ -56,5 +58,16 @@ public class HelloWorldController {
         return mav;
     }
 
+    @RequestMapping("/game")
+    public ModelAndView gamePage(@RequestParam("gameId") final long gameId){
+        final ModelAndView mav = new ModelAndView("gamePage");
+        Optional<Game> optionalGame = gs.findById(gameId);
+        if(optionalGame.isPresent()) {
+            mav.addObject("game", optionalGame.get());
+        } else {
+            return new ModelAndView("index");
+        }
+        return mav;
+    }
 
 }

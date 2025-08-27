@@ -2,7 +2,7 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <html>
 <body>
-<h2>Añadir un juego</h2>
+<h2>Agregar un juego</h2>
 <c:url value="/game/create" var="postPath"/>
 <form:form modelAttribute="gameForm" action="${postPath}" method="post">
     <div>

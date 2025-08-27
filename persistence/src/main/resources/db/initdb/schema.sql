@@ -3,10 +3,9 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(100) NOT NULL UNIQUE
 );
 
-CREATE TABLE game (
+CREATE TABLE IF NOT EXISTS game (
         id BIGSERIAL PRIMARY KEY,
         name text NOT NULL UNIQUE,
         genre genre_enum
 );
 
-CREATE TYPE genre_enum AS ENUM ('MOBA', 'FPS', 'Fighting', 'TPS', 'BattleRoyale', 'RTS', 'Sports', 'DGC');
