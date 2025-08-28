@@ -7,7 +7,7 @@
         <title></title>
     </head>
 <body>
-    <paw:banner size="lg" image="${pageContext.request.contextPath}/images/arcane.jpg">
+    <paw:banner size="l" image="${pageContext.request.contextPath}/images/arcane.jpg">
         <paw:h1>Are you ready?</paw:h1>
         <br>
         <paw:h2>Let's play.</paw:h2>
@@ -18,21 +18,8 @@
         <paw:button-card title="Test your habilities" butText="Join a Tournament" onclick=""/>
     </div>
 
-    <paw:button type="profile" onclick="goToIndex()"><c:out value="${user.username}"/></paw:button>
-    
-    <script>
-        function goToIndex() {
-            window.location.href = '<c:url value="/"/>';
-        }
-        
-        function goToQuickMatch() {
-            window.location.href = '<c:url value="/"/>';
-        }
-        
-        function goToTournament() {
-            window.location.href = '<c:url value="/tournament"/>';
-        }
-    </script>
+    <paw:profileButton text="${user.username}" onclick=""/>
+
 </body>
 </html>
 

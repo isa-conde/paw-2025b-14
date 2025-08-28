@@ -21,7 +21,7 @@
     </c:if>
     <c:if test="${not empty fn:trim(buttonText)}">
         <div class="card-button-container">
-            <paw:button type="main" onclick="${onclick}">${butText}</paw:button>
+            <paw:button text="${butText}" onclick="${onclick}"/>
         </div>
     </c:if>
 </div>

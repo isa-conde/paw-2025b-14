@@ -5,7 +5,7 @@
 
 <c:set var="fontSize" value="${size == 'xs' ? 'var(--text-14)' : 
                                size == 's' ? 'var(--text-18)' : 
-                               size == 'md' ? 'var(--text-20)' : 
+                               size == 'm' ? 'var(--text-20)' :
                                size == 'l' ? 'var(--text-24)' : 
                                size == 'xl' ? 'var(--text-32)' : 'var(--text-20)'}" />
 
