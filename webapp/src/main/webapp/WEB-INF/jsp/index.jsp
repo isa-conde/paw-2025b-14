@@ -7,7 +7,7 @@
         <title></title>
     </head>
 <body>
-    <h1>Hello <c:out value="${user.username}"/>>!</h1>
+    <h1>Hello <c:out value="${user.username}"/>!</h1>
     <h4>Your id is <c:out value="${user.id}"/></h4>
 </body>
 </html>

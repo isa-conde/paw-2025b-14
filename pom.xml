@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><project>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>ar.edu.itba.paw</groupId>
   <artifactId>PAW-2024b-14</artifactId>
@@ -6,8 +7,8 @@
   <packaging>pom</packaging>
 
   <properties>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
+  	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  	<maven.compiler.release>17</maven.compiler.release>
     <org.springframework.version>5.3.33</org.springframework.version>
     <jstl.version>1.2</jstl.version>
     <servlet-api.version>4.0.1</servlet-api.version>
@@ -25,30 +26,6 @@
         <groupId>org.springframework</groupId>
         <artifactId>spring-webmvc</artifactId>
         <version>${org.springframework.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-jdbc</artifactId>
-        <version>${org.springframework.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.postgresql</groupId>
-        <artifactId>postgresql</artifactId>
-        <version>${org.postgresql.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-core</artifactId>
-        <version>${mockito.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>${junit.version}</version>
-        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
@@ -68,10 +45,48 @@
         <version>${javax.validation-api.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.hibernate</groupId>
+        <groupId>org.hibernate.validator</groupId>
         <artifactId>hibernate-validator</artifactId>
         <version>${org.hibernate.validator}</version>
       </dependency>
+      <dependency>
+      	<groupId>org.springframework</groupId>
+      	<artifactId>spring-context</artifactId>
+      	<version>${org.springframework.version}</version>
+      </dependency>
+      <dependency>
+      	<groupId>javax.servlet</groupId>
+      	<artifactId>javax.servlet-api</artifactId>
+      	<version>${servlet-api.version}</version>
+      	<scope>provided</scope>
+	  </dependency>
+	  <dependency>
+	  	<groupId>javax.servlet</groupId>
+	  	<artifactId>jstl</artifactId>
+	  	<version>${jstl.version}</version>
+	  </dependency>
+	  <dependency>
+	  	<groupId>org.postgresql</groupId>
+	  	<artifactId>postgresql</artifactId>
+	  	<version>${org.postgresql.version}</version>
+	  </dependency>
+	  <dependency>
+	  	<groupId>org.springframework</groupId>
+	  	<artifactId>spring-jdbc</artifactId>
+	  	<version>${org.springframework.version}</version>
+	  </dependency>
+	  <dependency>
+	  	<groupId>org.mockito</groupId>
+	  	<artifactId>mockito-core</artifactId>
+	  	<version>${mockito.version}</version>
+	  	<scope>test</scope>
+	  </dependency>
+	  <dependency>
+	  	<groupId>junit</groupId>
+	  	<artifactId>junit</artifactId>
+	  	<version>${junit.version}</version>
+	  	<scope>test</scope>
+	  </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -91,9 +106,7 @@
           <artifactId>maven-war-plugin</artifactId>
           <version>3.4.0</version>
           <configuration>
-            <!-- opcional -->
             <failOnMissingWebXml>false</failOnMissingWebXml>
-            <!-- <warName>ROOT</warName> -->
           </configuration>
         </plugin>
       </plugins>
