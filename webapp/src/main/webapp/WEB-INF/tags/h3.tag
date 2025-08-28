@@ -1,11 +1,6 @@
-<%@ tag language ="java" pageEncoding="UTF-8" %>
-<%@ attribute name="text" required="true" %>
-<%@ attribute name="fontFamily" required="false"%>
+<%@ tag language="java" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<c:set var="textFont" value="${not empty fontFamily ? fontFamily : 'montserrat'}"/>
-<c:set var="classes" value="${textFont}"/>
-
-<h3 class="${classes}">
-    <c:out value="${text}"/>
+<h3 class="title" style="font-size: var(--text-36);">
+    <jsp:doBody/>
 </h3>

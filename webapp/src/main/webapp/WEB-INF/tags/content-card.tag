@@ -6,20 +6,21 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 
-
 <c:set var="cardText" value="${not empty text ? text : ''}"/>
 <c:set var="buttonText" value="${not empty butText ? butText : ''}"/>
 
 <div class="content-card">
-    <h2 class="card-title">
-        <c:out value="${title}"/>
-    </h2>
-    <p class="card-text p-md">
-        <c:out value="${text}"/>
-    </p>
+    <div class="card-title">
+        <paw:h2><c:out value="${title}"/></paw:h2>
+    </div>
+    <c:if test="${not empty fn:trim(cardText)}">
+        <p class="card-text p-md">
+            <c:out value="${text}"/>
+        </p>
+    </c:if>
     <c:if test="${not empty fn:trim(buttonText)}">
-        <div class="card-actions">
-            <paw:button text="${buttonText}" size="md"/>
+        <div class="card-button-container">
+            <paw:button type="main" onclick="goToIndex()">${butText}</paw:button>
         </div>
     </c:if>
 </div>

@@ -7,14 +7,30 @@
         <title></title>
     </head>
 <body>
-    <h1>Hello <c:out value="${user.username}"/>>!</h1>
-    <h4>Your id is <c:out value="${user.id}"/></h4>
-    <paw:button type="main" onclick="goToIndex()">Join a Tournament</paw:button>
+    <paw:banner size="lg" image="${pageContext.request.contextPath}/images/arcane.jpg">
+        <paw:h1>Are you ready?</paw:h1>
+        <br>
+        <paw:h2>Let's play.</paw:h2>
+    </paw:banner>
+
+    <div class="cards-container">
+        <paw:content-card title="Become an Organizer" butText="Create a Tournament"/>
+        <paw:content-card title="Test your habilities" butText="Join a Tournament"/>
+    </div>
+
     <paw:button type="profile" onclick="goToIndex()"><c:out value="${user.username}"/></paw:button>
     
     <script>
         function goToIndex() {
-            window.location.href = '<c:url value="/index"/>';
+            window.location.href = '<c:url value="/"/>';
+        }
+        
+        function goToQuickMatch() {
+            window.location.href = '<c:url value="/"/>';
+        }
+        
+        function goToTournament() {
+            window.location.href = '<c:url value="/tournament"/>';
         }
     </script>
 </body>
