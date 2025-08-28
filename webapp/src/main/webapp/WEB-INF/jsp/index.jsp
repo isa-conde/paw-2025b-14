@@ -14,8 +14,8 @@
     </paw:banner>
 
     <div class="cards-container">
-        <paw:content-card title="Become an Organizer" butText="Create a Tournament"/>
-        <paw:content-card title="Test your habilities" butText="Join a Tournament"/>
+        <paw:button-card title="Become an Organizer" butText="Create a Tournament" onclick=""/>
+        <paw:button-card title="Test your habilities" butText="Join a Tournament" onclick=""/>
     </div>
 
     <paw:button type="profile" onclick="goToIndex()"><c:out value="${user.username}"/></paw:button>
