@@ -12,9 +12,9 @@
     
     <div class="tournament-card-content">
         <div class="tournament-info">
-            <paw:h5>${title}</paw:h5>
+            <paw:text type="h5">${title}</paw:text>
             <c:if test="${not empty subtitle}">
-                <paw:p size="xs" weight="1">${subtitle}</paw:p>
+                <paw:text size="xs" weight="1">${subtitle}</paw:text>
             </c:if>
         </div>
         
