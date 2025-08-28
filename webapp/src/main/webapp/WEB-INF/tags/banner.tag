@@ -1,13 +1,13 @@
 <%@ tag language="java" pageEncoding="UTF-8" %>
-<%@ attribute name="size" required="true" description="Banner height: md or lg" %>
+<%@ attribute name="size" required="false" description="Banner height: [m] or l" %>
 <%@ attribute name="image" required="true" description="Banner image URL" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<c:set var="height" value="${size == 'lg' ? 600 : 330}" />
+<c:set var="height" value="${not empty size ? size : 'm'}" />
 
-<div class="banner" style="height: ${height}px;">
-    <img src="${image}" alt="Banner" class="banner-image">
-    <div class="banner-content" style="margin-bottom: ${height / 10}px">
+<div class="banner ${height}">
+    <img class="banner-image" src="${image}" alt="Banner">
+    <div class="banner-content">
         <jsp:doBody/>
     </div>
 </div>
