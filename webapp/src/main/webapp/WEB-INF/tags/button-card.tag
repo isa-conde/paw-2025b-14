@@ -14,11 +14,11 @@
 
 <div class="card ${grain}">
     <div class="card-title">
-        <paw:h2><c:out value="${title}"/></paw:h2>
+        <paw:text type="h2"><c:out value="${title}"/></paw:text>
     </div>
     <c:if test="${not empty fn:trim(cardText)}">
         <div class="card-text">
-            <paw:p size="lg" weight="2"><c:out value="${text}"/></paw:p>
+            <paw:text size="lg" weight="2"><c:out value="${text}"/></paw:text>
         </div>
     </c:if>
     <c:if test="${not empty fn:trim(buttonText)}">

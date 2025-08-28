@@ -8,9 +8,9 @@
     </head>
 <body>
     <paw:banner size="l" image="${pageContext.request.contextPath}/images/arcane.jpg">
-        <paw:h1>Are you ready?</paw:h1>
+        <paw:text type="h1">Are you ready?</paw:text>
         <br>
-        <paw:h2>Let's play.</paw:h2>
+        <paw:text type="h2">Let's play.</paw:text>
     </paw:banner>
 
     <div class="cards-container">
