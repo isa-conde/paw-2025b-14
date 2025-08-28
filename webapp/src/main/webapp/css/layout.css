@@ -1,0 +1,9 @@
+/* ------- HOME ------- */
+
+.cards-container {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    align-items: flex-start;
+    margin: 40px 0;
+}

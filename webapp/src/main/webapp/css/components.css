@@ -176,14 +176,6 @@ p, span {
 
 /* ------- CONTENT CARD ------- */
 
-.cards-container {
-    display: flex;
-    gap: 40px;
-    justify-content: center;
-    align-items: flex-start;
-    margin: 40px 0;
-}
-
 .card {
     background-color: var(--background-card);
     border-radius: 15px;
@@ -193,6 +185,22 @@ p, span {
     justify-content: space-between;
     width: 500px;
     position: relative;
+    overflow: hidden;
+}
+
+.card.grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: repeating-radial-gradient(
+            circle at center,
+            var(--background) 0,
+            var(--background) 1px,
+            transparent 1px,
+            transparent 2px
+    );
+    opacity: 0.1;
+    mix-blend-mode: multiply;
 }
 
 .card-title{
