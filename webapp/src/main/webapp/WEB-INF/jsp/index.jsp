@@ -7,11 +7,13 @@
         <title></title>
     </head>
 <body>
-    <paw:banner size="l" image="${pageContext.request.contextPath}/images/arcane.jpg">
-        <paw:text type="h1">Are you ready?</paw:text>
-        <br>
-        <paw:text type="h2">Let's play.</paw:text>
-    </paw:banner>
+
+    <paw:layout>
+        <paw:banner size="l" image="${pageContext.request.contextPath}/images/arcane.jpg">
+            <paw:text type="h1">Are you ready?</paw:text>
+            <br>
+            <paw:text type="h2">Let's play.</paw:text>
+        </paw:banner>
 
     <div class="container">
         <div class="cards-container">

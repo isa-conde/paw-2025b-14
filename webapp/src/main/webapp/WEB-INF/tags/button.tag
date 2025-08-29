@@ -18,5 +18,5 @@
     <c:if test="${hasImage}">
         <img class="button-image ${btnSize}" src="${image}" alt="Profile Picture">
     </c:if>
-    <paw:text type="p" size="${btnSize}"><c:out value="${text}"/></paw:text>
+    <paw:text size="${btnSize}"><c:out value="${text}"/></paw:text>
 </button>
