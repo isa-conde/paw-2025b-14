@@ -4,6 +4,7 @@
 <%@ attribute name="image" required="true" rtexprvalue="true" %>
 <%@ attribute name="title" required="true" rtexprvalue="true" %>
 <%@ attribute name="subtitle" required="false" rtexprvalue="true" %>
+<%@ attribute name="tags" required="false" rtexprvalue="true" type="java.util.List" %>
 
 <div class="tournament-card">
     <div class="tournament-card-bg">
@@ -19,7 +20,13 @@
         </div>
         
         <div class="tournament-bottom">
-            <jsp:doBody/>
+            <div class="tournament-tags">
+                <c:if test="${not empty tags}">
+                    <c:forEach var="tag" items="${tags}">
+                        <span class="tournament-tag">${tag}</span>
+                    </c:forEach>
+                </c:if>
+            </div>
         </div>
     </div>
 </div>

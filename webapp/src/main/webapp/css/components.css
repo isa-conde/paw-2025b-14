@@ -6,6 +6,18 @@ body {
     background-color: var(--background);
 }
 
+.container {
+    margin: 50px 250px;
+}
+
+.cards-container {
+    display: flex;
+    gap: 100px;
+    justify-content: center;
+    align-items: flex-start;
+    margin: 100px 0;
+}
+
 /* ------- FONTS ------- */
 
 @font-face {
@@ -99,7 +111,6 @@ body {
     display: flex;
     align-items: flex-end;
     justify-content: center;
-    margin-bottom: 50px;
 }
 
 .banner.m {
@@ -108,7 +119,7 @@ body {
 }
 
 .banner.l {
-    height: 600px;
+    height: 550px;
     padding-bottom: 60px;
 }
 
@@ -185,22 +196,6 @@ p, span {
     justify-content: space-between;
     width: 500px;
     position: relative;
-    overflow: hidden;
-}
-
-.card.grain::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-image: repeating-radial-gradient(
-            circle at center,
-            var(--background) 0,
-            var(--background) 1px,
-            transparent 1px,
-            transparent 2px
-    );
-    opacity: 0.1;
-    mix-blend-mode: multiply;
 }
 
 .card-title{
