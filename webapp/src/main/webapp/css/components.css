@@ -2,8 +2,14 @@
 
 /* ------- GENERAL ------- */
 
-body {
+body, html {
     background-color: var(--background);
+    font-family: var(--font-main), sans-serif;
+    color: var(--primary-text);
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    max-width: 100%;
 }
 
 /* ------- FONTS ------- */
@@ -276,4 +282,51 @@ p, span {
     align-items: center;
     justify-content: center;
     text-align: center;
+}
+
+/* ------- HEADER ------- */
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--background-secondary);
+    padding: 16px;
+    grid-area: header;
+}
+
+.header .logo {
+    height: 80px;
+    width: auto;
+}
+
+/* ------- SIDEBAR ------- */
+
+.sidebar {
+    height: 100%;
+    width: 160px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: var(--background-secondary);
+    overflow-x: hidden;
+    padding-top: 20px;
+    grid-area: sidebar;
+}
+
+/* ------- LAYOUT ------- */
+
+.container {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+            "sidebar header"
+            "sidebar content";
+    min-height: 100vh;
+}
+
+.main-content {
+    overflow-y: auto;
+    grid-area: content;
 }

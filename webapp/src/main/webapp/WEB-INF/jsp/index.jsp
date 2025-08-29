@@ -7,18 +7,19 @@
         <title></title>
     </head>
 <body>
-    <paw:banner size="l" image="${pageContext.request.contextPath}/images/arcane.jpg">
-        <paw:text type="h1">Are you ready?</paw:text>
-        <br>
-        <paw:text type="h2">Let's play.</paw:text>
-    </paw:banner>
 
-    <div class="cards-container">
-        <paw:button-card title="Become an Organizer" butText="Create a Tournament" onclick=""/>
-        <paw:button-card title="Test your habilities" butText="Join a Tournament" onclick=""/>
-    </div>
+    <paw:layout>
+        <paw:banner size="l" image="${pageContext.request.contextPath}/images/arcane.jpg">
+            <paw:text type="h1">Are you ready?</paw:text>
+            <br>
+            <paw:text type="h2">Let's play.</paw:text>
+        </paw:banner>
 
-    <paw:profileButton text="${user.username}" onclick=""/>
+        <div class="cards-container">
+            <paw:button-card title="Become an Organizer" butText="Create a Tournament" onclick=""/>
+            <paw:button-card title="Test your habilities" butText="Join a Tournament" onclick=""/>
+        </div>
+    </paw:layout>
 
 </body>
 </html>
