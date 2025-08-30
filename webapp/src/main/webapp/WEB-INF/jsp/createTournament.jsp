@@ -14,8 +14,8 @@
         <form:input type="number" path="creator_id"/>
     </div>
     <div>
-        <form:label path="game_id">Game ID: </form:label>
-        <form:input type="number" path="game_id"/>
+        <form:label path="game_id">Game: </form:label>
+        <form:select path="game_id" items="${games}" itemValue="id" itemLabel="name"/>
     </div>
     <div>
         <form:label path="region">Region: </form:label>

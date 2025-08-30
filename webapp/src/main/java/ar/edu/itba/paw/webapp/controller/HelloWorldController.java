@@ -21,6 +21,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.tags.Param;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -56,6 +57,8 @@ public class HelloWorldController {
         mav.addObject("regions", Region.values());
         mav.addObject("elos", Elo.values());
         mav.addObject("structures", Structure.values());
+        mav.addObject("games", gs.findAll()
+);
 
         return mav;
     }
@@ -63,7 +66,11 @@ public class HelloWorldController {
     @RequestMapping(value = "/tournament/create", method = { RequestMethod.POST })
     public ModelAndView createTournament(@Valid @ModelAttribute("tournamentForm") final TournamentForm form) {
 
-        final Tournament t = ts.create(form.getCreator_id(), form.getName(), form.getGame_id(),
+        Optional<Game> optionalGame = gs.findById(form.getGame_id());
+        if (!optionalGame.isPresent()){
+            return new ModelAndView("index");
+        }
+        final Tournament t = ts.create(form.getCreator_id(), form.getName(), optionalGame.get().getId(),
                 form.getRegion(), form.getElo(), form.getStart_date(), form.getEnd_date(),
                 form.getFormat(), form.getStructure(), form.getMax_participants());
         return new ModelAndView("redirect:/tournament?tournamentId=" + t.getId());
