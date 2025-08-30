@@ -7,10 +7,10 @@
     <version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>persistence</artifactId>
+  <artifactId>interfaces</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>persistence</name>
+  <name>interfaces</name>
   <!-- FIXME change it to the project's website -->
   <url>http://www.example.com</url>
 
@@ -33,32 +33,29 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>test</scope>
     </dependency>
+    <!-- Optionally: parameterized tests support -->
     <dependency>
-		<groupId>org.springframework</groupId>
-		<artifactId>spring-jdbc</artifactId>
-	</dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>interfaces</artifactId>
-      <version>${project.version}</version>
-      <scope>compile</scope>
+      <groupId>ar.edu.itba.paw</groupId>
+      <artifactId>model</artifactId>
+      <version>1.0-SNAPSHOT</version>
     </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-test</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.hsqldb</groupId>
-      <artifactId>hsqldb</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-    </dependency>
+      <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-context</artifactId>
+          <version>5.3.33</version>
+          <scope>compile</scope>
+      </dependency>
+
   </dependencies>
 
   <build>
