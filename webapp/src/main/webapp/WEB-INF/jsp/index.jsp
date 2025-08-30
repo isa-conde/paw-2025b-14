@@ -35,7 +35,7 @@
 
             <p>Contenido adicional aquí</p>
         </paw:tournament-card>
-        
+
     </div>
 
 </paw:layout>

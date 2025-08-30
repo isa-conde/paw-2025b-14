@@ -2,6 +2,7 @@
 <%@ attribute name="title" required="true" %>
 <%@ attribute name="text" required="false" %>
 <%@ attribute name="butText" required="false"%>
+<%@ attribute name="grain" required="false"%>
 <%@ attribute name="onclick" required="true" description="Onclick event handler" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -9,8 +10,9 @@
 
 <c:set var="cardText" value="${not empty text ? text : ''}"/>
 <c:set var="buttonText" value="${not empty butText ? butText : ''}"/>
+<c:set var="grain" value="${not empty butText && grain ? 'grain' : ''}"/>
 
-<div class="card">
+<div class="card ${grain}">
     <div class="card-title">
         <paw:text type="h2"><c:out value="${title}"/></paw:text>
     </div>

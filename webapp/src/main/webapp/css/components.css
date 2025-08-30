@@ -12,6 +12,18 @@ body, html {
     max-width: 100%;
 }
 
+.container {
+    margin: 50px 250px;
+}
+
+.cards-container {
+    display: flex;
+    gap: 100px;
+    justify-content: center;
+    align-items: flex-start;
+    margin: 100px 0;
+}
+
 /* ------- FONTS ------- */
 
 @font-face {
@@ -105,7 +117,6 @@ body, html {
     display: flex;
     align-items: flex-end;
     justify-content: center;
-    margin-bottom: 50px;
 }
 
 .banner.m {
@@ -114,7 +125,7 @@ body, html {
 }
 
 .banner.l {
-    height: 600px;
+    height: 550px;
     padding-bottom: 60px;
 }
 
@@ -181,14 +192,6 @@ p, span {
 }
 
 /* ------- CONTENT CARD ------- */
-
-.cards-container {
-    display: flex;
-    gap: 40px;
-    justify-content: center;
-    align-items: flex-start;
-    margin: 40px 0;
-}
 
 .card {
     background-color: var(--background-card);
