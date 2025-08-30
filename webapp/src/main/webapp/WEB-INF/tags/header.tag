@@ -3,6 +3,6 @@
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 
 <header class="header">
-    <img class="logo" src="${pageContext.request.contextPath}/images/corona.png" alt="logo"/>
+    <img class="logo" src="${pageContext.request.contextPath}/images/crown.png" alt="logo"/>
     <jsp:doBody/>
 </header>

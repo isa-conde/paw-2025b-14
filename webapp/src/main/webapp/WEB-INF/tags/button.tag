@@ -3,6 +3,7 @@
 <%@ attribute name="size" required="false" description="Button size: xs, s, m, [l]"%>
 <%@ attribute name="onclick" required="true" description="Onclick event handler" %>
 <%@ attribute name="image" required="false" description="Image URL" %>
+<%@ attribute name="fill" required="false" description="Fill: [true] or false" type="java.lang.Boolean"%>
 <%@ attribute name="disabled" required="false" description="Whether button is disabled" type="java.lang.Boolean"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
@@ -10,9 +11,10 @@
 <c:set var="hasImage" value="${not empty image ? 'true' : 'false'}" />
 <c:set var="btnSize" value="${not empty size? size : 'l'}" />
 <c:set var="isDisabled" value="${disabled == 'true'}" />
-<c:set var="btnClass" value="${hasImage? 'btn image' : 'btn'}" />
+<c:set var="imgClass" value="${hasImage? 'image' : ''}" />
+<c:set var="emptyClass" value="${fill == 'false'? 'empty' : ''}" />
 
-<button class="${btnClass}"
+<button class="btn ${imgClass} ${emptyClass}"
         onclick="${onclick}"
         <c:if test="${isDisabled}">disabled</c:if>>
     <c:if test="${hasImage}">

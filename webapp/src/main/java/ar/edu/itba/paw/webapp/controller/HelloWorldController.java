@@ -21,7 +21,7 @@ public class HelloWorldController {
 
     @RequestMapping("/")
     public ModelAndView helloWorld(@RequestParam(name = "userId", required = false, defaultValue = "1") final int userId) {
-        final ModelAndView mav = new ModelAndView("index");
+        final ModelAndView mav = new ModelAndView("tournament");
         mav.addObject("user", us.findById(userId).get());
         return mav;
     }
@@ -29,7 +29,6 @@ public class HelloWorldController {
     @RequestMapping("/create")
     public ModelAndView profile(@RequestParam("username") final String username) {
         User newUser = us.create(username);
-        final ModelAndView mav = new ModelAndView("redirect:/?userId = " + newUser.getId());
-        return mav;
+        return new ModelAndView("redirect:/?userId = " + newUser.getId());
     }
 }

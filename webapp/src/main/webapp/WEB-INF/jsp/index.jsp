@@ -1,40 +1,40 @@
 <%@ taglib prefix="c"   uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 
-<html>
-    <head>
-        <link rel="stylesheet" href="<c:url value='/css/components.css'/>">
-        <title></title>
-    </head>
-<body>
-
-    <paw:layout>
-        <paw:banner size="l" image="${pageContext.request.contextPath}/images/arcane.jpg">
-            <paw:text type="h1">Are you ready?</paw:text>
-            <br>
-            <paw:text type="h2">Let's play.</paw:text>
-        </paw:banner>
-
-    <div class="container">
+<paw:layout>
+    <paw:banner size="l" image="${pageContext.request.contextPath}/images/arcane.jpg">
+        <paw:text type="title" size="xl">Are you ready?</paw:text>
+        <br>
+        <paw:text type="title" size="l">Let's play.</paw:text>
+    </paw:banner>
+    <div class="content-container">
         <div class="cards-container">
-            <paw:button-card title="Become an Organizer" butText="Create a Tournament" onclick=""/>
-            <paw:button-card title="Test your habilities" butText="Join a Tournament" onclick=""/>
+            <paw:button-card title="Become an Organizer" butText="Create a Tournament" onclick="" texture="true"/>
+            <paw:button-card title="Test your habilities" butText="Join a Tournament" onclick="" texture="true"/>
+        </div>
+        <c:set var="tournamentList" value="${[1,2,3,4,5,6,7]}"/>
+
+        <div class="content-title">
+            <paw:text type="title" size="l">Games</paw:text>
+        </div>
+        <paw:carrousel id="10" elements="${tournamentList}"/>
+
+        <div class="content-title">
+            <paw:text type="title" size="l">Open Tournaments</paw:text>
         </div>
 
-        <paw:text type="h2">Open Tournaments</paw:text>
-        <paw:text type="h4">League of Legends</paw:text>
+        <div class="carrousel-title">
+            <paw:text type="title" size="s">League of Legends</paw:text>
+        </div>
+        <paw:carrousel id="0" elements="${tournamentList}"/>
+        <div class="carrousel-title">
+            <paw:text type="title" size="s">League of Legends</paw:text>
+        </div>
+        <paw:carrousel id="1" elements="${tournamentList}"/>
+        <div class="carrousel-title">
+            <paw:text type="title" size="s">League of Legends</paw:text>
+        </div>
+        <paw:carrousel id="2" elements="${tournamentList}"/>
 
-        <paw:profileButton text="${user.username}" onclick=""/>
-
-        <paw:tournament-card
-                image="/images/tournament.jpg"
-                title="Torneo Anual"
-                subtitle="Edición 2025"
-                tags="${['Fútbol','Juveniles','Verano']}">
-
-            <p>Contenido adicional aquí</p>
-        </paw:tournament-card>
     </div>
-</body>
-</html>
-
+</paw:layout>
