@@ -330,3 +330,40 @@ p, span {
     overflow-y: auto;
     grid-area: content;
 }
+
+/* ------- MODAL ------- */
+
+dialog::backdrop {
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(3px);
+}
+
+dialog:not([open]) {
+    display: none;
+}
+
+.modal {
+    display: flex;
+    flex-direction: column;
+    border-width: 3px;
+    border-radius: 15px;
+    border-color: var(--primary-details);
+    background-color: var(--background-card);
+    padding: 15px;
+    width: 45%;
+}
+
+.modal .row {
+    display: flex;
+    justify-content: space-between;
+    background-color: transparent;
+}
+
+/* ------- ICON BUTTON ------- */
+
+.icon-btn {
+    border-radius: 15px;
+    border: none;
+    cursor: pointer;
+    background-color: transparent;
+}

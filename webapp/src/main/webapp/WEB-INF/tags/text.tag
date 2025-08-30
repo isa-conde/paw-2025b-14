@@ -38,12 +38,12 @@
             <jsp:doBody/>
         </h3>
     </c:when>
-    <c:when test="${textType == 'h3'}">
+    <c:when test="${textType == 'h4'}">
         <h4 class="title" style="font-size: var(--text-24);">
             <jsp:doBody/>
         </h4>
     </c:when>
-    <c:when test="${textType == 'h3'}">
+    <c:when test="${textType == 'h5'}">
         <h5 class="title" style="font-size: var(--text-20);">
             <jsp:doBody/>
         </h5>
