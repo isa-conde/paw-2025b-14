@@ -10,10 +10,6 @@
   <artifactId>webapp</artifactId>
   <packaging>war</packaging>
 
-  <build>
-    <finalName>ROOT</finalName>
-  </build>
-
   <dependencies>
     <dependency>
       <groupId>org.springframework</groupId>

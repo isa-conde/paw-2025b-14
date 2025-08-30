@@ -18,15 +18,13 @@ public class GameForm {
     public String getName() {
         return name;
     }
-
-    public Genre getGenre() {
-        return genre;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
 
+    public Genre getGenre() {
+        return genre;
+    }
     public void setGenre(Genre genre) {
         this.genre = genre;
     }
