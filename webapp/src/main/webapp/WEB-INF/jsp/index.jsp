@@ -11,15 +11,33 @@
         <paw:text type="h2">Let's play.</paw:text>
     </paw:banner>
 
-    <div class="cards-container">
-        <paw:button-card title="Become an Organizer" butText="Create a Tournament" onclick="openModal()"/>
-        <paw:modal title="Create a Tournament">
+    <div class="container">
+        <div class="cards-container">
+            <paw:button-card title="Become an Organizer" butText="Create a Tournament" onclick="openModal()"/>
+            <paw:modal title="Create a Tournament">
                 <form:form>
                 </form:form>
-        </paw:modal>
+            </paw:modal>
 
-        <paw:button-card title="Test your habilities" butText="Join a Tournament" onclick=""/>
+            <paw:button-card title="Test your habilities" butText="Join a Tournament" onclick=""/>
+        </div>
+
+        <paw:text type="h2">Open Tournaments</paw:text>
+        <paw:text type="h4">League of Legends</paw:text>
+
+        <paw:profileButton text="${user.username}" onclick=""/>
+
+        <paw:tournament-card
+                image="/images/tournament.jpg"
+                title="Torneo Anual"
+                subtitle="Edición 2025"
+                tags="${['Fútbol','Juveniles','Verano']}">
+
+            <p>Contenido adicional aquí</p>
+        </paw:tournament-card>
+        
     </div>
+
 </paw:layout>
 
 <script src="${pageContext.request.contextPath}/js/modal.js"></script>
