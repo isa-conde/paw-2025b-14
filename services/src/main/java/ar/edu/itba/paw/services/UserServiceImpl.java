@@ -18,12 +18,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> findById(long id) {
-        return Optional.of(new User(id, "PAW"));
+        return userDao.findById(id);
     }
 
     @Override
-    public User create(String username) {
-        return userDao.create(username);
+    public User create(String username, String email) {
+        return userDao.create(username, email);
     }
 
 }

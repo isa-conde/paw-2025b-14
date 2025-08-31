@@ -39,13 +39,13 @@ public class HelloWorldController {
     @RequestMapping("/")
     public ModelAndView helloWorld(@RequestParam(name = "userId", required = false, defaultValue = "1") final int userId) {
         final ModelAndView mav = new ModelAndView("index");
-        mav.addObject("user", us.findById(userId).get());
+        mav.addObject("user", us.findById(userId).isPresent() ? us.findById(userId).get() : null);
         return mav;
     }
 
     @RequestMapping("/create")
     public ModelAndView profile(@RequestParam("username") final String username) {
-        User newUser = us.create(username);
+        User newUser = us.create(username, username + "@email.com");
         return new ModelAndView("redirect:/?userId = " + newUser.getId());
     }
 

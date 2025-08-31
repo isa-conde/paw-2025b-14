@@ -1,8 +1,8 @@
 <%@ taglib prefix="c"   uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
-
-<paw:layout>
+    
+<paw:layout user="${user != null ? user : null}">
     <paw:banner size="l" image="${pageContext.request.contextPath}/images/arcane.jpg">
         <paw:text type="title" size="xl">Are you ready?</paw:text>
         <br>
