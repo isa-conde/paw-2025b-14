@@ -34,6 +34,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Value("classpath:db/initdb/schema.sql")
     private Resource schemaSql;
 
+    @Bean
     public MessageSource messageSource() {
     	final ReloadableResourceBundleMessageSource messageSource = new
     	ReloadableResourceBundleMessageSource();

@@ -4,14 +4,16 @@ import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 import org.springframework.format.annotation.DateTimeFormat;
-
 import java.time.LocalDate;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 
 
 public class TournamentForm {
 
     // FALTA AGREGAR VALIDACION Y CONSTRAINTS
     private Long creator_id;
+    @Size(min = 6, max = 100)
     private String name;
     private Long game_id;
     private Region region;
@@ -20,8 +22,10 @@ public class TournamentForm {
     private LocalDate start_date;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate end_date;
+    @Size(max = 255)
     private String format;
     private Structure structure;
+    @Min(value = 2)
     private Integer max_participants;
 
     public Long getCreator_id() {
