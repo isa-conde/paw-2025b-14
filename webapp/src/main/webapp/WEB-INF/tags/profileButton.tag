@@ -3,6 +3,7 @@
 <%@ attribute name="size" required="false" description="Button size: xs, s, [m], l"%>
 <%@ attribute name="onclick" required="true" description="Onclick event handler" %>
 <%@ attribute name="image" required="false" description="Image URL" %>
+<%@ attribute name="fill" required="false" description="Fill: [true] or false" type="java.lang.Boolean"%>
 <%@ attribute name="disabled" required="false" description="Whether button is disabled" type="java.lang.Boolean"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
@@ -23,4 +24,5 @@
         image="${btnImg}"
         disabled="${disabled}"
         size="${btnSize}"
+        fill="${fill}"
 />

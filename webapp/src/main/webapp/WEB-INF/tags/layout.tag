@@ -10,10 +10,10 @@
     </head>
     <body>
         <div class="container">
-            <paw:header>
-                <paw:profileButton text="${user.username}" onclick=""/>
-            </paw:header>
             <paw:sidebar/>
+            <paw:header>
+                <paw:profileButton text="${user.username}" onclick="" disabled="true"/>
+            </paw:header>
             <main class="main-content">
                 <jsp:doBody/>
             </main>
