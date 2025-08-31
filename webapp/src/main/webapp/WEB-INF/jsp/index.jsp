@@ -10,7 +10,32 @@
     </paw:banner>
     <div class="content-container">
         <div class="cards-container">
-            <paw:button-card title="Become an Organizer" butText="Create a Tournament" onclick="" texture="true"/>
+            <paw:button-card title="Become an Organizer" butText="Create a Tournament" onclick="openModal()" texture="true"/>
+            <paw:modal title="Create a Tournament">
+                <form:form cssClass="form">
+                    <div class="row">
+                        <paw:input path="name" label="Tournament Name"/>
+                    </div>
+                    <div class="row">
+                        <paw:input path="game" label="Game" containerType="half" inputType="select"/>
+                        <paw:input path="region" label="Region" containerType="half" inputType="select"/>
+                    </div>
+                    <div class="row">
+                        <paw:input path="startDate" label="Start Date" containerType="half" inputType="date"/>
+                        <paw:input path="endDate" label="End Date" containerType="half" inputType="date"/>
+                    </div>
+                    <div class="row">
+                        <paw:input path="format" label="Format" containerType="half" inputType="select"/>
+                        <paw:input path="elo" label="Skill level" containerType="half" inputType="select"/>
+                    </div>
+                    <div class="row center">
+                        <paw:input path="maxParticipants" label="Max Participants" containerType="half" inputType="number"/>
+                    </div>
+                    <div class="row center">
+                        <paw:input path="" label="Create" containerType="half" inputType="submit"/>
+                    </div>
+                </form:form>
+            </paw:modal>
             <paw:button-card title="Test your habilities" butText="Join a Tournament" onclick="" texture="true"/>
         </div>
         <c:set var="tournamentList" value="${[1,2,3,4,5,6,7]}"/>
@@ -39,3 +64,5 @@
 
     </div>
 </paw:layout>
+
+<script src="${pageContext.request.contextPath}/js/modal.js"></script>

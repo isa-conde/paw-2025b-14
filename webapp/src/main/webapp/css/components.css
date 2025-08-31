@@ -178,6 +178,7 @@ body, html {
 .title {
     font-family: var(--font-titles), serif;
     margin: 10px 0;
+    color: var(--primary-text);
 }
 
 .title.xl {

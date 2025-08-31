@@ -4,7 +4,7 @@
 
 <dialog class="modal">
     <div class="header">
-        <paw:text type="h3"><c:out value="${title}"/></paw:text>
+        <paw:text type="title" ><c:out value="${title}"/></paw:text>
         <paw:iconButton icon="${pageContext.request.contextPath}/images/close.png" onclick="closeModal()"/>
     </div>
     <jsp:doBody/>
