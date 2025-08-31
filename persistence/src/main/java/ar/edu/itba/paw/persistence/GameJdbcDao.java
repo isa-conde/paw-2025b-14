@@ -7,10 +7,13 @@ import ar.edu.itba.paw.model.enums.Genre;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.sql.Types;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,13 +58,12 @@ public class GameJdbcDao implements GameDao {
 
     @Override
     public Game create(String name, Genre genre) {
-        final String sql = "INSERT INTO game (name, genre) VALUES (?, ?::genre_enum) RETURNING id";
-        Long id = jdbcTemplate.queryForObject(
-                sql,
-                new Object[]{name, genre.name()},
-                Long.class
-        );
-        return new Game(id, name, genre);
+        SqlParameterSource values = new MapSqlParameterSource()
+                .addValue("name", name)
+                .addValue("genre", genre.name(), Types.OTHER);
+
+        Number key = jdbcInsert.executeAndReturnKey(values);
+        return new Game(key.longValue(), name, genre);
     }
 
 }
