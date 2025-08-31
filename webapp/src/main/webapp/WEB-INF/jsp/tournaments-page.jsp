@@ -1,7 +1,7 @@
 <%@ taglib prefix="c"   uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 
-<paw:layout>
+<paw:layout user="${user}">
   <div class="content-container">
     <div class="cards-container">
       <paw:text type="title" size="xl">Tournaments</paw:text>
@@ -10,40 +10,37 @@
     <!-- FILTROS -->
     <paw:filter-pills/>
     
-    <c:set var="tournamentList" value="${[1,2,3,4,5,6,7,8,9]}"/>
-    
     <!-- Variable para simular filtros activos (en producción vendría del backend) -->
-    <c:set var="hasActiveFilters" value="${false}"/>
+    <c:set var="hasActiveFilters" value="${true}"/>
 
     <!-- GRID DE TORNEOS (solo si hay filtros activos) -->
     <c:if test="${hasActiveFilters}">
       <div class="tournaments-grid">
-        <c:forEach var="i" items="${tournamentList}">
+        <c:forEach var="tournament" items="${tournamentsGame1}">
           <paw:element-card
                   image="${pageContext.request.contextPath}/images/lol.jpg"
-                  title="Torneo ${i}"
-                  subtitle="Edición ${i}.0"
-                  game="League of Legends"/>
+                  title="${tournament.name}"
+                  subtitle="Format: ${tournament.format}"
+                  game="${game1.name}"/>
         </c:forEach>
       </div>
     </c:if>
 
     <!-- CARROUSELES (solo si NO hay filtros activos) -->
     <c:if test="${!hasActiveFilters}">
-      <div class="carrousel-title">
-        <paw:text type="title" size="s">League of Legends</paw:text>
-      </div>
-      <paw:carrousel id="lol-tournaments" elements="${tournamentList}"/>
+      <c:if test="${not empty game1}">
+        <div class="carrousel-title">
+          <paw:text type="title" size="s">${game1.name}</paw:text>
+        </div>
+        <paw:carrousel id="game1-tournaments" elements="${tournamentsGame1}"/>
+      </c:if>
       
-      <div class="carrousel-title">
-        <paw:text type="title" size="s">Valorant</paw:text>
-      </div>
-      <paw:carrousel id="valorant-tournaments" elements="${tournamentList}"/>
-      
-      <div class="carrousel-title">
-        <paw:text type="title" size="s">CS:GO</paw:text>
-      </div>
-      <paw:carrousel id="csgo-tournaments" elements="${tournamentList}"/>
+      <c:if test="${not empty game2}">
+        <div class="carrousel-title">
+          <paw:text type="title" size="s">${game2.name}</paw:text>
+        </div>
+        <paw:carrousel id="game2-tournaments" elements="${tournamentsGame2}"/>
+      </c:if>
     </c:if>
   </div>
 </paw:layout>

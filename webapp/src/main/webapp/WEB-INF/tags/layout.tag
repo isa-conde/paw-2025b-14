@@ -13,7 +13,14 @@
         <div class="container">
             <paw:sidebar/>
             <paw:header>
-                <paw:profileButton text="${isLoggedIn ? user.username : 'Log in'}" onclick="" disabled="true"/>
+                <c:choose>
+                    <c:when test="${isLoggedIn}">
+                        <paw:profileButton text="${user.username}" onclick="" disabled="true"/>
+                    </c:when>
+                    <c:otherwise>
+                        <paw:button text="Log in" size="m" onclick=""/>
+                    </c:otherwise>
+                </c:choose>
             </paw:header>
             <main class="main-content">
                 <jsp:doBody/>

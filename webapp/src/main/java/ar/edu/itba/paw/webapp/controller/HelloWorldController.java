@@ -11,6 +11,7 @@ import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Genre;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
+import ar.edu.itba.paw.model.filters.TournamentFilter;
 import ar.edu.itba.paw.webapp.form.GameForm;
 import ar.edu.itba.paw.webapp.form.TournamentForm;
 import org.springframework.stereotype.Controller;
@@ -40,6 +41,23 @@ public class HelloWorldController {
     public ModelAndView helloWorld(@RequestParam(name = "userId", required = false, defaultValue = "1") final int userId) {
         final ModelAndView mav = new ModelAndView("index");
         mav.addObject("user", us.findById(userId).isPresent() ? us.findById(userId).get() : null);
+        
+        List<Game> allGames = gs.findAll();
+        mav.addObject("games", allGames);
+
+        TournamentFilter tf1 = new TournamentFilter();
+        TournamentFilter tf2 = new TournamentFilter();
+        tf1.setGame_id(allGames.getFirst().getId());
+        tf2.setGame_id(allGames.getLast().getId());
+
+        List<Tournament> tournamentsGame1 = ts.findTournaments(tf1);
+        List<Tournament> tournamentsGame2 = ts.findTournaments(tf2);
+        
+        mav.addObject("tournamentsGame1", tournamentsGame1);
+        mav.addObject("tournamentsGame2", tournamentsGame2);
+        mav.addObject("game1", allGames.get(0));
+        mav.addObject("game2", allGames.get(1));
+
         return mav;
     }
 
@@ -109,6 +127,30 @@ public class HelloWorldController {
         } else {
             return new ModelAndView("index");
         }
+        return mav;
+    }
+
+    @RequestMapping("/tournaments-page")
+    public ModelAndView tournamentsPage(@RequestParam(name = "userId", required = false, defaultValue = "1") final int userId) {
+        final ModelAndView mav = new ModelAndView("tournaments-page");
+        mav.addObject("user", us.findById(userId).isPresent() ? us.findById(userId).get() : null);
+        
+        List<Game> allGames = gs.findAll();
+        mav.addObject("games", allGames);
+        
+        TournamentFilter tf1 = new TournamentFilter();
+        TournamentFilter tf2 = new TournamentFilter();
+        tf1.setGame_id(allGames.getFirst().getId());
+        tf2.setGame_id(allGames.getLast().getId());
+
+        List<Tournament> tournamentsGame1 = ts.findTournaments(tf1);
+        List<Tournament> tournamentsGame2 = ts.findTournaments(tf2);
+        
+        mav.addObject("tournamentsGame1", tournamentsGame1);
+        mav.addObject("tournamentsGame2", tournamentsGame2);
+        mav.addObject("game1", allGames.get(0));
+        mav.addObject("game2", allGames.get(1));
+        
         return mav;
     }
 

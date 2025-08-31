@@ -67,7 +67,7 @@ body, html {
     justify-content: center;
     background-color: var(--primary-button);
     color: var(--primary-text);
-    padding: 16px 30px;
+    padding: 8px 30px;
 }
 
 .btn:hover:not(:disabled) {
@@ -212,6 +212,7 @@ body, html {
 
 .main-text.l {
     font-size: var(--text-24);
+    padding: 8px 0;
 }
 
 .main-text.m {

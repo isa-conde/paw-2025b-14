@@ -37,31 +37,30 @@
                     </div>
                 </form:form>
             </paw:modal>
-            <paw:button-card title="Test your habilities" butText="Join a Tournament" onclick="" texture="true"/>
+            <paw:button-card title="Test your habilities" butText="Join a Tournament" onclick="window.location.href='${pageContext.request.contextPath}/tournaments-page'" texture="true"/>
         </div>
-        <c:set var="tournamentList" value="${[1,2,3,4,5,6,7]}"/>
-
         <div class="content-title">
             <paw:text type="title" size="l"><spring:message code="games"/></paw:text>
         </div>
-        <paw:carrousel id="10" elements="${tournamentList}"/>
+        <paw:carrousel id="game-list" elements="${games}" noFormat="true"/>
 
         <div class="content-title">
             <paw:text type="title" size="l"><spring:message code="tournaments"/></paw:text>
         </div>
 
-        <div class="carrousel-title">
-            <paw:text type="title" size="s">League of Legends</paw:text>
-        </div>
-        <paw:carrousel id="0" elements="${tournamentList}"/>
-        <div class="carrousel-title">
-            <paw:text type="title" size="s">League of Legends</paw:text>
-        </div>
-        <paw:carrousel id="1" elements="${tournamentList}"/>
-        <div class="carrousel-title">
-            <paw:text type="title" size="s">League of Legends</paw:text>
-        </div>
-        <paw:carrousel id="2" elements="${tournamentList}"/>
+        <c:if test="${not empty game1}">
+            <div class="carrousel-title">
+                <paw:text type="title" size="s">${game1.name}</paw:text>
+            </div>
+            <paw:carrousel id="game1-tournaments" elements="${tournamentsGame1}"/>
+        </c:if>
+        
+        <c:if test="${not empty game2}">
+            <div class="carrousel-title">
+                <paw:text type="title" size="s">${game2.name}</paw:text>
+            </div>
+            <paw:carrousel id="game2-tournaments" elements="${tournamentsGame2}"/>
+        </c:if>
 
     </div>
 </paw:layout>
