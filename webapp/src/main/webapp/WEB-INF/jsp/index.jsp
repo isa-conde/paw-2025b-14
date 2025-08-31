@@ -13,13 +13,13 @@
         <div class="cards-container">
             <paw:button-card title="Become an Organizer" butText="Create a Tournament" onclick="openModal()" texture="true"/>
             <paw:modal title="Create a Tournament">
-                <form:form cssClass="form">
+                <form:form cssClass="form" modelAttribute="tournamentForm">
                     <div class="row">
                         <paw:input path="name" label="Tournament Name"/>
                     </div>
                     <div class="row">
-                        <paw:input path="game" label="Game" containerType="half" inputType="select"/>
-                        <paw:input path="region" label="Region" containerType="half" inputType="select"/>
+                        <paw:input path="game_id" label="Game" containerType="half" inputType="select" items="${games}" itemValue="id" itemLabel="name"/>
+                        <paw:input path="region" label="Region" containerType="half" inputType="select" items="${regions}"/>
                     </div>
                     <div class="row">
                         <paw:input path="startDate" label="Start Date" containerType="half" inputType="date"/>
@@ -27,10 +27,11 @@
                     </div>
                     <div class="row">
                         <paw:input path="format" label="Format" containerType="half" inputType="select"/>
-                        <paw:input path="elo" label="Skill level" containerType="half" inputType="select"/>
+                        <paw:input path="elo" label="Skill level" containerType="half" inputType="select" items="${elos}"/>
                     </div>
                     <div class="row center">
                         <paw:input path="maxParticipants" label="Max Participants" containerType="half" inputType="number"/>
+                        <paw:input path="structure" label="Structure" items="${structures}" inputType="select"/>
                     </div>
                     <div class="row center">
                         <paw:input path="" label="Create" containerType="half" inputType="submit"/>

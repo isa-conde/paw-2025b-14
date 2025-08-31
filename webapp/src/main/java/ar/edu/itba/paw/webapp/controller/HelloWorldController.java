@@ -20,7 +20,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Controller
@@ -37,9 +40,13 @@ public class HelloWorldController {
     }
 
     @RequestMapping("/")
-    public ModelAndView helloWorld(@RequestParam(name = "userId", required = false, defaultValue = "1") final int userId) {
+    public ModelAndView helloWorld(@RequestParam(name = "userId", required = false, defaultValue = "1") final int userId, @ModelAttribute("tournamentForm") final TournamentForm form) {
         final ModelAndView mav = new ModelAndView("index");
         mav.addObject("user", us.findById(userId).isPresent() ? us.findById(userId).get() : null);
+        mav.addObject("games", gs.findAll());
+        mav.addObject("regions", Arrays.stream(Region.values()).toList());
+        mav.addObject("elos", Arrays.stream(Elo.values()).toList());
+        mav.addObject("structures", Arrays.stream(Structure.values()).toList());
         return mav;
     }
 
@@ -55,8 +62,7 @@ public class HelloWorldController {
         mav.addObject("regions", Region.values());
         mav.addObject("elos", Elo.values());
         mav.addObject("structures", Structure.values());
-        mav.addObject("games", gs.findAll()
-);
+        mav.addObject("games", gs.findAll());
 
         return mav;
     }
@@ -102,10 +108,17 @@ public class HelloWorldController {
 
     @RequestMapping("/tournament")
     public ModelAndView tournamentPage(@RequestParam("tournamentId") final long tournamentId){
-        final ModelAndView mav = new ModelAndView("tournamentPage");
+        final ModelAndView mav = new ModelAndView("tournament");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM-dd-yyyy", Locale.ENGLISH);
         Optional<Tournament> optionalTournament = ts.findById(tournamentId);
         if(optionalTournament.isPresent()) {
-            mav.addObject("tournament", optionalTournament.get());
+            Tournament tournament = optionalTournament.get();
+            Optional<Game> optionalGame = gs.findById(tournament.getGame_id());
+            Optional<User> optionalUser = us.findById(tournament.getCreator_id());
+            mav.addObject("tournament", tournament);
+            mav.addObject("game", optionalGame.get());
+            mav.addObject("creator", optionalUser.get());
+            mav.addObject("formatter", formatter);
         } else {
             return new ModelAndView("index");
         }

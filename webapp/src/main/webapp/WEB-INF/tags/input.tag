@@ -6,6 +6,9 @@
 <%@ attribute name="label" required="true"%>
 <%@ attribute name="containerType" required="false"%>
 <%@ attribute name="inputType" required="false"%>
+<%@ attribute name="items" type="java.util.List" required="false"%>
+<%@ attribute name="itemValue" required="false"%>
+<%@ attribute name="itemLabel" required="false"%>
 
 <c:choose>
     <c:when test="${inputType != 'submit'}">
@@ -16,9 +19,14 @@
                     <input class="input"/>
                 </c:when>
                 <c:when test="${inputType == 'select'}">
-                    <select class="input">
-                        <jsp:doBody/>
-                    </select>
+                    <c:choose>
+                        <c:when test="${itemLabel != null && itemValue != null}">
+                            <form:select path="${path}" items="${items}" itemLabel="${itemLabel}" itemValue="${itemValue}" cssClass="input"/>
+                        </c:when>
+                        <c:otherwise>
+                            <form:select path="${path}" items="${items}" cssClass="input"/>
+                        </c:otherwise>
+                    </c:choose>
                 </c:when>
                 <c:when test="${inputType == 'date'}">
                     <input type="date" class="input"/>
