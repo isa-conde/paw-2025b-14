@@ -11,8 +11,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.tags.Param;
 
 import javax.validation.Valid;
 import java.util.Optional;
@@ -38,8 +39,7 @@ public class HelloWorldController {
     @RequestMapping("/create")
     public ModelAndView profile(@RequestParam("username") final String username) {
         User newUser = us.create(username);
-        final ModelAndView mav = new ModelAndView("redirect:/?userId = " + newUser.getId());
-        return mav;
+        return new ModelAndView("redirect:/?userId = " + newUser.getId());
     }
 
     @RequestMapping(value = "/game/create", method = { RequestMethod.POST })
