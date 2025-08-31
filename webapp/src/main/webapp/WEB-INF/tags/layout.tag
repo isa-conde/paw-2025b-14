@@ -13,7 +13,15 @@
         <div class="container">
             <paw:sidebar/>
             <paw:header>
-                <paw:profileButton text="${isLoggedIn ? user.username : 'Log in'}" onclick="" disabled="true"/>
+                <c:if test="${isLoggedIn}">
+                    <paw:profileButton text="${user.username}" onclick=""/>
+                </c:if>
+                <c:if test="${!isLoggedIn}">
+                    <div>
+                        <paw:button text="Log in" onclick="openModal('loginModal')"/>
+                        <paw:button text="Register" onclick="openModal('registerModal')"/>
+                    </div>
+                </c:if>
             </paw:header>
             <main class="main-content">
                 <jsp:doBody/>
@@ -21,3 +29,5 @@
         </div>
     </body>
 </html>
+
+<script src="${pageContext.request.contextPath}/js/modal.js"></script>

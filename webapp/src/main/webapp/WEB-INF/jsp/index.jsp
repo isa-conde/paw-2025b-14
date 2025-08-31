@@ -3,6 +3,38 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
     
 <paw:layout user="${user != null ? user : null}">
+
+    <c:url value="/login" var="userLoginPath"/>
+    <c:url value="/register" var="userRegisterPath"/>
+
+    <paw:modal id="loginModal" title="Log in">
+        <form:form cssClass="form" modelAttribute="loginForm" action="${userLoginPath}" method="post">
+            <div class="row">
+                <paw:input path="username" label="Username"/>
+            </div>
+            <div class="row">
+                <paw:input path="email" label="Email" inputType="email"/>
+            </div>
+            <div class="row center">
+                <paw:input path="" label="Log in" containerType="half" inputType="submit"/>
+            </div>
+        </form:form>
+    </paw:modal>
+
+    <paw:modal id="registerModal" title="Register">
+        <form:form cssClass="form" modelAttribute="registerForm" action="${userRegisterPath}" method="post">
+            <div class="row">
+                <paw:input path="username" label="Username"/>
+            </div>
+            <div class="row">
+                <paw:input path="email" label="Email" inputType="email"/>
+            </div>
+            <div class="row center">
+                <paw:input path="" label="Register" containerType="half" inputType="submit"/>
+            </div>
+        </form:form>
+    </paw:modal>
+
     <paw:banner size="l" image="${pageContext.request.contextPath}/images/arcane.jpg">
         <paw:text type="title" size="xl">Are you ready?</paw:text>
         <br>
@@ -10,8 +42,8 @@
     </paw:banner>
     <div class="content-container">
         <div class="cards-container">
-            <paw:button-card title="Become an Organizer" butText="Create a Tournament" onclick="openModal()" texture="true"/>
-            <paw:modal title="Create a Tournament">
+            <paw:button-card title="Become an Organizer" butText="Create a Tournament" onclick="openModal('createTournamentModal')" texture="true"/>
+            <paw:modal id="createTournamentModal" title="Create a Tournament">
                 <form:form cssClass="form">
                     <div class="row">
                         <paw:input path="name" label="Tournament Name"/>

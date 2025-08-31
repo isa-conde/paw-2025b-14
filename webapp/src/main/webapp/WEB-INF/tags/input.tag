@@ -9,25 +9,28 @@
 
 <c:choose>
     <c:when test="${inputType != 'submit'}">
-        <label class="input-label ${containerType == 'half' ? 'half-input-container' : 'input-container'}">
+        <form:label path="${path}" class="input-label ${containerType == 'half' ? 'half-input-container' : 'input-container'}">
             <paw:text weight="3" size="l"><c:out value="${label}"/></paw:text>
             <c:choose>
                 <c:when test="${inputType == 'input' || inputType == null}">
-                    <input class="input"/>
+                    <form:input path="${path}" class="input"/>
                 </c:when>
                 <c:when test="${inputType == 'select'}">
-                    <select class="input">
+                    <form:select path="${path}" class="input">
                         <jsp:doBody/>
-                    </select>
+                    </form:select>
                 </c:when>
                 <c:when test="${inputType == 'date'}">
-                    <input type="date" class="input"/>
+                    <form:input path="${path}" type="date" class="input"/>
                 </c:when>
                 <c:when test="${inputType == 'number'}">
-                    <input type="number" class="input"/>
+                    <form:input path="${path}" type="number" class="input"/>
+                </c:when>
+                <c:when test="${inputType == 'email'}">
+                    <form:input path="${path}" type="email" class="input"/>
                 </c:when>
             </c:choose>
-        </label>
+        </form:label>
     </c:when>
     <c:otherwise>
         <input type="submit" class="btn submit" value="${label}"/>

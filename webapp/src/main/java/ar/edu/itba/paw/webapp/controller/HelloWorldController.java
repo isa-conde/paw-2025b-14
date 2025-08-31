@@ -13,12 +13,14 @@ import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.webapp.form.GameForm;
 import ar.edu.itba.paw.webapp.form.TournamentForm;
+import ar.edu.itba.paw.webapp.form.UserForm;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +32,12 @@ public class HelloWorldController {
     private final GameService gs;
     private final TournamentService ts;
 
+    @ModelAttribute("loginForm")
+    public UserForm loginForm() { return new UserForm(); }
+
+    @ModelAttribute("registerForm")
+    public UserForm registerForm() { return new UserForm(); }
+
     public HelloWorldController(final UserService us, final GameService gs, final TournamentService ts) {
         this.us = us;
         this.gs = gs;
@@ -37,10 +45,34 @@ public class HelloWorldController {
     }
 
     @RequestMapping("/")
-    public ModelAndView helloWorld(@RequestParam(name = "userId", required = false, defaultValue = "1") final int userId) {
+    public ModelAndView index(HttpServletRequest request, @ModelAttribute("loginForm") UserForm loginForm, @ModelAttribute("registerForm") UserForm registerForm) {
         final ModelAndView mav = new ModelAndView("index");
-        mav.addObject("user", us.findById(userId).isPresent() ? us.findById(userId).get() : null);
+        User user = (User) request.getSession().getAttribute("user");
+        mav.addObject("user", user);
+        mav.addObject("loginForm", loginForm);
+        mav.addObject("registerForm", registerForm);
+        List<Game> games = gs.findAll();
         return mav;
+    }
+
+    @PostMapping("/register")
+    public ModelAndView register(@Valid @ModelAttribute("registerForm") UserForm form, HttpServletRequest request) {
+        User user = us.create(form.getUsername(), form.getEmail());
+        request.getSession().setAttribute("user", user);
+        return new ModelAndView("redirect:/?userId=" + user.getId());
+    }
+
+    @PostMapping("/login")
+    public ModelAndView login(@Valid @ModelAttribute("loginForm") UserForm form, HttpServletRequest request) {
+        Optional<User> user = us.authenticate(form.getUsername(), form.getEmail());
+        if (user.isPresent()) {
+            request.getSession().setAttribute("user", user.get());
+            return new ModelAndView("redirect:/?userId=" + user.get().getId());
+        } else {
+            ModelAndView mav = new ModelAndView("index");
+            mav.addObject("loginError", "Invalid credentials");
+            return mav;
+        }
     }
 
     @RequestMapping("/create")
