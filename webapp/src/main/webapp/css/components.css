@@ -12,10 +12,6 @@ body, html {
     max-width: 100%;
 }
 
-.container {
-    margin: 50px 250px;
-}
-
 .cards-container {
     display: flex;
     gap: 100px;
@@ -353,13 +349,23 @@ dialog:not([open]) {
     border-color: var(--primary-details);
     background-color: var(--background-card);
     padding: 15px;
-    width: 45%;
+    width: 35%;
+}
+
+.modal .header {
+    display: flex;
+    justify-content: space-between;
+    background-color: transparent;
+    padding: 15px;
 }
 
 .modal .row {
     display: flex;
-    justify-content: space-between;
-    background-color: transparent;
+    gap: 40px;
+}
+
+.modal .center {
+    justify-content: center;
 }
 
 /* ------- ICON BUTTON ------- */
@@ -369,4 +375,52 @@ dialog:not([open]) {
     border: none;
     cursor: pointer;
     background-color: transparent;
+}
+
+/* ------- FORM ------- */
+
+.form {
+    margin: 0 10px 10px 10px;
+}
+
+.submit {
+    margin-top: 20px;
+    padding: 15px 30px;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+/* ------- INPUT ------- */
+
+.input-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.half-input-container {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+}
+
+.input {
+    background-color: var(--background-secondary);
+    border: 2px solid var(--secondary-details);
+    border-radius: 12px;
+    color: var(--primary-text);
+    font-family: var(--font-main), serif;
+    font-size: 20px;
+    padding: 10px;
+}
+
+.input-label {
+    font-size: 8px;
+    color: var(--primary-text);
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
 }

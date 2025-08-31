@@ -11,32 +11,36 @@
         <paw:text type="h2">Let's play.</paw:text>
     </paw:banner>
 
-    <div class="container">
         <div class="cards-container">
             <paw:button-card title="Become an Organizer" butText="Create a Tournament" onclick="openModal()"/>
             <paw:modal title="Create a Tournament">
-                <form:form>
+                <form:form cssClass="form">
+                    <div class="row">
+                        <paw:input path="name" label="Tournament Name"/>
+                    </div>
+                    <div class="row">
+                        <paw:input path="game" label="Game" containerType="half" inputType="select"/>
+                        <paw:input path="region" label="Region" containerType="half" inputType="select"/>
+                    </div>
+                    <div class="row">
+                        <paw:input path="startDate" label="Start Date" containerType="half" inputType="date"/>
+                        <paw:input path="endDate" label="End Date" containerType="half" inputType="date"/>
+                    </div>
+                    <div class="row">
+                        <paw:input path="format" label="Format" containerType="half" inputType="select"/>
+                        <paw:input path="elo" label="Skill level" containerType="half" inputType="select"/>
+                    </div>
+                    <div class="row center">
+                        <paw:input path="maxParticipants" label="Max Participants" containerType="half" inputType="number"/>
+                    </div>
+                    <div class="row center">
+                        <paw:input path="" label="Create" containerType="half" inputType="submit"/>
+                    </div>
                 </form:form>
             </paw:modal>
 
-            <paw:button-card title="Test your habilities" butText="Join a Tournament" onclick=""/>
+            <paw:button-card title="Test your abilities" butText="Join a Tournament" onclick=""/>
         </div>
-
-        <paw:text type="h2">Open Tournaments</paw:text>
-        <paw:text type="h4">League of Legends</paw:text>
-
-        <paw:profileButton text="${user.username}" onclick=""/>
-
-        <paw:tournament-card
-                image="/images/tournament.jpg"
-                title="Torneo Anual"
-                subtitle="Edición 2025"
-                tags="${['Fútbol','Juveniles','Verano']}">
-
-            <p>Contenido adicional aquí</p>
-        </paw:tournament-card>
-
-    </div>
 
 </paw:layout>
 
