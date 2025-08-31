@@ -8,5 +8,5 @@ public interface UserDao {
 
     public Optional<User> findById(long id);
 
-    User create(String username);
+    User create(String username, String email);
 }

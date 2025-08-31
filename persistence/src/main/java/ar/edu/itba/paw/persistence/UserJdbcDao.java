@@ -17,7 +17,7 @@ public class UserJdbcDao implements UserDao {
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
 
-    private static final RowMapper<User> ROW_MAPPER = (rs, rowNum) -> new User(rs.getLong("userId"), rs.getString("username"));
+    private static final RowMapper<User> ROW_MAPPER = (rs, rowNum) -> new User(rs.getLong("userId"), rs.getString("username"), rs.getString("email"));
 
     public UserJdbcDao(final DataSource ds) {
         jdbcTemplate = new JdbcTemplate(ds);
@@ -28,15 +28,15 @@ public class UserJdbcDao implements UserDao {
 
     @Override
     public Optional<User> findById(long id) {
-        return jdbcTemplate.query("SELECT * FROM users WHERE userId = ?", ROW_MAPPER, id).stream().findFirst();
+        return jdbcTemplate.query("SELECT * FROM users WHERE id = ?", ROW_MAPPER, id).stream().findFirst();
     }
 
     @Override
-    public User create(String username) {
-        final Map<String, Object> values = Map.of("username", username);
+    public User create(String username, String email) {
+        final Map<String, Object> values = Map.of("username", username, "email", email);
         final Number key = jdbcInsert.executeAndReturnKey(values);
 
-        return new User(key.longValue(), username);
+        return new User(key.longValue(), username, email);
     }
 
 }

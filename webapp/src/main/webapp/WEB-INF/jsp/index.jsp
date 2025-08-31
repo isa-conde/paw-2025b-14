@@ -2,8 +2,8 @@
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
-
-<paw:layout>
+    
+<paw:layout user="${user != null ? user : null}">
     <paw:banner size="l" image="${pageContext.request.contextPath}/images/arcane.jpg">
         <paw:text type="title" size="xl"><spring:message code="welcome.title"/></paw:text>
         <br>

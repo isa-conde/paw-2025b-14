@@ -49,7 +49,7 @@ public class TournamentJdbcDao implements TournamentDao {
             Elo.valueOf(rs.getString("elo")), rs.getDate("start_date").toLocalDate(), rs.getDate("end_date").toLocalDate(),
             rs.getString("format"), Structure.valueOf(rs.getString("structure")), rs.getInt("max_participants"));
 
-    private static final RowMapper<User> ROW_MAPPER_USER = (rs, rowNum) -> new User(rs.getLong("userId"), rs.getString("username"));
+    private static final RowMapper<User> ROW_MAPPER_USER = (rs, rowNum) -> new User(rs.getLong("userId"), rs.getString("username"), rs.getString("email"));
 
 
     @Override
