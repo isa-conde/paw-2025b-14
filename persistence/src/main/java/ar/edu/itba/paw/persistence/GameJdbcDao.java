@@ -2,6 +2,7 @@ package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.interfaces.persistence.GameDao;
 import ar.edu.itba.paw.model.Game;
+import ar.edu.itba.paw.model.GameFormat;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Genre;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +25,10 @@ public class GameJdbcDao implements GameDao {
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
+    private final SimpleJdbcInsert jdbcInsertFormat;
+    private final SimpleJdbcInsert jdbcInsertImage;
 
-    private static final RowMapper<Game> ROW_MAPPER = (rs, rowNum) -> new Game(rs.getLong("id"), rs.getString("name"), Genre.valueOf(rs.getString("genre")));
+    private static final RowMapper<Game> ROW_MAPPER = (rs, rowNum) -> new Game(rs.getLong("id"), rs.getString("name"), Genre.valueOf(rs.getString("genre")), rs.getInt("image_id"));
 
     @Autowired
     public GameJdbcDao(final DataSource ds) {
@@ -33,6 +36,12 @@ public class GameJdbcDao implements GameDao {
         jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .usingGeneratedKeyColumns("id")
                 .withTableName("game");
+        jdbcInsertFormat = new SimpleJdbcInsert(jdbcTemplate)
+                .usingGeneratedKeyColumns("id")
+                .withTableName("game_format");
+        jdbcInsertImage = new SimpleJdbcInsert(jdbcTemplate)
+                .usingGeneratedKeyColumns("id")
+                .withTableName("image");
     }
 
     @Override
@@ -57,13 +66,31 @@ public class GameJdbcDao implements GameDao {
     }
 
     @Override
-    public Game create(String name, Genre genre) {
+    public Game create(String name, Genre genre, Integer image_id) {
         SqlParameterSource values = new MapSqlParameterSource()
                 .addValue("name", name)
-                .addValue("genre", genre.name(), Types.OTHER);
+                .addValue("genre", genre.name(), Types.OTHER)
+                .addValue("image_id", image_id);
 
         Number key = jdbcInsert.executeAndReturnKey(values);
-        return new Game(key.longValue(), name, genre);
+        return new Game(key.longValue(), name, genre, image_id);
+    }
+
+    @Override
+    public Game createWithFormats(String name, Genre genre, List<GameFormat> formats, byte[] image) {
+        SqlParameterSource img = new MapSqlParameterSource().addValue("image", image);
+        Integer image_id = jdbcInsertImage.executeAndReturnKey(img).intValue();
+
+        Game game = this.create(name, genre, image_id);
+
+        for (GameFormat f : formats){
+            SqlParameterSource values = new MapSqlParameterSource()
+                    .addValue("name", f.getName())
+                    .addValue("players_per_team", f.getPlayers_per_team())
+                    .addValue("game_id", game.getId());
+            jdbcInsertFormat.execute(values);
+        }
+        return game;
     }
 
 }

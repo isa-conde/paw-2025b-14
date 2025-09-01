@@ -11,5 +11,6 @@
     <div>
         <h4>Genre: <c:out value="${game.genre}"/></h4>
     </div>
+
 </body>
 </html>

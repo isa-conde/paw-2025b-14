@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
@@ -90,7 +91,17 @@ public class HelloWorldController {
     @RequestMapping(value = "/game/create", method = { RequestMethod.POST })
     public ModelAndView createGame(@Valid @ModelAttribute("gameForm") final GameForm form) {
 
-        final Game g = gs.create(form.getName(), form.getGenre());
+        byte[] imageBytes = null;
+        try {
+            if (form.getImage() != null && !form.getImage().isEmpty()) {
+                imageBytes = form.getImage().getBytes();
+            }
+        } catch (IOException e) {
+            //TBD
+            return new ModelAndView("index");
+        }
+
+        final Game g = gs.createWithFormats(form.getName(), form.getGenre(), form.getFormats(), imageBytes);
         return new ModelAndView("redirect:/game?gameId=" + g.getId());
     }
 

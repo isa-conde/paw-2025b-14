@@ -4,7 +4,7 @@
 <body>
 <h2>Agregar un juego</h2>
 <c:url value="/game/create" var="postPath"/>
-<form:form modelAttribute="gameForm" action="${postPath}" method="post">
+<form:form modelAttribute="gameForm" action="${postPath}" method="post" enctype="multipart/form-data">
     <div>
         <form:label path="name">Name: </form:label>
         <form:input type="text" path="name"/>
@@ -14,6 +14,38 @@
         <form:select path="genre" items="${genres}" />
     </div>
     <div>
+        <form:label path="image">Image: </form:label>
+        <form:input type="file" path="image"/>
+    </div>
+
+    <div>
+        <h3>Formatos</h3>
+
+        <!-- Formato 1 -->
+        <div>
+            <form:label path="formats[0].name">Nombre:</form:label>
+            <form:input path="formats[0].name"/>
+            <form:label path="formats[0].players_per_team">Jugadores por equipo:</form:label>
+            <form:input type="number" path="formats[0].players_per_team"/>
+        </div>
+
+        <!-- Formato 2 -->
+        <div>
+            <form:label path="formats[1].name">Nombre:</form:label>
+            <form:input path="formats[1].name"/>
+            <form:label path="formats[1].players_per_team">Jugadores por equipo:</form:label>
+            <form:input type="number" path="formats[1].players_per_team"/>
+        </div>
+
+        <!-- Formato 3 -->
+        <div>
+            <form:label path="formats[2].name">Nombre:</form:label>
+            <form:input path="formats[2].name"/>
+            <form:label path="formats[2].players_per_team">Jugadores por equipo:</form:label>
+            <form:input type="number" path="formats[2].players_per_team"/>
+        </div>
+
+        <div>
         <input type="submit" value="Guardar!"/>
     </div>
 </form:form>
