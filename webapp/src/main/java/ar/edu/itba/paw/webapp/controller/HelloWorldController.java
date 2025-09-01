@@ -153,7 +153,7 @@ public class HelloWorldController {
         }
 
         final Game g = gs.createWithFormats(form.getName(), form.getGenre(), form.getFormats(), imageBytes);
-        return new ModelAndView("redirect:/game?gameId=" + g.getId());
+        return new ModelAndView("redirect:/game?game_id=" + g.getId());
     }
 
     @RequestMapping("/game")
