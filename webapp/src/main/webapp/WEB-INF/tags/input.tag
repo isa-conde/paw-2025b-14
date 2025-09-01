@@ -9,6 +9,7 @@
 <%@ attribute name="items" type="java.util.List" required="false"%>
 <%@ attribute name="itemValue" required="false"%>
 <%@ attribute name="itemLabel" required="false"%>
+<%@ attribute name="emptyOption" required="false"%>
 
 <c:choose>
     <c:when test="${inputType != 'submit'}">
@@ -21,10 +22,20 @@
                 <c:when test="${inputType == 'select'}">
                     <c:choose>
                         <c:when test="${itemLabel != null && itemValue != null}">
-                            <form:select path="${path}" items="${items}" itemLabel="${itemLabel}" itemValue="${itemValue}" cssClass="input"/>
+                            <form:select path="${path}" cssClass="input">
+                                <c:if test="${emptyOption != null}">
+                                    <form:option value="" label="${emptyOption}"/>
+                                </c:if>
+                                <form:options items="${items}" itemLabel="${itemLabel}" itemValue="${itemValue}"/>
+                            </form:select>
                         </c:when>
                         <c:otherwise>
-                            <form:select path="${path}" items="${items}" cssClass="input"/>
+                            <form:select path="${path}" cssClass="input">
+                                <c:if test="${emptyOption != null}">
+                                    <form:option value="" label="${emptyOption}"/>
+                                </c:if>
+                                <form:options items="${items}"/>
+                            </form:select>
                         </c:otherwise>
                     </c:choose>
                 </c:when>

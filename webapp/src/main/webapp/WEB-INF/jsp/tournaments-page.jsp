@@ -7,19 +7,18 @@
     <div class="cards-container">
       <paw:text type="title" size="xl">Tournaments</paw:text>
     </div>
-    <form:form cssClass="form" modelAttribute="tournamentForm" method="post">
-      <div class="row">
-        <paw:input path="game_id" label="Game" containerType="half" inputType="select" items="${games}" itemValue="id" itemLabel="name"/>
-        <paw:input path="region" label="Region" containerType="half" inputType="select" items="${regions}"/>
-        <paw:input path="" label="Filter" containerType="half" inputType="submit"/>
+    <form:form cssClass="form" modelAttribute="filterForm" method="post">
+      <div class="filter-container">
+        <paw:input path="game_id" label="Game" inputType="select" items="${games}" itemValue="id" itemLabel="name" emptyOption="All Games"/>
+        <paw:input path="region" label="Region" inputType="select" items="${regions}" emptyOption="All Regions"/>
+        <paw:input path="elo" label="Level" inputType="select" items="${elos}" emptyOption="All Levels"/>
+        <paw:input path="" label="Filter" inputType="submit"/>
       </div>
     </form:form>
-    
-    <c:set var="hasActiveFilters" value="${true}"/>
 
-    <c:if test="${hasActiveFilters}">
+    <c:if test="${isFiltered}">
       <div class="tournaments-grid">
-        <c:forEach var="tournament" items="${tournamentsGame1}">
+        <c:forEach var="tournament" items="${tournaments}">
           <paw:element-card
                   image="${pageContext.request.contextPath}/images/lol.jpg"
                   title="${tournament.name}"
@@ -29,7 +28,7 @@
       </div>
     </c:if>
 
-    <c:if test="${!hasActiveFilters}">
+    <c:if test="${!isFiltered}">
       <c:if test="${not empty game1}">
         <div class="carrousel-title">
           <paw:text type="title" size="s">${game1.name}</paw:text>
