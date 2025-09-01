@@ -174,31 +174,17 @@ public class HelloWorldController {
         return mav;
     }
 
-    @RequestMapping(value = "/tournaments-page", method =  { RequestMethod.GET })
-    public ModelAndView tournamentsPage(@RequestParam(name = "userId", required = false, defaultValue = "1") final int userId, @ModelAttribute("filterForm") FilterForm filterForm) {
-        // Initialize filterForm if it's null
-        if (filterForm == null) {
-            filterForm = new FilterForm();
-        }
+    @RequestMapping(value = "/tournaments-page")
+    public ModelAndView tournamentsPage(@RequestParam(name = "userId", required = false, defaultValue = "1") final int userId, @ModelAttribute("filterForm") FilterForm filterForm, TournamentFilter tf) {
         final ModelAndView mav = new ModelAndView("tournaments-page");
         List<Game> allGames = gs.findAll();
 
         mav.addObject("user", us.findById(userId).isPresent() ? us.findById(userId).get() : null);
         mav.addObject("games", allGames);
-
-        List<Region> regionsWithEmpty = new ArrayList<>();
-        regionsWithEmpty.add(null);
-        regionsWithEmpty.addAll(Arrays.stream(Region.values()).toList());
-        mav.addObject("regions", regionsWithEmpty);
-
-        List<Elo> elosWithEmpty = new ArrayList<>();
-        elosWithEmpty.add(null);
-        elosWithEmpty.addAll(Arrays.stream(Elo.values()).toList());
-        mav.addObject("elos", elosWithEmpty);
-
         mav.addObject("structures", Arrays.stream(Structure.values()).toList());
+        mav.addObject("regions", Arrays.stream(Region.values()).toList());
+        mav.addObject("elos", Arrays.stream(Elo.values()).toList());
 
-        TournamentFilter tf = new TournamentFilter();
         tf.setGame_id(filterForm.getGame_id());
         tf.setRegion(filterForm.getRegion());
         tf.setElo(filterForm.getElo());
@@ -217,46 +203,4 @@ public class HelloWorldController {
 
         return mav;
     }
-
-    @RequestMapping(value = "/tournaments-page", method =  { RequestMethod.POST })
-    public ModelAndView filter(@Valid @ModelAttribute("filterForm") final FilterForm form, @RequestParam(name = "userId", required = false, defaultValue = "1") final int userId) {
-        final ModelAndView mav = new ModelAndView("tournaments-page");
-        List<Game> allGames = gs.findAll();
-
-        mav.addObject("user", us.findById(userId).isPresent() ? us.findById(userId).get() : null);
-        mav.addObject("games", allGames);
-
-        List<Region> regionsWithEmpty = new ArrayList<>();
-        regionsWithEmpty.add(null);
-        regionsWithEmpty.addAll(Arrays.stream(Region.values()).toList());
-        mav.addObject("regions", regionsWithEmpty);
-
-        List<Elo> elosWithEmpty = new ArrayList<>();
-        elosWithEmpty.add(null);
-        elosWithEmpty.addAll(Arrays.stream(Elo.values()).toList());
-        mav.addObject("elos", elosWithEmpty);
-
-        mav.addObject("structures", Arrays.stream(Structure.values()).toList());
-        mav.addObject("filterForm", form);
-
-        TournamentFilter tf = new TournamentFilter();
-        tf.setGame_id(form.getGame_id());
-        tf.setRegion(form.getRegion());
-        tf.setElo(form.getElo());
-
-        mav.addObject("tournaments", ts.findTournaments(tf));
-
-        List<Tournament> tournamentsGame1 = ts.findGameTournaments(allGames.get(0).getId());
-        List<Tournament> tournamentsGame2 = ts.findGameTournaments(allGames.get(1).getId());
-
-        mav.addObject("tournamentsGame1", tournamentsGame1);
-        mav.addObject("tournamentsGame2", tournamentsGame2);
-        mav.addObject("game1", allGames.get(0));
-        mav.addObject("game2", allGames.get(1));
-
-        mav.addObject("isFiltered", !tf.isEmpty());
-
-        return mav;
-    }
-
 }

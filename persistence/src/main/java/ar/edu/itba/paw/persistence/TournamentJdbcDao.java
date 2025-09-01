@@ -11,8 +11,10 @@ import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
@@ -29,6 +31,7 @@ import java.util.stream.Collectors;
 public class TournamentJdbcDao implements TournamentDao {
 
     private final JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate namedJdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
     private final SimpleJdbcInsert jdbcInsertUser;
     private final SimpleJdbcInsert jdbcInsertTeam;
@@ -36,6 +39,7 @@ public class TournamentJdbcDao implements TournamentDao {
     @Autowired
     public TournamentJdbcDao(final DataSource ds) {
         this.jdbcTemplate = new JdbcTemplate(ds);
+        this.namedJdbcTemplate = new NamedParameterJdbcTemplate(ds);
         this.jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("tournament")
                 .usingGeneratedKeyColumns("id");
@@ -61,35 +65,35 @@ public class TournamentJdbcDao implements TournamentDao {
     @Override
     public List<Tournament> findTournaments(TournamentFilter filter) {
         StringBuilder sql = new StringBuilder("SELECT * FROM tournament t WHERE 1=1");
-        List<Object> params = new ArrayList<>();
+        MapSqlParameterSource params = new MapSqlParameterSource();
 
         if (filter.getName() != null){
-            sql.append(" AND t.name LIKE ?");
-            params.add(filter.getName());
+            sql.append(" AND t.name LIKE :name");
+            params.addValue("name", filter.getName());
         }if (filter.getGame_id() != null){
-            sql.append(" AND t.game_id = ?");
-            params.add(filter.getGame_id());
+            sql.append(" AND t.game_id = :game_id");
+            params.addValue("game_id", filter.getGame_id());
         }if (filter.getElo() != null){
-            sql.append(" AND t.elo = ?");
-            params.add(filter.getElo());
+            sql.append(" AND t.elo = :elo");
+            params.addValue("elo", filter.getElo(), Types.OTHER);
+        }if (filter.getRegion() != null){
+            sql.append(" AND t.region = :region");
+            params.addValue("region", filter.getRegion(), Types.OTHER);
         }if (filter.getFormat() != null){
-            sql.append(" AND t.format = ?");
-            params.add(filter.getFormat());
+            sql.append(" AND t.format = :format");
+            params.addValue("format", filter.getFormat());
         }if (filter.getStructure() != null){
-            sql.append(" AND t.structure = ?");
-            params.add(filter.getStructure());
+            sql.append(" AND t.structure = :structure");
+            params.addValue("structure", filter.getStructure(), Types.OTHER);
         }if (filter.getStart_date() != null){
-            sql.append(" AND t.start_date < ?");
-            params.add(filter.getStart_date());
+            sql.append(" AND t.start_date < :start_date");
+            params.addValue("start_date", filter.getStart_date());
         }if (filter.getEnd_date() != null){
-            sql.append(" AND t.end_date < ?");
-            params.add(filter.getEnd_date());
-        }if (filter.getStructure() != null){
-            sql.append(" AND t.structure = ?");
-            params.add(filter.getStructure());
+            sql.append(" AND t.end_date < :end_date");
+            params.addValue("end_date", filter.getEnd_date());
         }
 
-        return jdbcTemplate.query(sql.toString(), params.toArray(), ROW_MAPPER);
+        return namedJdbcTemplate.query(sql.toString(), params, ROW_MAPPER);
     }
 
     @Override

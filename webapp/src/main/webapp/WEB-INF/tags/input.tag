@@ -10,10 +10,11 @@
 <%@ attribute name="itemValue" required="false"%>
 <%@ attribute name="itemLabel" required="false"%>
 <%@ attribute name="emptyOption" required="false"%>
+<%@ attribute name="inline" required="false"%>
 
 <c:choose>
     <c:when test="${inputType != 'submit'}">
-        <form:label path="${path}" class="input-label ${containerType == 'half' ? 'half-input-container' : 'input-container'}">
+        <form:label path="${path}" class="input-label ${inline == 'true' ? 'inline-input-container' : (containerType == 'half' ? 'half-input-container' : 'input-container')}">
             <paw:text weight="3" size="l"><c:out value="${label}"/></paw:text>
             <c:choose>
                 <c:when test="${inputType == 'input' || inputType == null}">
@@ -52,7 +53,9 @@
         </form:label>
     </c:when>
     <c:otherwise>
-        <input type="submit" class="btn submit" value="${label}"/>
+        <div class="inline-input-container submit-container">
+            <input type="submit" class="btn submit" value="${label}"/>
+        </div>
     </c:otherwise>
 </c:choose>
 
