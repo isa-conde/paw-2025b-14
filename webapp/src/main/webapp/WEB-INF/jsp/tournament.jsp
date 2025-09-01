@@ -5,8 +5,8 @@
 <paw:layout user="${user}">
   <paw:banner image="${pageContext.request.contextPath}/images/lol.jpg">
     <paw:text type="title">${game.name}</paw:text>
-    <paw:text type="title" size="xl">${tournament.name}</paw:text>*
-    <paw:text>${tournament.start_date.format(formatter)} - ${tournament.end_date.format(formatter)}</paw:text>
+    <paw:text type="title" size="xl">${tournament.name}</paw:text>
+    <paw:text>${tournament.startdate.format(formatter)} - ${tournament.enddate.format(formatter)}</paw:text>
     <br/>
     <div class="organizer-container">
       <paw:text size="s">Organized by</paw:text>

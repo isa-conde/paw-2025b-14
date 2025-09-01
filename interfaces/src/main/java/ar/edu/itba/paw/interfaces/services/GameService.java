@@ -11,6 +11,8 @@ public interface GameService {
 
     public Optional<Game> findById(long id);
 
+    Optional<Game> findByName(String name);
+
     public List<Game> searchByName(String name);
 
     public List<Game> searchByGenre(Genre genre);

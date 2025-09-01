@@ -25,6 +25,11 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
+    public Optional<Game> findByName(String name) {
+        return gameDao.findByName(name);
+    }
+
+    @Override
     public List<Game> searchByName(String name) {
         return gameDao.searchByName(name);
     }

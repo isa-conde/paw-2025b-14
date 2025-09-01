@@ -21,4 +21,5 @@ public interface GameDao {
 
     public Game createWithFormats(String name, Genre genre, List<GameFormat> formats, byte[] image);
 
+    Optional<Game> findByName(String name);
 }

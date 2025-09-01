@@ -12,12 +12,12 @@
     </div>
     <div>
         <form:label path="name">Creator ID: </form:label>
-        <form:input type="number" path="creator_id"/>
+        <form:input type="number" path="creatorid"/>
 		<form:errors path="name" cssClass="formError"/>
     </div>
     <div>
-        <form:label path="game_id">Game: </form:label>
-        <form:select path="game_id" items="${games}" itemValue="id" itemLabel="name"/>
+        <form:label path="gameid">Game: </form:label>
+        <form:select path="gameid" items="${games}" itemValue="id" itemLabel="name"/>
 		<form:errors path="name" cssClass="formError"/>
     </div>
     <div>
@@ -31,13 +31,13 @@
 		<form:errors path="name" cssClass="formError"/>
     </div>
     <div>
-        <form:label path="start_date">Start Date: </form:label>
-        <form:input type="date" path="start_date"/>
+        <form:label path="startdate">Start Date: </form:label>
+        <form:input type="date" path="startdate"/>
 		<form:errors path="name" cssClass="formError"/>
     </div>
     <div>
-        <form:label path="end_date">End Date: </form:label>
-        <form:input type="date" path="end_date"/>
+        <form:label path="enddate">End Date: </form:label>
+        <form:input type="date" path="enddate"/>
 		<form:errors path="name" cssClass="formError"/>
     </div>
     <div>
