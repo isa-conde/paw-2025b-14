@@ -3,6 +3,7 @@ package ar.edu.itba.paw.persistence;
 import ar.edu.itba.paw.interfaces.persistence.GameDao;
 import ar.edu.itba.paw.model.Game;
 import ar.edu.itba.paw.model.GameFormat;
+import ar.edu.itba.paw.model.GameImg;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Genre;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +16,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.sql.Types;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 public class GameJdbcDao implements GameDao {
@@ -29,6 +27,7 @@ public class GameJdbcDao implements GameDao {
     private final SimpleJdbcInsert jdbcInsertImage;
 
     private static final RowMapper<Game> ROW_MAPPER = (rs, rowNum) -> new Game(rs.getLong("id"), rs.getString("name"), Genre.valueOf(rs.getString("genre")), rs.getInt("image_id"));
+    private static final RowMapper<GameImg> ROW_MAPPER_IMG = (rs, rowNum) -> new GameImg(new Game(rs.getLong("id"), rs.getString("name"), Genre.valueOf(rs.getString("genre")), rs.getInt("image_id")), Base64.getEncoder().encodeToString(rs.getBytes("image")));
 
     @Autowired
     public GameJdbcDao(final DataSource ds) {
@@ -96,6 +95,10 @@ public class GameJdbcDao implements GameDao {
             jdbcInsertFormat.execute(values);
         }
         return game;
+    }
+
+    public List<GameImg> findAllWithImg(){
+        return jdbcTemplate.query("SELECT g.*, i.image FROM game g LEFT JOIN image i ON g.image_id = i.id;", ROW_MAPPER_IMG);
     }
 
 }

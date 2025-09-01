@@ -2,6 +2,7 @@ package ar.edu.itba.paw.interfaces.persistence;
 
 import ar.edu.itba.paw.model.Game;
 import ar.edu.itba.paw.model.GameFormat;
+import ar.edu.itba.paw.model.GameImg;
 import ar.edu.itba.paw.model.enums.Genre;
 
 import java.util.List;
@@ -22,4 +23,6 @@ public interface GameDao {
     public Game createWithFormats(String name, Genre genre, List<GameFormat> formats, byte[] image);
 
     Optional<Game> findByName(String name);
+
+    public List<GameImg> findAllWithImg();
 }
