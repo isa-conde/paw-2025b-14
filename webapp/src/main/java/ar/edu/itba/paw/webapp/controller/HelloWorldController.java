@@ -75,6 +75,12 @@ public class HelloWorldController {
         }
     }
 
+    @RequestMapping("/logout")
+    public ModelAndView logout(HttpServletRequest request) {
+        request.getSession().invalidate();
+        return new ModelAndView("redirect:/");
+    }
+
     @RequestMapping("/create")
     public ModelAndView profile(@RequestParam("username") final String username) {
         User newUser = us.create(username, username + "@email.com");
@@ -89,7 +95,6 @@ public class HelloWorldController {
         mav.addObject("structures", Structure.values());
         mav.addObject("games", gs.findAll()
 );
-
         return mav;
     }
 

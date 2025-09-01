@@ -20,7 +20,6 @@
             </div>
         </form:form>
     </paw:modal>
-
     <paw:modal id="registerModal" title="Register">
         <form:form cssClass="form" modelAttribute="registerForm" action="${userRegisterPath}" method="post">
             <div class="row">
