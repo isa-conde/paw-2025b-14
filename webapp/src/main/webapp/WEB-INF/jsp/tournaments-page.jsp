@@ -1,19 +1,22 @@
 <%@ taglib prefix="c"   uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
 <paw:layout user="${user}">
   <div class="content-container">
     <div class="cards-container">
       <paw:text type="title" size="xl">Tournaments</paw:text>
     </div>
+    <form:form cssClass="form" modelAttribute="tournamentForm" method="post">
+      <div class="row">
+        <paw:input path="game_id" label="Game" containerType="half" inputType="select" items="${games}" itemValue="id" itemLabel="name"/>
+        <paw:input path="region" label="Region" containerType="half" inputType="select" items="${regions}"/>
+        <paw:input path="" label="Filter" containerType="half" inputType="submit"/>
+      </div>
+    </form:form>
     
-    <!-- FILTROS -->
-    <paw:filter-pills/>
-    
-    <!-- Variable para simular filtros activos (en producción vendría del backend) -->
     <c:set var="hasActiveFilters" value="${true}"/>
 
-    <!-- GRID DE TORNEOS (solo si hay filtros activos) -->
     <c:if test="${hasActiveFilters}">
       <div class="tournaments-grid">
         <c:forEach var="tournament" items="${tournamentsGame1}">
@@ -26,7 +29,6 @@
       </div>
     </c:if>
 
-    <!-- CARROUSELES (solo si NO hay filtros activos) -->
     <c:if test="${!hasActiveFilters}">
       <c:if test="${not empty game1}">
         <div class="carrousel-title">

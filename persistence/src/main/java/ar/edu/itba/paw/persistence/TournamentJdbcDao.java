@@ -23,6 +23,7 @@ import java.lang.reflect.Type;
 import java.sql.Types;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class TournamentJdbcDao implements TournamentDao {
@@ -89,6 +90,11 @@ public class TournamentJdbcDao implements TournamentDao {
         }
 
         return jdbcTemplate.query(sql.toString(), params.toArray(), ROW_MAPPER);
+    }
+
+    @Override
+    public List<Tournament> findGameTournaments(Long game_id){
+        return jdbcTemplate.query("SELECT * FROM tournament t WHERE game_id = ?", ROW_MAPPER, game_id);
     }
 
     @Override

@@ -11,10 +11,12 @@ import ar.edu.itba.paw.model.enums.Genre;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
+import ar.edu.itba.paw.webapp.form.FilterForm;
 import ar.edu.itba.paw.webapp.form.GameForm;
 import ar.edu.itba.paw.webapp.form.TournamentForm;
 import ar.edu.itba.paw.webapp.form.UserForm;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -47,6 +49,11 @@ public class HelloWorldController {
         return new TournamentForm();
     }
 
+    @ModelAttribute("filterForm")
+    public FilterForm filterForm() {
+        return new FilterForm();
+    }
+
     public HelloWorldController(final UserService us, final GameService gs, final TournamentService ts) {
         this.us = us;
         this.gs = gs;
@@ -54,7 +61,7 @@ public class HelloWorldController {
     }
 
     @RequestMapping("/")
-    public ModelAndView index(HttpServletRequest request, @ModelAttribute("loginForm") UserForm loginForm, @ModelAttribute("registerForm") UserForm registerForm, @ModelAttribute("tournamentForm") TournamentForm tournamentForm) {
+    public ModelAndView index(HttpServletRequest request, @ModelAttribute("loginForm") UserForm loginForm, @ModelAttribute("registerForm") UserForm registerForm, @ModelAttribute("tournamentForm") TournamentForm tournamentForm, TournamentFilter tf) {
         final ModelAndView mav = new ModelAndView("index");
         User user = (User) request.getSession().getAttribute("user");
         List<Game> allGames = gs.findAll();
@@ -67,13 +74,11 @@ public class HelloWorldController {
         mav.addObject("registerForm", registerForm);
         mav.addObject("tournamentForm", tournamentForm);
 
-        TournamentFilter tf1 = new TournamentFilter();
-        TournamentFilter tf2 = new TournamentFilter();
-        tf1.setGame_id(allGames.get(0).getId());
-        tf2.setGame_id(allGames.get(1).getId());
+        tf.setGame_id(allGames.get(0).getId());
+        List<Tournament> tournamentsGame1 = ts.findTournaments(tf);
 
-        List<Tournament> tournamentsGame1 = ts.findTournaments(tf1);
-        List<Tournament> tournamentsGame2 = ts.findTournaments(tf2);
+        tf.setGame_id(allGames.get(1).getId());
+        List<Tournament> tournamentsGame2 = ts.findTournaments(tf);
 
         mav.addObject("tournamentsGame1", tournamentsGame1);
         mav.addObject("tournamentsGame2", tournamentsGame2);
@@ -154,7 +159,7 @@ public class HelloWorldController {
     }
 
     @RequestMapping("/tournament")
-    public ModelAndView tournamentPage(@RequestParam("tournamentId") final long tournamentId){
+    public ModelAndView tournamentPage(@RequestParam("tournamentId") final long tournamentId) {
         final ModelAndView mav = new ModelAndView("tournament");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM-dd-yyyy", Locale.ENGLISH);
         Optional<Tournament> optionalTournament = ts.findById(tournamentId);
@@ -172,28 +177,37 @@ public class HelloWorldController {
         return mav;
     }
 
-    @RequestMapping("/tournaments-page")
-    public ModelAndView tournamentsPage(@RequestParam(name = "userId", required = false, defaultValue = "1") final int userId) {
+    @RequestMapping(value = "/tournaments-page", method =  { RequestMethod.GET })
+    public ModelAndView tournamentsPage(@RequestParam(name = "userId", required = false, defaultValue = "1") final int userId, @ModelAttribute("filterForm") FilterForm filterForm, TournamentFilter tf) {
         final ModelAndView mav = new ModelAndView("tournaments-page");
-        mav.addObject("user", us.findById(userId).isPresent() ? us.findById(userId).get() : null);
-
         List<Game> allGames = gs.findAll();
+
+        mav.addObject("user", us.findById(userId).isPresent() ? us.findById(userId).get() : null);
         mav.addObject("games", allGames);
+        mav.addObject("regions", Arrays.stream(Region.values()).toList());
+        mav.addObject("elos", Arrays.stream(Elo.values()).toList());
+        mav.addObject("structures", Arrays.stream(Structure.values()).toList());
+        mav.addObject("tournaments", ts.findTournaments(tf));
 
-        TournamentFilter tf1 = new TournamentFilter();
-        TournamentFilter tf2 = new TournamentFilter();
-        tf1.setGame_id(allGames.get(0).getId());
-        tf2.setGame_id(allGames.get(1).getId());
-
-        List<Tournament> tournamentsGame1 = ts.findTournaments(tf1);
-        List<Tournament> tournamentsGame2 = ts.findTournaments(tf2);
+        List<Tournament> tournamentsGame1 = ts.findGameTournaments(allGames.get(0).getId());
+        List<Tournament> tournamentsGame2 = ts.findGameTournaments(allGames.get(1).getId());
 
         mav.addObject("tournamentsGame1", tournamentsGame1);
         mav.addObject("tournamentsGame2", tournamentsGame2);
         mav.addObject("game1", allGames.get(0));
         mav.addObject("game2", allGames.get(1));
 
+        mav.addObject("isFiltered", tf.isEmpty());
+
         return mav;
+    }
+
+    @RequestMapping(value = "/filter", method = { RequestMethod.GET })
+    public ModelAndView filter(@Valid @ModelAttribute("filterForm") final FilterForm form, TournamentFilter tournamentFilter) {
+        tournamentFilter.setElo(form.getElo());
+        tournamentFilter.setGame_id(form.getGame_id());
+        tournamentFilter.setRegion(form.getRegion());
+        return new ModelAndView("t");
     }
 
 }

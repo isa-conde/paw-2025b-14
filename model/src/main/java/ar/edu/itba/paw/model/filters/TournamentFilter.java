@@ -40,4 +40,8 @@ public class TournamentFilter {
 
     public Structure getStructure() { return structure;}
     public void setStructure(Structure structure) { this.structure = structure;}
+
+    public boolean isEmpty(){
+        return name == null && game_id == null && region == null && elo == null && start_date == null && end_date == null && format == null && structure == null;
+    }
 }

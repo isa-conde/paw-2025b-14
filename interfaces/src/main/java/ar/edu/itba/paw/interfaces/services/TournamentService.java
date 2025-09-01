@@ -17,6 +17,8 @@ public interface TournamentService {
 
     public List<Tournament> findTournaments(TournamentFilter tournamentFilter);
 
+    public List<Tournament> findGameTournaments(Long game_id);
+
     public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants);
 
     public void joinTournamentUser(Long user_id, Long tournament_id);
