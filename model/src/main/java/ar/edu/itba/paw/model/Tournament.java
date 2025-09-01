@@ -10,47 +10,47 @@ import java.util.Date;
 public class Tournament {
 
     private final Long id;
-    private final Long creator_id;
+    private final Long creatorid;
     private final String name;
-    private final Long game_id;
+    private final Long gameid;
     private final Region region;
     private final Elo elo;
-    private final LocalDate start_date;
-    private final LocalDate end_date;
+    private final LocalDate startdate;
+    private final LocalDate enddate;
     private final String format;
     private final Structure structure;
     private final Integer max_participants;
 
 
 
-    public Tournament(Long id, Long creatorId, String name, Long gameId, Region region, Elo elo, LocalDate startDate, LocalDate endDate, String format, Structure structure, Integer maxParticipants) {
+    public Tournament(Long id, Long creatorid, String name, Long gameid, Region region, Elo elo, LocalDate startdate, LocalDate enddate, String format, Structure structure, Integer max_participants) {
         this.id = id;
-        creator_id = creatorId;
+        this.creatorid = creatorid;
         this.name = name;
-        game_id = gameId;
+        this.gameid = gameid;
         this.region = region;
         this.elo = elo;
-        start_date = startDate;
-        end_date = endDate;
+        this.startdate = startdate;
+        this.enddate = enddate;
         this.format = format;
         this.structure = structure;
-        max_participants = maxParticipants;
+        this.max_participants = max_participants;
     }
 
     public Long getId() {
         return id;
     }
 
-    public Long getCreator_id() {
-        return creator_id;
+    public Long getCreatorid() {
+        return creatorid;
     }
 
     public String getName() {
         return name;
     }
 
-    public Long getGame_id() {
-        return game_id;
+    public Long getGameid() {
+        return gameid;
     }
 
     public Region getRegion() {
@@ -61,12 +61,12 @@ public class Tournament {
         return elo;
     }
 
-    public LocalDate getStart_date() {
-        return start_date;
+    public LocalDate getStartdate() {
+        return startdate;
     }
 
-    public LocalDate getEnd_date() {
-        return end_date;
+    public LocalDate getEnddate() {
+        return enddate;
     }
 
     public String getFormat() {

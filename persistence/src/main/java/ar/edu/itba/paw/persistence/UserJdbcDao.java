@@ -39,4 +39,14 @@ public class UserJdbcDao implements UserDao {
         return new User(key.longValue(), username, email);
     }
 
+    @Override
+    public Optional<User> authenticate(String username, String email) {
+        return jdbcTemplate.query(
+                "SELECT * FROM users WHERE username = ? AND email = ?",
+                ROW_MAPPER,
+                username,
+                email
+        ).stream().findFirst();
+    }
+
 }

@@ -14,11 +14,11 @@ public class UserForm {
 	@Pattern( regexp = "[a-zA-Z][-a-zA-Z0-9_]+")
 	private String username;
 	
-	@Size(min = 8, max =31)
-	private String password;
-	
-	@Size(min = 8, max =31)
-	private String repeatPassword;
+//	@Size(min = 8, max =31)
+//	private String password;
+//
+//	@Size(min = 8, max =31)
+//	private String repeatPassword;
 	
 	@Pattern( regexp = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}")
 	private String email;
@@ -29,18 +29,18 @@ public class UserForm {
 	public void setUsername(String username) {
 		this.username = username;
 	}
-	public String getPassword() {
-		return password;
-	}
-	public void setPassword(String password) {
-		this.password = password;
-	}
-	public String getRepeatPassword() {
-		return repeatPassword;
-	}
-	public void setRepeatPassword(String repeatPassword) {
-		this.repeatPassword = repeatPassword;
-	}
+//	public String getPassword() {
+//		return password;
+//	}
+//	public void setPassword(String password) {
+//		this.password = password;
+//	}
+//	public String getRepeatPassword() {
+//		return repeatPassword;
+//	}
+//	public void setRepeatPassword(String repeatPassword) {
+//		this.repeatPassword = repeatPassword;
+//	}
 	public String getEmail() {
 		return email;
 	}
