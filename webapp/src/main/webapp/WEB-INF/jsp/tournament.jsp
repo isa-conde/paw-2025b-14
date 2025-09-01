@@ -2,23 +2,23 @@
 <%@ taglib prefix="c"   uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 
-<paw:layout>
+<paw:layout user="${user}">
   <paw:banner image="${pageContext.request.contextPath}/images/lol.jpg">
-    <paw:text type="title">League of Legends</paw:text>
-    <paw:text type="title" size="xl">Superstars Tournament</paw:text>
-    <paw:text>Aug 25th 2025 - Aug 30th 2025</paw:text>
+    <paw:text type="title">${game.name}</paw:text>
+    <paw:text type="title" size="xl">${tournament.name}</paw:text>
+    <paw:text>${tournament.startdate.format(formatter)} - ${tournament.enddate.format(formatter)}</paw:text>
     <br/>
     <div class="organizer-container">
       <paw:text size="s">Organized by</paw:text>
-      <paw:profileButton text="tounexd" onclick="" size="xs" fill="false" disabled="true"/>
+      <paw:profileButton text="${creator.username}" onclick="" size="xs" fill="false" disabled="true"/>
     </div>
   </paw:banner>
   <div class="content-container">
     <div class="icon-card-container">
-      <paw:icon-card icon="${pageContext.request.contextPath}/images/map.png" text="LATAM"/>
-      <paw:icon-card icon="${pageContext.request.contextPath}/images/team.png" text="5 vs 5"/>
-      <paw:icon-card icon="${pageContext.request.contextPath}/images/level.png" text="HIGH"/>
-      <paw:icon-card icon="${pageContext.request.contextPath}/images/members.png" text="16 Teams"/>
+      <paw:icon-card icon="${pageContext.request.contextPath}/images/map.png" text="${tournament.region}"/>
+      <paw:icon-card icon="${pageContext.request.contextPath}/images/team.png" text="${tournament.format}"/>
+      <paw:icon-card icon="${pageContext.request.contextPath}/images/level.png" text="${tournament.elo}"/>
+      <paw:icon-card icon="${pageContext.request.contextPath}/images/members.png" text="${tournament.max_participants} Teams"/>
     </div>
     <div class="cards-container">
       <paw:button-card
@@ -35,3 +35,5 @@
     <paw:board participants="${[1, 2, 3, 4, 5, 6]}"/>
   </div>
 </paw:layout>
+
+

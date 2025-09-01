@@ -41,6 +41,11 @@ public class GameJdbcDao implements GameDao {
     }
 
     @Override
+    public Optional<Game> findByName(String name) {
+        return jdbcTemplate.query("SELECT * FROM game WHERE name = ?", ROW_MAPPER, name).stream().findFirst();
+    }
+
+    @Override
     public List<Game> searchByName(String name) {
         String sql = "SELECT * FROM game WHERE name ILIKE '%' || ? || '%'";
         return jdbcTemplate.query(sql, ROW_MAPPER, name);

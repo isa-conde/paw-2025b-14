@@ -18,4 +18,5 @@ public interface GameDao {
 
     public Game create(String name, Genre genre);
 
+    Optional<Game> findByName(String name);
 }

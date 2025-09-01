@@ -17,12 +17,12 @@ public class UserJdbcDao implements UserDao {
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
 
-    private static final RowMapper<User> ROW_MAPPER = (rs, rowNum) -> new User(rs.getLong("userId"), rs.getString("username"), rs.getString("email"));
+    private static final RowMapper<User> ROW_MAPPER = (rs, rowNum) -> new User(rs.getLong("id"), rs.getString("username"), rs.getString("email"));
 
     public UserJdbcDao(final DataSource ds) {
         jdbcTemplate = new JdbcTemplate(ds);
         jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
-                .usingGeneratedKeyColumns("userId")
+                .usingGeneratedKeyColumns("id")
                 .withTableName("users");
     }
 
@@ -37,6 +37,16 @@ public class UserJdbcDao implements UserDao {
         final Number key = jdbcInsert.executeAndReturnKey(values);
 
         return new User(key.longValue(), username, email);
+    }
+
+    @Override
+    public Optional<User> authenticate(String username, String email) {
+        return jdbcTemplate.query(
+                "SELECT * FROM users WHERE username = ? AND email = ?",
+                ROW_MAPPER,
+                username,
+                email
+        ).stream().findFirst();
     }
 
 }

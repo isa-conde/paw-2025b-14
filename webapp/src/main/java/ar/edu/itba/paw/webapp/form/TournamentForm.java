@@ -12,27 +12,27 @@ import javax.validation.constraints.Size;
 public class TournamentForm {
 
     // FALTA AGREGAR VALIDACION Y CONSTRAINTS
-    private Long creator_id;
+    private Long creatorid;
     @Size(min = 6, max = 100)
     private String name;
-    private Long game_id;
+    private Long gameid;
     private Region region;
     private Elo elo;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate start_date;
+    private LocalDate startdate;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate end_date;
+    private LocalDate enddate;
     @Size(max = 255)
     private String format;
     private Structure structure;
     @Min(value = 2)
     private Integer max_participants;
 
-    public Long getCreator_id() {
-        return creator_id;
+    public Long getCreatorid() {
+        return creatorid;
     }
-    public void setCreator_id(Long creator_id) {
-        this.creator_id = creator_id;
+    public void setCreatorid(Long creatorid) {
+        this.creatorid = creatorid;
     }
 
     public String getName() {
@@ -42,11 +42,11 @@ public class TournamentForm {
         this.name = name;
     }
 
-    public Long getGame_id() {
-        return game_id;
+    public Long getGameid() {
+        return gameid;
     }
-    public void setGame_id(Long game_id) {
-        this.game_id = game_id;
+    public void setGameid(Long gameid) {
+        this.gameid = gameid;
     }
 
     public Region getRegion() {
@@ -63,18 +63,18 @@ public class TournamentForm {
         this.elo = elo;
     }
 
-    public LocalDate getStart_date() {
-        return start_date;
+    public LocalDate getStartdate() {
+        return startdate;
     }
-    public void setStart_date(LocalDate start_date) {
-        this.start_date = start_date;
+    public void setStartdate(LocalDate startdate) {
+        this.startdate = startdate;
     }
 
-    public LocalDate getEnd_date() {
-        return end_date;
+    public LocalDate getEnddate() {
+        return enddate;
     }
-    public void setEnd_date(LocalDate end_date) {
-        this.end_date = end_date;
+    public void setEnddate(LocalDate enddate) {
+        this.enddate = enddate;
     }
 
     public String getFormat() {

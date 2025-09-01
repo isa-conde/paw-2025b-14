@@ -20,4 +20,8 @@ public class User {
         return username;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
 }

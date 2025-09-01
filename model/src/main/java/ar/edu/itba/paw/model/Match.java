@@ -3,56 +3,67 @@ package ar.edu.itba.paw.model;
 import java.util.Date;
 
 public class Match {
-
     private final Long id;
-    private final Long tournament_id;
-    private final Long user1_id;
-    private final Long user2_id;
-    private final Date match_date;
-    private final Short winner;
-    private final Integer points_user1;
-    private final Integer point_user2;
+    private final Long tournamentId;
+    private Long localId;
+    private Long visitorId;
+    private Date matchDate;
+    private Integer pointsUser1;
+    private Integer pointUser2;
+    
+    public Match(Long id, Long tournamentId) {
+		this(id, tournamentId, null, null, null);
+	}
 
-    public Match(Long id, Long tournamentId, Long user1Id, Long user2Id, Date matchDate, Short winner, Integer pointsUser1, Integer pointUser2) {
+    public Match(Long id, Long tournamentId, Long localId, Long visitorId, Date matchDate) {
         this.id = id;
-        tournament_id = tournamentId;
-        user1_id = user1Id;
-        user2_id = user2Id;
-        match_date = matchDate;
-        this.winner = winner;
-        points_user1 = pointsUser1;
-        point_user2 = pointUser2;
+        this.tournamentId = tournamentId;
+        this.localId = localId;
+        this.visitorId = visitorId;
+        this.matchDate = matchDate;
     }
+    
+    public void loadPoints(Integer pointsUser1, Integer pointUser2) {
+    	this.pointsUser1 = pointsUser1;
+		this.pointUser2 = pointUser2;
+    }
+    
+    public void appointMatch(Date date, Long localId, Long visitorId) {
+    	this.localId = localId;
+		this.visitorId = visitorId;
+		this.matchDate = date;
+	}
 
     public Long getId() {
         return id;
     }
 
-    public Long getTournament_id() {
-        return tournament_id;
+    public Long getTournamentId() {
+        return tournamentId;
     }
 
-    public Long getUser1_id() {
-        return user1_id;
+    public Long getLocalId() {
+        return localId;
     }
 
-    public Long getUser2_id() {
-        return user2_id;
+    public Long getVisitorId() {
+        return visitorId;
     }
 
-    public Date getMatch_date() {
-        return match_date;
+    public Date getMatchDate() {
+        return matchDate;
     }
 
     public Short getWinner() {
-        return winner;
+        if(pointsUser1 == null || pointUser2 == null) return null;
+        return (short) (pointsUser1 > pointUser2 ? 1 : 0);
     }
 
-    public Integer getPoints_user1() {
-        return points_user1;
+    public Integer getPointsUser1() {
+        return pointsUser1;
     }
 
-    public Integer getPoint_user2() {
-        return point_user2;
+    public Integer getPointUser2() {
+        return pointUser2;
     }
 }
