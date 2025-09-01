@@ -50,7 +50,7 @@
                         <paw:input path="name" label="Tournament Name"/>
                     </div>
                     <div class="row">
-                        <paw:input path="game_id" label="Game" containerType="half" inputType="select" items="${games}" itemValue="id" itemLabel="name"/>
+                        <paw:input path="game_id" label="Game" containerType="half" inputType="select" items="${games}" itemValue="game.id" itemLabel="game.name"/>
                         <paw:input path="region" label="Region" containerType="half" inputType="select" items="${regions}"/>
                     </div>
                     <div class="row">

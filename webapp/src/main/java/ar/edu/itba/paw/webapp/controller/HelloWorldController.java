@@ -4,6 +4,7 @@ import ar.edu.itba.paw.interfaces.services.GameService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.Game;
+import ar.edu.itba.paw.model.GameImg;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Elo;
@@ -64,7 +65,7 @@ public class HelloWorldController {
     public ModelAndView index(HttpServletRequest request, @ModelAttribute("loginForm") UserForm loginForm, @ModelAttribute("registerForm") UserForm registerForm, @ModelAttribute("tournamentForm") TournamentForm tournamentForm, TournamentFilter tf) {
         final ModelAndView mav = new ModelAndView("index");
         User user = (User) request.getSession().getAttribute("user");
-        List<Game> allGames = gs.findAll();
+        List<GameImg> allGames = gs.findAllWithImg();
         mav.addObject("user", user);
         mav.addObject("games", allGames);
         mav.addObject("regions", Arrays.stream(Region.values()).toList());
@@ -74,16 +75,16 @@ public class HelloWorldController {
         mav.addObject("registerForm", registerForm);
         mav.addObject("tournamentForm", tournamentForm);
 
-        tf.setGame_id(allGames.get(0).getId());
+        tf.setGame_id(allGames.get(0).getGame().getId());
         List<Tournament> tournamentsGame1 = ts.findTournaments(tf);
 
-        tf.setGame_id(allGames.get(1).getId());
+        tf.setGame_id(allGames.get(1).getGame().getId());
         List<Tournament> tournamentsGame2 = ts.findTournaments(tf);
 
         mav.addObject("tournamentsGame1", tournamentsGame1);
         mav.addObject("tournamentsGame2", tournamentsGame2);
-        mav.addObject("game1", allGames.get(0));
-        mav.addObject("game2", allGames.get(1));
+        mav.addObject("game1", allGames.get(0).getGame());
+        mav.addObject("game2", allGames.get(1).getGame());
 
         return mav;
     }

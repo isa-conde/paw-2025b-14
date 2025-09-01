@@ -17,8 +17,8 @@
             <c:forEach var="e" items="${elements}" varStatus="status">
                 <div class="carrousel-item">
                     <paw:element-card 
-                        image="${pageContext.request.contextPath}/images/lol.jpg" 
-                        title="${e.name}" 
+                        image="data:image/png;base64,${e.img}"
+                        title="${isGame? e.game.name : e.name}"
                         subtitle="${isGame? '' : e.format}"/>
                 </div>
             </c:forEach>
