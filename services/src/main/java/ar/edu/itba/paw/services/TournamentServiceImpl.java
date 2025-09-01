@@ -38,8 +38,14 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public Tournament create(Long creatorid, String name, Long gameid, Region region, Elo elo, LocalDate startdate, LocalDate enddate, String format, Structure structure, Integer max_participants) {
-        return tournamentDao.create(creatorid, name, gameid, region, elo, startdate, enddate, format, structure, max_participants);
+    public List<Tournament> findGameTournaments(Long game_id){
+        return tournamentDao.findGameTournaments(game_id);
+    }
+
+
+    @Override
+    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants) {
+        return tournamentDao.create(creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants);
     }
 
     @Override
