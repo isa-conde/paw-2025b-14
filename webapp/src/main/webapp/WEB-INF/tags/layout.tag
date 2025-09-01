@@ -26,8 +26,8 @@
                     </c:when>
                     <c:otherwise>
                         <div>
-                            <paw:button text="Log in" onclick="openModal('loginModal')"/>
-                            <paw:button text="Register" onclick="openModal('registerModal')"/>
+                            <paw:button text="Log in" size="m" onclick="openModal('loginModal')"/>
+                            <paw:button text="Register" size="m" onclick="openModal('registerModal')"/>
                         </div>
                     </c:otherwise>
                 </c:choose>

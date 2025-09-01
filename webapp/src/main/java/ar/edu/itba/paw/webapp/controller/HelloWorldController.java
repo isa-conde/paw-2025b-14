@@ -57,23 +57,20 @@ public class HelloWorldController {
     public ModelAndView index(HttpServletRequest request, @ModelAttribute("loginForm") UserForm loginForm, @ModelAttribute("registerForm") UserForm registerForm, @ModelAttribute("tournamentForm") TournamentForm tournamentForm) {
         final ModelAndView mav = new ModelAndView("index");
         User user = (User) request.getSession().getAttribute("user");
+        List<Game> allGames = gs.findAll();
         mav.addObject("user", user);
-        mav.addObject("games", gs.findAll());
+        mav.addObject("games", allGames);
         mav.addObject("regions", Arrays.stream(Region.values()).toList());
         mav.addObject("elos", Arrays.stream(Elo.values()).toList());
         mav.addObject("structures", Arrays.stream(Structure.values()).toList());
         mav.addObject("loginForm", loginForm);
         mav.addObject("registerForm", registerForm);
         mav.addObject("tournamentForm", tournamentForm);
-        mav.addObject("user", us.findById(userId).isPresent() ? us.findById(userId).get() : null);
-
-        List<Game> allGames = gs.findAll();
-        mav.addObject("games", allGames);
 
         TournamentFilter tf1 = new TournamentFilter();
         TournamentFilter tf2 = new TournamentFilter();
-        tf1.setGame_id(allGames.getFirst().getId());
-        tf2.setGame_id(allGames.getLast().getId());
+        tf1.setGame_id(allGames.get(0).getId());
+        tf2.setGame_id(allGames.get(1).getId());
 
         List<Tournament> tournamentsGame1 = ts.findTournaments(tf1);
         List<Tournament> tournamentsGame2 = ts.findTournaments(tf2);
@@ -120,12 +117,12 @@ public class HelloWorldController {
     @RequestMapping(value = "/tournament/create", method = { RequestMethod.POST })
     public ModelAndView createTournament(HttpServletRequest request, @Valid @ModelAttribute("tournamentForm") final TournamentForm form) {
         User user = (User) request.getSession().getAttribute("user");
-        Optional<Game> optionalGame = gs.findById(form.getGameid());
+        Optional<Game> optionalGame = gs.findById(form.getGame_id());
         if (optionalGame.isEmpty()){
             return new ModelAndView("gamePage");
         }
         final Tournament t = ts.create(user.getId(), form.getName(), optionalGame.get().getId(),
-                form.getRegion(), form.getElo(), form.getStartdate(), form.getEnddate(),
+                form.getRegion(), form.getElo(), form.getStart_date(), form.getEnd_date(),
                 form.getFormat(), form.getStructure(), form.getMax_participants());
         return new ModelAndView("redirect:/tournament?tournamentId=" + t.getId());
     }
@@ -141,13 +138,13 @@ public class HelloWorldController {
     public ModelAndView createGame(@Valid @ModelAttribute("gameForm") final GameForm form) {
 
         final Game g = gs.create(form.getName(), form.getGenre());
-        return new ModelAndView("redirect:/game?gameid=" + g.getId());
+        return new ModelAndView("redirect:/game?game_id=" + g.getId());
     }
 
     @RequestMapping("/game")
-    public ModelAndView gamePage(@RequestParam("gameid") final long gameid){
+    public ModelAndView gamePage(@RequestParam("game_id") final long game_id){
         final ModelAndView mav = new ModelAndView("gamePage");
-        Optional<Game> optionalGame = gs.findById(gameid);
+        Optional<Game> optionalGame = gs.findById(game_id);
         if(optionalGame.isPresent()) {
             mav.addObject("game", optionalGame.get());
         } else {
@@ -163,8 +160,8 @@ public class HelloWorldController {
         Optional<Tournament> optionalTournament = ts.findById(tournamentId);
         if(optionalTournament.isPresent()) {
             Tournament tournament = optionalTournament.get();
-            Optional<Game> optionalGame = gs.findById(tournament.getGameid());
-            Optional<User> optionalUser = us.findById(tournament.getCreatorid());
+            Optional<Game> optionalGame = gs.findById(tournament.getGame_id());
+            Optional<User> optionalUser = us.findById(tournament.getCreator_id());
             mav.addObject("tournament", tournament);
             mav.addObject("game", optionalGame.get());
             mav.addObject("creator", optionalUser.get());
@@ -185,8 +182,8 @@ public class HelloWorldController {
 
         TournamentFilter tf1 = new TournamentFilter();
         TournamentFilter tf2 = new TournamentFilter();
-        tf1.setGame_id(allGames.getFirst().getId());
-        tf2.setGame_id(allGames.getLast().getId());
+        tf1.setGame_id(allGames.get(0).getId());
+        tf2.setGame_id(allGames.get(1).getId());
 
         List<Tournament> tournamentsGame1 = ts.findTournaments(tf1);
         List<Tournament> tournamentsGame2 = ts.findTournaments(tf2);
