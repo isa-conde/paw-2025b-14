@@ -13,10 +13,10 @@
         <c:forEach var="participant" items="${participants}">
             <div class="board-row">
                 <div class="board-cell participant-cell">
-                    <paw:text weight="thin"><c:out value="La Barryneta"/></paw:text>
+                    <paw:text weight="thin"><c:out value="${participant.username}"/></paw:text>
                 </div>
                 <div class="board-cell">
-                    <paw:text weight="semi-bold"><c:out value="1250"/></paw:text>
+                    <paw:text weight="semi-bold"><c:out value="${participant.points}"/></paw:text>
                 </div>
             </div>
         </c:forEach>

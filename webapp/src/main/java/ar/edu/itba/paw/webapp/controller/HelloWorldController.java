@@ -193,7 +193,7 @@ public class HelloWorldController {
     }
 
     @RequestMapping("/tournament")
-    public ModelAndView tournamentPage(@RequestParam("tournamentId") final long tournamentId) {
+    public ModelAndView tournamentPage(@RequestParam("tournamentId") final long tournamentId, HttpServletRequest request){
         final ModelAndView mav = new ModelAndView("tournament");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
         Optional<TournamentImg> optionalTournament = ts.findByIdWithImg(tournamentId);
@@ -201,6 +201,9 @@ public class HelloWorldController {
             TournamentImg t = optionalTournament.get();
             Optional<Game> optionalGame = gs.findById(t.getTournament().getGame_id());
             Optional<User> optionalUser = us.findById(t.getTournament().getCreator_id());
+            User user = (User) request.getSession().getAttribute("user");
+            mav.addObject("participants", ts.getTournamentParticipants(tournamentId));
+            mav.addObject("user", user);
             mav.addObject("tournamentImg", t);
             mav.addObject("game", optionalGame.get());
             mav.addObject("creator", optionalUser.get());
@@ -209,6 +212,16 @@ public class HelloWorldController {
             return new ModelAndView("index");
         }
         return mav;
+    }
+
+    @RequestMapping(value = "/tournament/join", method = { RequestMethod.POST })
+    public ModelAndView joinTournament(HttpServletRequest request, @RequestParam("tournamentId") final long tournamentId) {
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null) {
+            return new ModelAndView("redirect:/");
+        }
+        ts.joinTournamentUser(user.getId(), tournamentId);
+        return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
     }
 
     @RequestMapping(value = "/tournamentsPage")
@@ -251,10 +264,10 @@ public class HelloWorldController {
     public ModelAndView gamesPage(@RequestParam(name = "userId", required = false, defaultValue = "1") final int userId) {
         final ModelAndView mav = new ModelAndView("gamesPage");
         List<GameImg> allGames = gs.findAllWithImg();
-        
+
         mav.addObject("user", us.findById(userId).isPresent() ? us.findById(userId).get() : null);
         mav.addObject("games", allGames);
-        
+
         return mav;
     }
 

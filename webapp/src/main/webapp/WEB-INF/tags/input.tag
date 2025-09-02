@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
+
 <%@ attribute name="path" required="true"%>
 <%@ attribute name="label" required="true"%>
 <%@ attribute name="containerType" required="false"%>
@@ -48,6 +49,9 @@
                 </c:when>
                 <c:when test="${inputType == 'email'}">
                     <form:input path="${path}" type="email" class="input"/>
+                </c:when>
+                <c:when test="${inputType == 'hidden'}">
+                    <form:hidden path="${path}" />
                 </c:when>
             </c:choose>
         </form:label>

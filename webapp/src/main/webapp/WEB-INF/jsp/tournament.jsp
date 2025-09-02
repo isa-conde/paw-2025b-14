@@ -2,6 +2,8 @@
 <%@ taglib prefix="c"   uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 
+<c:url value="/tournament/join" var="joinUrl"/>
+
 <paw:layout user="${user}">
   <paw:banner image="data:image/png;base64,${tournamentImg.base64Img}">
     <paw:text type="title" size="m" stroke="true">${game.name}</paw:text>
@@ -35,12 +37,14 @@
                   text="Play against all your oponents to collect points and win the tournament"
                   butText="Join Tournament"
                   icon="${pageContext.request.contextPath}/images/grid.png"
-                  onclick=""
+                  method="post"
+                  onclick="${joinUrl}"
+                  tournamentId="${tournamentImg.tournament.id}"
                   texture="true"/>
-        </div>  
+        </div>
         <br/>
         <paw:text type="title" size="l">Standings</paw:text>
-        <paw:board participants="${[1, 2, 3, 4, 5, 6]}"/>
+        <paw:board participants="${participants}"/>
       </c:when>
       <c:when test="${activeSection == 'Matches'}">
         <c:choose>

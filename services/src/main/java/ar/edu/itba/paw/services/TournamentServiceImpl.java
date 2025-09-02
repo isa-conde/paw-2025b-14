@@ -2,7 +2,10 @@ package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
+import ar.edu.itba.paw.model.ParticipantUser;
+import ar.edu.itba.paw.model.ParticipantUserInfo;
 import ar.edu.itba.paw.model.Tournament;
+import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.TournamentImg;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.*;
 
 @Service
 public class TournamentServiceImpl implements TournamentService {
@@ -63,6 +67,28 @@ public class TournamentServiceImpl implements TournamentService {
         return tournamentDao.findWithImg(tournamentFilter);
     }
 
+
+    @Override
+    public List<ParticipantUserInfo> getTournamentParticipants(Long tournament_id) {
+        List<User> users = tournamentDao.getTournamentUsers(tournament_id);
+        List<ParticipantUser> participants = tournamentDao.getTournamentParticipantUsers(tournament_id);
+
+        Map<Long, Integer> userPoints = new HashMap<>();
+        for (ParticipantUser p : participants) {
+            userPoints.put(p.getUser_id(), p.getPoints());
+        }
+
+        List<ParticipantUserInfo> result = new ArrayList<>();
+        for (User user : users) {
+            int points = userPoints.getOrDefault(user.getId(), 0);
+            result.add(new ParticipantUserInfo(user.getId(), user.getUsername(), user.getEmail(), points));
+        }
+
+        result.sort((p1, p2) -> p2.getPoints().compareTo(p1.getPoints()));
+
+        return result;
+
+    }
     @Override
     public Optional<TournamentImg> findByIdWithImg(Long id){
         return tournamentDao.findByIdWithImg(id);

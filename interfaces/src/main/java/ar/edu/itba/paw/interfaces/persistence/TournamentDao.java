@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.interfaces.persistence;
 
+import ar.edu.itba.paw.model.ParticipantUser;
 import ar.edu.itba.paw.model.TournamentImg;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Structure;
@@ -26,7 +27,9 @@ public interface TournamentDao {
 
     public void joinTournamentTeam(Long team_id, Long tournament_id);
 
-    public List<User> getTournamentParticipants(Long tournament_id);
+    public List<User> getTournamentUsers(Long tournament_id);
+
+    List<ParticipantUser> getTournamentParticipantUsers(Long tournament_id);
 
     public List<TournamentImg> findWithImg(TournamentFilter tournamentFilter);
 

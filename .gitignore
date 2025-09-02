@@ -61,4 +61,6 @@ tmp/
 # SmartTomcat
 .smarttomcat/
 
+.env
+
 

@@ -1,5 +1,8 @@
 package ar.edu.itba.paw.interfaces.services;
 
+import ar.edu.itba.paw.model.ParticipantUser;
+import ar.edu.itba.paw.model.ParticipantUserInfo;
+import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.TournamentImg;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
@@ -26,6 +29,8 @@ public interface TournamentService {
     public void joinTournamentTeam(Long team_id, Long tournament_id);
 
     public List<TournamentImg> findWithImg(TournamentFilter tournamentFilter);
+
+    List<ParticipantUserInfo> getTournamentParticipants(Long tournament_id);
 
     public Optional<TournamentImg> findByIdWithImg(Long id);
 

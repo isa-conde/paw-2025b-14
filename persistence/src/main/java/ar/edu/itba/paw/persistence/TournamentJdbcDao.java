@@ -1,6 +1,10 @@
 package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
+import ar.edu.itba.paw.model.Game;
+import ar.edu.itba.paw.model.ParticipantUser;
+import ar.edu.itba.paw.model.Tournament;
+import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.*;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Genre;
@@ -57,7 +61,9 @@ public class TournamentJdbcDao implements TournamentDao {
             rs.getString("format"), Structure.valueOf(rs.getString("structure")), rs.getInt("max_participants"), rs.getInt("image_id"),
             rs.getBoolean("open_inscriptions"), rs.getBoolean("is_finished"));
 
-    private static final RowMapper<User> ROW_MAPPER_USER = (rs, rowNum) -> new User(rs.getLong("userId"), rs.getString("username"), rs.getString("email"));
+    private static final RowMapper<User> ROW_MAPPER_USER = (rs, rowNum) -> new User(rs.getLong("id"), rs.getString("username"), rs.getString("email"));
+
+    private static final RowMapper<ParticipantUser> ROW_MAPPER_PARTICIPANT_USER = (rs, rowNum) -> new ParticipantUser(rs.getLong("user_id"), rs.getLong("tournament_id"));
 
     private static final RowMapper<TournamentImg> ROW_MAPPER_IMG = (rs, rowNum) -> new TournamentImg(new Tournament(rs.getLong("id"),
             rs.getLong("creator_id"), rs.getString("name"), rs.getLong("game_id"), Region.valueOf(rs.getString("region")),
@@ -141,6 +147,7 @@ public class TournamentJdbcDao implements TournamentDao {
 
         values.put("user_id", user_id);
         values.put("tournament_id", tournament_id);
+        values.put("points", 0);
 
         jdbcInsertUser.execute(values);
     }
@@ -156,10 +163,10 @@ public class TournamentJdbcDao implements TournamentDao {
     }
 
     @Override
-    public List<User> getTournamentParticipants(Long tournament_id){
-        return jdbcTemplate.query("SELECT u.id, u.username FROM users u" +
-                                "JOIN participant_user p ON u.id = p.user_id" +
-                                "WHERE p.tournament_id = ?", ROW_MAPPER_USER ,tournament_id);
+    public List<User> getTournamentUsers(Long tournament_id) {
+        return jdbcTemplate.query("SELECT u.id, u.username, u.email FROM users u " +
+                "JOIN participant_user p ON u.id = p.user_id " +
+                "WHERE p.tournament_id = ?", ROW_MAPPER_USER, tournament_id);
     }
 
     @Override
@@ -221,5 +228,8 @@ public class TournamentJdbcDao implements TournamentDao {
         jdbcTemplate.query("UPDATE tournament SET isFinished = true WHERE id = ?", ROW_MAPPER ,tournament_id);
     }
 
-
+    @Override
+    public List<ParticipantUser> getTournamentParticipantUsers(Long tournament_id) {
+        return jdbcTemplate.query("SELECT * FROM participant_user WHERE tournament_id = ?", ROW_MAPPER_PARTICIPANT_USER, tournament_id);
+    }
 }
