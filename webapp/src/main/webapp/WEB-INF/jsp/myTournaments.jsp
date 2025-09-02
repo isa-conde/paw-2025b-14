@@ -17,7 +17,14 @@
 
             </c:when>
             <c:when test="${activeSection == 'Created Tournaments'}">
-
+                <div class="grid-title">
+                    <paw:text type="title">On Going Tournaments</paw:text>
+                </div>
+                <paw:elements-grid elements="${onGoingTournaments}" id="on-going-${user.id}-creations"/>
+                <div class="grid-title">
+                    <paw:text type="title">Finished Tournaments</paw:text>
+                </div>
+                <paw:elements-grid elements="${finishedTournaments}" id="finished-${user.id}-creations"/>
             </c:when>
             <c:when test="${activeSection == 'Past Tournaments'}">
 

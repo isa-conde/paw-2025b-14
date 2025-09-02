@@ -264,15 +264,24 @@ public class HelloWorldController {
     }
 
     @RequestMapping("/myTournaments")
-    public ModelAndView myTournaments(@RequestParam(name = "userId", required = false, defaultValue = "1") final int userId) {
+    public ModelAndView myTournaments(@RequestParam(name = "userId", required = false, defaultValue = "1") final Long userId) {
         final ModelAndView mav = new ModelAndView("myTournaments");
 
-//        List<TournamentImg> createdTournaments = ts.findWithImg();
+        List<TournamentImg> allCreatedTournaments = ts.findByCreatorImg(userId);
+        
+        List<TournamentImg> onGoingTournaments = allCreatedTournaments.stream()
+            .filter(t -> !t.getTournament().getFinished())
+            .toList();
+            
+        List<TournamentImg> finishedTournaments = allCreatedTournaments.stream()
+            .filter(t -> t.getTournament().getFinished())
+            .toList();
 //        List<TournamentImg> joinedTournaments = ts.findWithImg();
 //        List<TournamentImg> pastTournaments = ts.findWithImg();
-//
+
         mav.addObject("user", us.findById(userId).isPresent() ? us.findById(userId).get() : null);
-//        mav.addObject("createdTournaments", createdTournaments);
+        mav.addObject("onGoingTournaments", onGoingTournaments);
+        mav.addObject("finishedTournaments", finishedTournaments);
 //        mav.addObject("joinedTournaments", joinedTournaments);
 //        mav.addObject("pastTournaments", pastTournaments);
 

@@ -213,7 +213,7 @@ public class TournamentJdbcDao implements TournamentDao {
     }
     @Override
     public List<TournamentImg> findByCreatorImg(Long creator_id) {
-        return jdbcTemplate.query("SELECT * FROM tournament WHERE creator_id = ?", ROW_MAPPER_IMG, creator_id);
+        return jdbcTemplate.query("SELECT * FROM tournament t LEFT JOIN image i ON t.image_id = i.id WHERE creator_id = ?", ROW_MAPPER_IMG, creator_id);
     }
 
     @Override
