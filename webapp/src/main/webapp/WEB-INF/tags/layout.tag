@@ -13,24 +13,24 @@
     </head>
     <body>
         <div class="container">
-            <paw:sidebar/>
+            <paw:sidebar user="${user}"/>
             <paw:header>
-                <c:choose>
-                    <c:when test="${isLoggedIn}">
-                        <paw:profileButton text="${user.username}" onclick="openModal('logoutModal')"/>
-                        <paw:modal id="logoutModal" title="Logout">
-                            <div class="row center">
-                                <paw:button text="Log out" onclick="window.location.href='${logoutUrl}'"/>
+                    <c:choose>
+                        <c:when test="${isLoggedIn}">
+                            <paw:profileButton text="${user.username}" onclick="openModal('logoutModal')"/>
+                            <paw:modal id="logoutModal" title="Logout">
+                                <div class="row center">
+                                    <paw:button text="Log out" onclick="window.location.href='${logoutUrl}'"/>
+                                </div>
+                            </paw:modal>
+                        </c:when>
+                        <c:otherwise>
+                            <div>
+                                <paw:button text="Log in" size="m" onclick="openModal('loginModal')"/>
+                                <paw:button text="Register" size="m" onclick="openModal('registerModal')"/>
                             </div>
-                        </paw:modal>
-                    </c:when>
-                    <c:otherwise>
-                        <div>
-                            <paw:button text="Log in" size="m" onclick="openModal('loginModal')"/>
-                            <paw:button text="Register" size="m" onclick="openModal('registerModal')"/>
-                        </div>
-                    </c:otherwise>
-                </c:choose>
+                        </c:otherwise>
+                    </c:choose>
             </paw:header>
             <main class="main-content">
                 <jsp:doBody/>
@@ -38,5 +38,4 @@
         </div>
     </body>
 </html>
-
 <script src="${pageContext.request.contextPath}/js/modal.js"></script>

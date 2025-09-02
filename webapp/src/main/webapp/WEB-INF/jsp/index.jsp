@@ -43,7 +43,22 @@
     </paw:banner>
     <div class="content-container">
         <div class="cards-container">
-            <paw:button-card title="Become an Organizer" butText="Create a Tournament" onclick="openModal('createTournamentModal')" texture="true"/>
+            <c:choose>
+                <c:when test="${user != null}">
+                    <paw:button-card
+                            title="Become an Organizer"
+                            butText="Create a Tournament"
+                            onclick="openModal('createTournamentModal')"
+                            texture="true"/>
+                </c:when>
+                <c:otherwise>
+                    <paw:button-card
+                            title="Become an Organizer"
+                            butText="Create a Tournament"
+                            onclick="openModal('loginModal')"
+                            texture="true"/>
+                </c:otherwise>
+            </c:choose>
             <paw:modal id="createTournamentModal" title="Create a Tournament">
                 <form:form cssClass="form" modelAttribute="tournamentForm" action="${createTournamentPath}" method="post" enctype="multipart/form-data">
                     <div class="row">
