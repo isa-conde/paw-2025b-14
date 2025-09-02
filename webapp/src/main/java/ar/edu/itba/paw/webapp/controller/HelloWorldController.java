@@ -23,12 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Controller
 public class HelloWorldController {
@@ -210,6 +205,8 @@ public class HelloWorldController {
             TournamentImg t = optionalTournament.get();
             Optional<Game> optionalGame = gs.findById(t.getTournament().getGame_id());
             Optional<User> optionalUser = us.findById(t.getTournament().getCreator_id());
+            mav.addObject("participants", ts.getTournamentParticipants(tournamentId));
+            mav.addObject("user", user);
             mav.addObject("tournamentImg", t);
             mav.addObject("game", optionalGame.get());
             mav.addObject("creator", optionalUser.get());
@@ -218,6 +215,16 @@ public class HelloWorldController {
             return new ModelAndView("index");
         }
         return mav;
+    }
+
+    @RequestMapping(value = "/tournament/join", method = { RequestMethod.POST })
+    public ModelAndView joinTournament(HttpServletRequest request, @RequestParam("tournamentId") final long tournamentId) {
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null) {
+            return new ModelAndView("redirect:/");
+        }
+        ts.joinTournamentUser(user.getId(), tournamentId);
+        return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
     }
 
     @RequestMapping(value = "/tournamentsPage")
@@ -264,7 +271,7 @@ public class HelloWorldController {
         
         mav.addObject("user", user);
         mav.addObject("games", allGames);
-        
+
         return mav;
     }
 
@@ -273,12 +280,23 @@ public class HelloWorldController {
         final ModelAndView mav = new ModelAndView("myTournaments");
         User user = (User) request.getSession().getAttribute("user");
 
-//        List<TournamentImg> createdTournaments = ts.findWithImg();
+        List<TournamentImg> allCreatedTournaments = ts.findByCreatorImg(userId);
+
+        List<TournamentImg> onGoingTournaments = allCreatedTournaments.stream()
+            .filter(t -> !t.getTournament().getFinished())
+            .toList();
+
+        List<TournamentImg> finishedTournaments = allCreatedTournaments.stream()
+            .filter(t -> t.getTournament().getFinished())
+            .toList();
 //        List<TournamentImg> joinedTournaments = ts.findWithImg();
 //        List<TournamentImg> pastTournaments = ts.findWithImg();
 //
         mav.addObject("user", user);
 //        mav.addObject("createdTournaments", createdTournaments);
+
+        mav.addObject("onGoingTournaments", onGoingTournaments);
+        mav.addObject("finishedTournaments", finishedTournaments);
 //        mav.addObject("joinedTournaments", joinedTournaments);
 //        mav.addObject("pastTournaments", pastTournaments);
 

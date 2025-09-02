@@ -2,6 +2,8 @@
 <%@ taglib prefix="c"   uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 
+<c:url value="/tournament/join" var="joinUrl"/>
+
 <paw:layout user="${user}">
   <paw:banner image="data:image/png;base64,${tournamentImg.base64Img}">
     <paw:text type="title" size="m" stroke="true">${game.name}</paw:text>
@@ -52,15 +54,40 @@
           </c:choose>
 
         </div>  
+          <paw:button-card
+                  title="Become the first in the league"
+                  text="Play against all your oponents to collect points and win the tournament"
+                  butText="Join Tournament"
+                  icon="${pageContext.request.contextPath}/images/grid.png"
+                  method="post"
+                  onclick="${joinUrl}"
+                  tournamentId="${tournamentImg.tournament.id}"
+                  texture="true"/>
+        </div>
         <br/>
         <paw:text type="title" size="l">Standings</paw:text>
-        <paw:board participants="${[1, 2, 3, 4, 5, 6]}"/>
+        <paw:board participants="${participants}"/>
       </c:when>
       <c:when test="${activeSection == 'Matches'}">
-        <div class="no-cards-container">
-          <paw:text size="l" weight="thin">Matches section coming soon...</paw:text>
-        </div>
+        <c:choose>
+          <c:when test="${empty matchesByDate}">
+            <div class="no-cards-container">
+              <paw:text size="l" weight="thin">No matches available</paw:text>
+            </div>
+          </c:when>
+          <c:otherwise>
+            <c:forEach var="dateEntry" items="${matchesByDate}">
+              <paw:date-matches dateNumber="${dateEntry.key}" matches="${dateEntry.value}"/>
+            </c:forEach>
+          </c:otherwise>
+        </c:choose>
       </c:when>
     </c:choose>
   </div>
 </paw:layout>
+
+<script>
+function setWinner(matchId, winnerId) {
+    alert('Setting winner for match ' + matchId + ' to player ' + winnerId);
+}
+</script>

@@ -27,6 +27,7 @@ public class GameJdbcDao implements GameDao {
     private final SimpleJdbcInsert jdbcInsertImage;
 
     private static final RowMapper<Game> ROW_MAPPER = (rs, rowNum) -> new Game(rs.getLong("id"), rs.getString("name"), Genre.valueOf(rs.getString("genre")), rs.getInt("image_id"));
+
     private static final RowMapper<GameImg> ROW_MAPPER_IMG = (rs, rowNum) -> new GameImg(new Game(rs.getLong("id"), rs.getString("name"), Genre.valueOf(rs.getString("genre")), rs.getInt("image_id")), Base64.getEncoder().encodeToString(rs.getBytes("image")));
 
     @Autowired
