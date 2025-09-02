@@ -1,49 +1,46 @@
 <%@ taglib prefix="c"   uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
-<paw:layout>
+<paw:layout user="${user}">
   <div class="content-container">
     <div class="cards-container">
       <paw:text type="title" size="xl">Tournaments</paw:text>
     </div>
-    
-    <!-- FILTROS -->
-    <paw:filter-pills/>
-    
-    <c:set var="tournamentList" value="${[1,2,3,4,5,6,7,8,9]}"/>
-    
-    <!-- Variable para simular filtros activos (en producción vendría del backend) -->
-    <c:set var="hasActiveFilters" value="${false}"/>
+    <form:form cssClass="form" modelAttribute="filterForm" method="post">
+      <div class="filter-container">
+        <paw:input path="game_id" label="Game" inputType="select" items="${games}" itemValue="id" itemLabel="name" emptyOption="All Games" inline="true"/>
+        <paw:input path="region" label="Region" inputType="select" items="${regions}" emptyOption="All Regions" inline="true"/>
+        <paw:input path="elo" label="Level" inputType="select" items="${elos}" emptyOption="All Levels" inline="true"/>
+        <paw:input path="" label="Filter" inputType="submit" inline="true"/>
+      </div>
+    </form:form>
 
-    <!-- GRID DE TORNEOS (solo si hay filtros activos) -->
-    <c:if test="${hasActiveFilters}">
+    <c:if test="${isFiltered}">
       <div class="tournaments-grid">
-        <c:forEach var="i" items="${tournamentList}">
+        <c:forEach var="t" items="${tournaments}">
+          <c:set var="tournamentGame" value="${games.stream().filter(g -> g.id == t.tournament.game_id).findFirst().orElse(null)}"/>
           <paw:element-card
-                  image="${pageContext.request.contextPath}/images/lol.jpg"
-                  title="Torneo ${i}"
-                  subtitle="Edición ${i}.0"
-                  game="League of Legends"/>
+                  image="data:image/png;base64,${t.base64Img}"
+                  title="${t.tournament.name}"
+                  start_date="${t.tournament.start_date}"
+                  end_date="${t.tournament.end_date}"
+                  game="${tournamentGame.name}"
+                  id="${t.tournament.id}"
+                  isGame="false"/>
         </c:forEach>
       </div>
     </c:if>
 
-    <!-- CARROUSELES (solo si NO hay filtros activos) -->
-    <c:if test="${!hasActiveFilters}">
-      <div class="carrousel-title">
-        <paw:text type="title" size="s">League of Legends</paw:text>
-      </div>
-      <paw:carrousel id="lol-tournaments" elements="${tournamentList}"/>
-      
-      <div class="carrousel-title">
-        <paw:text type="title" size="s">Valorant</paw:text>
-      </div>
-      <paw:carrousel id="valorant-tournaments" elements="${tournamentList}"/>
-      
-      <div class="carrousel-title">
-        <paw:text type="title" size="s">CS:GO</paw:text>
-      </div>
-      <paw:carrousel id="csgo-tournaments" elements="${tournamentList}"/>
+    <c:if test="${!isFiltered}">
+      <c:forEach var="game" items="${games}" varStatus="status">
+        <c:if test="${not empty gameTournaments[game.id]}">
+          <div class="carrousel-title">
+            <paw:text type="title" size="s">${game.name}</paw:text>
+          </div>
+          <paw:carrousel id="game-${game.id}-tournaments" elements="${gameTournaments[game.id]}"/>
+        </c:if>
+      </c:forEach>
     </c:if>
   </div>
 </paw:layout>

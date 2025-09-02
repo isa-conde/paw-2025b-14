@@ -5,6 +5,7 @@ import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.Match;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.model.TournamentImg;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
@@ -39,8 +40,14 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public Tournament create(Long creatorid, String name, Long gameid, Region region, Elo elo, LocalDate startdate, LocalDate enddate, String format, Structure structure, Integer max_participants) {
-        return tournamentDao.create(creatorid, name, gameid, region, elo, startdate, enddate, format, structure, max_participants);
+    public List<Tournament> findGameTournaments(Long game_id){
+        return tournamentDao.findGameTournaments(game_id);
+    }
+
+
+    @Override
+    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, byte[] image) {
+        return tournamentDao.create(creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image);
     }
 
     @Override
@@ -77,4 +84,9 @@ public class TournamentServiceImpl implements TournamentService {
 	public List<Match> getTournamentMatches(Long tournament_id) {
 		return tournamentDao.getTournamentMatches(tournament_id);
 	}
+
+    @Override
+    public List<TournamentImg> findWithImg(TournamentFilter tournamentFilter){
+        return tournamentDao.findWithImg(tournamentFilter);
+    }
 }

@@ -47,5 +47,18 @@ Thumbs.db
 *.flv
 *.mov
 *.wmv
-*.classpath
-*.project
+
+# Eclipse IDE
+.project
+.classpath
+.settings/
+bin/
+tmp/
+
+# Eclipse working files
+*.launch
+
+# SmartTomcat
+.smarttomcat/
+
+

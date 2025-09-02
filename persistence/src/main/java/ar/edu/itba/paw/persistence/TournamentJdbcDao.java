@@ -5,6 +5,7 @@ import ar.edu.itba.paw.model.Match;
 import ar.edu.itba.paw.model.Pair;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.model.*;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
@@ -26,14 +28,17 @@ import java.util.*;
 public class TournamentJdbcDao implements TournamentDao {
 
     private final JdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate namedJdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
     private final SimpleJdbcInsert jfbcInsertParticipant;
     private final SimpleJdbcInsert jfbcInsertMatch;
     //private final SimpleJdbcInsert jdbcInsertTeam;
+    private final SimpleJdbcInsert jdbcInsertImage;
 
     @Autowired
     public TournamentJdbcDao(final DataSource ds) {
         this.jdbcTemplate = new JdbcTemplate(ds);
+        this.namedJdbcTemplate = new NamedParameterJdbcTemplate(ds);
         this.jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("tournament")
                 .usingGeneratedKeyColumns("id");
@@ -43,14 +48,22 @@ public class TournamentJdbcDao implements TournamentDao {
         //        .withTableName("participant_team");
         this.jfbcInsertMatch = new SimpleJdbcInsert(jdbcTemplate)
 				.withTableName("match");
+        this.jdbcInsertImage = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("image")
+                .usingGeneratedKeyColumns("id");
     }
 
     private static final RowMapper<Tournament> ROW_MAPPER = (rs, rowNum) -> new Tournament(rs.getLong("id"),
-            rs.getLong("creatorid"), rs.getString("name"), rs.getLong("gameid"), Region.valueOf(rs.getString("region")),
-            Elo.valueOf(rs.getString("elo")), rs.getDate("startdate").toLocalDate(), rs.getDate("enddate").toLocalDate(),
-            rs.getString("format"), Structure.valueOf(rs.getString("structure")), rs.getInt("max_participants"));
+            rs.getLong("creator_id"), rs.getString("name"), rs.getLong("game_id"), Region.valueOf(rs.getString("region")),
+            Elo.valueOf(rs.getString("elo")), rs.getDate("start_date").toLocalDate(), rs.getDate("end_date").toLocalDate(),
+            rs.getString("format"), Structure.valueOf(rs.getString("structure")), rs.getInt("max_participants"), rs.getInt("image_id"));
 
     private static final RowMapper<User> ROW_MAPPER_USER = (rs, rowNum) -> new User(rs.getLong("userId"), rs.getString("username"), rs.getString("email"));
+
+    private static final RowMapper<TournamentImg> ROW_MAPPER_IMG = (rs, rowNum) -> new TournamentImg(new Tournament(rs.getLong("id"),
+            rs.getLong("creator_id"), rs.getString("name"), rs.getLong("game_id"), Region.valueOf(rs.getString("region")),
+            Elo.valueOf(rs.getString("elo")), rs.getDate("start_date").toLocalDate(), rs.getDate("end_date").toLocalDate(),
+            rs.getString("format"), Structure.valueOf(rs.getString("structure")), rs.getInt("max_participants"), rs.getInt("image_id")), Base64.getEncoder().encodeToString(rs.getBytes("image")));
 
 
     @Override
@@ -61,69 +74,63 @@ public class TournamentJdbcDao implements TournamentDao {
     @Override
     public List<Tournament> findTournaments(TournamentFilter filter) {
         StringBuilder sql = new StringBuilder("SELECT * FROM tournament t WHERE 1=1");
-        List<Object> params = new ArrayList<>();
+        MapSqlParameterSource params = new MapSqlParameterSource();
 
         if (filter.getName() != null){
-            sql.append(" AND t.name LIKE ?");
-            params.add(filter.getName());
-        }if (filter.getGameid() != null){
-            sql.append(" AND t.gameid = ?");
-            params.add(filter.getGameid());
+            sql.append(" AND t.name LIKE :name");
+            params.addValue("name", filter.getName());
+        }if (filter.getGame_id() != null){
+            sql.append(" AND t.game_id = :game_id");
+            params.addValue("game_id", filter.getGame_id());
         }if (filter.getElo() != null){
-            sql.append(" AND t.elo = ?");
-            params.add(filter.getElo());
+            sql.append(" AND t.elo = :elo");
+            params.addValue("elo", filter.getElo(), Types.OTHER);
+        }if (filter.getRegion() != null){
+            sql.append(" AND t.region = :region");
+            params.addValue("region", filter.getRegion(), Types.OTHER);
         }if (filter.getFormat() != null){
-            sql.append(" AND t.format = ?");
-            params.add(filter.getFormat());
+            sql.append(" AND t.format = :format");
+            params.addValue("format", filter.getFormat());
         }if (filter.getStructure() != null){
-            sql.append(" AND t.structure = ?");
-            params.add(filter.getStructure());
-        }if (filter.getStartdate() != null){
-            sql.append(" AND t.startdate < ?");
-            params.add(filter.getStartdate());
-        }if (filter.getEnddate() != null){
-            sql.append(" AND t.enddate < ?");
-            params.add(filter.getEnddate());
-        }if (filter.getStructure() != null){
-            sql.append(" AND t.structure = ?");
-            params.add(filter.getStructure());
+            sql.append(" AND t.structure = :structure");
+            params.addValue("structure", filter.getStructure(), Types.OTHER);
+        }if (filter.getStart_date() != null){
+            sql.append(" AND t.start_date < :start_date");
+            params.addValue("start_date", filter.getStart_date());
+        }if (filter.getEnd_date() != null){
+            sql.append(" AND t.end_date < :end_date");
+            params.addValue("end_date", filter.getEnd_date());
         }
 
-        return jdbcTemplate.query(sql.toString(), params.toArray(), ROW_MAPPER);
+        return namedJdbcTemplate.query(sql.toString(), params, ROW_MAPPER);
     }
 
     @Override
-    public Tournament create(Long creatorid, String name, Long gameid, Region region, Elo elo, LocalDate startdate, LocalDate enddate, String format, Structure structure, Integer max_participants) {
-//        final Map<String, Object> values = new HashMap<>();
-//        values.put("creatorid", creatorid);
-//        values.put("name", name);
-//        values.put("gameid", gameid);
-//        values.put("region", region.toString());
-//        values.put("elo", elo.toString());
-//        values.put("startdate", startdate);
-//        values.put("enddate", enddate);
-//        values.put("format", format);
-//        values.put("structure", structure.toString());
-//        values.put("max_participants", max_participants);
-//        
-//        final Number tournamentId = jdbcInsert.executeAndReturnKey(new MapSqlParameterSource(values));
-//        
-//        return new Tournament(tournamentId.longValue(), creatorid, name, gameid, region, elo, startdate, enddate, format, structure, max_participants);
-    	
-    	SqlParameterSource values = new MapSqlParameterSource()
-                .addValue("creatorid", creatorid)
+    public List<Tournament> findGameTournaments(Long game_id){
+        return jdbcTemplate.query("SELECT * FROM tournament t WHERE game_id = ?", ROW_MAPPER, game_id);
+    }
+
+    @Override
+    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, byte[] image) {
+
+        SqlParameterSource img = new MapSqlParameterSource().addValue("image", image);
+        Integer image_id = jdbcInsertImage.executeAndReturnKey(img).intValue();
+
+        SqlParameterSource values = new MapSqlParameterSource()
+                .addValue("creator_id", creator_id)
                 .addValue("name", name)
-                .addValue("gameid", gameid)
+                .addValue("game_id", game_id)
                 .addValue("region", region, Types.OTHER)
                 .addValue("elo", elo, Types.OTHER)
-                .addValue("startdate", startdate)
-                .addValue("enddate", enddate)
+                .addValue("start_date", start_date)
+                .addValue("end_date", end_date)
                 .addValue("format", format)
                 .addValue("structure", structure, Types.OTHER)
-                .addValue("max_participants", max_participants);
+                .addValue("max_participants", max_participants)
+                .addValue("image_id", image_id);
 
         Number key = jdbcInsert.executeAndReturnKey(values);
-        return new Tournament(key.longValue(), creatorid, name, gameid, region, elo, startdate, enddate, format, structure, max_participants);
+        return new Tournament(key.longValue(), creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id);
     }
 
     @Override
@@ -166,7 +173,6 @@ public class TournamentJdbcDao implements TournamentDao {
         jfbcInsertParticipant.execute(values);
     }
     */
-    
     @Override
     public List<User> getTournamentParticipants(Long tournament_id){
         return jdbcTemplate.query("SELECT u.id, u.username FROM users u" +
@@ -211,5 +217,50 @@ public class TournamentJdbcDao implements TournamentDao {
     @Override
     public List<Match> getTournamentMatches(Long tournament_id) {
     	return jdbcTemplate.query("SELECT * FROM match WHERE tournament_id = ?", (rs, rowNum) -> new Match(rs.getLong("id"), rs.getLong("tournament_id"), rs.getObject("local_id") != null ? rs.getLong("local_id") : null, rs.getObject("visitor_id") != null ? rs.getLong("visitor_id") : null, rs.getObject("local_score") != null ? rs.getInt("local_score") : null, rs.getObject("visitor_score") != null ? rs.getInt("visitor_score") : null), tournament_id);
+    }
+
+    @Override
+    public List<TournamentImg> findWithImg(TournamentFilter filter) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT t.*, i.image " +
+                        "FROM tournament t " +
+                        "LEFT JOIN image i ON t.image_id = i.id " +
+                        "WHERE 1=1"
+        );
+        MapSqlParameterSource params = new MapSqlParameterSource();
+
+        if (filter.getName() != null){
+            sql.append(" AND t.name LIKE = :name");
+            params.addValue("name", filter.getName());
+        }
+        if (filter.getGame_id() != null){
+            sql.append(" AND t.game_id = :game_id");
+            params.addValue("game_id", filter.getGame_id());
+        }
+        if (filter.getElo() != null){
+            sql.append(" AND t.elo = :elo");
+            params.addValue("elo", filter.getElo(), Types.OTHER);
+        }if (filter.getRegion() != null){
+            sql.append(" AND t.region = :region");
+            params.addValue("region", filter.getRegion(), Types.OTHER);
+        }
+        if (filter.getFormat() != null){
+            sql.append(" AND t.format = :format");
+            params.addValue("format", filter.getFormat());
+        }
+        if (filter.getStructure() != null){
+            sql.append(" AND t.structure = :structure");
+            params.addValue("structure", filter.getStructure(), Types.OTHER);
+        }
+        if (filter.getStart_date() != null){
+            sql.append(" AND t.start_date < :start_date");
+            params.addValue("start_date", filter.getStart_date());
+        }
+        if (filter.getEnd_date() != null){
+            sql.append(" AND t.end_date < :end_date");
+            params.addValue("end_date", filter.getEnd_date());
+        }
+
+        return namedJdbcTemplate.query(sql.toString(), params, ROW_MAPPER_IMG);
     }
 }

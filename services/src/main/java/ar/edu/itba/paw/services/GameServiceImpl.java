@@ -3,6 +3,8 @@ package ar.edu.itba.paw.services;
 import ar.edu.itba.paw.interfaces.persistence.GameDao;
 import ar.edu.itba.paw.interfaces.services.GameService;
 import ar.edu.itba.paw.model.Game;
+import ar.edu.itba.paw.model.GameFormat;
+import ar.edu.itba.paw.model.GameImg;
 import ar.edu.itba.paw.model.enums.Genre;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +46,19 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public Game create(String name, Genre genre) {
-        return gameDao.create(name, genre);
+    public Game create(String name, Genre genre, Integer image_id) {
+        return gameDao.create(name, genre, image_id);
     }
+
+    @Override
+    public Game createWithFormats(String name, Genre genre, List<GameFormat> formats, byte[] image) {
+        return gameDao.createWithFormats(name, genre, formats, image);
+    }
+
+    @Override
+    public List<GameImg> findAllWithImg(){
+        return gameDao.findAllWithImg();
+    }
+
+
 }

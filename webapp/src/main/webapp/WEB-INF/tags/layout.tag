@@ -15,20 +15,22 @@
         <div class="container">
             <paw:sidebar/>
             <paw:header>
-                <c:if test="${isLoggedIn}">
-                    <paw:profileButton text="${user.username}" onclick="openModal('logoutModal')"/>
-                    <paw:modal id="logoutModal" title="Logout">
-                        <div class="row center">
-                            <paw:button text="Log out" onclick="window.location.href='${logoutUrl}'"/>
+                <c:choose>
+                    <c:when test="${isLoggedIn}">
+                        <paw:profileButton text="${user.username}" onclick="openModal('logoutModal')"/>
+                        <paw:modal id="logoutModal" title="Logout">
+                            <div class="row center">
+                                <paw:button text="Log out" onclick="window.location.href='${logoutUrl}'"/>
+                            </div>
+                        </paw:modal>
+                    </c:when>
+                    <c:otherwise>
+                        <div>
+                            <paw:button text="Log in" size="m" onclick="openModal('loginModal')"/>
+                            <paw:button text="Register" size="m" onclick="openModal('registerModal')"/>
                         </div>
-                    </paw:modal>
-                </c:if>
-                <c:if test="${!isLoggedIn}">
-                    <div>
-                        <paw:button text="Log in" onclick="openModal('loginModal')"/>
-                        <paw:button text="Register" onclick="openModal('registerModal')"/>
-                    </div>
-                </c:if>
+                    </c:otherwise>
+                </c:choose>
             </paw:header>
             <main class="main-content">
                 <jsp:doBody/>

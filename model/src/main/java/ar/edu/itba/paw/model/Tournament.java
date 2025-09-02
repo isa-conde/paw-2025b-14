@@ -10,47 +10,49 @@ import java.util.List;
 public class Tournament {
 
     private final Long id;
-    private final Long creatorid;
+    private final Long creator_id;
     private final String name;
-    private final Long gameid;
+    private final Long game_id;
     private final Region region;
     private final Elo elo;
-    private final LocalDate startdate;
-    private final LocalDate enddate;
+    private final LocalDate start_date;
+    private final LocalDate end_date;
     private final String format;
     private final Structure structure;
     private final Integer max_participants;
+    private final Integer image_id;
 
 
 
-    public Tournament(Long id, Long creatorid, String name, Long gameid, Region region, Elo elo, LocalDate startdate, LocalDate enddate, String format, Structure structure, Integer max_participants) {
+    public Tournament(Long id, Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Integer imageId) {
         this.id = id;
-        this.creatorid = creatorid;
+        this.creator_id = creator_id;
         this.name = name;
-        this.gameid = gameid;
+        this.game_id = game_id;
         this.region = region;
         this.elo = elo;
-        this.startdate = startdate;
-        this.enddate = enddate;
+        this.start_date = start_date;
+        this.end_date = end_date;
         this.format = format;
         this.structure = structure;
         this.max_participants = max_participants;
+        this.image_id = imageId;
     }
 
     public Long getId() {
         return id;
     }
 
-    public Long getCreatorid() {
-        return creatorid;
+    public Long getCreator_id() {
+        return creator_id;
     }
 
     public String getName() {
         return name;
     }
 
-    public Long getGameid() {
-        return gameid;
+    public Long getGame_id() {
+        return game_id;
     }
 
     public Region getRegion() {
@@ -61,12 +63,12 @@ public class Tournament {
         return elo;
     }
 
-    public LocalDate getStartdate() {
-        return startdate;
+    public LocalDate getStart_date() {
+        return start_date;
     }
 
-    public LocalDate getEnddate() {
-        return enddate;
+    public LocalDate getEnd_date() {
+        return end_date;
     }
 
     public String getFormat() {
@@ -92,4 +94,8 @@ public class Tournament {
     public List<Pair<Integer,Integer>> firstMatches(int participant) {
     	return structure.firstMatches(participant, max_participants);
 	}
+
+    public Integer getImage_id() {
+        return image_id;
+    }
 }
