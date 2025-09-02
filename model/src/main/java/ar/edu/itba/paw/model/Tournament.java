@@ -20,10 +20,11 @@ public class Tournament {
     private final String format;
     private final Structure structure;
     private final Integer max_participants;
+    private final Integer image_id;
 
 
 
-    public Tournament(Long id, Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants) {
+    public Tournament(Long id, Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Integer imageId) {
         this.id = id;
         this.creator_id = creator_id;
         this.name = name;
@@ -35,6 +36,7 @@ public class Tournament {
         this.format = format;
         this.structure = structure;
         this.max_participants = max_participants;
+        this.image_id = imageId;
     }
 
     public Long getId() {
@@ -79,5 +81,9 @@ public class Tournament {
 
     public Integer getMax_participants() {
         return max_participants;
+    }
+
+    public Integer getImage_id() {
+        return image_id;
     }
 }

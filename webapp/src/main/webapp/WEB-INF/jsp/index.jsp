@@ -45,7 +45,7 @@
         <div class="cards-container">
             <paw:button-card title="Become an Organizer" butText="Create a Tournament" onclick="openModal('createTournamentModal')" texture="true"/>
             <paw:modal id="createTournamentModal" title="Create a Tournament">
-                <form:form cssClass="form" modelAttribute="tournamentForm" action="${createTournamentPath}" method="post">
+                <form:form cssClass="form" modelAttribute="tournamentForm" action="${createTournamentPath}" method="post" enctype="multipart/form-data">
                     <div class="row">
                         <paw:input path="name" label="Tournament Name"/>
                     </div>
@@ -64,6 +64,10 @@
                     <div class="row center">
                         <paw:input path="max_participants" label="Max Participants" containerType="half" inputType="number"/>
                         <paw:input path="structure" label="Structure" items="${structures}" inputType="select"/>
+                    </div>
+                    <div class="row center">
+                        <form:label path="image">Image: </form:label>
+                        <form:input type="file" path="image"/>
                     </div>
                     <div class="row center">
                         <paw:input path="" label="Create" containerType="half" inputType="submit"/>

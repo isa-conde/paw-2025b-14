@@ -3,10 +3,7 @@ package ar.edu.itba.paw.webapp.controller;
 import ar.edu.itba.paw.interfaces.services.GameService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.interfaces.services.UserService;
-import ar.edu.itba.paw.model.Game;
-import ar.edu.itba.paw.model.GameImg;
-import ar.edu.itba.paw.model.Tournament;
-import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.model.*;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Genre;
 import ar.edu.itba.paw.model.enums.Region;
@@ -76,10 +73,10 @@ public class HelloWorldController {
         mav.addObject("tournamentForm", tournamentForm);
 
         tf.setGame_id(allGames.get(0).getGame().getId());
-        List<Tournament> tournamentsGame1 = ts.findTournaments(tf);
+        List<TournamentImg> tournamentsGame1 = ts.findWithImg(tf);
 
         tf.setGame_id(allGames.get(1).getGame().getId());
-        List<Tournament> tournamentsGame2 = ts.findTournaments(tf);
+        List<TournamentImg> tournamentsGame2 = ts.findWithImg(tf);
 
         mav.addObject("tournamentsGame1", tournamentsGame1);
         mav.addObject("tournamentsGame2", tournamentsGame2);
@@ -127,9 +124,20 @@ public class HelloWorldController {
         if (optionalGame.isEmpty()){
             return new ModelAndView("gamePage");
         }
+
+        byte[] imageBytes = null;
+        try {
+            if (form.getImage() != null && !form.getImage().isEmpty()) {
+                imageBytes = form.getImage().getBytes();
+            }
+        } catch (IOException e) {
+            //TBD
+            return new ModelAndView("index");
+        }
+
         final Tournament t = ts.create(user.getId(), form.getName(), optionalGame.get().getId(),
                 form.getRegion(), form.getElo(), form.getStart_date(), form.getEnd_date(),
-                form.getFormat(), form.getStructure(), form.getMax_participants());
+                form.getFormat(), form.getStructure(), form.getMax_participants(), imageBytes);
         return new ModelAndView("redirect:/tournament?tournamentId=" + t.getId());
     }
 

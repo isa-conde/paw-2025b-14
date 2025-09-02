@@ -4,6 +4,8 @@ import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.time.LocalDate;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
@@ -27,6 +29,7 @@ public class TournamentForm {
     private Structure structure;
     @Min(value = 2)
     private Integer max_participants;
+    private MultipartFile image;
 
     public Long getCreator_id() {
         return creator_id;
@@ -96,5 +99,12 @@ public class TournamentForm {
     }
     public void setMax_participants(Integer max_participants) {
         this.max_participants = max_participants;
+    }
+
+    public MultipartFile getImage() {
+        return image;
+    }
+    public void setImage(MultipartFile image) {
+        this.image = image;
     }
 }

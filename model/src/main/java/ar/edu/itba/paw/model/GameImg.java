@@ -18,7 +18,7 @@ public class GameImg {
         this.game = game;
     }
 
-    public String getImg() {
+    public String getBase64Img() {
         return base64Img;
     }
 
