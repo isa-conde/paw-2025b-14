@@ -36,3 +36,16 @@ CREATE TABLE IF NOT EXISTS participant_user (
                                   FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
+CREATE TABLE IF NOT EXISTS game_format (
+                             id    SERIAL PRIMARY KEY NOT NULL,
+                             name text NOT NULL,
+                             players_per_team smallint NOT NULL,
+                             game_id INT NOT NULL,
+                             FOREIGN KEY (game_id) REFERENCES game(id)
+);
+
+
+CREATE TABLE IF NOT EXISTS image (
+                       id SERIAL PRIMARY KEY NOT NULL,
+                       image BYTEA
+);

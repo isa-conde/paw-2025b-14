@@ -8,5 +8,6 @@ public enum Genre {
     BattleRoyale,
     RTS,
     Sports,
-    DGC
+    DGC,
+    MOBILE
 }

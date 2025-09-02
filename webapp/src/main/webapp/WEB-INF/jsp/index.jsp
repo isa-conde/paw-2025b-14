@@ -45,12 +45,12 @@
         <div class="cards-container">
             <paw:button-card title="Become an Organizer" butText="Create a Tournament" onclick="openModal('createTournamentModal')" texture="true"/>
             <paw:modal id="createTournamentModal" title="Create a Tournament">
-                <form:form cssClass="form" modelAttribute="tournamentForm" action="${createTournamentPath}" method="post">
+                <form:form cssClass="form" modelAttribute="tournamentForm" action="${createTournamentPath}" method="post" enctype="multipart/form-data">
                     <div class="row">
                         <paw:input path="name" label="Tournament Name"/>
                     </div>
                     <div class="row">
-                        <paw:input path="game_id" label="Game" containerType="half" inputType="select" items="${games}" itemValue="id" itemLabel="name"/>
+                        <paw:input path="game_id" label="Game" containerType="half" inputType="select" items="${games}" itemValue="game.id" itemLabel="game.name"/>
                         <paw:input path="region" label="Region" containerType="half" inputType="select" items="${regions}"/>
                     </div>
                     <div class="row">
@@ -66,35 +66,37 @@
                         <paw:input path="structure" label="Structure" items="${structures}" inputType="select"/>
                     </div>
                     <div class="row center">
+                        <form:label path="image">Image: </form:label>
+                        <form:input type="file" path="image"/>
+                    </div>
+                    <div class="row center">
                         <paw:input path="" label="Create" containerType="half" inputType="submit"/>
                     </div>
                 </form:form>
             </paw:modal>
-            <paw:button-card title="Test your habilities" butText="Join a Tournament" onclick="" texture="true"/>
+            <paw:button-card title="Test your habilities" butText="Join a Tournament" onclick="window.location.href='${pageContext.request.contextPath}/tournaments-page'" texture="true"/>
         </div>
-        <c:set var="tournamentList" value="${[1,2,3,4,5,6,7]}"/>
-
         <div class="content-title">
             <paw:text type="title" size="l"><spring:message code="games"/></paw:text>
         </div>
-        <paw:carrousel id="10" elements="${tournamentList}"/>
+        <paw:carrousel id="game-list" elements="${games}" isGame="true"/>
 
         <div class="content-title">
             <paw:text type="title" size="l"><spring:message code="tournaments"/></paw:text>
         </div>
 
-        <div class="carrousel-title">
-            <paw:text type="title" size="s">League of Legends</paw:text>
-        </div>
-        <paw:carrousel id="0" elements="${tournamentList}"/>
-        <div class="carrousel-title">
-            <paw:text type="title" size="s">League of Legends</paw:text>
-        </div>
-        <paw:carrousel id="1" elements="${tournamentList}"/>
-        <div class="carrousel-title">
-            <paw:text type="title" size="s">League of Legends</paw:text>
-        </div>
-        <paw:carrousel id="2" elements="${tournamentList}"/>
+        <c:forEach var="game" items="${games}" varStatus="status">
+            <c:set var="gameId" value="${game.game.id}"/>
+            <c:set var="gameTournaments" value="${requestScope['tournaments' += gameId]}"/>
+            <c:set var="gameObject" value="${requestScope['game' += gameId]}"/>
+
+            <c:if test="${not empty gameObject and not empty gameTournaments}">
+                <div class="carrousel-title">
+                    <paw:text type="title" size="s">${gameObject.game.name}</paw:text>
+                </div>
+                <paw:carrousel id="game-${gameId}-tournaments" elements="${gameTournaments}"/>
+            </c:if>
+        </c:forEach>
 
     </div>
 </paw:layout>
