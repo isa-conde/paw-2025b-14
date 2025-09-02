@@ -3,6 +3,7 @@ package ar.edu.itba.paw.services;
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.Tournament;
+import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
@@ -10,7 +11,6 @@ import ar.edu.itba.paw.model.filters.TournamentFilter;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,9 +46,30 @@ public class TournamentServiceImpl implements TournamentService {
     public void joinTournamentUser(Long user_id, Long tournament_id) {
         tournamentDao.joinTournamentUser(user_id, tournament_id);
     }
+    
+    @Override
+    public List<User> getTournamentParticipants(Long tournament_id) {
+		return tournamentDao.getTournamentParticipants(tournament_id);
+	}
 
     @Override
-    public void joinTournamentTeam(Long team_id, Long tournament_id) {
-        tournamentDao.joinTournamentTeam(team_id, tournament_id);
+    public void createMatches(Long tournament_id) {
+		tournamentDao.createMatches(tournament_id);
+	}
+    
+    @Override
+    public Optional<Structure> getTournamentStructure(Long tournament_id){
+    	return tournamentDao.getTournamentStructure(tournament_id);
     }
+    
+    @Override
+    public void loadScores(Long match_id, Long tournament_id, Integer local_score, Integer visitor_score) {
+    	tournamentDao.loadScores(match_id, tournament_id, local_score, visitor_score);
+    }
+//   
+//    @Override
+//    public void joinTournamentTeam(Long team_id, Long tournament_id) {
+//        tournamentDao.joinTournamentTeam(team_id, tournament_id);
+//    }
+//    
 }

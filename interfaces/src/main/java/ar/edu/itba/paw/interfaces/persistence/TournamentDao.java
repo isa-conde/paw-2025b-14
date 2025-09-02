@@ -21,8 +21,13 @@ public interface TournamentDao {
 
     public void joinTournamentUser(Long user_id, Long tournament_id);
 
-    public void joinTournamentTeam(Long team_id, Long tournament_id);
+    //public void joinTournamentTeam(Long team_id, Long tournament_id);
 
     public List<User> getTournamentParticipants(Long tournament_id);
 
+    public void createMatches(Long tournament_id);
+    
+    public Optional<Structure> getTournamentStructure(Long tournament_id);
+    
+    public void loadScores(Long match_id, Long tournament_id, Integer local_score, Integer visitor_score);
 }
