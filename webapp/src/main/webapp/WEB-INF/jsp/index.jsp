@@ -74,30 +74,29 @@
                     </div>
                 </form:form>
             </paw:modal>
-            <paw:button-card title="Test your habilities" butText="Join a Tournament" onclick="window.location.href='${pageContext.request.contextPath}/tournaments-page'" texture="true"/>
+            <paw:button-card title="Test your habilities" butText="Join a Tournament" onclick="window.location.href='${pageContext.request.contextPath}/tournamentsPage'" texture="true"/>
         </div>
         <div class="content-title">
             <paw:text type="title" size="l"><spring:message code="games"/></paw:text>
         </div>
-        <paw:carrousel id="game-list" elements="${games}" noFormat="true"/>
+        <paw:carrousel id="game-list" elements="${games}" isGame="true"/>
 
         <div class="content-title">
             <paw:text type="title" size="l"><spring:message code="tournaments"/></paw:text>
         </div>
 
-        <c:if test="${not empty game1}">
-            <div class="carrousel-title">
-                <paw:text type="title" size="s">${game1.name}</paw:text>
-            </div>
-            <paw:carrousel id="game1-tournaments" elements="${tournamentsGame1}"/>
-        </c:if>
-        
-        <c:if test="${not empty game2}">
-            <div class="carrousel-title">
-                <paw:text type="title" size="s">${game2.name}</paw:text>
-            </div>
-            <paw:carrousel id="game2-tournaments" elements="${tournamentsGame2}"/>
-        </c:if>
+        <c:forEach var="game" items="${games}" varStatus="status">
+            <c:set var="gameId" value="${game.game.id}"/>
+            <c:set var="gameTournaments" value="${requestScope['tournaments' += gameId]}"/>
+            <c:set var="gameObject" value="${requestScope['game' += gameId]}"/>
+            
+            <c:if test="${not empty gameObject and not empty gameTournaments}">
+                <div class="carrousel-title">
+                    <paw:text type="title" size="s">${gameObject.game.name}</paw:text>
+                </div>
+                <paw:carrousel id="game-${gameId}-tournaments" elements="${gameTournaments}"/>
+            </c:if>
+        </c:forEach>
 
     </div>
 </paw:layout>

@@ -60,5 +60,8 @@ public class GameServiceImpl implements GameService {
         return gameDao.findAllWithImg();
     }
 
-
+    @Override
+    public Optional<GameImg> findByIdWithImage(long id){
+        return gameDao.findByIdWithImage(id);
+    }
 }

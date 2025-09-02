@@ -4,7 +4,7 @@ import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 public class TournamentFilter {
 
@@ -12,8 +12,8 @@ public class TournamentFilter {
     private Long game_id;
     private Region region;
     private Elo elo;
-    private Date start_date;
-    private Date end_date;
+    private LocalDate start_date;
+    private LocalDate end_date;
     private String format;
     private Structure structure;
 
@@ -26,14 +26,14 @@ public class TournamentFilter {
     public Region getRegion() { return region; }
     public void setRegion(Region region) { this.region = region; }
 
-    public Date getEnd_date() { return end_date; }
-    public void setEnd_date(Date end_date) { this.end_date = end_date; }
+    public LocalDate getEnd_date() { return end_date; }
+    public void setEnd_date(LocalDate end_date) { this.end_date = end_date; }
 
     public Elo getElo() { return elo;}
     public void setElo(Elo elo) { this.elo = elo;}
 
-    public Date getStart_date() { return start_date;}
-    public void setStart_date(Date start_date) { this.start_date = start_date;}
+    public LocalDate getStart_date() { return start_date;}
+    public void setStart_date(LocalDate start_date) { this.start_date = start_date;}
 
     public String getFormat() { return format;}
     public void setFormat(String format) { this.format = format;}

@@ -11,7 +11,6 @@ import ar.edu.itba.paw.model.filters.TournamentFilter;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,6 +63,10 @@ public class TournamentServiceImpl implements TournamentService {
         return tournamentDao.findWithImg(tournamentFilter);
     }
 
+    @Override
+    public Optional<TournamentImg> findByIdWithImg(Long id){
+        return tournamentDao.findByIdWithImg(id);
+    }
     @Override
     public List<TournamentImg> findByCreatorImg(Long creator_id) {
         return tournamentDao.findByCreatorImg(creator_id);

@@ -8,7 +8,6 @@ import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +26,8 @@ public interface TournamentService {
     public void joinTournamentTeam(Long team_id, Long tournament_id);
 
     public List<TournamentImg> findWithImg(TournamentFilter tournamentFilter);
+
+    public Optional<TournamentImg> findByIdWithImg(Long id);
 
     public List<TournamentImg> findByCreatorImg(Long creator_id);
 
