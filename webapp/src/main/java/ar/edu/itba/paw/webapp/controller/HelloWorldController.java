@@ -26,8 +26,10 @@ import javax.validation.Valid;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -74,13 +76,22 @@ public class HelloWorldController {
         mav.addObject("registerForm", registerForm);
         mav.addObject("tournamentForm", tournamentForm);
 
-        List<Tournament> tournamentsGame1 = ts.findGameTournaments(allGames.get(0).getId());
-        List<Tournament> tournamentsGame2 = ts.findGameTournaments(allGames.get(1).getId());
+        List<Game> topGamesWithTournaments = allGames.stream()
+            .map(game -> {
+                List<Tournament> gameTours = ts.findGameTournaments(game.getId());
+                return new Object[]{game, gameTours.size()};
+            })
+            .filter(gameData -> (Integer) gameData[1] > 0)
+            .sorted((a, b) -> Integer.compare((Integer) b[1], (Integer) a[1]))
+            .limit(5)
+            .map(gameData -> (Game) gameData[0])
+            .toList();
 
-        mav.addObject("tournamentsGame1", tournamentsGame1);
-        mav.addObject("tournamentsGame2", tournamentsGame2);
-        mav.addObject("game1", allGames.get(0));
-        mav.addObject("game2", allGames.get(1));
+        for (Game game : topGamesWithTournaments) {
+            List<Tournament> gameTours = ts.findGameTournaments(game.getId());
+            mav.addObject("tournaments" + game.getId(), gameTours);
+            mav.addObject("game" + game.getId(), game);
+        }
 
         return mav;
     }
@@ -158,7 +169,7 @@ public class HelloWorldController {
     @RequestMapping("/tournament")
     public ModelAndView tournamentPage(@RequestParam("tournamentId") final long tournamentId) {
         final ModelAndView mav = new ModelAndView("tournament");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM-dd-yyyy", Locale.ENGLISH);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
         Optional<Tournament> optionalTournament = ts.findById(tournamentId);
         if(optionalTournament.isPresent()) {
             Tournament tournament = optionalTournament.get();
@@ -191,13 +202,14 @@ public class HelloWorldController {
 
         mav.addObject("tournaments", ts.findTournaments(tf));
 
-        List<Tournament> tournamentsGame1 = ts.findGameTournaments(allGames.get(0).getId());
-        List<Tournament> tournamentsGame2 = ts.findGameTournaments(allGames.get(1).getId());
-
-        mav.addObject("tournamentsGame1", tournamentsGame1);
-        mav.addObject("tournamentsGame2", tournamentsGame2);
-        mav.addObject("game1", allGames.get(0));
-        mav.addObject("game2", allGames.get(1));
+        Map<Long, List<Tournament>> gameTournaments = new HashMap<>();
+        for (Game game : allGames) {
+            List<Tournament> gameTours = ts.findGameTournaments(game.getId());
+            if (!gameTours.isEmpty()) {
+                gameTournaments.put(game.getId(), gameTours);
+            }
+        }
+        mav.addObject("gameTournaments", gameTournaments);
 
         mav.addObject("isFiltered", !tf.isEmpty());
 

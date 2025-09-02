@@ -19,29 +19,28 @@
     <c:if test="${isFiltered}">
       <div class="tournaments-grid">
         <c:forEach var="tournament" items="${tournaments}">
+          <c:set var="tournamentGame" value="${games.stream().filter(g -> g.id == tournament.game_id).findFirst().orElse(null)}"/>
           <paw:element-card
                   image="${pageContext.request.contextPath}/images/lol.jpg"
                   title="${tournament.name}"
-                  subtitle="Format: ${tournament.format}"
-                  game="${game1.name}"/>
+                  start_date="${tournament.start_date}"
+                  end_date="${tournament.end_date}"
+                  game="${tournamentGame.name}"
+                  id="${tournament.id}"
+                  isGame="false"/>
         </c:forEach>
       </div>
     </c:if>
 
     <c:if test="${!isFiltered}">
-      <c:if test="${not empty game1}">
-        <div class="carrousel-title">
-          <paw:text type="title" size="s">${game1.name}</paw:text>
-        </div>
-        <paw:carrousel id="game1-tournaments" elements="${tournamentsGame1}"/>
-      </c:if>
-      
-      <c:if test="${not empty game2}">
-        <div class="carrousel-title">
-          <paw:text type="title" size="s">${game2.name}</paw:text>
-        </div>
-        <paw:carrousel id="game2-tournaments" elements="${tournamentsGame2}"/>
-      </c:if>
+      <c:forEach var="game" items="${games}" varStatus="status">
+        <c:if test="${not empty gameTournaments[game.id]}">
+          <div class="carrousel-title">
+            <paw:text type="title" size="s">${game.name}</paw:text>
+          </div>
+          <paw:carrousel id="game-${game.id}-tournaments" elements="${gameTournaments[game.id]}"/>
+        </c:if>
+      </c:forEach>
     </c:if>
   </div>
 </paw:layout>

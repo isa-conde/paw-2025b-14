@@ -1,11 +1,12 @@
 <%@ tag language="java" pageEncoding="UTF-8" %>
 <%@ attribute name="elements" required="false" type="java.util.List" %>
-<%@ attribute name="noFormat" required="false" rtexprvalue="true" description="game or [tournament] carrousel" %>
+<%@ attribute name="isGame" required="false" rtexprvalue="true" description="game or [tournament] carrousel" %>
 <%@ attribute name="id" required="true" rtexprvalue="true" %>
+<%@ attribute name="dateFormatter" required="false"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 
-<c:set var="isGame" value="${not empty noFormat? noFormat : false}"/>
+<c:set var="isGame" value="${not empty isGame? isGame : false}"/>
 
 <div class="carrousel-container">
     <button class="carrousel-arrow carrousel-arrow-left" onclick="moveCarrousel('${id}', -1)">
@@ -19,7 +20,10 @@
                     <paw:element-card 
                         image="${pageContext.request.contextPath}/images/lol.jpg" 
                         title="${e.name}" 
-                        subtitle="${isGame? '' : e.format}"/>
+                        start_date="${isGame? '' : e.start_date}"
+                        end_date="${isGame? '' : e.end_date}"
+                        id="${e.id}"
+                        isGame="${isGame}"/>
                 </div>
             </c:forEach>
         </div>
