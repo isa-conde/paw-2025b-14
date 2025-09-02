@@ -143,6 +143,11 @@ body, html {
     justify-content: center;
 }
 
+.banner.s {
+    height: 200px;
+    padding-bottom: 20px;
+}
+
 .banner.m {
     height: 330px;
     padding-bottom: 33px;

@@ -11,4 +11,17 @@
     <c:set var="navbarSections" value="${['Joined Tournaments', 'Created Tournaments', 'Past Tournaments']}"/>
     <c:set var="activeSection" value="${param.section != null ? param.section : 'Joined Tournaments'}"/>
     <paw:navbar sections="${navbarSections}" activeSection="${activeSection}"/>
+    <div class="content-container">
+        <c:choose>
+            <c:when test="${activeSection == 'Joined Tournaments'}">
+
+            </c:when>
+            <c:when test="${activeSection == 'Created Tournaments'}">
+
+            </c:when>
+            <c:when test="${activeSection == 'Past Tournaments'}">
+
+            </c:when>
+        </c:choose>
+    </div>
 </paw:layout>
