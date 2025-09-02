@@ -79,7 +79,7 @@ public class TournamentJdbcDao implements TournamentDao {
 
     @Override
     public List<Tournament> findTournaments(TournamentFilter filter) {
-        StringBuilder sql = new StringBuilder("SELECT * FROM tournament t WHERE 1=1");
+        StringBuilder sql = new StringBuilder("SELECT * FROM tournament t WHERE open_inscriptions = true");
         MapSqlParameterSource params = new MapSqlParameterSource();
 
         if (filter.getName() != null){
@@ -113,7 +113,7 @@ public class TournamentJdbcDao implements TournamentDao {
 
     @Override
     public List<Tournament> findGameTournaments(Long game_id){
-        return jdbcTemplate.query("SELECT * FROM tournament t WHERE game_id = ?", ROW_MAPPER, game_id);
+        return jdbcTemplate.query("SELECT * FROM tournament t WHERE game_id = ? AND open_inscriptions = true", ROW_MAPPER, game_id);
     }
 
     @Override
@@ -175,7 +175,7 @@ public class TournamentJdbcDao implements TournamentDao {
                 "SELECT t.*, i.image " +
                         "FROM tournament t " +
                         "LEFT JOIN image i ON t.image_id = i.id " +
-                        "WHERE 1=1"
+                        "WHERE open_inscriptions = true"
         );
         MapSqlParameterSource params = new MapSqlParameterSource();
 
