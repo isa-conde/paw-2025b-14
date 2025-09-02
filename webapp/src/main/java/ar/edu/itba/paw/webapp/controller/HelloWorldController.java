@@ -137,7 +137,7 @@ public class HelloWorldController {
 
         final Tournament t = ts.create(user.getId(), form.getName(), optionalGame.get().getId(),
                 form.getRegion(), form.getElo(), form.getStart_date(), form.getEnd_date(),
-                form.getFormat(), form.getStructure(), form.getMax_participants(), imageBytes);
+                form.getFormat(), form.getStructure(), form.getMax_participants(), imageBytes, true, false);
         return new ModelAndView("redirect:/tournament?tournamentId=" + t.getId());
     }
 
