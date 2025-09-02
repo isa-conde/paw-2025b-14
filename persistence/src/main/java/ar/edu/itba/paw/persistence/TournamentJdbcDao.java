@@ -2,6 +2,7 @@ package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.model.Game;
+import ar.edu.itba.paw.model.ParticipantUser;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Elo;
@@ -45,12 +46,13 @@ public class TournamentJdbcDao implements TournamentDao {
     }
 
     private static final RowMapper<Tournament> ROW_MAPPER = (rs, rowNum) -> new Tournament(rs.getLong("id"),
-            rs.getLong("creatorid"), rs.getString("name"), rs.getLong("gameid"), Region.valueOf(rs.getString("region")),
-            Elo.valueOf(rs.getString("elo")), rs.getDate("startdate").toLocalDate(), rs.getDate("enddate").toLocalDate(),
+            rs.getLong("creator_id"), rs.getString("name"), rs.getLong("game_id"), Region.valueOf(rs.getString("region")),
+            Elo.valueOf(rs.getString("elo")), rs.getDate("start_date").toLocalDate(), rs.getDate("end_date").toLocalDate(),
             rs.getString("format"), Structure.valueOf(rs.getString("structure")), rs.getInt("max_participants"));
 
-    private static final RowMapper<User> ROW_MAPPER_USER = (rs, rowNum) -> new User(rs.getLong("userId"), rs.getString("username"), rs.getString("email"));
+    private static final RowMapper<User> ROW_MAPPER_USER = (rs, rowNum) -> new User(rs.getLong("id"), rs.getString("username"), rs.getString("email"));
 
+    private static final RowMapper<ParticipantUser> ROW_MAPPER_PARTICIPANT_USER = (rs, rowNum) -> new ParticipantUser(rs.getLong("user_id"), rs.getLong("tournament_id"));
 
     @Override
     public Optional<Tournament> findById(Long id) {
@@ -65,9 +67,9 @@ public class TournamentJdbcDao implements TournamentDao {
         if (filter.getName() != null){
             sql.append(" AND t.name LIKE ?");
             params.add(filter.getName());
-        }if (filter.getGameid() != null){
-            sql.append(" AND t.gameid = ?");
-            params.add(filter.getGameid());
+        }if (filter.getGame_id() != null){
+            sql.append(" AND t.game_id = ?");
+            params.add(filter.getGame_id());
         }if (filter.getElo() != null){
             sql.append(" AND t.elo = ?");
             params.add(filter.getElo());
@@ -77,12 +79,12 @@ public class TournamentJdbcDao implements TournamentDao {
         }if (filter.getStructure() != null){
             sql.append(" AND t.structure = ?");
             params.add(filter.getStructure());
-        }if (filter.getStartdate() != null){
-            sql.append(" AND t.startdate < ?");
-            params.add(filter.getStartdate());
-        }if (filter.getEnddate() != null){
-            sql.append(" AND t.enddate < ?");
-            params.add(filter.getEnddate());
+        }if (filter.getStart_date() != null){
+            sql.append(" AND t.start_date < ?");
+            params.add(filter.getStart_date());
+        }if (filter.getEnd_date() != null){
+            sql.append(" AND t.end_date < ?");
+            params.add(filter.getEnd_date());
         }if (filter.getStructure() != null){
             sql.append(" AND t.structure = ?");
             params.add(filter.getStructure());
@@ -92,21 +94,21 @@ public class TournamentJdbcDao implements TournamentDao {
     }
 
     @Override
-    public Tournament create(Long creatorid, String name, Long gameid, Region region, Elo elo, LocalDate startdate, LocalDate enddate, String format, Structure structure, Integer max_participants) {
+    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants) {
         SqlParameterSource values = new MapSqlParameterSource()
-                .addValue("creatorid", creatorid)
+                .addValue("creator_id", creator_id)
                 .addValue("name", name)
-                .addValue("gameid", gameid)
+                .addValue("game_id", game_id)
                 .addValue("region", region, Types.OTHER)
                 .addValue("elo", elo, Types.OTHER)
-                .addValue("startdate", startdate)
-                .addValue("enddate", enddate)
+                .addValue("start_date", start_date)
+                .addValue("end_date", end_date)
                 .addValue("format", format)
                 .addValue("structure", structure, Types.OTHER)
                 .addValue("max_participants", max_participants);
 
         Number key = jdbcInsert.executeAndReturnKey(values);
-        return new Tournament(key.longValue(), creatorid, name, gameid, region, elo, startdate, enddate, format, structure, max_participants);
+        return new Tournament(key.longValue(), creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants);
     }
 
     @Override
@@ -115,6 +117,7 @@ public class TournamentJdbcDao implements TournamentDao {
 
         values.put("user_id", user_id);
         values.put("tournament_id", tournament_id);
+        values.put("points", 0);
 
         jdbcInsertUser.execute(values);
     }
@@ -129,9 +132,15 @@ public class TournamentJdbcDao implements TournamentDao {
         jdbcInsertUser.execute(values);
     }
 
-    public List<User> getTournamentParticipants(Long tournament_id){
-        return jdbcTemplate.query("SELECT u.id, u.username FROM users u" +
-                                "JOIN participant_user p ON u.id = p.user_id" +
-                                "WHERE p.tournament_id = ?", ROW_MAPPER_USER ,tournament_id);
+    @Override
+    public List<User> getTournamentUsers(Long tournament_id) {
+        return jdbcTemplate.query("SELECT u.id, u.username, u.email FROM users u " +
+                "JOIN participant_user p ON u.id = p.user_id " +
+                "WHERE p.tournament_id = ?", ROW_MAPPER_USER, tournament_id);
+    }
+
+    @Override
+    public List<ParticipantUser> getTournamentParticipantUsers(Long tournament_id) {
+        return jdbcTemplate.query("SELECT * FROM participant_user WHERE tournament_id = ?", ROW_MAPPER_PARTICIPANT_USER, tournament_id);
     }
 }

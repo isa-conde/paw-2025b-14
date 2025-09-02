@@ -100,12 +100,12 @@ public class HelloWorldController {
     @RequestMapping(value = "/tournament/create", method = { RequestMethod.POST })
     public ModelAndView createTournament(HttpServletRequest request, @Valid @ModelAttribute("tournamentForm") final TournamentForm form) {
         User user = (User) request.getSession().getAttribute("user");
-        Optional<Game> optionalGame = gs.findById(form.getGameid());
+        Optional<Game> optionalGame = gs.findById(form.getGame_id());
         if (optionalGame.isEmpty()){
             return new ModelAndView("gamePage");
         }
         final Tournament t = ts.create(user.getId(), form.getName(), optionalGame.get().getId(),
-                form.getRegion(), form.getElo(), form.getStartdate(), form.getEnddate(),
+                form.getRegion(), form.getElo(), form.getStart_date(), form.getEnd_date(),
                 form.getFormat(), form.getStructure(), form.getMax_participants());
         return new ModelAndView("redirect:/tournament?tournamentId=" + t.getId());
     }
@@ -121,13 +121,13 @@ public class HelloWorldController {
     public ModelAndView createGame(@Valid @ModelAttribute("gameForm") final GameForm form) {
 
         final Game g = gs.create(form.getName(), form.getGenre());
-        return new ModelAndView("redirect:/game?gameid=" + g.getId());
+        return new ModelAndView("redirect:/game?game_id=" + g.getId());
     }
 
     @RequestMapping("/game")
-    public ModelAndView gamePage(@RequestParam("gameid") final long gameid){
+    public ModelAndView gamePage(@RequestParam("game_id") final long game_id){
         final ModelAndView mav = new ModelAndView("gamePage");
-        Optional<Game> optionalGame = gs.findById(gameid);
+        Optional<Game> optionalGame = gs.findById(game_id);
         if(optionalGame.isPresent()) {
             mav.addObject("game", optionalGame.get());
         } else {
@@ -137,14 +137,17 @@ public class HelloWorldController {
     }
 
     @RequestMapping("/tournament")
-    public ModelAndView tournamentPage(@RequestParam("tournamentId") final long tournamentId){
+    public ModelAndView tournamentPage(@RequestParam("tournamentId") final long tournamentId, HttpServletRequest request){
         final ModelAndView mav = new ModelAndView("tournament");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM-dd-yyyy", Locale.ENGLISH);
         Optional<Tournament> optionalTournament = ts.findById(tournamentId);
         if(optionalTournament.isPresent()) {
             Tournament tournament = optionalTournament.get();
-            Optional<Game> optionalGame = gs.findById(tournament.getGameid());
-            Optional<User> optionalUser = us.findById(tournament.getCreatorid());
+            Optional<Game> optionalGame = gs.findById(tournament.getGame_id());
+            Optional<User> optionalUser = us.findById(tournament.getCreator_id());
+            User user = (User) request.getSession().getAttribute("user");
+            mav.addObject("participants", ts.getTournamentParticipants(tournamentId));
+            mav.addObject("user", user);
             mav.addObject("tournament", tournament);
             mav.addObject("game", optionalGame.get());
             mav.addObject("creator", optionalUser.get());
@@ -153,6 +156,16 @@ public class HelloWorldController {
             return new ModelAndView("index");
         }
         return mav;
+    }
+
+    @RequestMapping(value = "/tournament/join", method = { RequestMethod.POST })
+    public ModelAndView joinTournament(HttpServletRequest request, @RequestParam("tournamentId") final long tournamentId) {
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null) {
+            return new ModelAndView("redirect:/");
+        }
+        ts.joinTournamentUser(user.getId(), tournamentId);
+        return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
     }
 
 }

@@ -9,7 +9,7 @@
     <h1>Tournament: <c:out value="${tournament.name}"/>!</h1>
 </div>
 <div>
-    <h4>Creator: <c:out value="${tournament.creatorid}"/></h4>
+    <h4>Creator: <c:out value="${tournament.creator_id}"/></h4>
 </div>
 <div>
     <h4>Region: <c:out value="${tournament.region}"/></h4>
@@ -18,10 +18,10 @@
     <h4>Tournament Level: <c:out value="${tournament.elo}"/></h4>
 </div>
 <div>
-    <h4>Start date: <c:out value="${tournament.startdate}"/></h4>
+    <h4>Start date: <c:out value="${tournament.start_date}"/></h4>
 </div>
 <div>
-    <h4>End date: <c:out value="${tournament.enddate}"/></h4>
+    <h4>End date: <c:out value="${tournament.end_date}"/></h4>
 </div>
 <div>
     <h4>Format: <c:out value="${tournament.format}"/></h4>

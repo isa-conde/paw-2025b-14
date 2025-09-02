@@ -2,7 +2,10 @@ package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
+import ar.edu.itba.paw.model.ParticipantUser;
+import ar.edu.itba.paw.model.ParticipantUserInfo;
 import ar.edu.itba.paw.model.Tournament;
+import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
@@ -10,9 +13,7 @@ import ar.edu.itba.paw.model.filters.TournamentFilter;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class TournamentServiceImpl implements TournamentService {
@@ -38,8 +39,8 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public Tournament create(Long creatorid, String name, Long gameid, Region region, Elo elo, LocalDate startdate, LocalDate enddate, String format, Structure structure, Integer max_participants) {
-        return tournamentDao.create(creatorid, name, gameid, region, elo, startdate, enddate, format, structure, max_participants);
+    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants) {
+        return tournamentDao.create(creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants);
     }
 
     @Override
@@ -50,5 +51,27 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public void joinTournamentTeam(Long team_id, Long tournament_id) {
         tournamentDao.joinTournamentTeam(team_id, tournament_id);
+    }
+
+    @Override
+    public List<ParticipantUserInfo> getTournamentParticipants(Long tournament_id) {
+        List<User> users = tournamentDao.getTournamentUsers(tournament_id);
+        List<ParticipantUser> participants = tournamentDao.getTournamentParticipantUsers(tournament_id);
+
+        Map<Long, Integer> userPoints = new HashMap<>();
+        for (ParticipantUser p : participants) {
+            userPoints.put(p.getUser_id(), p.getPoints());
+        }
+
+        List<ParticipantUserInfo> result = new ArrayList<>();
+        for (User user : users) {
+            int points = userPoints.getOrDefault(user.getId(), 0);
+            result.add(new ParticipantUserInfo(user.getId(), user.getUsername(), user.getEmail(), points));
+        }
+
+        result.sort((p1, p2) -> p2.getPoints().compareTo(p1.getPoints()));
+
+        return result;
+
     }
 }
