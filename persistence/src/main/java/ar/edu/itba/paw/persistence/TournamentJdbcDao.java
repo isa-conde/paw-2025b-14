@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
+import ar.edu.itba.paw.model.Match;
 import ar.edu.itba.paw.model.Pair;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.User;
@@ -206,4 +207,9 @@ public class TournamentJdbcDao implements TournamentDao {
 			}
 		}
 	}
+    
+    @Override
+    public List<Match> getTournamentMatches(Long tournament_id) {
+    	return jdbcTemplate.query("SELECT * FROM match WHERE tournament_id = ?", (rs, rowNum) -> new Match(rs.getLong("id"), rs.getLong("tournament_id"), rs.getObject("local_id") != null ? rs.getLong("local_id") : null, rs.getObject("visitor_id") != null ? rs.getLong("visitor_id") : null, rs.getObject("local_score") != null ? rs.getInt("local_score") : null, rs.getObject("visitor_score") != null ? rs.getInt("visitor_score") : null), tournament_id);
+    }
 }

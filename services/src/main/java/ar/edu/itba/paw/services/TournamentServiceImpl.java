@@ -2,6 +2,7 @@ package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
+import ar.edu.itba.paw.model.Match;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Elo;
@@ -72,4 +73,8 @@ public class TournamentServiceImpl implements TournamentService {
 //        tournamentDao.joinTournamentTeam(team_id, tournament_id);
 //    }
 //    
+    @Override
+	public List<Match> getTournamentMatches(Long tournament_id) {
+		return tournamentDao.getTournamentMatches(tournament_id);
+	}
 }

@@ -1,7 +1,5 @@
 package ar.edu.itba.paw.model;
 
-import java.util.Date;
-
 public class Match {
     private final Long id;
     private final Long tournamentId;
@@ -12,15 +10,17 @@ public class Match {
     private Integer visitorScore;
     
     public Match(Long id, Long tournamentId) {
-		this(id, tournamentId, null, null, null);
+		this(id, tournamentId, null, null, null, null);
 	}
 
-    public Match(Long id, Long tournamentId, Long localId, Long visitorId, Date matchDate) {
+    public Match(Long id, Long tournamentId, Long localId, Long visitorId/*, Date matchDate*/, Integer localScore, Integer visitorScore) {
         this.id = id;
         this.tournamentId = tournamentId;
         this.localId = localId;
         this.visitorId = visitorId;
         // this.matchDate = matchDate;
+        this.localScore = localScore;
+        this.visitorScore = visitorScore;
     }
     
     public void loadPoints(Integer localScore, Integer visitorScore) {
