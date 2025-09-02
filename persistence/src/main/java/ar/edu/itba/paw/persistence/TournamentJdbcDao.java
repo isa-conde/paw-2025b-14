@@ -55,7 +55,7 @@ public class TournamentJdbcDao implements TournamentDao {
             rs.getLong("creator_id"), rs.getString("name"), rs.getLong("game_id"), Region.valueOf(rs.getString("region")),
             Elo.valueOf(rs.getString("elo")), rs.getDate("start_date").toLocalDate(), rs.getDate("end_date").toLocalDate(),
             rs.getString("format"), Structure.valueOf(rs.getString("structure")), rs.getInt("max_participants"), rs.getInt("image_id"),
-            rs.getBoolean("openInscriptions"), rs.getBoolean("isFinished"));
+            rs.getBoolean("open_inscriptions"), rs.getBoolean("is_finished"));
 
     private static final RowMapper<User> ROW_MAPPER_USER = (rs, rowNum) -> new User(rs.getLong("userId"), rs.getString("username"), rs.getString("email"));
 
@@ -63,7 +63,7 @@ public class TournamentJdbcDao implements TournamentDao {
             rs.getLong("creator_id"), rs.getString("name"), rs.getLong("game_id"), Region.valueOf(rs.getString("region")),
             Elo.valueOf(rs.getString("elo")), rs.getDate("start_date").toLocalDate(), rs.getDate("end_date").toLocalDate(),
             rs.getString("format"), Structure.valueOf(rs.getString("structure")), rs.getInt("max_participants"), rs.getInt("image_id"),
-            rs.getBoolean("openInscriptions"), rs.getBoolean("isFinished")), Base64.getEncoder().encodeToString(rs.getBytes("image")));
+            rs.getBoolean("open_inscriptions"), rs.getBoolean("is_finished")), Base64.getEncoder().encodeToString(rs.getBytes("image")));
 
 
     @Override
