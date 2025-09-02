@@ -5,7 +5,6 @@ import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 public class Tournament {
 

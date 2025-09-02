@@ -7,42 +7,40 @@
     <div class="cards-container">
       <paw:text type="title" size="xl">Tournaments</paw:text>
     </div>
-    <form:form cssClass="form" modelAttribute="tournamentForm" method="post">
-      <div class="row">
-        <paw:input path="game_id" label="Game" containerType="half" inputType="select" items="${games}" itemValue="id" itemLabel="name"/>
-        <paw:input path="region" label="Region" containerType="half" inputType="select" items="${regions}"/>
-        <paw:input path="" label="Filter" containerType="half" inputType="submit"/>
+    <form:form cssClass="form" modelAttribute="filterForm" method="post">
+      <div class="filter-container">
+        <paw:input path="game_id" label="Game" inputType="select" items="${games}" itemValue="id" itemLabel="name" emptyOption="All Games" inline="true"/>
+        <paw:input path="region" label="Region" inputType="select" items="${regions}" emptyOption="All Regions" inline="true"/>
+        <paw:input path="elo" label="Level" inputType="select" items="${elos}" emptyOption="All Levels" inline="true"/>
+        <paw:input path="" label="Filter" inputType="submit" inline="true"/>
       </div>
     </form:form>
-    
-    <c:set var="hasActiveFilters" value="${true}"/>
 
-    <c:if test="${hasActiveFilters}">
+    <c:if test="${isFiltered}">
       <div class="tournaments-grid">
-        <c:forEach var="tournament" items="${tournamentsGame1}">
+        <c:forEach var="t" items="${tournaments}">
+          <c:set var="tournamentGame" value="${games.stream().filter(g -> g.id == t.tournament.game_id).findFirst().orElse(null)}"/>
           <paw:element-card
-                  image="${pageContext.request.contextPath}/images/lol.jpg"
-                  title="${tournament.name}"
-                  subtitle="Format: ${tournament.format}"
-                  game="${game1.name}"/>
+                  image="data:image/png;base64,${t.base64Img}"
+                  title="${t.tournament.name}"
+                  start_date="${t.tournament.start_date}"
+                  end_date="${t.tournament.end_date}"
+                  game="${tournamentGame.name}"
+                  id="${t.tournament.id}"
+                  isGame="false"/>
         </c:forEach>
       </div>
     </c:if>
 
-    <c:if test="${!hasActiveFilters}">
-      <c:if test="${not empty game1}">
-        <div class="carrousel-title">
-          <paw:text type="title" size="s">${game1.name}</paw:text>
-        </div>
-        <paw:carrousel id="game1-tournaments" elements="${tournamentsGame1}"/>
-      </c:if>
-      
-      <c:if test="${not empty game2}">
-        <div class="carrousel-title">
-          <paw:text type="title" size="s">${game2.name}</paw:text>
-        </div>
-        <paw:carrousel id="game2-tournaments" elements="${tournamentsGame2}"/>
-      </c:if>
+    <c:if test="${!isFiltered}">
+      <c:forEach var="game" items="${games}" varStatus="status">
+        <c:if test="${not empty gameTournaments[game.id]}">
+          <div class="carrousel-title">
+            <paw:text type="title" size="s">${game.name}</paw:text>
+          </div>
+          <paw:carrousel id="game-${game.id}-tournaments" elements="${gameTournaments[game.id]}"/>
+        </c:if>
+      </c:forEach>
     </c:if>
   </div>
 </paw:layout>
