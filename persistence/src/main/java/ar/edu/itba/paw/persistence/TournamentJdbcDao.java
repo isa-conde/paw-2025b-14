@@ -58,7 +58,8 @@ public class TournamentJdbcDao implements TournamentDao {
     private static final RowMapper<Tournament> ROW_MAPPER = (rs, rowNum) -> new Tournament(rs.getLong("id"),
             rs.getLong("creator_id"), rs.getString("name"), rs.getLong("game_id"), Region.valueOf(rs.getString("region")),
             Elo.valueOf(rs.getString("elo")), rs.getDate("start_date").toLocalDate(), rs.getDate("end_date").toLocalDate(),
-            rs.getString("format"), Structure.valueOf(rs.getString("structure")), rs.getInt("max_participants"), rs.getInt("image_id"));
+            rs.getString("format"), Structure.valueOf(rs.getString("structure")), rs.getInt("max_participants"), rs.getInt("image_id"),
+            rs.getBoolean("open_inscriptions"), rs.getBoolean("is_finished"));
 
     private static final RowMapper<User> ROW_MAPPER_USER = (rs, rowNum) -> new User(rs.getLong("id"), rs.getString("username"), rs.getString("email"));
 
@@ -67,7 +68,8 @@ public class TournamentJdbcDao implements TournamentDao {
     private static final RowMapper<TournamentImg> ROW_MAPPER_IMG = (rs, rowNum) -> new TournamentImg(new Tournament(rs.getLong("id"),
             rs.getLong("creator_id"), rs.getString("name"), rs.getLong("game_id"), Region.valueOf(rs.getString("region")),
             Elo.valueOf(rs.getString("elo")), rs.getDate("start_date").toLocalDate(), rs.getDate("end_date").toLocalDate(),
-            rs.getString("format"), Structure.valueOf(rs.getString("structure")), rs.getInt("max_participants"), rs.getInt("image_id")), Base64.getEncoder().encodeToString(rs.getBytes("image")));
+            rs.getString("format"), Structure.valueOf(rs.getString("structure")), rs.getInt("max_participants"), rs.getInt("image_id"),
+            rs.getBoolean("open_inscriptions"), rs.getBoolean("is_finished")), Base64.getEncoder().encodeToString(rs.getBytes("image")));
 
 
     @Override
@@ -115,7 +117,7 @@ public class TournamentJdbcDao implements TournamentDao {
     }
 
     @Override
-    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, byte[] image) {
+    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, byte[] image, Boolean open_inscriptions, Boolean is_finished) {
 
         SqlParameterSource img = new MapSqlParameterSource().addValue("image", image);
         Integer image_id = jdbcInsertImage.executeAndReturnKey(img).intValue();
@@ -131,10 +133,12 @@ public class TournamentJdbcDao implements TournamentDao {
                 .addValue("format", format)
                 .addValue("structure", structure, Types.OTHER)
                 .addValue("max_participants", max_participants)
-                .addValue("image_id", image_id);
+                .addValue("image_id", image_id)
+                .addValue("open_inscriptions", open_inscriptions)
+                .addValue("is_finished", is_finished);
 
         Number key = jdbcInsert.executeAndReturnKey(values);
-        return new Tournament(key.longValue(), creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id);
+        return new Tournament(key.longValue(), creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished);
     }
 
     @Override
@@ -210,6 +214,19 @@ public class TournamentJdbcDao implements TournamentDao {
         return namedJdbcTemplate.query(sql.toString(), params, ROW_MAPPER_IMG);
     }
 
+    public Optional<TournamentImg> findByIdWithImg(Long id){
+        return jdbcTemplate.query("SELECT t.*, i.image FROM tournament t LEFT JOIN image i ON t.image_id = i.id WHERE t.id = ?", ROW_MAPPER_IMG, id
+        ).stream().findFirst();
+    }
+    @Override
+    public List<TournamentImg> findByCreatorImg(Long creator_id) {
+        return jdbcTemplate.query("SELECT * FROM tournament WHERE creator_id = ?", ROW_MAPPER_IMG, creator_id);
+    }
+
+    @Override
+    public void setFinished(Long tournament_id) {
+        jdbcTemplate.query("UPDATE tournament SET isFinished = true WHERE id = ?", ROW_MAPPER ,tournament_id);
+    }
 
     @Override
     public List<ParticipantUser> getTournamentParticipantUsers(Long tournament_id) {

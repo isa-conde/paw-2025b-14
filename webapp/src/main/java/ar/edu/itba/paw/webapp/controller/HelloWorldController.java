@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -131,7 +130,7 @@ public class HelloWorldController {
         User user = (User) request.getSession().getAttribute("user");
         Optional<Game> optionalGame = gs.findById(form.getGame_id());
         if (optionalGame.isEmpty()){
-            return new ModelAndView("gamePage");
+            return new ModelAndView("game");
         }
 
         byte[] imageBytes = null;
@@ -146,7 +145,7 @@ public class HelloWorldController {
 
         final Tournament t = ts.create(user.getId(), form.getName(), optionalGame.get().getId(),
                 form.getRegion(), form.getElo(), form.getStart_date(), form.getEnd_date(),
-                form.getFormat(), form.getStructure(), form.getMax_participants(), imageBytes);
+                form.getFormat(), form.getStructure(), form.getMax_participants(), imageBytes, true, false);
         return new ModelAndView("redirect:/tournament?tournamentId=" + t.getId());
     }
 
@@ -175,14 +174,26 @@ public class HelloWorldController {
     }
 
     @RequestMapping("/game")
-    public ModelAndView gamePage(@RequestParam("game_id") final long game_id){
-        final ModelAndView mav = new ModelAndView("gamePage");
-        Optional<Game> optionalGame = gs.findById(game_id);
+    public ModelAndView game(@RequestParam(name = "userId", required = false, defaultValue = "1") final int userId, @RequestParam("game_id") final long game_id, @ModelAttribute("filterForm") FilterForm filterForm, TournamentFilter tf){
+        final ModelAndView mav = new ModelAndView("game");
+        Optional<GameImg> optionalGame = gs.findByIdWithImage(game_id);
         if(optionalGame.isPresent()) {
             mav.addObject("game", optionalGame.get());
         } else {
             return new ModelAndView("index");
         }
+        mav.addObject("user", us.findById(userId).isPresent() ? us.findById(userId).get() : null);
+        mav.addObject("structures", Arrays.stream(Structure.values()).toList());
+        mav.addObject("regions", Arrays.stream(Region.values()).toList());
+        mav.addObject("elos", Arrays.stream(Elo.values()).toList());
+
+        tf.setGame_id(game_id);
+        tf.setRegion(filterForm.getRegion());
+        tf.setElo(filterForm.getElo());
+
+        mav.addObject("tournaments", ts.findWithImg(tf));
+        mav.addObject("isFiltered", !tf.isEmpty());
+
         return mav;
     }
 
@@ -190,15 +201,15 @@ public class HelloWorldController {
     public ModelAndView tournamentPage(@RequestParam("tournamentId") final long tournamentId, HttpServletRequest request){
         final ModelAndView mav = new ModelAndView("tournament");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
-        Optional<Tournament> optionalTournament = ts.findById(tournamentId);
+        Optional<TournamentImg> optionalTournament = ts.findByIdWithImg(tournamentId);
         if(optionalTournament.isPresent()) {
-            Tournament tournament = optionalTournament.get();
-            Optional<Game> optionalGame = gs.findById(tournament.getGame_id());
-            Optional<User> optionalUser = us.findById(tournament.getCreator_id());
+            TournamentImg t = optionalTournament.get();
+            Optional<Game> optionalGame = gs.findById(t.getTournament().getGame_id());
+            Optional<User> optionalUser = us.findById(t.getTournament().getCreator_id());
             User user = (User) request.getSession().getAttribute("user");
             mav.addObject("participants", ts.getTournamentParticipants(tournamentId));
             mav.addObject("user", user);
-            mav.addObject("tournament", tournament);
+            mav.addObject("tournamentImg", t);
             mav.addObject("game", optionalGame.get());
             mav.addObject("creator", optionalUser.get());
             mav.addObject("formatter", formatter);
@@ -218,9 +229,9 @@ public class HelloWorldController {
         return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
     }
 
-    @RequestMapping(value = "/tournaments-page")
+    @RequestMapping(value = "/tournamentsPage")
     public ModelAndView tournamentsPage(@RequestParam(name = "userId", required = false, defaultValue = "1") final int userId, @ModelAttribute("filterForm") FilterForm filterForm, TournamentFilter tf) {
-        final ModelAndView mav = new ModelAndView("tournaments-page");
+        final ModelAndView mav = new ModelAndView("tournamentsPage");
         List<Game> allGames = gs.findAll();
 
         mav.addObject("user", us.findById(userId).isPresent() ? us.findById(userId).get() : null);
@@ -251,6 +262,33 @@ public class HelloWorldController {
         }
 
         mav.addObject("isFiltered", isFiltered);
+        return mav;
+    }
+
+    @RequestMapping("/gamesPage")
+    public ModelAndView gamesPage(@RequestParam(name = "userId", required = false, defaultValue = "1") final int userId) {
+        final ModelAndView mav = new ModelAndView("gamesPage");
+        List<GameImg> allGames = gs.findAllWithImg();
+
+        mav.addObject("user", us.findById(userId).isPresent() ? us.findById(userId).get() : null);
+        mav.addObject("games", allGames);
+
+        return mav;
+    }
+
+    @RequestMapping("/myTournaments")
+    public ModelAndView myTournaments(@RequestParam(name = "userId", required = false, defaultValue = "1") final int userId) {
+        final ModelAndView mav = new ModelAndView("myTournaments");
+
+//        List<TournamentImg> createdTournaments = ts.findWithImg();
+//        List<TournamentImg> joinedTournaments = ts.findWithImg();
+//        List<TournamentImg> pastTournaments = ts.findWithImg();
+//
+        mav.addObject("user", us.findById(userId).isPresent() ? us.findById(userId).get() : null);
+//        mav.addObject("createdTournaments", createdTournaments);
+//        mav.addObject("joinedTournaments", joinedTournaments);
+//        mav.addObject("pastTournaments", pastTournaments);
+
         return mav;
     }
 }

@@ -16,10 +16,10 @@
 <a href="${url}" class="element-card">
     <img src="${image}" alt="Background" class="element-card-image">
     <div class="element-card-content game">
-        <paw:text type="title" size="xs"><c:out value="${game}"/></paw:text>
+        <paw:text type="title" size="xs" stroke="true"><c:out value="${game}"/></paw:text>
     </div>
     <div class="element-card-content">
-        <paw:text type="title" size="s"><c:out value="${title}"/></paw:text>
+        <paw:text type="title" size="s" stroke="true"><c:out value="${title}"/></paw:text>
         <c:if test="${hasDate}">
             <div class="date-container">
                 <paw:datetime date="${start_date}" size="s" weight="thin"/>

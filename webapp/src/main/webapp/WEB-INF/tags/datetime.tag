@@ -4,9 +4,11 @@
 <%@ attribute name="date" required="true" rtexprvalue="true" type="java.time.LocalDate"%>
 <%@ attribute name="size" required="false" rtexprvalue="true" description="Font size: xs, s, [m], l, xl"%>
 <%@ attribute name="weight" required="false" rtexprvalue="true" description="Font weight: thin, semi-bold, [bold]"%>
+<%@ attribute name="stroke" required="false" rtexprvalue="true" description="Add text stroke: true or false"%>
 
 <c:set var="fontSize" value="${not empty size? size : 'm'}"/>
 <c:set var="fontWeight" value="${not empty weight? weight : 'bold'}"/>
+<c:set var="hasStroke" value="${not empty stroke ? stroke : 'false'}"/>
 
 <c:set var="daySuffix" value=""/>
 <c:choose>
@@ -28,6 +30,6 @@
 <c:set var="monthIndex" value="${date.monthValue - 1}"/>
 <c:set var="monthName" value="${monthNames.split(',')[monthIndex]}"/>
 
-<paw:text size="${fontSize}" weight="${fontWeight}">
+<paw:text size="${fontSize}" weight="${fontWeight}" stroke="${hasStroke}">
     ${monthName} ${date.dayOfMonth}${daySuffix} ${date.year}
 </paw:text>
