@@ -28,24 +28,41 @@ CREATE TABLE IF NOT EXISTS tournament (
 );
 
 CREATE TABLE IF NOT EXISTS participant_user (
-                                  user_id INT NOT NULL,
-                                  tournament_id INT NOT NULL,
-                                  points INT NOT NULL,
-                                  PRIMARY KEY (user_id, tournament_id),
-                                  FOREIGN KEY (tournament_id) REFERENCES tournament(id),
-                                  FOREIGN KEY (user_id) REFERENCES users(id)
+        user_id INT NOT NULL,
+        tournament_id INT NOT NULL,
+        points INT NOT NULL DEFAULT 0,
+        PRIMARY KEY(user_id, tournament_id),
+        FOREIGN KEY (user_id) REFERENCES users(userid) ON DELETE CASCADE,
+        FOREIGN KEY (tournament_id) REFERENCES tournament(id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS game_format (
-                             id    SERIAL PRIMARY KEY NOT NULL,
-                             name text NOT NULL,
-                             players_per_team smallint NOT NULL,
-                             game_id INT NOT NULL,
-                             FOREIGN KEY (game_id) REFERENCES game(id)
+CREATE TABLE IF NOT EXISTS match (
+	id INT,
+	tournament_id INT NOT NULL,
+	local_id INT,
+	visitor_id INT,
+	local_score INT,
+	visitor_score INT,
+	PRIMARY KEY (id, tournament_id),
+	FOREIGN KEY (tournament_id) REFERENCES tournament(id) ON DELETE CASCADE,
+	FOREIGN KEY (local_id) REFERENCES users(userid),
+	FOREIGN KEY (visitor_id) REFERENCES users(userid)
 );
-
 
 CREATE TABLE IF NOT EXISTS image (
                        id SERIAL PRIMARY KEY NOT NULL,
                        image BYTEA
+);
+
+CREATE TABLE IF NOT EXISTS game_format (
+	id SERIAL PRIMARY KEY NOT NULL,
+	name TEXT NOT NULL,
+	players_per_team smallint NOT NULL,
+	game_id INT NOT NULL,
+	FOREIGN KEY (game_id) REFERENCES game(id)
+);
+
+CREATE TABLE IF NOT EXISTS image(
+	id SERIAL PRIMARY KEY NOT NULL,
+	image BYTEA
 );

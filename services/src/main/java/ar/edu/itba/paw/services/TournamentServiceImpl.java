@@ -4,6 +4,7 @@ import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.ParticipantUser;
 import ar.edu.itba.paw.model.ParticipantUserInfo;
+import ar.edu.itba.paw.model.Match;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.TournamentImg;
@@ -58,9 +59,29 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public void joinTournamentTeam(Long team_id, Long tournament_id) {
-        tournamentDao.joinTournamentTeam(team_id, tournament_id);
+    public void createMatches(Long tournament_id) {
+		tournamentDao.createMatches(tournament_id);
+	}
+
+    @Override
+    public Optional<Structure> getTournamentStructure(Long tournament_id){
+    	return tournamentDao.getTournamentStructure(tournament_id);
     }
+
+    @Override
+    public void loadScores(Long match_id, Long tournament_id, Integer local_score, Integer visitor_score) {
+    	tournamentDao.loadScores(match_id, tournament_id, local_score, visitor_score);
+    }
+//
+//    @Override
+//    public void joinTournamentTeam(Long team_id, Long tournament_id) {
+//        tournamentDao.joinTournamentTeam(team_id, tournament_id);
+//    }
+//
+    @Override
+	public List<Match> getTournamentMatches(Long tournament_id) {
+		return tournamentDao.getTournamentMatches(tournament_id);
+	}
 
     @Override
     public List<TournamentImg> findWithImg(TournamentFilter tournamentFilter){

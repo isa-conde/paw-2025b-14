@@ -5,15 +5,17 @@ import ar.edu.itba.paw.model.Game;
 import ar.edu.itba.paw.model.ParticipantUser;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.model.Match;
+import ar.edu.itba.paw.model.Pair;
+import ar.edu.itba.paw.model.Tournament;
+import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.*;
 import ar.edu.itba.paw.model.enums.Elo;
-import ar.edu.itba.paw.model.enums.Genre;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -22,12 +24,9 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import javax.swing.*;
-import java.lang.reflect.Type;
 import java.sql.Types;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Repository
 public class TournamentJdbcDao implements TournamentDao {
@@ -35,8 +34,10 @@ public class TournamentJdbcDao implements TournamentDao {
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
+    private final SimpleJdbcInsert jfbcInsertParticipant;
+    private final SimpleJdbcInsert jfbcInsertMatch;
     private final SimpleJdbcInsert jdbcInsertUser;
-    private final SimpleJdbcInsert jdbcInsertTeam;
+    //private final SimpleJdbcInsert jdbcInsertTeam;
     private final SimpleJdbcInsert jdbcInsertImage;
 
     @Autowired
@@ -48,8 +49,12 @@ public class TournamentJdbcDao implements TournamentDao {
                 .usingGeneratedKeyColumns("id");
         this.jdbcInsertUser = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("participant_user");
-        this.jdbcInsertTeam = new SimpleJdbcInsert(jdbcTemplate)
-                .withTableName("participant_team");
+        this.jfbcInsertParticipant = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("participant_user");
+        //this.jdbcInsertTeam = new SimpleJdbcInsert(jdbcTemplate)
+        //        .withTableName("participant_team");
+        this.jfbcInsertMatch = new SimpleJdbcInsert(jdbcTemplate)
+				.withTableName("match");
         this.jdbcInsertImage = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("image")
                 .usingGeneratedKeyColumns("id");
@@ -150,8 +155,34 @@ public class TournamentJdbcDao implements TournamentDao {
         values.put("points", 0);
 
         jdbcInsertUser.execute(values);
+    	Tournament t = findById(tournament_id).orElse(null);
+    	List<User> participants = getTournamentParticipants(tournament_id);
+    	if (t != null && participants.size() < t.getMax_participants()) {
+    		List<Pair<Integer, Integer>> firstMatches = t.firstMatches(participants.size());
+
+    		for (Pair<Integer, Integer> match : firstMatches) {
+    			if(match.getRight() == 0) {
+    				jdbcTemplate.update("UPDATE match SET local_id = ? WHERE id = ? AND tournament_id = ?", user_id, match.getLeft(), tournament_id);
+    			}else {
+					jdbcTemplate.update("UPDATE match SET visitor_id = ? WHERE id = ? AND tournament_id = ?", user_id, match.getLeft(), tournament_id);
+				}
+    		}
+
+	        Map<String, Object> values = new HashMap<>();
+
+	        values.put("user_id", user_id);
+	        values.put("tournament_id", tournament_id);
+
+	        jfbcInsertParticipant.execute(values);
+    	}
     }
 
+	@Override
+    public void loadScores(Long match_id, Long tournament_id, Integer local_score, Integer visitor_score) {
+		jdbcTemplate.update("UPDATE match SET local_score = ?, visitor_score = ? WHERE id = ? AND tournament_id = ?", local_score, visitor_score, match_id, tournament_id);
+	}
+
+    /*
     @Override
     public void joinTournamentTeam(Long team_id, Long tournament_id) {
         Map<String, Object> values = new HashMap<>();
@@ -159,14 +190,53 @@ public class TournamentJdbcDao implements TournamentDao {
         values.put("team_id", team_id);
         values.put("tournament_id", tournament_id);
 
-        jdbcInsertUser.execute(values);
+        jfbcInsertParticipant.execute(values);
     }
-
+    */
     @Override
     public List<User> getTournamentUsers(Long tournament_id) {
         return jdbcTemplate.query("SELECT u.id, u.username, u.email FROM users u " +
                 "JOIN participant_user p ON u.id = p.user_id " +
                 "WHERE p.tournament_id = ?", ROW_MAPPER_USER, tournament_id);
+    }
+
+    @Override
+    public Optional<Structure> getTournamentStructure(Long tournament_id) {
+    	Tournament t = findById(tournament_id).orElse(null);
+    	if (t != null) {
+			return Optional.of(t.getStructure());
+		}
+    	return Optional.empty();
+	}
+//
+//    public Integer getTournamentMaxParticipants(Long tournament_id) {
+//		Tournament t = findById(tournament_id).orElse(null);
+//		if (t != null) {
+//
+//		}
+//    }
+
+    @Override
+    public void createMatches(Long tournament_id) {
+		Tournament t = findById(tournament_id).orElse(null);
+		if (t != null) {
+			int rounds = t.amountOfMatches();
+			for(int i = 0; i < rounds; i++) {
+				Map<String, Object> values = new HashMap<>();
+				values.put("id", i+1);
+				values.put("tournament_id", tournament_id);
+				values.put("local_id", null);
+				values.put("visitor_id", null);
+				values.put("local_score", null);
+				values.put("visitor_score", null);
+				jfbcInsertMatch.execute(values);
+			}
+		}
+	}
+
+    @Override
+    public List<Match> getTournamentMatches(Long tournament_id) {
+    	return jdbcTemplate.query("SELECT * FROM match WHERE tournament_id = ?", (rs, rowNum) -> new Match(rs.getLong("id"), rs.getLong("tournament_id"), rs.getObject("local_id") != null ? rs.getLong("local_id") : null, rs.getObject("visitor_id") != null ? rs.getLong("visitor_id") : null, rs.getObject("local_score") != null ? rs.getInt("local_score") : null, rs.getObject("visitor_score") != null ? rs.getInt("visitor_score") : null), tournament_id);
     }
 
     @Override
@@ -231,5 +301,10 @@ public class TournamentJdbcDao implements TournamentDao {
     @Override
     public List<ParticipantUser> getTournamentParticipantUsers(Long tournament_id) {
         return jdbcTemplate.query("SELECT * FROM participant_user WHERE tournament_id = ?", ROW_MAPPER_PARTICIPANT_USER, tournament_id);
+    }
+
+    @Override
+    public List<User> getTournamentParticipants(Long tournament_id) {
+        return List.of();
     }
 }
