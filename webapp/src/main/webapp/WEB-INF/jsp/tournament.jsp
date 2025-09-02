@@ -43,10 +43,25 @@
         <paw:board participants="${[1, 2, 3, 4, 5, 6]}"/>
       </c:when>
       <c:when test="${activeSection == 'Matches'}">
-        <div class="no-cards-container">
-          <paw:text size="l" weight="thin">Matches section coming soon...</paw:text>
-        </div>
+        <c:choose>
+          <c:when test="${empty matchesByDate}">
+            <div class="no-cards-container">
+              <paw:text size="l" weight="thin">No matches available</paw:text>
+            </div>
+          </c:when>
+          <c:otherwise>
+            <c:forEach var="dateEntry" items="${matchesByDate}">
+              <paw:date-matches dateNumber="${dateEntry.key}" matches="${dateEntry.value}"/>
+            </c:forEach>
+          </c:otherwise>
+        </c:choose>
       </c:when>
     </c:choose>
   </div>
 </paw:layout>
+
+<script>
+function setWinner(matchId, winnerId) {
+    alert('Setting winner for match ' + matchId + ' to player ' + winnerId);
+}
+</script>
