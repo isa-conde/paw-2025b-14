@@ -27,5 +27,5 @@ public interface TournamentService {
 
     public List<TournamentImg> findWithImg(TournamentFilter tournamentFilter);
 
-
+    public Optional<TournamentImg> findByIdWithImg(Long id);
 }

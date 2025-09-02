@@ -203,4 +203,8 @@ public class TournamentJdbcDao implements TournamentDao {
         return namedJdbcTemplate.query(sql.toString(), params, ROW_MAPPER_IMG);
     }
 
+    public Optional<TournamentImg> findByIdWithImg(Long id){
+        return jdbcTemplate.query("SELECT t.*, i.image FROM tournament t LEFT JOIN image i ON t.image_id = i.id WHERE t.id = ?", ROW_MAPPER_IMG, id
+        ).stream().findFirst();
+    }
 }

@@ -1,5 +1,5 @@
 <%@ tag language="java" pageEncoding="UTF-8" %>
-<%@ attribute name="elements" required="false" type="java.util.List" %>
+<%@ attribute name="elements" required="true" type="java.util.List" %>
 <%@ attribute name="isGame" required="false" rtexprvalue="true" description="game or [tournament] carrousel" %>
 <%@ attribute name="id" required="true" rtexprvalue="true" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>

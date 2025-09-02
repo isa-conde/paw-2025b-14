@@ -25,4 +25,6 @@ public interface GameDao {
     Optional<Game> findByName(String name);
 
     public List<GameImg> findAllWithImg();
+
+    public Optional<GameImg> findByIdWithImage(long id);
 }

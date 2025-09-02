@@ -30,4 +30,5 @@ public interface TournamentDao {
 
     public List<TournamentImg> findWithImg(TournamentFilter tournamentFilter);
 
+    public Optional<TournamentImg> findByIdWithImg(Long id);
 }

@@ -3,10 +3,12 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
 <paw:layout user="${user}">
-  <div class="content-container">
-    <div class="cards-container">
-      <paw:text type="title" size="xl">Tournaments</paw:text>
+  <paw:banner image="${pageContext.request.contextPath}/images/tournament.jpeg">
+    <div class="page-title">
+      <paw:text type="title" size="xl" stroke="true">Tournaments</paw:text>
     </div>
+  </paw:banner>
+  <div class="content-container">
     <form:form cssClass="form" modelAttribute="filterForm" method="post">
       <div class="filter-container">
         <paw:input path="game_id" label="Game" inputType="select" items="${games}" itemValue="id" itemLabel="name" emptyOption="All Games" inline="true"/>
@@ -16,20 +18,16 @@
       </div>
     </form:form>
 
+
     <c:if test="${isFiltered}">
-      <div class="tournaments-grid">
-        <c:forEach var="t" items="${tournaments}">
-          <c:set var="tournamentGame" value="${games.stream().filter(g -> g.id == t.tournament.game_id).findFirst().orElse(null)}"/>
-          <paw:element-card
-                  image="data:image/png;base64,${t.base64Img}"
-                  title="${t.tournament.name}"
-                  start_date="${t.tournament.start_date}"
-                  end_date="${t.tournament.end_date}"
-                  game="${tournamentGame.name}"
-                  id="${t.tournament.id}"
-                  isGame="false"/>
-        </c:forEach>
-      </div>
+      <c:choose>
+        <c:when test="${tournaments.size() <= '0'}">
+          <div class="no-cards-container"><paw:text size="l" weight="thin">(No tournaments)</paw:text></div>
+        </c:when>
+        <c:otherwise>
+          <paw:elements-grid elements="${tournaments}" id="tournamets-grid" headerElements="${games}"/>
+        </c:otherwise>
+      </c:choose>
     </c:if>
 
     <c:if test="${!isFiltered}">

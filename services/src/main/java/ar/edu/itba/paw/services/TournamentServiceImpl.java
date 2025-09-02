@@ -63,4 +63,8 @@ public class TournamentServiceImpl implements TournamentService {
         return tournamentDao.findWithImg(tournamentFilter);
     }
 
+    @Override
+    public Optional<TournamentImg> findByIdWithImg(Long id){
+        return tournamentDao.findByIdWithImg(id);
+    }
 }

@@ -87,7 +87,7 @@ public class GameJdbcDao implements GameDao {
 
         Game game = this.create(name, genre, image_id);
 
-        for (GameFormat f : formats){
+        for (GameFormat f : formats) {
             SqlParameterSource values = new MapSqlParameterSource()
                     .addValue("name", f.getName())
                     .addValue("players_per_team", f.getPlayers_per_team())
@@ -97,8 +97,15 @@ public class GameJdbcDao implements GameDao {
         return game;
     }
 
-    public List<GameImg> findAllWithImg(){
+    @Override
+    public List<GameImg> findAllWithImg() {
         return jdbcTemplate.query("SELECT g.*, i.image FROM game g LEFT JOIN image i ON g.image_id = i.id;", ROW_MAPPER_IMG);
+    }
+
+    @Override
+    public Optional<GameImg> findByIdWithImage(long id) {
+        return jdbcTemplate.query("SELECT g.*, i.image FROM game g LEFT JOIN image i ON g.image_id = i.id WHERE g.id = ?", ROW_MAPPER_IMG, id
+        ).stream().findFirst();
     }
 
 }

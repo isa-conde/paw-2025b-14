@@ -74,7 +74,7 @@
                     </div>
                 </form:form>
             </paw:modal>
-            <paw:button-card title="Test your habilities" butText="Join a Tournament" onclick="window.location.href='${pageContext.request.contextPath}/tournaments-page'" texture="true"/>
+            <paw:button-card title="Test your habilities" butText="Join a Tournament" onclick="window.location.href='${pageContext.request.contextPath}/tournamentsPage'" texture="true"/>
         </div>
         <div class="content-title">
             <paw:text type="title" size="l"><spring:message code="games"/></paw:text>
