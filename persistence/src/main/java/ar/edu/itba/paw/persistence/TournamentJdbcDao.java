@@ -31,8 +31,8 @@ public class TournamentJdbcDao implements TournamentDao {
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
-    private final SimpleJdbcInsert jdbcInsertMatch;
     private final SimpleJdbcInsert jdbcInsertParticipantUser;
+    private final SimpleJdbcInsert jdbcInsertMatch;
     //private final SimpleJdbcInsert jdbcInsertTeam;
     private final SimpleJdbcInsert jdbcInsertImage;
 
@@ -181,7 +181,7 @@ public class TournamentJdbcDao implements TournamentDao {
         values.put("team_id", team_id);
         values.put("tournament_id", tournament_id);
 
-        jfbcInsertParticipant.execute(values);
+        jdbcInsertParticipant.execute(values);
     }
     */
     @Override
@@ -287,7 +287,13 @@ public class TournamentJdbcDao implements TournamentDao {
 
     @Override
     public void setFinished(Long tournament_id) {
-        jdbcTemplate.query("UPDATE tournament SET isFinished = true WHERE id = ?", ROW_MAPPER ,tournament_id);
+        jdbcTemplate.query("UPDATE tournament SET is_finished = true WHERE id = ?", ROW_MAPPER ,tournament_id);
+    }
+
+    @Override
+    public void closeInscriptions(Long tournament_id){
+        jdbcTemplate.query("UPDATE tournament SET open_inscriptions = false WHERE id = ?", ROW_MAPPER ,tournament_id);
+
     }
 
     @Override
@@ -295,11 +301,6 @@ public class TournamentJdbcDao implements TournamentDao {
         return jdbcTemplate.query("SELECT * FROM participant_user WHERE tournament_id = ?", ROW_MAPPER_PARTICIPANT_USER, tournament_id);
     }
 
-    @Override
-    public List<User> getTournamentParticipants(Long tournament_id) {
-        return List.of();
-    }
-    
     @Override
     public List<Pair<String,String>> getGenericMatches(Long tournament_id) {
     	Structure structure = getTournamentStructure(tournament_id).orElse(null);

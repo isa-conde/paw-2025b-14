@@ -126,6 +126,11 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
+    public void closeInscriptions(Long tournament_id){
+        tournamentDao.closeInscriptions(tournament_id);
+    }
+
+    @Override
     public List<Pair<String,String>> getGenericMatches(Long tournament_id) {
 		return tournamentDao.getGenericMatches(tournament_id);
 	}
