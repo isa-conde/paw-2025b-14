@@ -32,6 +32,12 @@
     <url-pattern>/</url-pattern>
   </servlet-mapping>
 
+  <!-- Favicon mapping -->
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>/favicon.ico</url-pattern>
+  </servlet-mapping>
+
   <!-- Contexto raíz de Spring (services/daos, etc.) -->
   <context-param>
     <param-name>contextClass</param-name>

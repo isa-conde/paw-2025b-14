@@ -14,7 +14,7 @@
     <div class="match-players">
         <div class="player local-player ${winner == 1 ? 'winner' : ''}">
             <img src="${pageContext.request.contextPath}/images/empty_user.png" alt="Player" class="player-avatar"/>
-            <paw:text size="s" weight="semi-bold"><c:out value="${localPlayer} wins"/></paw:text>
+            <paw:text size="s" weight="semi-bold"><c:out value="${localPlayer}"/></paw:text>
         </div>
         
         <div class="vs-container">
@@ -23,7 +23,7 @@
         
         <div class="player visitor-player ${winner == 2 ? 'winner' : ''}">
             <img src="${pageContext.request.contextPath}/images/empty_user.png" alt="Player" class="player-avatar"/>
-            <paw:text size="s" weight="semi-bold"><c:out value="${visitorPlayer} wins"/></paw:text>
+            <paw:text size="s" weight="semi-bold"><c:out value="${visitorPlayer}"/></paw:text>
         </div>
     </div>
     
