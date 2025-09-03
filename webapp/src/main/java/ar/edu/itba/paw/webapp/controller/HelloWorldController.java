@@ -61,6 +61,11 @@ public class HelloWorldController {
         final ModelAndView mav = new ModelAndView("index");
         User user = (User) request.getSession().getAttribute("user");
         List<GameImg> allGames = gs.findAllWithImg();
+        
+        if (tournamentForm.getStructure() == null) {
+            tournamentForm.setStructure(Structure.LEAGUE);
+        }
+        
         mav.addObject("user", user);
         mav.addObject("games", allGames);
         mav.addObject("regions", Arrays.stream(Region.values()).toList());
@@ -337,8 +342,7 @@ public class HelloWorldController {
         List<TournamentImg> pastTournaments = ts.findUserPastTournaments(user.getId());
 
         mav.addObject("user", user);
-//        mav.addObject("createdTournaments", createdTournaments);
-
+        mav.addObject("pastTournaments", pastTournaments);
         mav.addObject("onGoingTournaments", onGoingTournaments);
         mav.addObject("finishedTournaments", finishedTournaments);
         mav.addObject("joinedTournaments", joinedTournaments);

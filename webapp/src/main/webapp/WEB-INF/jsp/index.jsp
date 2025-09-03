@@ -65,24 +65,22 @@
                         <paw:input path="name" label="Tournament Name"/>
                     </div>
                     <div class="row">
-                        <paw:input path="game_id" label="Game" containerType="half" inputType="select" items="${games}" itemValue="game.id" itemLabel="game.name"/>
-                        <paw:input path="region" label="Region" containerType="half" inputType="select" items="${regions}"/>
+                        <paw:input path="game_id" label="Game" inputType="select" items="${games}" itemValue="game.id" itemLabel="game.name"/>
                     </div>
                     <div class="row">
                         <paw:input path="start_date" label="Start Date" containerType="half" inputType="date"/>
                         <paw:input path="end_date" label="End Date" containerType="half" inputType="date"/>
                     </div>
+                    <div class="row center">
+                        <paw:input path="region" label="Region" containerType="half" inputType="select" items="${regions}"/>
+                        <paw:input path="max_participants" label="Max Participants" containerType="half" inputType="number"/>
+                    </div>
                     <div class="row">
                         <paw:input path="format" label="Format" containerType="half"/>
                         <paw:input path="elo" label="Skill level" containerType="half" inputType="select" items="${elos}"/>
                     </div>
-                    <div class="row center">
-                        <paw:input path="max_participants" label="Max Participants" containerType="half" inputType="number"/>
-                        <paw:input path="structure" label="Structure" items="${structures}" inputType="select"/>
-                    </div>
-                    <div class="row center">
-                        <form:label path="image">Image: </form:label>
-                        <form:input type="file" path="image"/>
+                    <div class="row">
+                        <paw:input path="image" label="Image" inputType="file"/>
                     </div>
                     <div class="row center">
                         <paw:input path="" label="Create" containerType="half" inputType="submit"/>

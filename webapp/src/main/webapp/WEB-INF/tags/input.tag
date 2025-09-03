@@ -53,6 +53,15 @@
                 <c:when test="${inputType == 'hidden'}">
                     <form:hidden path="${path}" />
                 </c:when>
+                <c:when test="${inputType == 'file'}">
+                    <div class="file-input-container">
+                        <form:input path="${path}" type="file" class="file-input" id="file-${path}" accept="image/*" onchange="updateFileName('file-${path}', 'file-text-${path}')"/>
+                        <label for="file-${path}" class="file-input-label">
+                            <img src="${pageContext.request.contextPath}/images/upload.png" alt="Upload" class="file-input-icon"/>
+                            <span class="file-input-text" id="file-text-${path}">Upload image</span>
+                        </label>
+                    </div>
+                </c:when>
             </c:choose>
         </form:label>
     </c:when>
@@ -62,6 +71,19 @@
         </div>
     </c:otherwise>
 </c:choose>
+
+<script>
+function updateFileName(inputId, textId) {
+    const input = document.getElementById(inputId);
+    const textElement = document.getElementById(textId);
+    
+    if (input.files && input.files[0]) {
+        textElement.textContent = input.files[0].name;
+    } else {
+        textElement.textContent = 'Upload image';
+    }
+}
+</script>
 
 
 
