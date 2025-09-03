@@ -307,4 +307,12 @@ public class TournamentJdbcDao implements TournamentDao {
     public List<User> getTournamentParticipants(Long tournament_id) {
         return List.of();
     }
+    
+    @Override
+    public List<Pair<String,String>> getGenericMatches(Long tournament_id) {
+    	Structure structure = getTournamentStructure(tournament_id).orElse(null);
+    	if (structure == null) return List.of();
+    	int maxParticipants = jdbcTemplate.queryForObject("SELECT max_participants FROM tournament WHERE id = ?", Integer.class, tournament_id);
+    	return structure.buildMatches(maxParticipants);
+    }
 }

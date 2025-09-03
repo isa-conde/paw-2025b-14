@@ -5,6 +5,7 @@ import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.ParticipantUser;
 import ar.edu.itba.paw.model.ParticipantUserInfo;
 import ar.edu.itba.paw.model.Match;
+import ar.edu.itba.paw.model.Pair;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.TournamentImg;
@@ -124,4 +125,8 @@ public class TournamentServiceImpl implements TournamentService {
         tournamentDao.setFinished(tournament_id);
     }
 
+    @Override
+    public List<Pair<String,String>> getGenericMatches(Long tournament_id) {
+		return tournamentDao.getGenericMatches(tournament_id);
+	}
 }

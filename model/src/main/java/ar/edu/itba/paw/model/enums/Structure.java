@@ -41,7 +41,7 @@ public enum Structure {
     	private void buildMatchesRec(List<Pair<String,String>> prev, int remaining) {
 			if(remaining == 0) return;
 			for(int i = 0; i < remaining; i++) {
-				prev.add(new Pair<>(String.valueOf(remaining), String.valueOf(i)));
+				prev.add(new Pair<>("Player " + String.valueOf((char) (remaining + 'A')), "Player " + String.valueOf((char) ('A' + i))));
 			}
 			buildMatchesRec(prev, remaining-1);
 		}

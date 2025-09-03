@@ -69,7 +69,7 @@
         <paw:board participants="${participants}"/>
       </c:when>
       <c:when test="${activeSection == 'Matches'}">
-        <c:choose>
+        <!--<c:choose>
           <c:when test="${empty matchesByDate}">
             <div class="no-cards-container">
               <paw:text size="l" weight="thin">No matches available</paw:text>
@@ -80,7 +80,10 @@
               <paw:date-matches dateNumber="${dateEntry.key}" matches="${dateEntry.value}"/>
             </c:forEach>
           </c:otherwise>
-        </c:choose>
+        </c:choose>-->
+		<c:forEach var="match" items="${genericMatches}">
+			<div class="no-cards-container"><paw:text size="1" weight="thin"><c:out value="${match.left}"/> vs <c:out value="${match.right}"/>. TO BE PLAYED</paw:text></div>
+		</c:forEach>
       </c:when>
     </c:choose>
   </div>

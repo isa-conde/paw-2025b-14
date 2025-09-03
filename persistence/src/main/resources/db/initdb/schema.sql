@@ -1,13 +1,19 @@
 CREATE TABLE IF NOT EXISTS users (
-    userid SERIAL PRIMARY KEY,
-    username VARCHAR(100) NOT NULL UNIQUE
+  id SERIAL PRIMARY KEY,
+  email text NOT NULL UNIQUE,
+  username text NOT NULL UNIQUE,
+  password text,
+  CONSTRAINT username_length CHECK (char_length(username) <= 15)
 );
 
 
+
 CREATE TABLE IF NOT EXISTS game (
-        id BIGSERIAL PRIMARY KEY,
+        id SERIAL PRIMARY KEY NOT NULL,
         name text NOT NULL UNIQUE,
-        genre VARCHAR(100)
+        genre genre_enum,
+        image_id INT,
+        FOREIGN KEY (image_id) REFERENCES image(id)
 );
 
 
@@ -31,8 +37,8 @@ CREATE TABLE IF NOT EXISTS participant_user (
         tournament_id INT NOT NULL,
         points INT NOT NULL DEFAULT 0,
         PRIMARY KEY(user_id, tournament_id),
-        FOREIGN KEY (user_id) REFERENCES users(userid) ON DELETE CASCADE,
-        FOREIGN KEY (tournament_id) REFERENCES tournament(id) ON DELETE CASCADE
+        FOREIGN KEY (user_id) REFERENCES users(id),
+        FOREIGN KEY (tournament_id) REFERENCES tournament(id)
 );
 
 CREATE TABLE IF NOT EXISTS match (
@@ -43,9 +49,9 @@ CREATE TABLE IF NOT EXISTS match (
 	local_score INT,
 	visitor_score INT,
 	PRIMARY KEY (id, tournament_id),
-	FOREIGN KEY (tournament_id) REFERENCES tournament(id) ON DELETE CASCADE,
-	FOREIGN KEY (local_id) REFERENCES users(userid),
-	FOREIGN KEY (visitor_id) REFERENCES users(userid)
+	FOREIGN KEY (tournament_id) REFERENCES tournament(id),
+	FOREIGN KEY (local_id) REFERENCES users(id),
+	FOREIGN KEY (visitor_id) REFERENCES users(id)
 );
 
 CREATE TABLE IF NOT EXISTS game_format (
