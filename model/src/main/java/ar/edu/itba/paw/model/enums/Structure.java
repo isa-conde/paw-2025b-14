@@ -27,6 +27,7 @@ public enum Structure {
     	
     	@Override
     	public List<Pair<Integer,Integer>> firstMatches(int participant, int maxParticipants) {
+    		System.out.println(participant);
 			if(participant < 0 || participant >= maxParticipants || maxParticipants < 2) return null;
 			List<Pair<Integer,Integer>> matches = new ArrayList<>();
 			// el primer Integer es el indice del partido, el segundo es 0 si juega de local y 1 si juega de visitante

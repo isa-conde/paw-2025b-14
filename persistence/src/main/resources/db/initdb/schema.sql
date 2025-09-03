@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS tournament (
 CREATE TABLE IF NOT EXISTS participant_user (
         user_id INT NOT NULL,
         tournament_id INT NOT NULL,
-        points INT NOT NULL DEFAULT 0,
+        points INT DEFAULT 0,
         PRIMARY KEY(user_id, tournament_id),
         FOREIGN KEY (user_id) REFERENCES users(id),
         FOREIGN KEY (tournament_id) REFERENCES tournament(id)
@@ -75,3 +75,7 @@ ALTER TABLE tournament ADD COLUMN IF NOT EXISTS open_inscriptions BOOLEAN;
 ALTER TABLE tournament ADD COLUMN IF NOT EXISTS is_finished BOOLEAN;
 UPDATE tournament SET open_inscriptions = TRUE WHERE open_inscriptions IS NULL;
 UPDATE tournament SET is_finished = FALSE WHERE is_finished IS NULL;
+
+UPDATE tournament SET start_date = '2024-12-31' WHERE start_date IS NULL;
+UPDATE tournament SET end_date = '2025-01-31' WHERE end_date IS NULL;
+UPDATE participant_user SET points = 0 WHERE points IS NULL;

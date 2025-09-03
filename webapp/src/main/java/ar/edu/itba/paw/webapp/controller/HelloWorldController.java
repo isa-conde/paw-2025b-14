@@ -211,7 +211,7 @@ public class HelloWorldController {
             mav.addObject("game", optionalGame.get());
             mav.addObject("creator", optionalUser.get());
             mav.addObject("formatter", formatter);
-            mav.addObject("genericMatches", ts.getGenericMatches(tournamentId));;
+            mav.addObject("genericMatches", ts.getMatches(tournamentId));;
         } else {
             return new ModelAndView("index");
         }
