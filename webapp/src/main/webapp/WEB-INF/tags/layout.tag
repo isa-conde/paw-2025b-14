@@ -14,7 +14,7 @@
     </head>
     <body>
         <div class="container">
-            <paw:sidebar/>
+            <paw:sidebar user="${user}"/>
             <paw:header>
                 <c:choose>
                     <c:when test="${isLoggedIn}">

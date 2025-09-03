@@ -23,14 +23,7 @@
                     </div>
                 </form:form>
 
-                <c:choose>
-                    <c:when test="${tournaments.size() <= '0'}">
-                        <div class="no-cards-container"><paw:text size="l" weight="thin">(No tournaments)</paw:text></div>
-                    </c:when>
-                    <c:otherwise>
-                        <paw:elements-grid elements="${tournaments}" id="tournaments-grid"/>
-                    </c:otherwise>
-                </c:choose>
+                <paw:elements-grid elements="${tournaments}" id="tournaments-grid"/>
             </div>
         </c:otherwise>
     </c:choose>

@@ -5,6 +5,7 @@ import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class Tournament {
 
@@ -85,6 +86,18 @@ public class Tournament {
     public Integer getMax_participants() {
         return max_participants;
     }
+    
+    public boolean isFull(int currentParticipants) {
+		return currentParticipants >= max_participants;
+	}
+    
+    public int amountOfMatches() {
+    	return structure.amountOfMatches(max_participants);
+    }
+    
+    public List<Pair<Integer,Integer>> firstMatches(int participant) {
+    	return structure.firstMatches(participant, max_participants);
+	}
 
     public Integer getImage_id() {
         return image_id;

@@ -24,16 +24,9 @@
         </form:form>
 
 
-        <c:if test="${isFiltered}">
-          <c:choose>
-            <c:when test="${tournaments.size() <= '0'}">
-              <div class="no-cards-container"><paw:text size="l" weight="thin">(No tournaments)</paw:text></div>
-            </c:when>
-            <c:otherwise>
-              <paw:elements-grid elements="${tournaments}" id="tournamets-grid" headerElements="${games}"/>
-            </c:otherwise>
-          </c:choose>
-        </c:if>
+    <c:if test="${isFiltered}">
+        <paw:elements-grid elements="${tournaments}" id="tournamets-grid" headerElements="${games}"/>
+    </c:if>
 
         <c:if test="${!isFiltered}">
           <c:forEach var="game" items="${games}" varStatus="status">

@@ -15,10 +15,37 @@ public enum Structure {
 			return matches;
 		}
     	
+    	@Override
+		public int amountOfMatches(int participants) {
+    		return participants < 2 ? -1 : participants * (participants - 1) / 2;
+    	}
+    	
+    	@Override
+		public boolean isEliminationStage(int indexMatch, int participants) {
+			return false;
+    	}
+    	
+    	@Override
+    	public List<Pair<Integer,Integer>> firstMatches(int participant, int maxParticipants) {
+			if(participant < 0 || participant >= maxParticipants || maxParticipants < 2) return null;
+			List<Pair<Integer,Integer>> matches = new ArrayList<>();
+			// el primer Integer es el indice del partido, el segundo es 0 si juega de local y 1 si juega de visitante
+			int counter = 0;
+			for(int i = 0; i < maxParticipants; i++) {
+				for(int j = i+1; j < maxParticipants; j++) {
+					if(i == participant || j == participant) {
+						matches.add(new Pair<>(counter, i == participant ? 0 : 1));
+					}
+					counter++;
+				}
+			}
+			return matches;
+		}
+    	
     	private void buildMatchesRec(List<Pair<String,String>> prev, int remaining) {
 			if(remaining == 0) return;
 			for(int i = 0; i < remaining; i++) {
-				prev.add(new Pair<>(String.valueOf(remaining), String.valueOf(i)));
+				prev.add(new Pair<>("Player " + String.valueOf((char) (remaining + 'A')), "Player " + String.valueOf((char) ('A' + i))));
 			}
 			buildMatchesRec(prev, remaining-1);
 		}
@@ -31,6 +58,26 @@ public enum Structure {
 				matches.add(new Pair<>(String.valueOf(i), String.valueOf(maxParticipants - 1 - i)));
 			}
 			buildMatchesRec(matches, maxParticipants/2, 0);
+			return matches;
+    	}
+    	
+    	@Override
+		public int amountOfMatches(int participants) {
+			if(participants < 2 || !isPowerOfTwo(participants)) return -1;
+			return participants - 1;
+		}
+    	
+    	@Override
+		public boolean isEliminationStage(int indexMatch, int participants) {
+			return true;
+    	}
+    	
+    	@Override
+    	public List<Pair<Integer,Integer>> firstMatches(int participant, int maxParticipants) {
+			if(participant < 0 || participant >= maxParticipants || maxParticipants < 2 || !isPowerOfTwo(maxParticipants)) return null;
+			List<Pair<Integer,Integer>> matches = new ArrayList<>();
+			int indexMatch = participant < maxParticipants/2 ? participant : maxParticipants - 1 - participant;
+			matches.add(new Pair<>(indexMatch, participant < maxParticipants/2 ? 0 : 1));
 			return matches;
     	}
     	
@@ -61,6 +108,46 @@ public enum Structure {
 			buildGroupMatches(matches, groupSize, groups);
 			int qualified = closestPowerOfTwo(groupSize/2);
 			buildBracketMatches(matches, groups, qualified);
+			return matches;
+    	}
+    	
+    	@Override
+		public int amountOfMatches(int participants) {
+			if(participants < 6 || participants % 2 == 1) return -1;
+			int groups = factorByTwo(participants);
+			if(isPowerOfTwo(participants)) {
+				groups/=4;
+			}
+			int groupSize = participants / groups;
+			int count = 0;
+			count += groups * (groupSize * (groupSize - 1) / 2); // partidos de grupos
+			int qualified = closestPowerOfTwo(groupSize/2);
+			count += qualified * groups - 1; // partidos de eliminación directa
+			return count;
+    	}
+    	
+    	@Override
+		public boolean isEliminationStage(int indexMatch, int participants) {
+    		return indexMatch >= participants * (participants - 1) / (2 * factorByTwo(participants));
+    	}
+    	
+    	@Override
+    	public List<Pair<Integer,Integer>> firstMatches(int participant, int maxParticipants) {
+			if(participant < 0 || participant >= maxParticipants || maxParticipants < 6 || maxParticipants % 2 == 1) return null;
+			List<Pair<Integer,Integer>> matches = new ArrayList<>();
+			int groups = factorByTwo(maxParticipants);
+			if(isPowerOfTwo(maxParticipants)) {
+				groups/=4;
+			}
+			int groupSize = maxParticipants / groups;
+			int groupIndex = participant / groupSize;
+			int indexInGroup = participant % groupSize;
+			// partidos de grupo
+			for(int i = 0; i < groupSize; i++) {
+				if(i == indexInGroup) continue;
+				int indexMatch = groupIndex * (groupSize * (groupSize - 1) / 2) + (indexInGroup < i ? (groupSize - 1) * indexInGroup - (indexInGroup * (indexInGroup + 1)) / 2 + (i - indexInGroup - 1) : (groupSize - 1) * i - (i * (i + 1)) / 2 + (indexInGroup - i - 1));
+				matches.add(new Pair<>(indexMatch, indexInGroup < i ? 0 : 1));
+			}
 			return matches;
     	}
     	
@@ -127,4 +214,10 @@ public enum Structure {
     };
     
     public abstract List<Pair<String,String>> buildMatches(int maxParticipants);
+    
+    public abstract int amountOfMatches(int participants) ;
+    
+    public abstract boolean isEliminationStage(int indexMatch, int participants);
+    
+    public abstract List<Pair<Integer,Integer>> firstMatches(int participant, int maxParticipants);
 }

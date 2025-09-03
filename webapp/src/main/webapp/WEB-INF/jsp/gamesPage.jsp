@@ -11,17 +11,7 @@
                 <paw:text type="title" size="xl" stroke="true">Games</paw:text>
             </paw:banner>
             <div class="content-container">
-
-                <c:choose>
-                    <c:when test="${empty games}">
-                        <div class="no-cards-container">
-                            <paw:text size="l" weight="thin">(No games available)</paw:text>
-                        </div>
-                    </c:when>
-                    <c:otherwise>
-                        <paw:elements-grid elements="${games}" id="games-grid" isGame="true"/>
-                    </c:otherwise>
-                </c:choose>
+                <paw:elements-grid elements="${games}" id="games-grid" isGame="true"/>
             </div>
         </c:otherwise>
     </c:choose>
