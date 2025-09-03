@@ -33,64 +33,45 @@
         </div>
         <div class="cards-container">
           <c:choose>
-            <c:when test="${user == null}">
+            <c:when test="${!hasJoined && tournamentImg.tournament.openInscriptions}">
               <paw:button-card
                       title="Become the first in the league"
                       text="Play against all your oponents to collect points and win the tournament"
                       butText="Join Tournament"
                       icon="${pageContext.request.contextPath}/images/grid.png"
-                      onclick="openModal('loginModal')"
+                      method="post"
+                      onclick="${joinUrl}"
+                      tournamentId="${tournamentImg.tournament.id}"
                       texture="true"/>
             </c:when>
-            <c:otherwise>
-              <paw:button-card
-                      title="Become the first in the league"
-                      text="Play against all your oponents to collect points and win the tournament"
-                      butText="Join Tournament"
-                      icon="${pageContext.request.contextPath}/images/grid.png"
-                      onclick=""
-                      texture="true"/>
-            </c:otherwise>
           </c:choose>
-
-        </div>  
-          <paw:button-card
-                  title="Become the first in the league"
-                  text="Play against all your oponents to collect points and win the tournament"
-                  butText="Join Tournament"
-                  icon="${pageContext.request.contextPath}/images/grid.png"
-                  method="post"
-                  onclick="${joinUrl}"
-                  tournamentId="${tournamentImg.tournament.id}"
-                  texture="true"/>
         </div>
         <br/>
+        <c:if test="${user.id == tournamentImg.tournament.creator_id && tournamentImg.tournament.openInscriptions}">
+          <div class="cards-container">
+            <form method="post" action="${pageContext.request.contextPath}/tournament/closeInscriptions" style="display: inline;">
+              <input type="hidden" name="tournamentId" value="${tournamentImg.tournament.id}"/>
+              <button type="submit" class="btn"><paw:text size="l">Close Inscriptions</paw:text></button>
+            </form>
+          </div>
+        </c:if>
         <paw:text type="title" size="l">Standings</paw:text>
         <paw:board participants="${participants}"/>
       </c:when>
       <c:when test="${activeSection == 'Matches'}">
-        <!--<c:choose>
-          <c:when test="${empty matchesByDate}">
+        <c:choose>
+          <c:when test="${empty matchesByStage}">
             <div class="no-cards-container">
               <paw:text size="l" weight="thin">No matches available</paw:text>
             </div>
           </c:when>
           <c:otherwise>
-            <c:forEach var="dateEntry" items="${matchesByDate}">
-              <paw:date-matches dateNumber="${dateEntry.key}" matches="${dateEntry.value}"/>
+            <c:forEach var="stageEntry" items="${matchesByStage}">
+              <paw:date-matches dateNumber="${stageEntry.key}" matches="${stageEntry.value}" tournamentId="${tournamentImg.tournament.id}"/>
             </c:forEach>
           </c:otherwise>
-        </c:choose>-->
-		<c:forEach var="match" items="${genericMatches}">
-			<div class="no-cards-container"><paw:text size="1" weight="thin"><c:out value="${match.left}"/> vs <c:out value="${match.right}"/>. TO BE PLAYED</paw:text></div>
-		</c:forEach>
+        </c:choose>
       </c:when>
     </c:choose>
   </div>
 </paw:layout>
-
-<script>
-function setWinner(matchId, winnerId) {
-    alert('Setting winner for match ' + matchId + ' to player ' + winnerId);
-}
-</script>

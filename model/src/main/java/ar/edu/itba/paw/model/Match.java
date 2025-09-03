@@ -8,12 +8,14 @@ public class Match {
     // private Date matchDate;
     private Integer localScore;
     private Integer visitorScore;
+    private Integer winner;
+    private Integer stage;
     
     public Match(Long id, Long tournamentId) {
-		this(id, tournamentId, null, null, null, null);
+		this(id, tournamentId, null, null, null, null, null, null);
 	}
 
-    public Match(Long id, Long tournamentId, Long localId, Long visitorId/*, Date matchDate*/, Integer localScore, Integer visitorScore) {
+    public Match(Long id, Long tournamentId, Long localId, Long visitorId/*, Date matchDate*/, Integer localScore, Integer visitorScore, Integer winner, Integer stage) {
         this.id = id;
         this.tournamentId = tournamentId;
         this.localId = localId;
@@ -21,6 +23,8 @@ public class Match {
         // this.matchDate = matchDate;
         this.localScore = localScore;
         this.visitorScore = visitorScore;
+        this.winner = winner;
+        this.stage = stage;
     }
     
     public void loadPoints(Integer localScore, Integer visitorScore) {
@@ -55,9 +59,12 @@ public class Match {
 //        return matchDate;
 //    }
 
-    public Short getWinner() {
-        if(localScore == null || visitorScore == null) return null;
-        return (short) (localScore > visitorScore ? 0 : 1);
+    public Integer getWinner() {
+        return winner;
+    }
+
+    public void setWinner(Integer winner) {
+        this.winner = winner;
     }
 
     public Integer getLocalScore() {
@@ -66,5 +73,13 @@ public class Match {
 
     public Integer getVisitorScore() {
         return visitorScore;
+    }
+
+    public Integer getStage() {
+        return stage;
+    }
+
+    public void setStage(Integer stage) {
+        this.stage = stage;
     }
 }

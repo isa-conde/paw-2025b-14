@@ -1,7 +1,6 @@
 package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
-import ar.edu.itba.paw.model.Game;
 import ar.edu.itba.paw.model.ParticipantUser;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.User;
@@ -34,9 +33,8 @@ public class TournamentJdbcDao implements TournamentDao {
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
-    private final SimpleJdbcInsert jfbcInsertParticipant;
-    private final SimpleJdbcInsert jfbcInsertMatch;
-    private final SimpleJdbcInsert jdbcInsertUser;
+    private final SimpleJdbcInsert jdbcInsertParticipantUser;
+    private final SimpleJdbcInsert jdbcInsertMatch;
     //private final SimpleJdbcInsert jdbcInsertTeam;
     private final SimpleJdbcInsert jdbcInsertImage;
 
@@ -47,13 +45,11 @@ public class TournamentJdbcDao implements TournamentDao {
         this.jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("tournament")
                 .usingGeneratedKeyColumns("id");
-        this.jdbcInsertUser = new SimpleJdbcInsert(jdbcTemplate)
-                .withTableName("participant_user");
-        this.jfbcInsertParticipant = new SimpleJdbcInsert(jdbcTemplate)
+        this.jdbcInsertParticipantUser = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("participant_user");
         //this.jdbcInsertTeam = new SimpleJdbcInsert(jdbcTemplate)
         //        .withTableName("participant_team");
-        this.jfbcInsertMatch = new SimpleJdbcInsert(jdbcTemplate)
+        this.jdbcInsertMatch = new SimpleJdbcInsert(jdbcTemplate)
 				.withTableName("match");
         this.jdbcInsertImage = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("image")
@@ -75,6 +71,17 @@ public class TournamentJdbcDao implements TournamentDao {
             Elo.valueOf(rs.getString("elo")), rs.getDate("start_date").toLocalDate(), rs.getDate("end_date").toLocalDate(),
             rs.getString("format"), Structure.valueOf(rs.getString("structure")), rs.getInt("max_participants"), rs.getInt("image_id"),
             rs.getBoolean("open_inscriptions"), rs.getBoolean("is_finished")), Base64.getEncoder().encodeToString(rs.getBytes("image")));
+
+    private static final RowMapper<Match> ROW_MAPPER_MATCH = (rs, rowNum) -> new Match(
+        rs.getLong("id"),
+        rs.getLong("tournament_id"),
+        rs.getObject("local_id") != null ? rs.getLong("local_id") : null,
+        rs.getObject("visitor_id") != null ? rs.getLong("visitor_id") : null,
+        rs.getObject("local_score") != null ? rs.getInt("local_score") : null,
+        rs.getObject("visitor_score") != null ? rs.getInt("visitor_score") : null,
+        rs.getObject("winner") != null ? rs.getInt("winner") : null,
+        rs.getObject("stage") != null ? rs.getInt("stage") : null
+    );
 
 
     @Override
@@ -154,36 +161,44 @@ public class TournamentJdbcDao implements TournamentDao {
         values.put("user_id", user_id);
         values.put("tournament_id", tournament_id);
         values.put("points", 0);
+        
+/////// STASHITO
+//      jdbcInsertUser.execute(values);
+//    	Tournament t = findById(tournament_id).orElse(null);
+//    	int size = getCurrentParticipants(tournament_id);
+//    	System.out.println(size);
+//    	System.out.println(t.getMax_participants());
+////    	List<User> participants = getTournamentParticipants(tournament_id);
+//    	if (t != null) {
+//    		List<Pair<Integer, Integer>> firstMatches = t.firstMatches(size-1);
+//
+//    		for (Pair<Integer, Integer> match : firstMatches) {
+//    			if(match.getRight() == 0) {
+//    				jdbcTemplate.update("UPDATE match SET local_id = ? WHERE id = ? AND tournament_id = ?", user_id, match.getLeft(), tournament_id);
+//    			}else {
+//					jdbcTemplate.update("UPDATE match SET visitor_id = ? WHERE id = ? AND tournament_id = ?", user_id, match.getLeft(), tournament_id);
+//				}
+//    		}
+//
+//	        Map<String, Object> valuesParticipants = new HashMap<>();
+//
+//	        valuesParticipants.put("user_id", user_id);
+//	        valuesParticipants.put("tournament_id", tournament_id);
+//	        valuesParticipants.put("points", 0);
+//
+//	        jfbcInsertParticipant.execute(valuesParticipants);
+//	        
+//	        if(size + 1 >= t.getMax_participants()) {
+//	        	jdbcTemplate.update("UPDATE tournament SET open_inscriptions = false WHERE id = ?", tournament_id);
+//	        }
+//    	}
+        jdbcInsertParticipantUser.execute(values);
 
-        jdbcInsertUser.execute(values);
-    	Tournament t = findById(tournament_id).orElse(null);
-    	int size = getCurrentParticipants(tournament_id);
-    	System.out.println(size);
-    	System.out.println(t.getMax_participants());
-//    	List<User> participants = getTournamentParticipants(tournament_id);
-    	if (t != null) {
-    		List<Pair<Integer, Integer>> firstMatches = t.firstMatches(size-1);
-
-    		for (Pair<Integer, Integer> match : firstMatches) {
-    			if(match.getRight() == 0) {
-    				jdbcTemplate.update("UPDATE match SET local_id = ? WHERE id = ? AND tournament_id = ?", user_id, match.getLeft(), tournament_id);
-    			}else {
-					jdbcTemplate.update("UPDATE match SET visitor_id = ? WHERE id = ? AND tournament_id = ?", user_id, match.getLeft(), tournament_id);
-				}
-    		}
-
-	        Map<String, Object> valuesParticipants = new HashMap<>();
-
-	        valuesParticipants.put("user_id", user_id);
-	        valuesParticipants.put("tournament_id", tournament_id);
-	        valuesParticipants.put("points", 0);
-
-	        jfbcInsertParticipant.execute(valuesParticipants);
-	        
-	        if(size + 1 >= t.getMax_participants()) {
-	        	jdbcTemplate.update("UPDATE tournament SET open_inscriptions = false WHERE id = ?", tournament_id);
-	        }
-    	}
+        List<ParticipantUser> participantUsers = getTournamentParticipantUsers(tournament_id);
+        Optional<Tournament> tournament = findById(tournament_id);
+        if (tournament.isPresent() && participantUsers.size() == tournament.get().getMax_participants()) {
+            closeInscriptions(tournament_id);
+        }
     }
     
     public int getCurrentParticipants(Long tournament_id) {
@@ -203,7 +218,7 @@ public class TournamentJdbcDao implements TournamentDao {
         values.put("team_id", team_id);
         values.put("tournament_id", tournament_id);
 
-        jfbcInsertParticipant.execute(values);
+        jdbcInsertParticipant.execute(values);
     }
     */
     @Override
@@ -230,26 +245,96 @@ public class TournamentJdbcDao implements TournamentDao {
 //    }
 
     @Override
-    public void createMatches(Long tournament_id) {
-		Tournament t = findById(tournament_id).orElse(null);
-		if (t != null) {
-			int rounds = t.amountOfMatches();
-			for(int i = 0; i < rounds; i++) {
-				Map<String, Object> values = new HashMap<>();
-				values.put("id", i);
-				values.put("tournament_id", tournament_id);
-				values.put("local_id", null);
-				values.put("visitor_id", null);
-				values.put("local_score", null);
-				values.put("visitor_score", null);
-				jfbcInsertMatch.execute(values);
-			}
-		}
-	}
+//////STASHITO
+//    public void createMatches(Long tournament_id) {
+//		Tournament t = findById(tournament_id).orElse(null);
+//		if (t != null) {
+//			int rounds = t.amountOfMatches();
+//			for(int i = 0; i < rounds; i++) {
+//				Map<String, Object> values = new HashMap<>();
+//				values.put("id", i);
+//				values.put("tournament_id", tournament_id);
+//				values.put("local_id", null);
+//				values.put("visitor_id", null);
+//				values.put("local_score", null);
+//				values.put("visitor_score", null);
+//				jfbcInsertMatch.execute(values);
+//			}
+//		}
+//	}
+    
+    public void createMatches(Long tournamentId) {
+        Tournament t = findById(tournamentId).orElse(null);
+        List<ParticipantUser> participants = getTournamentParticipantUsers(tournamentId);
+
+        if (t != null && !participants.isEmpty()) {
+            int n = participants.size();
+
+            // Odd # of participants -> add fictional participant
+            if (n % 2 != 0) {
+                participants.add(null);
+                n++;
+            }
+
+            int rounds = n - 1;
+            int halfSize = n / 2;
+
+            List<ParticipantUser> rotated = new ArrayList<>(participants);
+            int matchId = 1;
+
+            for (int round = 0; round < rounds; round++) {
+                for (int i = 0; i < halfSize; i++) {
+                    ParticipantUser home = rotated.get(i);
+                    ParticipantUser away = rotated.get(n - 1 - i);
+
+                    if (home != null && away != null) {
+                        Map<String, Object> values = new HashMap<>();
+                        values.put("id", matchId++);
+                        values.put("tournament_id", tournamentId);
+                        values.put("local_id", home.getUser_id());
+                        values.put("visitor_id", away.getUser_id());
+                        values.put("local_score", null);
+                        values.put("visitor_score", null);
+                        values.put("winner", null);
+                        values.put("stage", round + 1);
+                        jdbcInsertMatch.execute(values);
+                    }
+                }
+                ParticipantUser first = rotated.remove(1);
+                rotated.add(first);
+            }
+        }
+    }
 
     @Override
     public List<Match> getTournamentMatches(Long tournament_id) {
-    	return jdbcTemplate.query("SELECT * FROM match WHERE tournament_id = ?", (rs, rowNum) -> new Match(rs.getLong("id"), rs.getLong("tournament_id"), rs.getObject("local_id") != null ? rs.getLong("local_id") : null, rs.getObject("visitor_id") != null ? rs.getLong("visitor_id") : null, rs.getObject("local_score") != null ? rs.getInt("local_score") : null, rs.getObject("visitor_score") != null ? rs.getInt("visitor_score") : null), tournament_id);
+    	return jdbcTemplate.query("SELECT * FROM match WHERE tournament_id = ?", ROW_MAPPER_MATCH, tournament_id);
+    }
+
+    @Override
+    public List<MatchWithPlayers> getTournamentMatchesWithPlayers(Long tournament_id) {
+        String sql = "SELECT m.id, m.tournament_id, m.local_id, m.visitor_id, " +
+                    "COALESCE(local_user.username, 'TBD') as local_player_name, " +
+                    "COALESCE(visitor_user.username, 'TBD') as visitor_player_name, " +
+                    "m.local_score, m.visitor_score, m.winner, m.stage " +
+                    "FROM match m " +
+                    "LEFT JOIN users local_user ON m.local_id = local_user.id " +
+                    "LEFT JOIN users visitor_user ON m.visitor_id = visitor_user.id " +
+                    "WHERE m.tournament_id = ? " +
+                    "ORDER BY m.stage, m.id";
+
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new MatchWithPlayers(
+            rs.getLong("id"),
+            rs.getLong("tournament_id"),
+            rs.getObject("local_id") != null ? rs.getLong("local_id") : null,
+            rs.getObject("visitor_id") != null ? rs.getLong("visitor_id") : null,
+            rs.getString("local_player_name"),
+            rs.getString("visitor_player_name"),
+            rs.getObject("local_score") != null ? rs.getInt("local_score") : null,
+            rs.getObject("visitor_score") != null ? rs.getInt("visitor_score") : null,
+            rs.getObject("winner") != null ? rs.getInt("winner") : null,
+            rs.getObject("stage") != null ? rs.getInt("stage") : null
+        ), tournament_id);
     }
 
     @Override
@@ -334,7 +419,13 @@ public class TournamentJdbcDao implements TournamentDao {
 
     @Override
     public void setFinished(Long tournament_id) {
-        jdbcTemplate.query("UPDATE tournament SET isFinished = true WHERE id = ?", ROW_MAPPER ,tournament_id);
+        jdbcTemplate.update("UPDATE tournament SET is_finished = true WHERE id = ?", tournament_id);
+    }
+
+    @Override
+    public void closeInscriptions(Long tournament_id){
+        jdbcTemplate.update("UPDATE tournament SET open_inscriptions = false WHERE id = ?", tournament_id);
+        createMatches(tournament_id);
     }
 
     @Override
@@ -343,15 +434,49 @@ public class TournamentJdbcDao implements TournamentDao {
     }
 
     @Override
-    public List<User> getTournamentParticipants(Long tournament_id) {
-        return List.of();
-    }
-    
-    @Override
     public List<Pair<String,String>> getGenericMatches(Long tournament_id) {
     	Structure structure = getTournamentStructure(tournament_id).orElse(null);
     	if (structure == null) return List.of();
     	int maxParticipants = jdbcTemplate.queryForObject("SELECT max_participants FROM tournament WHERE id = ?", Integer.class, tournament_id);
     	return structure.buildMatches(maxParticipants);
     }
+
+    @Override
+    public Boolean hasJoined(Long userId, Long tournamentId) {
+        String sql = "SELECT EXISTS (SELECT 1 FROM participant_user WHERE user_id = ? AND tournament_id = ?)";
+        return jdbcTemplate.queryForObject(sql, Boolean.class, userId, tournamentId);
+    }
+
+    @Override
+    public void setMatchWinner(Long matchId, Long tournamentId, Integer winner) {
+        jdbcTemplate.update("UPDATE match SET winner = ? WHERE id = ? AND tournament_id = ?",
+                           winner, matchId, tournamentId);
+
+        Long winnerId = jdbcTemplate.queryForObject(
+                "SELECT CASE WHEN ? = 1 THEN local_id WHEN ? = 2 THEN visitor_id END " +
+                        "FROM match WHERE id = ? AND tournament_id = ?",
+                Long.class, winner, winner, matchId, tournamentId
+        );
+
+        jdbcTemplate.update("UPDATE participant_user SET points = points + 3 WHERE user_id = ?", winnerId);
+    }
+    @Override
+    public List<TournamentImg> findUserActiveTournaments(Long userId) {
+        return findUserTournaments(userId, false);
+    }
+
+    @Override
+    public List<TournamentImg> findUserPastTournaments(Long userId) {
+        return findUserTournaments(userId, true);
+    }
+
+    private List<TournamentImg> findUserTournaments(Long userId, Boolean isFinished){
+        String sql = "SELECT t.*, i.image " +
+                "FROM tournament t " +
+                "LEFT JOIN image i ON t.image_id = i.id " +
+                "INNER JOIN participant_user p ON p.tournament_id = t.id " +
+                "WHERE p.user_id = ? AND t.is_finished = ?; ";
+        return jdbcTemplate.query(sql, ROW_MAPPER_IMG, userId, isFinished);
+    }
+
 }

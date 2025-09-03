@@ -5,6 +5,7 @@ import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.ParticipantUser;
 import ar.edu.itba.paw.model.ParticipantUserInfo;
 import ar.edu.itba.paw.model.Match;
+import ar.edu.itba.paw.model.MatchWithPlayers;
 import ar.edu.itba.paw.model.Pair;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.User;
@@ -84,7 +85,12 @@ public class TournamentServiceImpl implements TournamentService {
 		return tournamentDao.getTournamentMatches(tournament_id);
 	}
 
-    @Override
+	@Override
+	public List<MatchWithPlayers> getTournamentMatchesWithPlayers(Long tournament_id) {
+		return tournamentDao.getTournamentMatchesWithPlayers(tournament_id);
+	}
+
+	@Override
     public List<TournamentImg> findWithImg(TournamentFilter tournamentFilter){
         return tournamentDao.findWithImg(tournamentFilter);
     }
@@ -109,8 +115,8 @@ public class TournamentServiceImpl implements TournamentService {
         result.sort((p1, p2) -> p2.getPoints().compareTo(p1.getPoints()));
 
         return result;
-
     }
+
     @Override
     public Optional<TournamentImg> findByIdWithImg(Long id){
         return tournamentDao.findByIdWithImg(id);
@@ -126,6 +132,11 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
+    public void closeInscriptions(Long tournament_id){
+        tournamentDao.closeInscriptions(tournament_id);
+    }
+
+    @Override
     public List<Pair<String,String>> getGenericMatches(Long tournament_id) {
 		return tournamentDao.getGenericMatches(tournament_id);
 	}
@@ -134,4 +145,24 @@ public class TournamentServiceImpl implements TournamentService {
 	public List<Pair<String,String>> getMatches(Long tournament_id) {
 		return tournamentDao.getMatches(tournament_id);
 	}
+
+    @Override
+    public Boolean hasJoined(Long userId, Long tournamentId) {
+        return tournamentDao.hasJoined(userId, tournamentId);
+    }
+
+    @Override
+    public void setMatchWinner(Long matchId, Long tournamentId, Integer winner) {
+        tournamentDao.setMatchWinner(matchId, tournamentId, winner);
+    }
+
+    @Override
+    public List<TournamentImg> findUserActiveTournaments(Long userId) {
+        return tournamentDao.findUserActiveTournaments(userId);
+    }
+
+    @Override
+    public List<TournamentImg> findUserPastTournaments(Long userId) {
+        return tournamentDao.findUserPastTournaments(userId);
+    }
 }
