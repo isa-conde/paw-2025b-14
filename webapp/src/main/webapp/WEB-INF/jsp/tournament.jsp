@@ -31,29 +31,21 @@
           <paw:icon-card icon="${pageContext.request.contextPath}/images/level.png" text="${tournamentImg.tournament.elo}"/>
           <paw:icon-card icon="${pageContext.request.contextPath}/images/members.png" text="${tournamentImg.tournament.max_participants} Teams"/>
         </div>
-        <div class="cards-container">
-          <c:choose>
-            <c:when test="${user == null}">
-              <paw:button-card
-                      title="Become the first in the league"
-                      text="Play against all your oponents to collect points and win the tournament"
-                      butText="Join Tournament"
-                      icon="${pageContext.request.contextPath}/images/grid.png"
-                      onclick="openModal('loginModal')"
-                      texture="true"/>
-            </c:when>
-            <c:otherwise>
-              <paw:button-card
-                      title="Become the first in the league"
-                      text="Play against all your oponents to collect points and win the tournament"
-                      butText="Join Tournament"
-                      icon="${pageContext.request.contextPath}/images/grid.png"
-                      method="post"
-                      onclick="${joinUrl}"
-                      tournamentId="${tournamentImg.tournament.id}"
-                      texture="true"/>
-            </c:otherwise>
-          </c:choose>
+          <div class="cards-container">
+            <c:choose>
+              <c:when test="${!hasJoined}">
+                <paw:button-card
+                        title="Become the first in the league"
+                        text="Play against all your oponents to collect points and win the tournament"
+                        butText="Join Tournament"
+                        icon="${pageContext.request.contextPath}/images/grid.png"
+                        method="post"
+                        onclick="${joinUrl}"
+                        tournamentId="${tournamentImg.tournament.id}"
+                        texture="true"/>
+              </c:when>
+            </c:choose>
+          </div>
         </div>
         <br/>
         <paw:text type="title" size="l">Standings</paw:text>
