@@ -12,6 +12,7 @@ import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
 import ar.edu.itba.paw.webapp.form.FilterForm;
 import ar.edu.itba.paw.webapp.form.GameForm;
+import ar.edu.itba.paw.webapp.form.SetWinnerForm;
 import ar.edu.itba.paw.webapp.form.TournamentForm;
 import ar.edu.itba.paw.webapp.form.UserForm;
 import org.springframework.stereotype.Controller;
@@ -253,6 +254,21 @@ public class HelloWorldController {
         }
         
         return tournamentPage(request, tournamentId);
+    }
+
+    @RequestMapping(value = "/tournament/setWinner", method = { RequestMethod.POST })
+    public ModelAndView setWinner(HttpServletRequest request, @ModelAttribute("setWinnerForm") SetWinnerForm form) {
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null) {
+            return new ModelAndView("redirect:/");
+        }
+        
+        Optional<Tournament> tournamentOpt = ts.findById(form.getTournamentId());
+        if (tournamentOpt.isPresent() && tournamentOpt.get().getCreator_id().equals(user.getId())) {
+            ts.setMatchWinner(form.getMatchId(), form.getTournamentId(), form.getWinner());
+        }
+        
+        return tournamentPage(request, form.getTournamentId());
     }
 
     @RequestMapping(value = "/tournamentsPage")

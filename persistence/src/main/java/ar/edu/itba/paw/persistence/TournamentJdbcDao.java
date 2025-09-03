@@ -366,4 +366,17 @@ public class TournamentJdbcDao implements TournamentDao {
         return jdbcTemplate.queryForObject(sql, Boolean.class, userId, tournamentId);
     }
 
+    @Override
+    public void setMatchWinner(Long matchId, Long tournamentId, Integer winner) {
+        jdbcTemplate.update("UPDATE match SET winner = ? WHERE id = ? AND tournament_id = ?", 
+                           winner, matchId, tournamentId);
+
+        Long winnerId = jdbcTemplate.queryForObject(
+                "SELECT CASE WHEN ? = 1 THEN local_id WHEN ? = 2 THEN visitor_id END " +
+                        "FROM match WHERE id = ? AND tournament_id = ?",
+                Long.class, winner, winner, matchId, tournamentId
+        );
+
+        jdbcTemplate.update("UPDATE participant_user SET points = points + 3 WHERE user_id = ?", winnerId);
+    }
 }

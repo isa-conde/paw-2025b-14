@@ -48,10 +48,10 @@
         </div>
         <br/>
         <c:if test="${user.id == tournamentImg.tournament.creator_id && tournamentImg.tournament.openInscriptions}">
-          <div class="row center">
+          <div class="cards-container">
             <form method="post" action="${pageContext.request.contextPath}/tournament/closeInscriptions" style="display: inline;">
               <input type="hidden" name="tournamentId" value="${tournamentImg.tournament.id}"/>
-              <button type="submit" class="button primary">Close Inscriptions</button>
+              <button type="submit" class="btn"><paw:text size="l">Close Inscriptions</paw:text></button>
             </form>
           </div>
         </c:if>
@@ -67,7 +67,7 @@
           </c:when>
           <c:otherwise>
             <c:forEach var="stageEntry" items="${matchesByStage}">
-              <paw:date-matches dateNumber="${stageEntry.key}" matches="${stageEntry.value}"/>
+              <paw:date-matches dateNumber="${stageEntry.key}" matches="${stageEntry.value}" tournamentId="${tournamentImg.tournament.id}"/>
             </c:forEach>
           </c:otherwise>
         </c:choose>

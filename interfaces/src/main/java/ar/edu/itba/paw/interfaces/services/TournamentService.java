@@ -57,4 +57,6 @@ public interface TournamentService {
     public List<Pair<String,String>> getGenericMatches(Long tournament_id);
 
     public Boolean hasJoined(Long userId, Long tournamentId);
+
+    public void setMatchWinner(Long matchId, Long tournamentId, Integer winner);
 }

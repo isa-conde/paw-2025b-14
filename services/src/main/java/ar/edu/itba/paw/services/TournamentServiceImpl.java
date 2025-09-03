@@ -145,4 +145,9 @@ public class TournamentServiceImpl implements TournamentService {
     public Boolean hasJoined(Long userId, Long tournamentId) {
         return tournamentDao.hasJoined(userId, tournamentId);
     }
+
+    @Override
+    public void setMatchWinner(Long matchId, Long tournamentId, Integer winner) {
+        tournamentDao.setMatchWinner(matchId, tournamentId, winner);
+    }
 }
