@@ -1,4 +1,3 @@
-
 CREATE TABLE IF NOT EXISTS users (
     userid SERIAL PRIMARY KEY,
     username VARCHAR(100) NOT NULL UNIQUE
@@ -49,11 +48,6 @@ CREATE TABLE IF NOT EXISTS match (
 	FOREIGN KEY (visitor_id) REFERENCES users(userid)
 );
 
-CREATE TABLE IF NOT EXISTS image (
-                       id SERIAL PRIMARY KEY NOT NULL,
-                       image BYTEA
-);
-
 CREATE TABLE IF NOT EXISTS game_format (
 	id SERIAL PRIMARY KEY NOT NULL,
 	name TEXT NOT NULL,
@@ -66,3 +60,12 @@ CREATE TABLE IF NOT EXISTS image(
 	id SERIAL PRIMARY KEY NOT NULL,
 	image BYTEA
 );
+
+ALTER TABLE game ADD COLUMN IF NOT EXISTS image_id INT;
+UPDATE game SET image_id = 2 WHERE image_id IS NULL;
+ALTER TABLE tournament ADD COLUMN IF NOT EXISTS image_id INT;
+UPDATE tournament SET image_id = 2 WHERE image_id IS NULL;
+ALTER TABLE tournament ADD COLUMN IF NOT EXISTS open_inscriptions BOOLEAN;
+ALTER TABLE tournament ADD COLUMN IF NOT EXISTS is_finished BOOLEAN;
+UPDATE tournament SET open_inscriptions = TRUE WHERE open_inscriptions IS NULL;
+UPDATE tournament SET is_finished = FALSE WHERE is_finished IS NULL;
