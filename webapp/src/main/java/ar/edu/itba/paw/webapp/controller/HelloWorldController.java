@@ -64,7 +64,7 @@ public class HelloWorldController {
     public ModelAndView register(@Valid @ModelAttribute("registerForm") UserForm form, HttpServletRequest request, final BindingResult result) {
         if (result.hasErrors()) {
             ModelAndView mav = index(request, loginForm(), form, tournamentForm(), new TournamentFilter());
-            mav.addObject("openModal", "'createTournamentModal'");
+            mav.addObject("openModal", "'registerModal'");
             return mav;
         }
 
@@ -113,7 +113,7 @@ public class HelloWorldController {
     public ModelAndView login(@Valid @ModelAttribute("loginForm") UserForm form, HttpServletRequest request, BindingResult result ) {
         if (result.hasErrors()) {
             ModelAndView mav = index(request, form, registerForm(), tournamentForm(), new TournamentFilter());
-            mav.addObject("openModal", "'createTournamentModal'");
+            mav.addObject("openModal", "'loginModal'");
             return mav;
         }
 
