@@ -199,12 +199,16 @@ public class HelloWorldController {
         final ModelAndView mav = new ModelAndView("tournament");
         User user = (User) request.getSession().getAttribute("user");
         mav.addObject("user", user);
+        if (user == null){
+            return new ModelAndView("redirect:/");
+        }
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
         Optional<TournamentImg> optionalTournament = ts.findByIdWithImg(tournamentId);
         if(optionalTournament.isPresent()) {
             TournamentImg t = optionalTournament.get();
             Optional<Game> optionalGame = gs.findById(t.getTournament().getGame_id());
             Optional<User> optionalUser = us.findById(t.getTournament().getCreator_id());
+            mav.addObject("hasJoined", ts.hasJoined(user.getId(), tournamentId));
             mav.addObject("participants", ts.getTournamentParticipants(tournamentId));
             mav.addObject("user", user);
             mav.addObject("tournamentImg", t);
@@ -225,7 +229,7 @@ public class HelloWorldController {
             return new ModelAndView("redirect:/");
         }
         ts.joinTournamentUser(user.getId(), tournamentId);
-        return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
+        return tournamentPage(request, tournamentId);
     }
 
     @RequestMapping(value = "/tournamentsPage")

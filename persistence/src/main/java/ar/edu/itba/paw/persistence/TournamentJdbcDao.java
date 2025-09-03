@@ -307,4 +307,11 @@ public class TournamentJdbcDao implements TournamentDao {
     	int maxParticipants = jdbcTemplate.queryForObject("SELECT max_participants FROM tournament WHERE id = ?", Integer.class, tournament_id);
     	return structure.buildMatches(maxParticipants);
     }
+
+    @Override
+    public Boolean hasJoined(Long userId, Long tournamentId) {
+        String sql = "SELECT EXISTS (SELECT 1 FROM participant_user WHERE user_id = ? AND tournament_id = ?)";
+        return jdbcTemplate.queryForObject(sql, Boolean.class, userId, tournamentId);
+    }
+
 }

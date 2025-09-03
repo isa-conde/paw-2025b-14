@@ -50,4 +50,6 @@ public interface TournamentService {
     public void setFinished (Long tournament_id);
 
     public List<Pair<String,String>> getGenericMatches(Long tournament_id);
+
+    public Boolean hasJoined(Long userId, Long tournamentId);
 }

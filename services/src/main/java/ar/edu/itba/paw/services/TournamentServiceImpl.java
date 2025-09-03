@@ -129,4 +129,9 @@ public class TournamentServiceImpl implements TournamentService {
     public List<Pair<String,String>> getGenericMatches(Long tournament_id) {
 		return tournamentDao.getGenericMatches(tournament_id);
 	}
+
+    @Override
+    public Boolean hasJoined(Long userId, Long tournamentId) {
+        return tournamentDao.hasJoined(userId, tournamentId);
+    }
 }
