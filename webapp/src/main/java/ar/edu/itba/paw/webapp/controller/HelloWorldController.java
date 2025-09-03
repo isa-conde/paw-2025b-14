@@ -4,6 +4,7 @@ import ar.edu.itba.paw.interfaces.services.GameService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.*;
+import ar.edu.itba.paw.model.MatchWithPlayers;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Genre;
 import ar.edu.itba.paw.model.enums.Region;
@@ -202,17 +203,14 @@ public class HelloWorldController {
         if (user == null){
             return new ModelAndView("redirect:/");
         }
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
         Optional<TournamentImg> optionalTournament = ts.findByIdWithImg(tournamentId);
-        List <Match> matches = ts.getTournamentMatches(tournamentId);
+        List <MatchWithPlayers> matches = ts.getTournamentMatchesWithPlayers(tournamentId);
 
-        Map<Integer, List<Match>> matchesByDate = new LinkedHashMap<>();
+        Map<Integer, List<MatchWithPlayers>> matchesByStage = new LinkedHashMap<>();
         if (!matches.isEmpty() && optionalTournament.isPresent()) {
-            int maxParticipants = optionalTournament.get().getTournament().getMax_participants();
-
-            for (int i = 0; i < matches.size(); i++) {
-                int dateNumber = (i / maxParticipants) + 1;
-                matchesByDate.computeIfAbsent(dateNumber, k -> new ArrayList<>()).add(matches.get(i));
+            for (MatchWithPlayers match : matches) {
+                int stage = match.getStage();
+                matchesByStage.computeIfAbsent(stage, k -> new ArrayList<>()).add(match);
             }
         }
         if(optionalTournament.isPresent()) {
@@ -225,9 +223,7 @@ public class HelloWorldController {
             mav.addObject("tournamentImg", t);
             mav.addObject("game", optionalGame.get());
             mav.addObject("creator", optionalUser.get());
-            mav.addObject("formatter", formatter);
-            mav.addObject("genericMatches", ts.getGenericMatches(tournamentId));;
-            mav.addObject("matchesByDate", matchesByDate);
+            mav.addObject("matchesByStage", matchesByStage);
         } else {
             return new ModelAndView("index");
         }
@@ -241,6 +237,21 @@ public class HelloWorldController {
             return new ModelAndView("redirect:/");
         }
         ts.joinTournamentUser(user.getId(), tournamentId);
+        return tournamentPage(request, tournamentId);
+    }
+
+    @RequestMapping(value = "/tournament/closeInscriptions", method = { RequestMethod.POST })
+    public ModelAndView closeInscriptions(HttpServletRequest request, @RequestParam("tournamentId") final long tournamentId) {
+        User user = (User) request.getSession().getAttribute("user");
+        if (user == null) {
+            return new ModelAndView("redirect:/");
+        }
+        
+        Optional<TournamentImg> tournamentOpt = ts.findByIdWithImg(tournamentId);
+        if (tournamentOpt.isPresent() && tournamentOpt.get().getTournament().getCreator_id().equals(user.getId())) {
+            ts.closeInscriptions(tournamentId);
+        }
+        
         return tournamentPage(request, tournamentId);
     }
 

@@ -5,6 +5,7 @@ import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.ParticipantUser;
 import ar.edu.itba.paw.model.ParticipantUserInfo;
 import ar.edu.itba.paw.model.Match;
+import ar.edu.itba.paw.model.MatchWithPlayers;
 import ar.edu.itba.paw.model.Pair;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.User;
@@ -84,7 +85,12 @@ public class TournamentServiceImpl implements TournamentService {
 		return tournamentDao.getTournamentMatches(tournament_id);
 	}
 
-    @Override
+	@Override
+	public List<MatchWithPlayers> getTournamentMatchesWithPlayers(Long tournament_id) {
+		return tournamentDao.getTournamentMatchesWithPlayers(tournament_id);
+	}
+
+	@Override
     public List<TournamentImg> findWithImg(TournamentFilter tournamentFilter){
         return tournamentDao.findWithImg(tournamentFilter);
     }
@@ -109,8 +115,8 @@ public class TournamentServiceImpl implements TournamentService {
         result.sort((p1, p2) -> p2.getPoints().compareTo(p1.getPoints()));
 
         return result;
-
     }
+
     @Override
     public Optional<TournamentImg> findByIdWithImg(Long id){
         return tournamentDao.findByIdWithImg(id);

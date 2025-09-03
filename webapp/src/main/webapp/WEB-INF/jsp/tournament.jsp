@@ -31,36 +31,43 @@
           <paw:icon-card icon="${pageContext.request.contextPath}/images/level.png" text="${tournamentImg.tournament.elo}"/>
           <paw:icon-card icon="${pageContext.request.contextPath}/images/members.png" text="${tournamentImg.tournament.max_participants} Teams"/>
         </div>
-          <div class="cards-container">
-            <c:choose>
-              <c:when test="${!hasJoined}">
-                <paw:button-card
-                        title="Become the first in the league"
-                        text="Play against all your oponents to collect points and win the tournament"
-                        butText="Join Tournament"
-                        icon="${pageContext.request.contextPath}/images/grid.png"
-                        method="post"
-                        onclick="${joinUrl}"
-                        tournamentId="${tournamentImg.tournament.id}"
-                        texture="true"/>
-              </c:when>
-            </c:choose>
-          </div>
+        <div class="cards-container">
+          <c:choose>
+            <c:when test="${!hasJoined && tournamentImg.tournament.openInscriptions}">
+              <paw:button-card
+                      title="Become the first in the league"
+                      text="Play against all your oponents to collect points and win the tournament"
+                      butText="Join Tournament"
+                      icon="${pageContext.request.contextPath}/images/grid.png"
+                      method="post"
+                      onclick="${joinUrl}"
+                      tournamentId="${tournamentImg.tournament.id}"
+                      texture="true"/>
+            </c:when>
+          </c:choose>
         </div>
         <br/>
+        <c:if test="${user.id == tournamentImg.tournament.creator_id && tournamentImg.tournament.openInscriptions}">
+          <div class="row center">
+            <form method="post" action="${pageContext.request.contextPath}/tournament/closeInscriptions" style="display: inline;">
+              <input type="hidden" name="tournamentId" value="${tournamentImg.tournament.id}"/>
+              <button type="submit" class="button primary">Close Inscriptions</button>
+            </form>
+          </div>
+        </c:if>
         <paw:text type="title" size="l">Standings</paw:text>
         <paw:board participants="${participants}"/>
       </c:when>
       <c:when test="${activeSection == 'Matches'}">
         <c:choose>
-          <c:when test="${empty matchesByDate}">
+          <c:when test="${empty matchesByStage}">
             <div class="no-cards-container">
               <paw:text size="l" weight="thin">No matches available</paw:text>
             </div>
           </c:when>
           <c:otherwise>
-            <c:forEach var="dateEntry" items="${matchesByDate}">
-              <paw:date-matches dateNumber="${dateEntry.key}" matches="${dateEntry.value}"/>
+            <c:forEach var="stageEntry" items="${matchesByStage}">
+              <paw:date-matches dateNumber="${stageEntry.key}" matches="${stageEntry.value}"/>
             </c:forEach>
           </c:otherwise>
         </c:choose>

@@ -7,6 +7,7 @@ import ar.edu.itba.paw.model.TournamentImg;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
 import ar.edu.itba.paw.model.Match;
+import ar.edu.itba.paw.model.MatchWithPlayers;
 import ar.edu.itba.paw.model.Pair;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.User;
@@ -38,6 +39,8 @@ public interface TournamentService {
     public void loadScores(Long match_id, Long tournament_id, Integer local_score, Integer visitor_score);
 
     public List<Match> getTournamentMatches(Long tournament_id);
+
+    public List<MatchWithPlayers> getTournamentMatchesWithPlayers(Long tournament_id);
 
     //public void joinTournamentTeam(Long team_id, Long tournament_id);
 
