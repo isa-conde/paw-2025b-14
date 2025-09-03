@@ -12,6 +12,7 @@
 <%@ attribute name="itemLabel" required="false"%>
 <%@ attribute name="emptyOption" required="false"%>
 <%@ attribute name="inline" required="false"%>
+<%@ attribute name="hasConstraint" required="false" type="java.lang.Boolean" %>
 
 <c:choose>
     <c:when test="${inputType != 'submit'}">
@@ -64,6 +65,9 @@
                 </c:when>
             </c:choose>
         </form:label>
+        <c:if test="${hasConstraint}">
+            <form:errors path="${path}" cssClass="formError" element="h1"/>
+        </c:if>
     </c:when>
     <c:otherwise>
         <div class="inline-input-container submit-container">

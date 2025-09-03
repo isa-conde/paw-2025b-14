@@ -2,6 +2,7 @@
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ attribute name="user" required="true" type="ar.edu.itba.paw.model.User" %>
+<%@ attribute name="function" required="false" type="java.lang.String" %>
 <%@ attribute name="isIndex" required="true"%>
 
 <c:set var="isLoggedIn" value="${user != null}"/>
@@ -12,7 +13,14 @@
         <link rel="stylesheet" href="<c:url value='/css/components.css'/>">
         <title></title>
     </head>
-    <body>
+    <c:choose>
+        <c:when test="${function != null}">
+            <body onload="openModal(${function})">
+        </c:when>
+        <c:otherwise>
+            <body>
+        </c:otherwise>
+    </c:choose>
         <div class="container">
             <paw:sidebar user="${user}"/>
             <paw:header>
@@ -41,5 +49,4 @@
         </div>
     </body>
 </html>
-
 <script src="${pageContext.request.contextPath}/js/modal.js"></script>
