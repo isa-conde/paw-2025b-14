@@ -262,6 +262,9 @@ public class HelloWorldController {
         if (user == null) {
             return new ModelAndView("redirect:/");
         }
+        Optional<Tournament> t = ts.findById(tournamentId);
+        String tournamentLink = request.getRequestURL().toString();
+        ms.sendTournamentJoinedEmail(user.getUsername(), t.get().getName(), tournamentLink, us.findById(t.get().getCreator_id()).get().getEmail(), user.getEmail());
         ts.joinTournamentUser(user.getId(), tournamentId);
         return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
     }
@@ -346,7 +349,9 @@ public class HelloWorldController {
     @RequestMapping("/myTournaments")
     public ModelAndView myTournaments(HttpServletRequest request) {
         final ModelAndView mav = new ModelAndView("myTournaments");
+
         User user = (User) request.getSession().getAttribute("user");
+
         List<TournamentImg> allCreatedTournaments = ts.findByCreatorImg(user.getId());
 
         List<TournamentImg> onGoingTournaments = allCreatedTournaments.stream()

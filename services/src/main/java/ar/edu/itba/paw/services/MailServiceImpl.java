@@ -39,10 +39,7 @@ public class MailServiceImpl implements MailService {
     }
 
     @Override
-    public void sendTournamentCreatedEmail(String userName,
-                                           String tournamentName,
-                                           String tournamentLink,
-                                           String recipient) {
+    public void sendTournamentCreatedEmail(String userName, String tournamentName, String tournamentLink, String recipient) {
         Context ctx = new Context();
         ctx.setVariable("userName", userName);
         ctx.setVariable("tournamentName", tournamentName);
@@ -54,17 +51,38 @@ public class MailServiceImpl implements MailService {
         try {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, StandardCharsets.UTF_8.name());
             helper.setTo(recipient);
-            helper.setSubject("Tournament Created");
+            helper.setSubject("Tournament Created!");
             helper.setText(body, true);
 
-            LOGGER.info("Sending tournament creation email to {}", recipient);
             mailSender.send(mimeMessage);
-            LOGGER.info("Tournament creation email successfully sent to {}", recipient);
         } catch (MessagingException e) {
-            LOGGER.error("Failed to construct tournament creation email for {}", recipient, e);
             throw new RuntimeException("Failed to build email", e);
         } catch (MailException e) {
-            LOGGER.error("Failed to send tournament creation email to {}", recipient, e);
+            throw e;
+        }
+    }
+
+    @Override
+    public void sendTournamentJoinedEmail(String userName, String tournamentName, String tournamentLink, String creatorMail, String recipient) {
+        Context ctx = new Context();
+        ctx.setVariable("userName", userName);
+        ctx.setVariable("tournamentName", tournamentName);
+        ctx.setVariable("tournamentLink", tournamentLink);
+        ctx.setVariable("creatorMail", creatorMail);
+
+        String body = templateEngine.process("tournament-joined-confirmation", ctx);
+
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, StandardCharsets.UTF_8.name());
+            helper.setTo(recipient);
+            helper.setSubject("You just joined a tournament!");
+            helper.setText(body, true);
+
+            mailSender.send(mimeMessage);
+        } catch (MessagingException e) {
+            throw new RuntimeException("Failed to build email", e);
+        } catch (MailException e) {
             throw e;
         }
     }
