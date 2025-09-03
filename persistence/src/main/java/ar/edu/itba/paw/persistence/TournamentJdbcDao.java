@@ -168,12 +168,12 @@ public class TournamentJdbcDao implements TournamentDao {
 				}
     		}
 
-	        Map<String, Object> values = new HashMap<>();
+	        Map<String, Object> participantValues = new HashMap<>();
 
-	        values.put("user_id", user_id);
-	        values.put("tournament_id", tournament_id);
+	        participantValues.put("user_id", user_id);
+	        participantValues.put("tournament_id", tournament_id);
 
-	        jfbcInsertParticipant.execute(values);
+	        jfbcInsertParticipant.execute(participantValues);
     	}
     }
 
