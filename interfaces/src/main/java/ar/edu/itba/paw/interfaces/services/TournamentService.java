@@ -4,6 +4,7 @@ import ar.edu.itba.paw.model.TournamentImg;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
 import ar.edu.itba.paw.model.Match;
+import ar.edu.itba.paw.model.Pair;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Elo;
@@ -21,8 +22,10 @@ public interface TournamentService {
 
     public List<Tournament> findGameTournaments(Long game_id);
 
-    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, byte[] image_id);
+    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, byte[] image_id, Boolean open_inscriptions, Boolean is_finished);
 
+    public Optional<TournamentImg> findByIdWithImg(Long id);
+    
     public void joinTournamentUser(Long user_id, Long tournament_id);
     
     public List<User> getTournamentParticipants(Long tournament_id);
@@ -39,5 +42,11 @@ public interface TournamentService {
 
     public List<TournamentImg> findWithImg(TournamentFilter tournamentFilter);
 
+    public List<TournamentImg> findByCreatorImg(Long creator_id);
 
+    public void setFinished (Long tournament_id);
+
+    public List<Pair<String,String>> getGenericMatches(Long tournament_id);
+    
+    public List<Pair<String,String>> getMatches(Long tournament_id);
 }

@@ -21,10 +21,10 @@ public class Tournament {
     private final Structure structure;
     private final Integer max_participants;
     private final Integer image_id;
+    private Boolean open_inscriptions;
+    private Boolean is_finished;
 
-
-
-    public Tournament(Long id, Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Integer imageId) {
+    public Tournament(Long id, Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Integer imageId, Boolean open_inscriptions, Boolean is_finished) {
         this.id = id;
         this.creator_id = creator_id;
         this.name = name;
@@ -37,6 +37,8 @@ public class Tournament {
         this.structure = structure;
         this.max_participants = max_participants;
         this.image_id = imageId;
+        this.open_inscriptions = open_inscriptions;
+        this.is_finished = is_finished;
     }
 
     public Long getId() {

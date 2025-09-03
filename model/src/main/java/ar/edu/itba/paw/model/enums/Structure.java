@@ -27,13 +27,20 @@ public enum Structure {
     	
     	@Override
     	public List<Pair<Integer,Integer>> firstMatches(int participant, int maxParticipants) {
+    		System.out.println(participant);
 			if(participant < 0 || participant >= maxParticipants || maxParticipants < 2) return null;
 			List<Pair<Integer,Integer>> matches = new ArrayList<>();
 			// el primer Integer es el indice del partido, el segundo es 0 si juega de local y 1 si juega de visitante
-			for(int i = 0; i < maxParticipants; i++) {
-				if(i == participant) continue;
-				int indexMatch = i < participant ? (maxParticipants - 1) * i - (i * (i + 1)) / 2 + (participant - i - 1) : (maxParticipants - 1) * participant - (participant * (participant + 1)) / 2 + (i - participant - 1);
-				matches.add(new Pair<>(indexMatch, i < participant ? 0 : 1));
+			int counter = 0;
+			for( int i = 0; i < maxParticipants; i++) {
+				for ( int j = i+1; j < maxParticipants; j++) {
+					if(i == participant){
+						matches.add(new Pair<>(counter,0));
+					}else if(j == participant){
+						matches.add(new Pair<>(counter,1));
+					}
+					counter++;
+				}
 			}
 			return matches;
 		}

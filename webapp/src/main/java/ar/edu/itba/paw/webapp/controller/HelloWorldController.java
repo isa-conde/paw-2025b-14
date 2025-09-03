@@ -146,7 +146,7 @@ public class HelloWorldController {
 
         final Tournament t = ts.create(user.getId(), form.getName(), optionalGame.get().getId(),
                 form.getRegion(), form.getElo(), form.getStart_date(), form.getEnd_date(),
-                form.getFormat(), form.getStructure(), form.getMax_participants(), imageBytes);
+                form.getFormat(), form.getStructure(), form.getMax_participants(), imageBytes, false, false);
         return new ModelAndView("redirect:/tournament?tournamentId=" + t.getId());
     }
 
@@ -199,6 +199,7 @@ public class HelloWorldController {
             mav.addObject("game", optionalGame.get());
             mav.addObject("creator", optionalUser.get());
             mav.addObject("formatter", formatter);
+            mav.addObject("genericMatches", ts.getMatches(tournamentId));
         } else {
             return new ModelAndView("index");
         }

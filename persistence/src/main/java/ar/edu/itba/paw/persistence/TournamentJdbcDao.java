@@ -1,10 +1,7 @@
 package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
-import ar.edu.itba.paw.model.Match;
-import ar.edu.itba.paw.model.Pair;
-import ar.edu.itba.paw.model.Tournament;
-import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.interfaces.persistence.UserDao;
 import ar.edu.itba.paw.model.*;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
@@ -56,14 +53,14 @@ public class TournamentJdbcDao implements TournamentDao {
     private static final RowMapper<Tournament> ROW_MAPPER = (rs, rowNum) -> new Tournament(rs.getLong("id"),
             rs.getLong("creator_id"), rs.getString("name"), rs.getLong("game_id"), Region.valueOf(rs.getString("region")),
             Elo.valueOf(rs.getString("elo")), rs.getDate("start_date").toLocalDate(), rs.getDate("end_date").toLocalDate(),
-            rs.getString("format"), Structure.valueOf(rs.getString("structure")), rs.getInt("max_participants"), rs.getInt("image_id"));
+            rs.getString("format"), Structure.valueOf(rs.getString("structure")), rs.getInt("max_participants"), rs.getInt("image_id"), rs.getBoolean("open_inscriptions"), rs.getBoolean("is_finished"));
 
     private static final RowMapper<User> ROW_MAPPER_USER = (rs, rowNum) -> new User(rs.getLong("userId"), rs.getString("username"), rs.getString("email"));
 
     private static final RowMapper<TournamentImg> ROW_MAPPER_IMG = (rs, rowNum) -> new TournamentImg(new Tournament(rs.getLong("id"),
             rs.getLong("creator_id"), rs.getString("name"), rs.getLong("game_id"), Region.valueOf(rs.getString("region")),
             Elo.valueOf(rs.getString("elo")), rs.getDate("start_date").toLocalDate(), rs.getDate("end_date").toLocalDate(),
-            rs.getString("format"), Structure.valueOf(rs.getString("structure")), rs.getInt("max_participants"), rs.getInt("image_id")), Base64.getEncoder().encodeToString(rs.getBytes("image")));
+            rs.getString("format"), Structure.valueOf(rs.getString("structure")), rs.getInt("max_participants"), rs.getInt("image_id"), rs.getBoolean("open_inscriptions"), rs.getBoolean("is_finished")), Base64.getEncoder().encodeToString(rs.getBytes("image")));
 
 
     @Override
@@ -111,7 +108,7 @@ public class TournamentJdbcDao implements TournamentDao {
     }
 
     @Override
-    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, byte[] image) {
+    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, byte[] image, Boolean open_inscriptions, Boolean is_finished) {
 
         SqlParameterSource img = new MapSqlParameterSource().addValue("image", image);
         Integer image_id = jdbcInsertImage.executeAndReturnKey(img).intValue();
@@ -130,16 +127,19 @@ public class TournamentJdbcDao implements TournamentDao {
                 .addValue("image_id", image_id);
 
         Number key = jdbcInsert.executeAndReturnKey(values);
-        return new Tournament(key.longValue(), creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id);
+        createMatches(key.longValue());
+        return new Tournament(key.longValue(), creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished);
     }
 
     @Override
     public void joinTournamentUser(Long user_id, Long tournament_id) {
     	Tournament t = findById(tournament_id).orElse(null);
-    	List<User> participants = getTournamentParticipants(tournament_id);
-    	if (t != null && participants.size() < t.getMax_participants()) {
-    		List<Pair<Integer, Integer>> firstMatches = t.firstMatches(participants.size());
-    		
+    	int size = getCurrentParticipants(tournament_id);
+    	System.out.println(size);
+    	System.out.println(t.getMax_participants());
+//    	List<User> participants = getTournamentParticipants(tournament_id);
+    	if (t != null) {
+    		List<Pair<Integer, Integer>> firstMatches = t.firstMatches(size-1);
     		for (Pair<Integer, Integer> match : firstMatches) {
     			if(match.getRight() == 0) {
     				jdbcTemplate.update("UPDATE match SET local_id = ? WHERE id = ? AND tournament_id = ?", user_id, match.getLeft(), tournament_id);
@@ -147,14 +147,23 @@ public class TournamentJdbcDao implements TournamentDao {
 					jdbcTemplate.update("UPDATE match SET visitor_id = ? WHERE id = ? AND tournament_id = ?", user_id, match.getLeft(), tournament_id);
 				}
     		}
-    		
-	        Map<String, Object> values = new HashMap<>();
+
+	        Map<String, Object> valuesParticipants = new HashMap<>();
+
+	        valuesParticipants.put("user_id", user_id);
+	        valuesParticipants.put("tournament_id", tournament_id);
+	        valuesParticipants.put("points", 0);
+
+	        jfbcInsertParticipant.execute(valuesParticipants);
 	        
-	        values.put("user_id", user_id);
-	        values.put("tournament_id", tournament_id);
-	
-	        jfbcInsertParticipant.execute(values);
+	        if(size + 1 >= t.getMax_participants()) {
+	        	jdbcTemplate.update("UPDATE tournament SET open_inscriptions = false WHERE id = ?", tournament_id);
+	        }
     	}
+    }
+    
+    public int getCurrentParticipants(Long tournament_id) {
+		return jdbcTemplate.queryForObject("SELECT COUNT(*) FROM participant_user WHERE tournament_id = ?", Integer.class, tournament_id);
     }
     
 	@Override
@@ -203,7 +212,7 @@ public class TournamentJdbcDao implements TournamentDao {
 			int rounds = t.amountOfMatches();
 			for(int i = 0; i < rounds; i++) {
 				Map<String, Object> values = new HashMap<>();
-				values.put("id", i+1);
+				values.put("id", i);
 				values.put("tournament_id", tournament_id);
 				values.put("local_id", null);
 				values.put("visitor_id", null);
@@ -219,6 +228,37 @@ public class TournamentJdbcDao implements TournamentDao {
     	return jdbcTemplate.query("SELECT * FROM match WHERE tournament_id = ?", (rs, rowNum) -> new Match(rs.getLong("id"), rs.getLong("tournament_id"), rs.getObject("local_id") != null ? rs.getLong("local_id") : null, rs.getObject("visitor_id") != null ? rs.getLong("visitor_id") : null, rs.getObject("local_score") != null ? rs.getInt("local_score") : null, rs.getObject("visitor_score") != null ? rs.getInt("visitor_score") : null), tournament_id);
     }
 
+    @Override
+    public List<Pair<String,String>> getMatches(Long tournament_id) {
+		List<Match> matches = getTournamentMatches(tournament_id);
+		int size = getCurrentParticipants(tournament_id);
+    	System.out.println(size);
+    	System.out.println(findById(tournament_id).get().getMax_participants());
+		if (matches.isEmpty()) return List.of();
+		List<Pair<String,String>> result = new ArrayList<>();
+		UserDao userDao = new UserJdbcDao(jdbcTemplate.getDataSource());
+		for(Match m : matches) {
+			String local, visitor;
+			if(m.getLocalId() == null || userDao.findById(m.getLocalId()).isEmpty()) {
+				local = "TBD";
+			}else {
+				local = userDao.findById(m.getLocalId()).get().getUsername();
+			}
+			if(m.getVisitorId() == null || userDao.findById(m.getVisitorId()).isEmpty()) {
+				visitor = "TBD";
+			}else {
+				visitor = userDao.findById(m.getVisitorId()).get().getUsername();
+			}
+			result.add(new Pair<>(local, visitor));
+		}
+		return result;
+	}
+    
+    @Override
+    public List<Pair<String,String>> getGenericMatches(Long tournament_id){
+    	return List.of();
+    }
+    
     @Override
     public List<TournamentImg> findWithImg(TournamentFilter filter) {
         StringBuilder sql = new StringBuilder(
@@ -263,4 +303,22 @@ public class TournamentJdbcDao implements TournamentDao {
 
         return namedJdbcTemplate.query(sql.toString(), params, ROW_MAPPER_IMG);
     }
+
+	@Override
+	public Optional<TournamentImg> findByIdWithImg(Long id) {
+		// TODO Auto-generated method stub
+		return Optional.empty();
+	}
+
+	@Override
+	public List<TournamentImg> findByCreatorImg(Long creator_id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setFinished(Long tournament_id) {
+		// TODO Auto-generated method stub
+		
+	}
 }

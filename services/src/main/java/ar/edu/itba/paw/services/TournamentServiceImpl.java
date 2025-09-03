@@ -3,6 +3,7 @@ package ar.edu.itba.paw.services;
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.Match;
+import ar.edu.itba.paw.model.Pair;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.TournamentImg;
@@ -46,8 +47,8 @@ public class TournamentServiceImpl implements TournamentService {
 
 
     @Override
-    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, byte[] image) {
-        return tournamentDao.create(creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image);
+    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, byte[] image, Boolean open_inscriptions, Boolean is_finished) {
+        return tournamentDao.create(creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image, open_inscriptions, is_finished);
     }
 
     @Override
@@ -89,4 +90,48 @@ public class TournamentServiceImpl implements TournamentService {
     public List<TournamentImg> findWithImg(TournamentFilter tournamentFilter){
         return tournamentDao.findWithImg(tournamentFilter);
     }
+
+//    @Override
+//    public List<ParticipantUserInfo> getTournamentParticipants(Long tournament_id) {
+//        List<User> users = tournamentDao.getTournamentUsers(tournament_id);
+//        List<ParticipantUser> participants = tournamentDao.getTournamentParticipantUsers(tournament_id);
+//
+//        Map<Long, Integer> userPoints = new HashMap<>();
+//        for (ParticipantUser p : participants) {
+//            userPoints.put(p.getUser_id(), p.getPoints());
+//        }
+//
+//        List<ParticipantUserInfo> result = new ArrayList<>();
+//        for (User user : users) {
+//            int points = userPoints.getOrDefault(user.getId(), 0);
+//            result.add(new ParticipantUserInfo(user.getId(), user.getUsername(), user.getEmail(), points));
+//        }
+//        result.sort((p1, p2) -> p2.getPoints().compareTo(p1.getPoints()));
+//
+//        return result;
+//
+//    }
+    @Override
+    public Optional<TournamentImg> findByIdWithImg(Long id){
+        return tournamentDao.findByIdWithImg(id);
+    }
+    @Override
+    public List<TournamentImg> findByCreatorImg(Long creator_id) {
+        return tournamentDao.findByCreatorImg(creator_id);
+    }
+
+    @Override
+    public void setFinished(Long tournament_id) {
+        tournamentDao.setFinished(tournament_id);
+    }
+
+    @Override
+    public List<Pair<String,String>> getGenericMatches(Long tournament_id) {
+		return tournamentDao.getGenericMatches(tournament_id);
+	}
+    
+    @Override
+	public List<Pair<String,String>> getMatches(Long tournament_id) {
+		return tournamentDao.getMatches(tournament_id);
+	}
 }
