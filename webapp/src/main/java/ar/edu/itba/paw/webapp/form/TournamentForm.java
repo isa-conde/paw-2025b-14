@@ -13,8 +13,8 @@ import javax.validation.constraints.*;
 public class TournamentForm {
 
     // FALTA AGREGAR VALIDACION Y CONSTRAINTS
-    @Size(min = 6, max = 100)
-    @NotEmpty
+    @Size(min = 6, max = 100, message = "Name must be between 6 and 100 characters long")
+    @NotEmpty(message = "This field is required")
     private String name;
     @NotNull
     private Long game_id;
@@ -28,12 +28,13 @@ public class TournamentForm {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @NotNull
     private LocalDate end_date;
-    @Size(max = 255)
+    @Size(max = 255, message = "Format must be at most 255 characters long")
+    @NotNull(message = "This field is required")
     private String format;
     private Structure structure;
-    @NotNull
-    @Min(value = 2)
-    @Max(value = 32)
+    @NotNull(message = "This field is required")
+    @Min(value = 2, message = "There must be at least 2 participants")
+    @Max(value = 32, message = "There can be at most 32 participants")
     private Integer max_participants;
 
     private MultipartFile image;

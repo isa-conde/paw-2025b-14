@@ -49,4 +49,5 @@
         </div>
     </body>
 </html>
+
 <script src="${pageContext.request.contextPath}/js/modal.js"></script>
