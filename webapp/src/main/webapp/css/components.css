@@ -973,11 +973,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .match-card {
     background: var(--background-secondary);
-    border: 2px solid var(--primary-text);
+    border: 2px solid var(--secondary-text);
     border-radius: 12px;
     padding: 20px;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    max-width: 350px;
+    max-width: 600px;
 }
 
 .match-card:hover {
@@ -1016,7 +1016,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .vs-container {
     margin: 0 15px;
-    padding: 8px 12px;
+    padding: 8px 20px;
     background-color: var(--secondary-details);
     border-radius: 20px;
 }
@@ -1031,7 +1031,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     padding: 8px 16px;
     border: 1px solid var(--primary-button);
     background-color: transparent;
-    color: var(--primary-button);
+    color: var(--primary-text);
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -1051,6 +1051,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .result-text {
-    color: var(--primary-button);
+    color: var(--primary-text);
 }
 
