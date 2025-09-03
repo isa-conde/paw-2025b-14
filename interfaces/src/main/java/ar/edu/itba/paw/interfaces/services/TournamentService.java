@@ -55,6 +55,8 @@ public interface TournamentService {
     public void closeInscriptions(Long tournament_id);
 
     public List<Pair<String,String>> getGenericMatches(Long tournament_id);
+    
+    public List<Pair<String,String>> getMatches(Long tournament_id);
 
     public Boolean hasJoined(Long userId, Long tournamentId);
 

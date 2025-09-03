@@ -421,7 +421,6 @@ a.element-card:hover {
     width: 100%;
     min-height: 250px;
     object-fit: cover;
-    filter: blur(2px);
     position: absolute;
     top: 0;
     left: 0;
