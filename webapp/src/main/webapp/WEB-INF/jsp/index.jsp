@@ -3,7 +3,7 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
-<paw:layout user="${user != null ? user : null}" function="${openModal}">
+<paw:layout user="${user != null ? user : null}" function="${openModal}" isIndex="true">
 <c:choose>
     <c:when test="${not empty user}">
         <c:set var="createTournamentFunction" value="openModal('createTournamentModal')"/>
@@ -14,9 +14,6 @@
         <c:set var="joinTournamentFunction" value="openModal('loginModal')"/>
     </c:otherwise>
 </c:choose>
-
-<paw:layout user="${user != null ? user : null}" isIndex="true">
-
     <c:url value="/login" var="userLoginPath"/>
     <c:url value="/register" var="userRegisterPath"/>
     <c:url value="/tournament/create" var="createTournamentPath"/>
