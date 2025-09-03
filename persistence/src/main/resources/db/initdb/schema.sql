@@ -1,0 +1,2 @@
+ALTER TABLE match ADD COLUMN stage INT;
+ALTER TABLE match ADD COLUMN winner INT;

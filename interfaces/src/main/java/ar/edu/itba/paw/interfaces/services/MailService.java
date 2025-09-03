@@ -9,4 +9,10 @@ public interface MailService {
                                     String tournamentLink,
                                     String recipient);
 
+    void sendTournamentJoinedEmail(String userName,
+                                 String tournamentName,
+                                 String tournamentLink,
+                                 String recipient,
+                                 String creatorMail);
+
 }

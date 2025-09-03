@@ -145,7 +145,7 @@ public class TournamentJdbcDao implements TournamentDao {
                 .addValue("start_date", start_date)
                 .addValue("end_date", end_date)
                 .addValue("format", format)
-                .addValue("structure", structure, Types.OTHER)
+                .addValue("structure", structure.name(), Types.OTHER)
                 .addValue("max_participants", max_participants)
                 .addValue("image_id", image_id)
                 .addValue("open_inscriptions", open_inscriptions)
