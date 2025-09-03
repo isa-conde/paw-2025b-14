@@ -4,6 +4,14 @@
 
 <c:url value="/tournament/join" var="joinUrl"/>
 
+<c:set var="isParticipant" value="false"/>
+
+<c:forEach var="participant" items="${participants}">
+  <c:if test="${participant.user_id == user.id}">
+    <c:set var="isParticipant" value="true"/>
+  </c:if>
+</c:forEach>
+
 <paw:layout user="${user}" isIndex="false">
   <c:choose>
     <c:when test="${user == null}">
@@ -36,18 +44,20 @@
               <paw:icon-card icon="${pageContext.request.contextPath}/images/level.png" text="${tournamentImg.tournament.elo}"/>
               <paw:icon-card icon="${pageContext.request.contextPath}/images/members.png" text="${tournamentImg.tournament.max_participants} Teams"/>
             </div>
-            <div class="cards-container">
-              <paw:button-card
-                      title="Become the first in the league"
-                      text="Play against all your oponents to collect points and win the tournament"
-                      butText="Join Tournament"
-                      icon="${pageContext.request.contextPath}/images/grid.png"
-                      method="post"
-                      onclick="${joinUrl}"
-                      tournamentId="${tournamentImg.tournament.id}"
-                      texture="true"/>
-            </div>
-            <br/>
+            <c:if test="${!isParticipant}">
+              <div class="cards-container">
+                <paw:button-card
+                        title="Become the first in the league"
+                        text="Play against all your oponents to collect points and win the tournament"
+                        butText="Join Tournament"
+                        icon="${pageContext.request.contextPath}/images/grid.png"
+                        method="post"
+                        onclick="${joinUrl}"
+                        tournamentId="${tournamentImg.tournament.id}"
+                        texture="true"/>
+              </div>
+              <br/>
+            </c:if>
             <paw:text type="title" size="l">Standings</paw:text>
             <paw:board participants="${participants}"/>
           </c:when>
