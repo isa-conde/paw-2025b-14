@@ -95,7 +95,6 @@ public class TournamentServiceImpl implements TournamentService {
         return tournamentDao.findWithImg(tournamentFilter);
     }
 
-
     @Override
     public List<ParticipantUserInfo> getTournamentParticipants(Long tournament_id) {
         List<User> users = tournamentDao.getTournamentUsers(tournament_id);
@@ -121,6 +120,7 @@ public class TournamentServiceImpl implements TournamentService {
     public Optional<TournamentImg> findByIdWithImg(Long id){
         return tournamentDao.findByIdWithImg(id);
     }
+
     @Override
     public List<TournamentImg> findByCreatorImg(Long creator_id) {
         return tournamentDao.findByCreatorImg(creator_id);

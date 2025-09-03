@@ -64,7 +64,11 @@ public class TournamentJdbcDao implements TournamentDao {
 
     private static final RowMapper<User> ROW_MAPPER_USER = (rs, rowNum) -> new User(rs.getLong("id"), rs.getString("username"), rs.getString("email"));
 
-    private static final RowMapper<ParticipantUser> ROW_MAPPER_PARTICIPANT_USER = (rs, rowNum) -> new ParticipantUser(rs.getLong("user_id"), rs.getLong("tournament_id"));
+    private static final RowMapper<ParticipantUser> ROW_MAPPER_PARTICIPANT_USER = (rs, rowNum) -> {
+        ParticipantUser participant = new ParticipantUser(rs.getLong("user_id"), rs.getLong("tournament_id"));
+        participant.setPoints(rs.getInt("points"));
+        return participant;
+    };
 
     private static final RowMapper<TournamentImg> ROW_MAPPER_IMG = (rs, rowNum) -> new TournamentImg(new Tournament(rs.getLong("id"),
             rs.getLong("creator_id"), rs.getString("name"), rs.getLong("game_id"), Region.valueOf(rs.getString("region")),
@@ -459,7 +463,22 @@ public class TournamentJdbcDao implements TournamentDao {
         );
 
         jdbcTemplate.update("UPDATE participant_user SET points = points + 3 WHERE user_id = ?", winnerId);
+
+        Integer totalMatches = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM match WHERE tournament_id = ?",
+                Integer.class, tournamentId
+        );
+
+        Integer finishedMatches = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM match WHERE tournament_id = ? AND winner IS NOT NULL AND winner > 0",
+                Integer.class, tournamentId
+        );
+
+        if (totalMatches.equals(finishedMatches) && totalMatches > 0) {
+            setFinished(tournamentId);
+        }
     }
+
     @Override
     public List<TournamentImg> findUserActiveTournaments(Long userId) {
         return findUserTournaments(userId, false);
@@ -478,5 +497,4 @@ public class TournamentJdbcDao implements TournamentDao {
                 "WHERE p.user_id = ? AND t.is_finished = ?; ";
         return jdbcTemplate.query(sql, ROW_MAPPER_IMG, userId, isFinished);
     }
-
 }
