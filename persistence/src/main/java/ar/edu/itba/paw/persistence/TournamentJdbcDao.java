@@ -153,7 +153,7 @@ public class TournamentJdbcDao implements TournamentDao {
 
         jdbcInsertParticipantUser.execute(values);
     	Tournament t = findById(tournament_id).orElse(null);
-    	List<User> participants = getTournamentParticipants(tournament_id);
+    	//List<User> participants = getTournamentParticipants(tournament_id);
     	/*if (t != null && participants.size() < t.getMax_participants()) {
     		List<Pair<Integer, Integer>> firstMatches = t.firstMatches(participants.size());
 
