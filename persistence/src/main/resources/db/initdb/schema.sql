@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS participant_user (
         tournament_id INT NOT NULL,
         points INT NOT NULL DEFAULT 0,
         PRIMARY KEY(user_id, tournament_id),
-        FOREIGN KEY (user_id) REFERENCES users(userid) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
         FOREIGN KEY (tournament_id) REFERENCES tournament(id) ON DELETE CASCADE
 );
 
@@ -60,12 +60,3 @@ CREATE TABLE IF NOT EXISTS image(
 	id SERIAL PRIMARY KEY NOT NULL,
 	image BYTEA
 );
-
-ALTER TABLE game ADD COLUMN IF NOT EXISTS image_id INT;
-UPDATE game SET image_id = 2 WHERE image_id IS NULL;
-ALTER TABLE tournament ADD COLUMN IF NOT EXISTS image_id INT;
-UPDATE tournament SET image_id = 2 WHERE image_id IS NULL;
-ALTER TABLE tournament ADD COLUMN IF NOT EXISTS open_inscriptions BOOLEAN;
-ALTER TABLE tournament ADD COLUMN IF NOT EXISTS is_finished BOOLEAN;
-UPDATE tournament SET open_inscriptions = TRUE WHERE open_inscriptions IS NULL;
-UPDATE tournament SET is_finished = FALSE WHERE is_finished IS NULL;

@@ -27,15 +27,15 @@ public interface TournamentService {
     public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, byte[] image_id, Boolean openInscriptions, Boolean isFinished);
 
     public void joinTournamentUser(Long user_id, Long tournament_id);
-    
+
     public List<ParticipantUserInfo> getTournamentParticipants(Long tournament_id);
 
     public void createMatches(Long tournament_id);
-    
+
     public Optional<Structure> getTournamentStructure(Long tournament_id);
-    
+
     public void loadScores(Long match_id, Long tournament_id, Integer local_score, Integer visitor_score);
-    
+
     public List<Match> getTournamentMatches(Long tournament_id);
 
     //public void joinTournamentTeam(Long team_id, Long tournament_id);
@@ -46,6 +46,7 @@ public interface TournamentService {
 
     public List<TournamentImg> findByCreatorImg(Long creator_id);
 
-    public void setFinished (Long tournament_id);
+    public void setFinished(Long tournament_id);
 
+    public void closeInscriptions(Long tournament_id);
 }

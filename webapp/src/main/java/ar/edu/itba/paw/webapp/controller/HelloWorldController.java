@@ -201,6 +201,17 @@ public class HelloWorldController {
         mav.addObject("user", user);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
         Optional<TournamentImg> optionalTournament = ts.findByIdWithImg(tournamentId);
+        List <Match> matches = ts.getTournamentMatches(tournamentId);
+        
+        Map<Integer, List<Match>> matchesByDate = new LinkedHashMap<>();
+        if (!matches.isEmpty() && optionalTournament.isPresent()) {
+            int maxParticipants = optionalTournament.get().getTournament().getMax_participants();
+            
+            for (int i = 0; i < matches.size(); i++) {
+                int dateNumber = (i / maxParticipants) + 1;
+                matchesByDate.computeIfAbsent(dateNumber, k -> new ArrayList<>()).add(matches.get(i));
+            }
+        } 
         if(optionalTournament.isPresent()) {
             TournamentImg t = optionalTournament.get();
             Optional<Game> optionalGame = gs.findById(t.getTournament().getGame_id());
@@ -211,6 +222,7 @@ public class HelloWorldController {
             mav.addObject("game", optionalGame.get());
             mav.addObject("creator", optionalUser.get());
             mav.addObject("formatter", formatter);
+            mav.addObject("matchesByDate", matchesByDate);
         } else {
             return new ModelAndView("index");
         }

@@ -124,4 +124,9 @@ public class TournamentServiceImpl implements TournamentService {
         tournamentDao.setFinished(tournament_id);
     }
 
+    @Override
+    public void closeInscriptions(Long tournament_id){
+        tournamentDao.closeInscriptions(tournament_id);
+    }
+
 }

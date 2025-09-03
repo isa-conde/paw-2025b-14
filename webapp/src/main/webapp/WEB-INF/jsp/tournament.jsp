@@ -48,21 +48,12 @@
                       text="Play against all your oponents to collect points and win the tournament"
                       butText="Join Tournament"
                       icon="${pageContext.request.contextPath}/images/grid.png"
-                      onclick=""
+                      method="post"
+                      onclick="${joinUrl}"
+                      tournamentId="${tournamentImg.tournament.id}"
                       texture="true"/>
             </c:otherwise>
           </c:choose>
-
-        </div>  
-          <paw:button-card
-                  title="Become the first in the league"
-                  text="Play against all your oponents to collect points and win the tournament"
-                  butText="Join Tournament"
-                  icon="${pageContext.request.contextPath}/images/grid.png"
-                  method="post"
-                  onclick="${joinUrl}"
-                  tournamentId="${tournamentImg.tournament.id}"
-                  texture="true"/>
         </div>
         <br/>
         <paw:text type="title" size="l">Standings</paw:text>
@@ -85,9 +76,3 @@
     </c:choose>
   </div>
 </paw:layout>
-
-<script>
-function setWinner(matchId, winnerId) {
-    alert('Setting winner for match ' + matchId + ' to player ' + winnerId);
-}
-</script>

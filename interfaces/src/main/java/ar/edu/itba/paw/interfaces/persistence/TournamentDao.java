@@ -32,8 +32,6 @@ public interface TournamentDao {
 
     List<ParticipantUser> getTournamentParticipantUsers(Long tournament_id);
 
-    public List<User> getTournamentParticipants(Long tournament_id);
-
     public void createMatches(Long tournament_id);
 
     public Optional<Structure> getTournamentStructure(Long tournament_id);
@@ -50,4 +48,5 @@ public interface TournamentDao {
 
     public void setFinished(Long tournament_id);
 
+    public void closeInscriptions(Long tournament_id);
 }

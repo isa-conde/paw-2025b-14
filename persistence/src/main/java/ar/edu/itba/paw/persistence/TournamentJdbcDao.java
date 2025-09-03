@@ -34,8 +34,8 @@ public class TournamentJdbcDao implements TournamentDao {
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
-    private final SimpleJdbcInsert jfbcInsertParticipant;
-    private final SimpleJdbcInsert jfbcInsertMatch;
+    private final SimpleJdbcInsert jdbcInsertParticipant;
+    private final SimpleJdbcInsert jdbcInsertMatch;
     private final SimpleJdbcInsert jdbcInsertUser;
     //private final SimpleJdbcInsert jdbcInsertTeam;
     private final SimpleJdbcInsert jdbcInsertImage;
@@ -49,11 +49,11 @@ public class TournamentJdbcDao implements TournamentDao {
                 .usingGeneratedKeyColumns("id");
         this.jdbcInsertUser = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("participant_user");
-        this.jfbcInsertParticipant = new SimpleJdbcInsert(jdbcTemplate)
+        this.jdbcInsertParticipant = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("participant_user");
         //this.jdbcInsertTeam = new SimpleJdbcInsert(jdbcTemplate)
         //        .withTableName("participant_team");
-        this.jfbcInsertMatch = new SimpleJdbcInsert(jdbcTemplate)
+        this.jdbcInsertMatch = new SimpleJdbcInsert(jdbcTemplate)
 				.withTableName("match");
         this.jdbcInsertImage = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("image")
@@ -155,26 +155,6 @@ public class TournamentJdbcDao implements TournamentDao {
         values.put("points", 0);
 
         jdbcInsertUser.execute(values);
-    	Tournament t = findById(tournament_id).orElse(null);
-    	List<User> participants = getTournamentParticipants(tournament_id);
-    	if (t != null && participants.size() < t.getMax_participants()) {
-    		List<Pair<Integer, Integer>> firstMatches = t.firstMatches(participants.size());
-
-    		for (Pair<Integer, Integer> match : firstMatches) {
-    			if(match.getRight() == 0) {
-    				jdbcTemplate.update("UPDATE match SET local_id = ? WHERE id = ? AND tournament_id = ?", user_id, match.getLeft(), tournament_id);
-    			}else {
-					jdbcTemplate.update("UPDATE match SET visitor_id = ? WHERE id = ? AND tournament_id = ?", user_id, match.getLeft(), tournament_id);
-				}
-    		}
-
-	        Map<String, Object> valuesParticipants = new HashMap<>();
-
-	        valuesParticipants.put("user_id", user_id);
-	        valuesParticipants.put("tournament_id", tournament_id);
-
-	        jfbcInsertParticipant.execute(valuesParticipants);
-    	}
     }
 
 	@Override
@@ -190,7 +170,7 @@ public class TournamentJdbcDao implements TournamentDao {
         values.put("team_id", team_id);
         values.put("tournament_id", tournament_id);
 
-        jfbcInsertParticipant.execute(values);
+        jdbcInsertParticipant.execute(values);
     }
     */
     @Override
@@ -229,7 +209,7 @@ public class TournamentJdbcDao implements TournamentDao {
 				values.put("visitor_id", null);
 				values.put("local_score", null);
 				values.put("visitor_score", null);
-				jfbcInsertMatch.execute(values);
+				jdbcInsertMatch.execute(values);
 			}
 		}
 	}
@@ -295,16 +275,17 @@ public class TournamentJdbcDao implements TournamentDao {
 
     @Override
     public void setFinished(Long tournament_id) {
-        jdbcTemplate.query("UPDATE tournament SET isFinished = true WHERE id = ?", ROW_MAPPER ,tournament_id);
+        jdbcTemplate.query("UPDATE tournament SET is_finished = true WHERE id = ?", ROW_MAPPER ,tournament_id);
+    }
+
+    @Override
+    public void closeInscriptions(Long tournament_id){
+        jdbcTemplate.query("UPDATE tournament SET open_inscriptions = false WHERE id = ?", ROW_MAPPER ,tournament_id);
+        
     }
 
     @Override
     public List<ParticipantUser> getTournamentParticipantUsers(Long tournament_id) {
         return jdbcTemplate.query("SELECT * FROM participant_user WHERE tournament_id = ?", ROW_MAPPER_PARTICIPANT_USER, tournament_id);
-    }
-
-    @Override
-    public List<User> getTournamentParticipants(Long tournament_id) {
-        return List.of();
     }
 }
