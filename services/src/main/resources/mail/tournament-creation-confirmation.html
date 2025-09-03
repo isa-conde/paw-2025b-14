@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tournament Created</title>
+    <style>
+        @font-face {
+            font-family: "Montserrat";
+            src: url("../fonts/Montserrat-VariableFont_wght.woff2") format("woff2");
+            font-style: normal;
+            font-display: swap;
+        }
+
+        @font-face {
+            font-family: "Russo One";
+            src: url("../fonts/RussoOne-Regular.woff2") format("woff2");
+            font-weight: 300;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        body {
+            background-color: #00070E;
+            color: #E6F7FF;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            background-color: #00244D;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            min-width: 500px;
+        }
+
+        h1 {
+            font-family: 'Russo One', sans-serif;
+            font-size: 40px;
+            margin: 10px 0;
+            color: #E6F7FF;
+        }
+
+        p {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 5px 0;
+            color: #E6F7FF;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            background-color: #005B99;
+            color: #E6F7FF !important;
+            padding: 8px 30px;
+            text-decoration: none !important;
+            border-radius: 15px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: #1971B8;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>Tournament Created!</h1>
+    <p th:text="'Hello ' + ${userName} + ','">Hello user,</p>
+    <p th:text="'Your tournament ' + ${tournamentName} + ' has been successfully created.'">
+        Your tournament has been successfully created.
+    </p>
+    <a class="btn" th:href="${tournamentLink}">View Tournament</a>
+</div>
+</body>
+</html>

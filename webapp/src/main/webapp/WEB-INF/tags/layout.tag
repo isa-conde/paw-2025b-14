@@ -2,6 +2,7 @@
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ attribute name="user" required="true" type="ar.edu.itba.paw.model.User" %>
+<%@ attribute name="isIndex" required="true"%>
 
 <c:set var="isLoggedIn" value="${user != null}"/>
 <c:url value="/logout" var="logoutUrl"/>
@@ -25,10 +26,12 @@
                         </paw:modal>
                     </c:when>
                     <c:otherwise>
-                        <div>
-                            <paw:button text="Log in" size="m" onclick="openModal('loginModal')"/>
-                            <paw:button text="Register" size="m" onclick="openModal('registerModal')"/>
-                        </div>
+                        <c:if test="${isIndex == 'true'}">
+                            <div>
+                                <paw:button text="Log in" size="m" onclick="openModal('loginModal')"/>
+                                <paw:button text="Register" size="m" onclick="openModal('registerModal')"/>
+                            </div>
+                        </c:if>
                     </c:otherwise>
                 </c:choose>
             </paw:header>

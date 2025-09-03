@@ -149,6 +149,9 @@ public class HelloWorldController {
         final Tournament t = ts.create(user.getId(), form.getName(), optionalGame.get().getId(),
                 form.getRegion(), form.getElo(), form.getStart_date(), form.getEnd_date(),
                 form.getFormat(), form.getStructure(), form.getMax_participants(), imageBytes, true, false);
+        String tournamentLink = request.getRequestURL().toString()
+                .replace("/tournament/create", "/tournament?tournamentId=" + t.getId());
+        ms.sendTournamentCreatedEmail(user.getUsername(), t.getName(), tournamentLink, user.getEmail());
         return new ModelAndView("redirect:/tournament?tournamentId=" + t.getId());
     }
 
@@ -177,7 +180,7 @@ public class HelloWorldController {
     }
 
     @RequestMapping("/game")
-    public ModelAndView game(@RequestParam(name = "userId", required = false, defaultValue = "1") final int userId, @RequestParam("game_id") final long game_id, @ModelAttribute("filterForm") FilterForm filterForm, TournamentFilter tf){
+    public ModelAndView game(HttpServletRequest request, @RequestParam("game_id") final long game_id, @ModelAttribute("filterForm") FilterForm filterForm, TournamentFilter tf){
         final ModelAndView mav = new ModelAndView("game");
         Optional<GameImg> optionalGame = gs.findByIdWithImage(game_id);
         if(optionalGame.isPresent()) {
@@ -185,7 +188,7 @@ public class HelloWorldController {
         } else {
             return new ModelAndView("index");
         }
-        mav.addObject("user", us.findById(userId).isPresent() ? us.findById(userId).get() : null);
+        mav.addObject("user", request.getSession().getAttribute("user"));
         mav.addObject("structures", Arrays.stream(Structure.values()).toList());
         mav.addObject("regions", Arrays.stream(Region.values()).toList());
         mav.addObject("elos", Arrays.stream(Elo.values()).toList());
@@ -233,11 +236,11 @@ public class HelloWorldController {
     }
 
     @RequestMapping(value = "/tournamentsPage")
-    public ModelAndView tournamentsPage(@RequestParam(name = "userId", required = false, defaultValue = "1") final int userId, @ModelAttribute("filterForm") FilterForm filterForm, TournamentFilter tf) {
+    public ModelAndView tournamentsPage(HttpServletRequest request, @ModelAttribute("filterForm") FilterForm filterForm, TournamentFilter tf) {
         final ModelAndView mav = new ModelAndView("tournamentsPage");
         List<Game> allGames = gs.findAll();
 
-        mav.addObject("user", us.findById(userId).isPresent() ? us.findById(userId).get() : null);
+        mav.addObject("user", request.getSession().getAttribute("user"));
         mav.addObject("games", allGames);
         mav.addObject("structures", Arrays.stream(Structure.values()).toList());
         mav.addObject("regions", Arrays.stream(Region.values()).toList());
@@ -269,25 +272,25 @@ public class HelloWorldController {
     }
 
     @RequestMapping("/gamesPage")
-    public ModelAndView gamesPage(@RequestParam(name = "userId", required = false, defaultValue = "1") final int userId) {
+    public ModelAndView gamesPage(HttpServletRequest request) {
         final ModelAndView mav = new ModelAndView("gamesPage");
         List<GameImg> allGames = gs.findAllWithImg();
 
-        mav.addObject("user", us.findById(userId).isPresent() ? us.findById(userId).get() : null);
+        mav.addObject("user", request.getSession().getAttribute("user"));
         mav.addObject("games", allGames);
 
         return mav;
     }
 
     @RequestMapping("/myTournaments")
-    public ModelAndView myTournaments(@RequestParam(name = "userId", required = false, defaultValue = "1") final int userId) {
+    public ModelAndView myTournaments(HttpServletRequest request) {
         final ModelAndView mav = new ModelAndView("myTournaments");
 
 //        List<TournamentImg> createdTournaments = ts.findWithImg();
 //        List<TournamentImg> joinedTournaments = ts.findWithImg();
 //        List<TournamentImg> pastTournaments = ts.findWithImg();
 //
-        mav.addObject("user", us.findById(userId).isPresent() ? us.findById(userId).get() : null);
+        mav.addObject("user", request.getSession().getAttribute("user"));
 //        mav.addObject("createdTournaments", createdTournaments);
 //        mav.addObject("joinedTournaments", joinedTournaments);
 //        mav.addObject("pastTournaments", pastTournaments);
@@ -297,7 +300,7 @@ public class HelloWorldController {
 
     @RequestMapping("/send")
     public ModelAndView sendTestEmail() {
-        ms.sendSimpleMessage("brunitaccone@gmail.com", "Test Subject", "hola mundo");
+        ms.sendSimpleMessage("brunitaccone@gmail.com", "Test Subject", "hola mundo  ");
         return new ModelAndView("index");
     }
 }

@@ -53,6 +53,9 @@
                 <c:when test="${inputType == 'hidden'}">
                     <form:hidden path="${path}" />
                 </c:when>
+                <c:when test="${inputType == 'file'}">
+                    <form:input path="${path}" type="file" class="input"/>
+                </c:when>
             </c:choose>
         </form:label>
     </c:when>

@@ -3,7 +3,18 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
-<paw:layout user="${user != null ? user : null}">
+<c:choose>
+    <c:when test="${not empty user}">
+        <c:set var="createTournamentFunction" value="openModal('createTournamentModal')"/>
+        <c:set var="joinTournamentFunction" value="window.location.href='${pageContext.request.contextPath}/tournamentsPage'"/>
+    </c:when>
+    <c:otherwise>
+        <c:set var="createTournamentFunction" value="openModal('loginModal')"/>
+        <c:set var="joinTournamentFunction" value="openModal('loginModal')"/>
+    </c:otherwise>
+</c:choose>
+
+<paw:layout user="${user != null ? user : null}" isIndex="true">
 
     <c:url value="/login" var="userLoginPath"/>
     <c:url value="/register" var="userRegisterPath"/>
@@ -43,7 +54,7 @@
     </paw:banner>
     <div class="content-container">
         <div class="cards-container">
-            <paw:button-card title="Become an Organizer" butText="Create a Tournament" onclick="openModal('createTournamentModal')" texture="true"/>
+            <paw:button-card title="Become an Organizer" butText="Create a Tournament" onclick="${createTournamentFunction}" texture="true"/>
             <paw:modal id="createTournamentModal" title="Create a Tournament">
                 <form:form cssClass="form" modelAttribute="tournamentForm" action="${createTournamentPath}" method="post" enctype="multipart/form-data">
                     <div class="row">
@@ -61,20 +72,19 @@
                         <paw:input path="format" label="Format" containerType="half"/>
                         <paw:input path="elo" label="Skill level" containerType="half" inputType="select" items="${elos}"/>
                     </div>
-                    <div class="row center">
+                    <div class="row">
                         <paw:input path="max_participants" label="Max Participants" containerType="half" inputType="number"/>
                         <paw:input path="structure" label="Structure" items="${structures}" inputType="select"/>
                     </div>
                     <div class="row center">
-                        <form:label path="image">Image: </form:label>
-                        <form:input type="file" path="image"/>
+                        <paw:input path="image" inputType="file" label="File" containerType="half"/>
                     </div>
                     <div class="row center">
                         <paw:input path="" label="Create" containerType="half" inputType="submit"/>
                     </div>
                 </form:form>
             </paw:modal>
-            <paw:button-card title="Test your habilities" butText="Join a Tournament" onclick="window.location.href='${pageContext.request.contextPath}/tournamentsPage'" texture="true"/>
+            <paw:button-card title="Test your abilities" butText="Join a Tournament" onclick="${joinTournamentFunction}" texture="true"/>
         </div>
         <div class="content-title">
             <paw:text type="title" size="l"><spring:message code="games"/></paw:text>

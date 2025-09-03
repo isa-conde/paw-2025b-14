@@ -843,10 +843,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(1);
 }
 
-::file-selector-button {
-    display: none;
-}
-
 /* ------- NAVBAR ------- */
 
 .navbar {
@@ -882,14 +878,3 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     background-color: var(--secondary-details);
 }
 
-/* ------- NO ACCESS ------- */
-
-.no-access-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 85vh;
-    text-align: center;
-    padding: 0 20px;
-}
