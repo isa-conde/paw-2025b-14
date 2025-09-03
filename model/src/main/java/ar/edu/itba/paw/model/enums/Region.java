@@ -9,5 +9,4 @@ public enum Region {
     EUNE,
     OCE,
     ASIA,
-    LATAM
 }
