@@ -280,7 +280,7 @@ public class HelloWorldController {
         final ModelAndView mav = new ModelAndView("myTournaments");
         User user = (User) request.getSession().getAttribute("user");
 
-        List<TournamentImg> allCreatedTournaments = ts.findByCreatorImg(userId);
+        List<TournamentImg> allCreatedTournaments = ts.findByCreatorImg(user.getId());
 
         List<TournamentImg> onGoingTournaments = allCreatedTournaments.stream()
             .filter(t -> !t.getTournament().getFinished())
