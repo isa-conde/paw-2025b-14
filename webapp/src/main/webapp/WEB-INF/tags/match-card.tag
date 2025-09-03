@@ -53,7 +53,7 @@
             <div class="match-result">
                 <div class="result-text">
                     <paw:text size="xs" weight="bold">
-                        ${winner == 1 ? localPlayer : visitorPlayer} Won
+                        <c:out value="${winner == 1 ? localPlayer : visitorPlayer} won"/>
                     </paw:text>
                 </div>
             </div>
