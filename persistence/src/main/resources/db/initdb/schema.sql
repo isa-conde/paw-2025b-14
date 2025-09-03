@@ -44,8 +44,8 @@ CREATE TABLE IF NOT EXISTS match (
 	visitor_score INT,
 	PRIMARY KEY (id, tournament_id),
 	FOREIGN KEY (tournament_id) REFERENCES tournament(id) ON DELETE CASCADE,
-	FOREIGN KEY (local_id) REFERENCES users(userid),
-	FOREIGN KEY (visitor_id) REFERENCES users(userid)
+	FOREIGN KEY (local_id) REFERENCES users(id),
+	FOREIGN KEY (visitor_id) REFERENCES users(id)
 );
 
 CREATE TABLE IF NOT EXISTS game_format (
