@@ -59,4 +59,8 @@ public interface TournamentService {
     public Boolean hasJoined(Long userId, Long tournamentId);
 
     public void setMatchWinner(Long matchId, Long tournamentId, Integer winner);
+
+    public List<TournamentImg> findUserActiveTournaments(Long userId);
+
+    public List<TournamentImg> findUserPastTournaments(Long userId);
 }

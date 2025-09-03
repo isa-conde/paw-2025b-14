@@ -150,4 +150,14 @@ public class TournamentServiceImpl implements TournamentService {
     public void setMatchWinner(Long matchId, Long tournamentId, Integer winner) {
         tournamentDao.setMatchWinner(matchId, tournamentId, winner);
     }
+
+    @Override
+    public List<TournamentImg> findUserActiveTournaments(Long userId) {
+        return tournamentDao.findUserActiveTournaments(userId);
+    }
+
+    @Override
+    public List<TournamentImg> findUserPastTournaments(Long userId) {
+        return tournamentDao.findUserPastTournaments(userId);
+    }
 }

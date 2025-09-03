@@ -71,13 +71,13 @@ public class TournamentJdbcDao implements TournamentDao {
             rs.getBoolean("open_inscriptions"), rs.getBoolean("is_finished")), Base64.getEncoder().encodeToString(rs.getBytes("image")));
 
     private static final RowMapper<Match> ROW_MAPPER_MATCH = (rs, rowNum) -> new Match(
-        rs.getLong("id"), 
-        rs.getLong("tournament_id"), 
-        rs.getObject("local_id") != null ? rs.getLong("local_id") : null, 
-        rs.getObject("visitor_id") != null ? rs.getLong("visitor_id") : null, 
-        rs.getObject("local_score") != null ? rs.getInt("local_score") : null, 
-        rs.getObject("visitor_score") != null ? rs.getInt("visitor_score") : null, 
-        rs.getObject("winner") != null ? rs.getInt("winner") : null, 
+        rs.getLong("id"),
+        rs.getLong("tournament_id"),
+        rs.getObject("local_id") != null ? rs.getLong("local_id") : null,
+        rs.getObject("visitor_id") != null ? rs.getLong("visitor_id") : null,
+        rs.getObject("local_score") != null ? rs.getInt("local_score") : null,
+        rs.getObject("visitor_score") != null ? rs.getInt("visitor_score") : null,
+        rs.getObject("winner") != null ? rs.getInt("winner") : null,
         rs.getObject("stage") != null ? rs.getInt("stage") : null
     );
 
@@ -267,7 +267,7 @@ public class TournamentJdbcDao implements TournamentDao {
                     "LEFT JOIN users visitor_user ON m.visitor_id = visitor_user.id " +
                     "WHERE m.tournament_id = ? " +
                     "ORDER BY m.stage, m.id";
-        
+
         return jdbcTemplate.query(sql, (rs, rowNum) -> new MatchWithPlayers(
             rs.getLong("id"),
             rs.getLong("tournament_id"),
@@ -368,7 +368,7 @@ public class TournamentJdbcDao implements TournamentDao {
 
     @Override
     public void setMatchWinner(Long matchId, Long tournamentId, Integer winner) {
-        jdbcTemplate.update("UPDATE match SET winner = ? WHERE id = ? AND tournament_id = ?", 
+        jdbcTemplate.update("UPDATE match SET winner = ? WHERE id = ? AND tournament_id = ?",
                            winner, matchId, tournamentId);
 
         Long winnerId = jdbcTemplate.queryForObject(
@@ -379,4 +379,23 @@ public class TournamentJdbcDao implements TournamentDao {
 
         jdbcTemplate.update("UPDATE participant_user SET points = points + 3 WHERE user_id = ?", winnerId);
     }
+    @Override
+    public List<TournamentImg> findUserActiveTournaments(Long userId) {
+        return findUserTournaments(userId, false);
+    }
+
+    @Override
+    public List<TournamentImg> findUserPastTournaments(Long userId) {
+        return findUserTournaments(userId, true);
+    }
+
+    private List<TournamentImg> findUserTournaments(Long userId, Boolean isFinished){
+        String sql = "SELECT t.*, i.image " +
+                "FROM tournament t " +
+                "LEFT JOIN image i ON t.image_id = i.id " +
+                "INNER JOIN participant_user p ON p.tournament_id = t.id " +
+                "WHERE p.user_id = ? AND t.is_finished = ?; ";
+        return jdbcTemplate.query(sql, ROW_MAPPER_IMG, userId, isFinished);
+    }
+
 }
