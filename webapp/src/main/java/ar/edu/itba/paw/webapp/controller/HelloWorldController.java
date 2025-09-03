@@ -68,7 +68,6 @@ public class HelloWorldController {
             return mav;
         }
 
-
         User user = us.create(form.getUsername(), form.getEmail());
         request.getSession().setAttribute("user", user);
         return new ModelAndView("redirect:/?userId=" + user.getId());
@@ -263,8 +262,8 @@ public class HelloWorldController {
             return new ModelAndView("redirect:/");
         }
         Optional<Tournament> t = ts.findById(tournamentId);
-        String tournamentLink = request.getRequestURL().toString();
-        ms.sendTournamentJoinedEmail(user.getUsername(), t.get().getName(), tournamentLink, us.findById(t.get().getCreator_id()).get().getEmail(), user.getEmail());
+        String tournamentLink = request.getRequestURL().toString()
+                .replace("/tournament/join", "/tournament?tournamentId=" + t.get().getId());        ms.sendTournamentJoinedEmail(user.getUsername(), t.get().getName(), tournamentLink, us.findById(t.get().getCreator_id()).get().getEmail(), user.getEmail());
         ts.joinTournamentUser(user.getId(), tournamentId);
         return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
     }
