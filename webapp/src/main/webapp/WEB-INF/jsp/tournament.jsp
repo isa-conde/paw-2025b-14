@@ -34,6 +34,7 @@
         </paw:banner>
         <c:set var="navbarSections" value="${['Overview', 'Matches']}"/>
         <c:set var="activeSection" value="${param.section != null ? param.section : 'Overview'}"/>
+        <c:set var="isCreator" value="${user.id == tournamentImg.tournament.creator_id}"/>
         <paw:navbar sections="${navbarSections}" activeSection="${activeSection}"/>
         <div class="content-container">
             <c:choose>
@@ -59,7 +60,10 @@
                             </c:when>
                         </c:choose>
                     </div>
-                    <br/>
+                    <c:if test="${not empty participants}">
+                        <paw:text type="title" size="l">Standings</paw:text>
+                        <paw:board participants="${participants}"/>
+                    </c:if>
                     <c:if test="${user.id == tournamentImg.tournament.creator_id && tournamentImg.tournament.openInscriptions}">
                         <div class="cards-container">
                             <form method="post" action="${pageContext.request.contextPath}/tournament/closeInscriptions" style="display: inline;">
@@ -68,8 +72,6 @@
                             </form>
                         </div>
                     </c:if>
-                    <paw:text type="title" size="l">Standings</paw:text>
-                    <paw:board participants="${participants}"/>
                 </c:when>
                 <c:when test="${activeSection == 'Matches'}">
                     <c:choose>
@@ -80,7 +82,7 @@
                         </c:when>
                         <c:otherwise>
                             <c:forEach var="stageEntry" items="${matchesByStage}">
-                                <paw:date-matches dateNumber="${stageEntry.key}" matches="${stageEntry.value}" tournamentId="${tournamentImg.tournament.id}"/>
+                                <paw:date-matches dateNumber="${stageEntry.key}" matches="${stageEntry.value}" tournamentId="${tournamentImg.tournament.id}" isCreator="${isCreator}"/>
                             </c:forEach>
                         </c:otherwise>
                     </c:choose>

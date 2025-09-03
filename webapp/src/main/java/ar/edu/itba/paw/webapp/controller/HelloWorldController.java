@@ -65,15 +65,11 @@ public class HelloWorldController {
         User user = (User) request.getSession().getAttribute("user");
         List<GameImg> allGames = gs.findAllWithImg();
 
-        if (tournamentForm.getStructure() == null) {
-            tournamentForm.setStructure(Structure.LEAGUE);
-        }
-
         mav.addObject("user", user);
         mav.addObject("games", allGames);
         mav.addObject("regions", Arrays.stream(Region.values()).toList());
         mav.addObject("elos", Arrays.stream(Elo.values()).toList());
-        mav.addObject("structures", Arrays.stream(Structure.values()).toList());
+        mav.addObject("structures", Arrays.stream(Structure.values()).filter(s -> s == Structure.LEAGUE).toList());
         mav.addObject("loginForm", loginForm);
         mav.addObject("registerForm", registerForm);
         mav.addObject("tournamentForm", tournamentForm);
@@ -247,7 +243,7 @@ public class HelloWorldController {
             return new ModelAndView("redirect:/");
         }
         ts.joinTournamentUser(user.getId(), tournamentId);
-        return tournamentPage(request, tournamentId);
+        return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
     }
 
     @RequestMapping(value = "/tournament/closeInscriptions", method = { RequestMethod.POST })
@@ -262,7 +258,7 @@ public class HelloWorldController {
             ts.closeInscriptions(tournamentId);
         }
 
-        return tournamentPage(request, tournamentId);
+        return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
     }
 
     @RequestMapping(value = "/tournament/setWinner", method = { RequestMethod.POST })
@@ -277,7 +273,7 @@ public class HelloWorldController {
             ts.setMatchWinner(form.getMatchId(), form.getTournamentId(), form.getWinner());
         }
 
-        return tournamentPage(request, form.getTournamentId());
+        return new ModelAndView("redirect:/tournament?tournamentId=" + form.getTournamentId() + "&section=Matches");
     }
 
     @RequestMapping(value = "/tournamentsPage")
@@ -330,7 +326,7 @@ public class HelloWorldController {
     @RequestMapping("/myTournaments")
     public ModelAndView myTournaments(HttpServletRequest request) {
         final ModelAndView mav = new ModelAndView("myTournaments");
-
+        User user = (User) request.getSession().getAttribute("user");
         List<TournamentImg> allCreatedTournaments = ts.findByCreatorImg(user.getId());
 
         List<TournamentImg> onGoingTournaments = allCreatedTournaments.stream()
@@ -343,7 +339,7 @@ public class HelloWorldController {
         List<TournamentImg> joinedTournaments = ts.findUserActiveTournaments(user.getId());
         List<TournamentImg> pastTournaments = ts.findUserPastTournaments(user.getId());
 
-        mav.addObject("user", request.getSession().getAttribute("user"));
+        mav.addObject("user", user);
         mav.addObject("pastTournaments", pastTournaments);
         mav.addObject("onGoingTournaments", onGoingTournaments);
         mav.addObject("finishedTournaments", finishedTournaments);
