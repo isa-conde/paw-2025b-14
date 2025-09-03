@@ -23,4 +23,8 @@ public class ParticipantUser {
     public Integer getPoints() {
         return points;
     }
+
+    public void setPoints(Integer points) {
+        this.points = points;
+    }
 }

@@ -5,6 +5,7 @@ import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.ParticipantUser;
 import ar.edu.itba.paw.model.ParticipantUserInfo;
 import ar.edu.itba.paw.model.Match;
+import ar.edu.itba.paw.model.MatchWithPlayers;
 import ar.edu.itba.paw.model.Pair;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.User;
@@ -84,11 +85,15 @@ public class TournamentServiceImpl implements TournamentService {
 		return tournamentDao.getTournamentMatches(tournament_id);
 	}
 
-    @Override
+	@Override
+	public List<MatchWithPlayers> getTournamentMatchesWithPlayers(Long tournament_id) {
+		return tournamentDao.getTournamentMatchesWithPlayers(tournament_id);
+	}
+
+	@Override
     public List<TournamentImg> findWithImg(TournamentFilter tournamentFilter){
         return tournamentDao.findWithImg(tournamentFilter);
     }
-
 
     @Override
     public List<ParticipantUserInfo> getTournamentParticipants(Long tournament_id) {
@@ -109,12 +114,13 @@ public class TournamentServiceImpl implements TournamentService {
         result.sort((p1, p2) -> p2.getPoints().compareTo(p1.getPoints()));
 
         return result;
-
     }
+
     @Override
     public Optional<TournamentImg> findByIdWithImg(Long id){
         return tournamentDao.findByIdWithImg(id);
     }
+
     @Override
     public List<TournamentImg> findByCreatorImg(Long creator_id) {
         return tournamentDao.findByCreatorImg(creator_id);
@@ -138,6 +144,11 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public Boolean hasJoined(Long userId, Long tournamentId) {
         return tournamentDao.hasJoined(userId, tournamentId);
+    }
+
+    @Override
+    public void setMatchWinner(Long matchId, Long tournamentId, Integer winner) {
+        tournamentDao.setMatchWinner(matchId, tournamentId, winner);
     }
 
     @Override

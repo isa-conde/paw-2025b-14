@@ -4,6 +4,18 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <paw:layout user="${user != null ? user : null}" function="${openModal}">
+<c:choose>
+    <c:when test="${not empty user}">
+        <c:set var="createTournamentFunction" value="openModal('createTournamentModal')"/>
+        <c:set var="joinTournamentFunction" value="window.location.href='${pageContext.request.contextPath}/tournamentsPage'"/>
+    </c:when>
+    <c:otherwise>
+        <c:set var="createTournamentFunction" value="openModal('loginModal')"/>
+        <c:set var="joinTournamentFunction" value="openModal('loginModal')"/>
+    </c:otherwise>
+</c:choose>
+
+<paw:layout user="${user != null ? user : null}" isIndex="true">
 
     <c:url value="/login" var="userLoginPath"/>
     <c:url value="/register" var="userRegisterPath"/>
@@ -73,26 +85,24 @@
                         <paw:input path="start_date" label="Start Date" containerType="half" inputType="date"/>
                         <paw:input path="end_date" label="End Date" containerType="half" inputType="date"/>
                     </div>
+                    <div class="row center">
+                        <paw:input path="max_participants" label="Max Participants" containerType="half" inputType="number"/>
+                        <paw:input path="structure" label="Structure" containerType="half" inputType="select" items="${structures}"/>
+                    </div>
                     <div class="row">
                         <paw:input path="format" label="Format" containerType="half" hasConstraint="true"/>
                         <paw:input path="elo" label="Skill level" containerType="half" inputType="select" items="${elos}" hasConstraint="true"/>
 
                     </div>
-                    <div class="row center">
-                        <paw:input path="max_participants" label="Max Participants" containerType="half" inputType="number" hasConstraint="true"/>
-
-                        <paw:input path="structure" label="Structure" items="${structures}" inputType="select" hasConstraint="true"/>
-                    </div>
-                    <div class="row center">
-                        <form:label path="image">Image: </form:label>
-                        <form:input type="file" path="image" hasConstraint="true"/>
+                    <div class="row">
+                        <paw:input path="image" label="Image" inputType="file"/>
                     </div>
                     <div class="row center">
                         <paw:input path="" label="Create" containerType="half" inputType="submit"/>
                     </div>
                 </form:form>
             </paw:modal>
-            <paw:button-card title="Test your habilities" butText="Join a Tournament" onclick="window.location.href='${pageContext.request.contextPath}/tournamentsPage'" texture="true"/>
+            <paw:button-card title="Test your abilities" butText="Join a Tournament" onclick="${joinTournamentFunction}" texture="true"/>
         </div>
         <div class="content-title">
             <paw:text type="title" size="l"><spring:message code="games"/></paw:text>
