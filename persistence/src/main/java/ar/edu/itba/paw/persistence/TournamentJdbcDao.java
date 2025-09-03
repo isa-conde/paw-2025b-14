@@ -154,7 +154,7 @@ public class TournamentJdbcDao implements TournamentDao {
         jdbcInsertParticipantUser.execute(values);
     	Tournament t = findById(tournament_id).orElse(null);
     	List<User> participants = getTournamentParticipants(tournament_id);
-    	if (t != null && participants.size() < t.getMax_participants()) {
+    	/*if (t != null && participants.size() < t.getMax_participants()) {
     		List<Pair<Integer, Integer>> firstMatches = t.firstMatches(participants.size());
 
     		for (Pair<Integer, Integer> match : firstMatches) {
@@ -165,7 +165,7 @@ public class TournamentJdbcDao implements TournamentDao {
 				}
     		}
 
-    	}
+    	}*/
     }
 
 	@Override
@@ -312,6 +312,25 @@ public class TournamentJdbcDao implements TournamentDao {
     public Boolean hasJoined(Long userId, Long tournamentId) {
         String sql = "SELECT EXISTS (SELECT 1 FROM participant_user WHERE user_id = ? AND tournament_id = ?)";
         return jdbcTemplate.queryForObject(sql, Boolean.class, userId, tournamentId);
+    }
+
+    @Override
+    public List<TournamentImg> findUserActiveTournaments(Long userId) {
+        return findUserTournaments(userId, false);
+    }
+
+    @Override
+    public List<TournamentImg> findUserPastTournaments(Long userId) {
+        return findUserTournaments(userId, true);
+    }
+
+    private List<TournamentImg> findUserTournaments(Long userId, Boolean isFinished){
+        String sql = "SELECT t.*, i.image " +
+                "FROM tournament t " +
+                "LEFT JOIN image i ON t.image_id = i.id " +
+                "INNER JOIN participant_user p ON p.tournament_id = t.id " +
+                "WHERE p.user_id = ? AND t.is_finished = ?; ";
+        return jdbcTemplate.query(sql, ROW_MAPPER_IMG, userId, isFinished);
     }
 
 }

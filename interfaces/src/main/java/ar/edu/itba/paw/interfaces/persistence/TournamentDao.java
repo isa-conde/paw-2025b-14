@@ -55,4 +55,7 @@ public interface TournamentDao {
 
     public Boolean hasJoined(Long userId, Long tournamentId);
 
+    public List<TournamentImg> findUserActiveTournaments(Long userId);
+
+    public List<TournamentImg> findUserPastTournaments(Long userId);
 }

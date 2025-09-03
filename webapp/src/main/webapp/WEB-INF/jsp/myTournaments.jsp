@@ -14,7 +14,10 @@
     <div class="content-container">
         <c:choose>
             <c:when test="${activeSection == 'Joined Tournaments'}">
-
+                <div class="grid-title">
+                    <paw:text type="title">On Going Tournaments</paw:text>
+                </div>
+                <paw:elements-grid elements="${joinedTournaments}" id="on-going-${user.id}-creations"/>
             </c:when>
             <c:when test="${activeSection == 'Created Tournaments'}">
                 <div class="grid-title">

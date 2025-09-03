@@ -294,16 +294,15 @@ public class HelloWorldController {
         List<TournamentImg> finishedTournaments = allCreatedTournaments.stream()
             .filter(t -> t.getTournament().getFinished())
             .toList();
-//        List<TournamentImg> joinedTournaments = ts.findWithImg();
-//        List<TournamentImg> pastTournaments = ts.findWithImg();
-//
+        List<TournamentImg> joinedTournaments = ts.findUserActiveTournaments(user.getId());
+        List<TournamentImg> pastTournaments = ts.findUserPastTournaments(user.getId());
+
         mav.addObject("user", user);
 //        mav.addObject("createdTournaments", createdTournaments);
 
         mav.addObject("onGoingTournaments", onGoingTournaments);
         mav.addObject("finishedTournaments", finishedTournaments);
-//        mav.addObject("joinedTournaments", joinedTournaments);
-//        mav.addObject("pastTournaments", pastTournaments);
+        mav.addObject("joinedTournaments", joinedTournaments);
 
         return mav;
     }
