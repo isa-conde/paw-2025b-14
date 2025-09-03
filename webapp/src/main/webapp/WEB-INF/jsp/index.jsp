@@ -3,6 +3,7 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
+<paw:layout user="${user != null ? user : null}" function="${openModal}">
 <c:choose>
     <c:when test="${not empty user}">
         <c:set var="createTournamentFunction" value="openModal('createTournamentModal')"/>
@@ -76,8 +77,9 @@
                         <paw:input path="name" label="Tournament Name"/>
                     </div>
                     <div class="row">
-                        <paw:input path="game_id" label="Game" containerType="half" inputType="select" items="${games}" itemValue="game.id" itemLabel="game.name"/>
-                        <paw:input path="region" label="Region" containerType="half" inputType="select" items="${regions}"/>
+                        <paw:input path="game_id" label="Game" containerType="half" inputType="select" items="${games}" itemValue="game.id" itemLabel="game.name" hasConstraint="true"/>
+                        <paw:input path="region" label="Region" containerType="half" inputType="select" items="${regions}" hasConstraint="true"/>
+
                     </div>
                     <div class="row">
                         <paw:input path="start_date" label="Start Date" containerType="half" inputType="date"/>
@@ -88,8 +90,9 @@
                         <paw:input path="structure" label="Structure" containerType="half" inputType="select" items="${structures}"/>
                     </div>
                     <div class="row">
-                        <paw:input path="format" label="Format" containerType="half"/>
-                        <paw:input path="elo" label="Skill level" containerType="half" inputType="select" items="${elos}"/>
+                        <paw:input path="format" label="Format" containerType="half" hasConstraint="true"/>
+                        <paw:input path="elo" label="Skill level" containerType="half" inputType="select" items="${elos}" hasConstraint="true"/>
+
                     </div>
                     <div class="row">
                         <paw:input path="image" label="Image" inputType="file"/>

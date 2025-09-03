@@ -7,36 +7,36 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 
 
 public class TournamentForm {
 
     // FALTA AGREGAR VALIDACION Y CONSTRAINTS
-    private Long creator_id;
     @Size(min = 6, max = 100)
+    @NotEmpty
     private String name;
+    @NotNull
     private Long game_id;
+    @NotNull
     private Region region;
+    @NotNull
     private Elo elo;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @NotNull
     private LocalDate start_date;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @NotNull
     private LocalDate end_date;
     @Size(max = 255)
     private String format;
     private Structure structure;
+    @NotNull
     @Min(value = 2)
+    @Max(value = 32)
     private Integer max_participants;
-    private MultipartFile image;
 
-    public Long getCreator_id() {
-        return creator_id;
-    }
-    public void setCreator_id(Long creator_id) {
-        this.creator_id = creator_id;
-    }
+    private MultipartFile image;
 
     public String getName() {
         return name;

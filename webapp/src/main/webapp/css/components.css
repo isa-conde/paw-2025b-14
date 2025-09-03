@@ -1053,3 +1053,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     color: var(--primary-text);
 }
 
+.formError {
+    color: red;
+    font-size: 0.9em;
+    font-weight: bold;
+    margin: 5px 0;
+}
+
+
