@@ -30,10 +30,14 @@ public enum Structure {
 			if(participant < 0 || participant >= maxParticipants || maxParticipants < 2) return null;
 			List<Pair<Integer,Integer>> matches = new ArrayList<>();
 			// el primer Integer es el indice del partido, el segundo es 0 si juega de local y 1 si juega de visitante
+			int counter = 0;
 			for(int i = 0; i < maxParticipants; i++) {
-				if(i == participant) continue;
-				int indexMatch = i < participant ? (maxParticipants - 1) * i - (i * (i + 1)) / 2 + (participant - i - 1) : (maxParticipants - 1) * participant - (participant * (participant + 1)) / 2 + (i - participant - 1);
-				matches.add(new Pair<>(indexMatch, i < participant ? 0 : 1));
+				for(int j = i+1; j < maxParticipants; j++) {
+					if(i == participant || j == participant) {
+						matches.add(new Pair<>(counter, i == participant ? 0 : 1));
+					}
+					counter++;
+				}
 			}
 			return matches;
 		}
@@ -41,7 +45,7 @@ public enum Structure {
     	private void buildMatchesRec(List<Pair<String,String>> prev, int remaining) {
 			if(remaining == 0) return;
 			for(int i = 0; i < remaining; i++) {
-				prev.add(new Pair<>(String.valueOf(remaining), String.valueOf(i)));
+				prev.add(new Pair<>("Player " + String.valueOf((char) (remaining + 'A')), "Player " + String.valueOf((char) ('A' + i))));
 			}
 			buildMatchesRec(prev, remaining-1);
 		}
