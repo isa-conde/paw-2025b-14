@@ -20,6 +20,9 @@
     <org.hsqldb.version>2.3.1</org.hsqldb.version>
     <javax.validation-api.version>2.0.1.Final</javax.validation-api.version>
     <org.hibernate.validator>6.2.4.Final</org.hibernate.validator>
+    <javax.mail.version>1.6.2</javax.mail.version>
+    <javax.activation.version>1.2.0</javax.activation.version>
+    <thymeleaf.version>3.1.2.RELEASE</thymeleaf.version>
   </properties>
 
   <dependencyManagement>
@@ -92,7 +95,27 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
-            <version>6.1.5</version>
+            <version>${org.springframework.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>${javax.mail.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.activation</groupId>
+            <artifactId>javax.activation</artifactId>
+            <version>${javax.activation.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.thymeleaf</groupId>
+            <artifactId>thymeleaf</artifactId>
+            <version>${thymeleaf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.thymeleaf</groupId>
+            <artifactId>thymeleaf-spring5</artifactId>
+            <version>${thymeleaf.version}</version>
         </dependency>
     </dependencies>
   </dependencyManagement>

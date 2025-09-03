@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.webapp.controller;
 
 import ar.edu.itba.paw.interfaces.services.GameService;
+import ar.edu.itba.paw.interfaces.services.MailService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.*;
@@ -36,6 +37,7 @@ public class HelloWorldController {
     private final UserService us;
     private final GameService gs;
     private final TournamentService ts;
+    private final MailService ms;
 
     @ModelAttribute("loginForm")
     public UserForm loginForm() { return new UserForm(); }
@@ -53,10 +55,11 @@ public class HelloWorldController {
         return new FilterForm();
     }
 
-    public HelloWorldController(final UserService us, final GameService gs, final TournamentService ts) {
+    public HelloWorldController(final UserService us, final GameService gs, final TournamentService ts, final MailService ms) {
         this.us = us;
         this.gs = gs;
         this.ts = ts;
+        this.ms = ms;
     }
 
     @RequestMapping("/")
@@ -290,5 +293,11 @@ public class HelloWorldController {
 //        mav.addObject("pastTournaments", pastTournaments);
 
         return mav;
+    }
+
+    @RequestMapping("/send")
+    public ModelAndView sendTestEmail() {
+        ms.sendSimpleMessage("brunitaccone@gmail.com", "Test Subject", "hola mundo");
+        return new ModelAndView("index");
     }
 }
