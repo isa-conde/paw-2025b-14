@@ -11,9 +11,9 @@ public class UserForm {
 	//password text NOT NULL,
 	//CONSTRAINT username_length CHECK (char_length(username) < 15)
 
-	@Size(min = 6, max = 31)
-	@Pattern( regexp = "[a-zA-Z][-a-zA-Z0-9_]+")
-	@NotNull
+	@Size(min = 6, max = 31, message = "Username must be between 6 and 31 characters long")
+	@Pattern( regexp = "[a-zA-Z][-a-zA-Z0-9_]+" , message = "Username must start with a letter and contain only letters, numbers, hyphens or underscores")
+	@NotNull(message = "This field is required")
 	private String username;
 	
 //	@Size(min = 8, max =31)
@@ -22,8 +22,8 @@ public class UserForm {
 //	@Size(min = 8, max =31)
 //	private String repeatPassword;
 	
-	@Pattern( regexp = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}")
-	@NotNull
+	@Pattern(regexp = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}", message = "Invalid email format")
+	@NotNull(message = "This field is required")
 	private String email;
 	
 	public String getUsername() {

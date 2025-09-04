@@ -21,10 +21,10 @@
     <paw:modal id="loginModal" title="Log in">
         <form:form cssClass="form" modelAttribute="loginForm" action="${userLoginPath}" method="post">
             <div class="row">
-                <paw:input path="username" label="Username"/>
+                <paw:input path="username" label="Username" hasConstraint="true"/>
             </div>
             <div class="row">
-                <paw:input path="email" label="Email" inputType="email"/>
+                <paw:input path="email" label="Email" inputType="email" hasConstraint="true"/>
             </div>
             <div class="row center">
                 <paw:input path="" label="Log in" containerType="half" inputType="submit"/>
@@ -34,10 +34,10 @@
     <paw:modal id="registerModal" title="Register">
         <form:form cssClass="form" modelAttribute="registerForm" action="${userRegisterPath}" method="post">
             <div class="row">
-                <paw:input path="username" label="Username"/>
+                <paw:input path="username" label="Username" hasConstraint="true"/>
             </div>
             <div class="row">
-                <paw:input path="email" label="Email" inputType="email"/>
+                <paw:input path="email" label="Email" inputType="email" hasConstraint="true"/>
             </div>
             <div class="row center">
                 <paw:input path="" label="Register" containerType="half" inputType="submit"/>
@@ -71,19 +71,18 @@
             <paw:modal id="createTournamentModal" title="Create a Tournament">
                 <form:form cssClass="form" modelAttribute="tournamentForm" action="${createTournamentPath}" method="post" enctype="multipart/form-data">
                     <div class="row">
-                        <paw:input path="name" label="Tournament Name"/>
+                        <paw:input path="name" label="Tournament Name" hasConstraint="true"/>
                     </div>
                     <div class="row">
                         <paw:input path="game_id" label="Game" containerType="half" inputType="select" items="${games}" itemValue="game.id" itemLabel="game.name" hasConstraint="true"/>
                         <paw:input path="region" label="Region" containerType="half" inputType="select" items="${regions}" hasConstraint="true"/>
-
                     </div>
                     <div class="row">
                         <paw:input path="start_date" label="Start Date" containerType="half" inputType="date"/>
                         <paw:input path="end_date" label="End Date" containerType="half" inputType="date"/>
                     </div>
                     <div class="row center">
-                        <paw:input path="max_participants" label="Max Participants" containerType="half" inputType="number"/>
+                        <paw:input path="max_participants" label="Max Participants" containerType="half" inputType="number" hasConstraint="true"/>
                         <paw:input path="structure" label="Structure" containerType="half" inputType="select" items="${structures}"/>
                     </div>
                     <div class="row">
