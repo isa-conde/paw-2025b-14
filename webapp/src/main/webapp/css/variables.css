@@ -11,6 +11,9 @@
     
     --primary-text: #E6F7FF;
     --secondary-text: #B3C9D6;
+
+    --error: #D64545;
+    --error-hover: #B93737;
     
     --font-main: 'Montserrat', sans-serif;
     --font-titles: 'Russo One', sans-serif;

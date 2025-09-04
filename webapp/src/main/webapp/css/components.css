@@ -1054,9 +1054,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .formError {
-    color: red;
+    color: var(--error);
     font-size: 0.9em;
-    font-weight: bold;
     margin: 5px 0;
 }
 
