@@ -61,7 +61,7 @@ public class HelloWorldController {
     }
 
     @PostMapping("/register")
-    public ModelAndView register(@Valid @ModelAttribute("registerForm") UserForm form, HttpServletRequest request, final BindingResult result) {
+    public ModelAndView register(@Valid @ModelAttribute("registerForm") UserForm form, final BindingResult result, HttpServletRequest request) {
         if (result.hasErrors()) {
             ModelAndView mav = index(request, loginForm(), form, tournamentForm(), new TournamentFilter());
             mav.addObject("openModal", "'registerModal'");
@@ -109,7 +109,7 @@ public class HelloWorldController {
     }
 
     @PostMapping("/login")
-    public ModelAndView login(@Valid @ModelAttribute("loginForm") UserForm form, HttpServletRequest request, BindingResult result ) {
+    public ModelAndView login(@Valid @ModelAttribute("loginForm") UserForm form, final BindingResult result, HttpServletRequest request) {
         if (result.hasErrors()) {
             ModelAndView mav = index(request, form, registerForm(), tournamentForm(), new TournamentFilter());
             mav.addObject("openModal", "'loginModal'");
