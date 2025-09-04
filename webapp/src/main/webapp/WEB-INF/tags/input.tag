@@ -17,6 +17,9 @@
 <c:choose>
     <c:when test="${inputType != 'submit'}">
         <form:label path="${path}" class="input-label ${inline == 'true' ? 'inline-input-container' : (containerType == 'half' ? 'half-input-container' : 'input-container')}">
+            <c:if test="${hasConstraint}">
+                <form:errors path="${path}" cssClass="formError" element="h1"/>
+            </c:if>
             <paw:text weight="3" size="l"><c:out value="${label}"/></paw:text>
             <c:choose>
                 <c:when test="${inputType == 'input' || inputType == null}">
@@ -65,9 +68,6 @@
                 </c:when>
             </c:choose>
         </form:label>
-        <c:if test="${hasConstraint}">
-            <form:errors path="${path}" cssClass="formError" element="h1"/>
-        </c:if>
     </c:when>
     <c:otherwise>
         <div class="inline-input-container submit-container">
