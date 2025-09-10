@@ -1,5 +1,8 @@
 package ar.edu.itba.paw.webapp.controller;
 
+import ar.edu.itba.paw.interfaces.exception.EmailAlreadyUsedException;
+import ar.edu.itba.paw.interfaces.exception.InvalidDatesException;
+import ar.edu.itba.paw.interfaces.exception.UsernameAlreadyUsedException;
 import ar.edu.itba.paw.interfaces.services.GameService;
 import ar.edu.itba.paw.interfaces.services.MailService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
@@ -41,7 +44,7 @@ public class HelloWorldController {
     public UserForm loginForm() { return new UserForm(); }
 
     @ModelAttribute("registerForm")
-    public UserForm registerForm() { return new UserForm(); }
+    public UserForm registerForm() { return new UserForm();  }
 
     @ModelAttribute("tournamentForm")
     public TournamentForm tournamentForm() {
@@ -68,9 +71,18 @@ public class HelloWorldController {
             return mav;
         }
 
-        User user = us.create(form.getUsername(), form.getEmail());
-        request.getSession().setAttribute("user", user);
-        return new ModelAndView("redirect:/?userId=" + user.getId());
+        try{
+            User user = us.create(form.getUsername(), form.getEmail());
+            request.getSession().setAttribute("user", user);
+            return new ModelAndView("redirect:/?userId=" + user.getId());
+        }catch (EmailAlreadyUsedException e){
+            result.rejectValue("email", "error.registerForm.emailUsed", e.getMessage());
+        }catch (UsernameAlreadyUsedException e){
+            result.rejectValue("username", "error.registerForm.usernameUsed", e.getMessage());
+        }
+        ModelAndView mav = index(request, loginForm(), form, tournamentForm(), new TournamentFilter());
+        mav.addObject("openModal", "'registerModal'");
+        return mav;
     }
 
     @RequestMapping("/")
@@ -148,27 +160,39 @@ public class HelloWorldController {
         }
         User user = (User) request.getSession().getAttribute("user");
         Optional<Game> optionalGame = gs.findById(form.getGame_id());
-        if (optionalGame.isEmpty()){
-            return new ModelAndView("game");
-        }
 
         byte[] imageBytes = null;
         try {
             if (form.getImage() != null && !form.getImage().isEmpty()) {
                 imageBytes = form.getImage().getBytes();
+            }else {
+                result.rejectValue("image", "error.tournamentForm.emptyImage");
+                ModelAndView mav = index(request, loginForm(), registerForm(), form, new TournamentFilter());
+                mav.addObject("openModal", "'createTournamentModal'");
+                return mav;
             }
         } catch (IOException e) {
-            //TBD
-            return new ModelAndView("index");
+            result.rejectValue("image", "error.tournamentForm.invalidImage", e.getMessage());
+            ModelAndView mav = index(request, loginForm(), registerForm(), form, new TournamentFilter());
+            mav.addObject("openModal", "'createTournamentModal'");
+            return mav;
         }
 
-        final Tournament t = ts.create(user.getId(), form.getName(), optionalGame.get().getId(),
-                form.getRegion(), form.getElo(), form.getStart_date(), form.getEnd_date(),
-                form.getFormat(), form.getStructure(), form.getMax_participants(), imageBytes, true, false);
-        String tournamentLink = request.getRequestURL().toString()
-                .replace("/tournament/create", "/tournament?tournamentId=" + t.getId());
-        ms.sendTournamentCreatedEmail(user.getUsername(), t.getName(), tournamentLink, user.getEmail());
-        return new ModelAndView("redirect:/tournament?tournamentId=" + t.getId());
+        try{
+            final Tournament t = ts.create(user.getId(), form.getName(), optionalGame.get().getId(),
+                    form.getRegion(), form.getElo(), form.getStart_date(), form.getEnd_date(),
+                    form.getFormat(), form.getStructure(), form.getMax_participants(), imageBytes, true, false);
+            String tournamentLink = request.getRequestURL().toString()
+                    .replace("/tournament/create", "/tournament?tournamentId=" + t.getId());
+            ms.sendTournamentCreatedEmail(user.getUsername(), t.getName(), tournamentLink, user.getEmail());
+            return new ModelAndView("redirect:/tournament?tournamentId=" + t.getId());
+        } catch (InvalidDatesException e){
+            result.rejectValue("start_date", "error.tournamentForm.invalidDates", e.getMessage());
+            ModelAndView mav = index(request, loginForm(), registerForm(), form, new TournamentFilter());
+            mav.addObject("openModal", "'createTournamentModal'");
+            return mav;
+        }
+
     }
 
     @RequestMapping(value = "/game/create", method = {RequestMethod.GET})

@@ -78,8 +78,8 @@
                         <paw:input path="region" label="Region" containerType="half" inputType="select" items="${regions}" hasConstraint="true"/>
                     </div>
                     <div class="row">
-                        <paw:input path="start_date" label="Start Date" containerType="half" inputType="date"/>
-                        <paw:input path="end_date" label="End Date" containerType="half" inputType="date"/>
+                        <paw:input path="start_date" label="Start Date" containerType="half" inputType="date" hasConstraint="true"/>
+                        <paw:input path="end_date" label="End Date" containerType="half" inputType="date" hasConstraint="true"/>
                     </div>
                     <div class="row center">
                         <paw:input path="max_participants" label="Max Participants" containerType="half" inputType="number" hasConstraint="true"/>
@@ -88,10 +88,9 @@
                     <div class="row">
                         <paw:input path="format" label="Format" containerType="half" hasConstraint="true"/>
                         <paw:input path="elo" label="Skill level" containerType="half" inputType="select" items="${elos}" hasConstraint="true"/>
-
                     </div>
                     <div class="row">
-                        <paw:input path="image" label="Image" inputType="file"/>
+                        <paw:input path="image" label="Image" inputType="file" hasConstraint="true"/>
                     </div>
                     <div class="row center">
                         <paw:input path="" label="Create" containerType="half" inputType="submit"/>

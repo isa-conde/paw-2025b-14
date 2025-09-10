@@ -11,4 +11,8 @@ public interface UserDao {
     User create(String username, String email);
 
     Optional<User> authenticate(String username, String email);
+
+    Boolean checkUsernameExists(String username);
+
+    Boolean checkEmailExists(String username);
 }

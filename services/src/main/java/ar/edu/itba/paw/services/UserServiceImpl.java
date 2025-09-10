@@ -3,6 +3,9 @@ package ar.edu.itba.paw.services;
 import ar.edu.itba.paw.interfaces.persistence.UserDao;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.interfaces.exception.BusinessException;
+import ar.edu.itba.paw.interfaces.exception.EmailAlreadyUsedException;
+import ar.edu.itba.paw.interfaces.exception.UsernameAlreadyUsedException;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -22,7 +25,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User create(String username, String email) {
+    public User create(String username, String email) throws BusinessException {
+        if (userDao.checkUsernameExists(username)){
+            throw new UsernameAlreadyUsedException(username);
+        }
+        if (userDao.checkEmailExists(email)){
+            throw new EmailAlreadyUsedException(email);
+        }
         return userDao.create(username, email);
     }
 

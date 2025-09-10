@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.webapp.form;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.validation.constraints.Pattern;
@@ -11,9 +12,9 @@ public class UserForm {
 	//password text NOT NULL,
 	//CONSTRAINT username_length CHECK (char_length(username) < 15)
 
+	@NotBlank(message = "This field is required")
 	@Size(min = 6, max = 31, message = "Username must be between 6 and 31 characters long")
-	@Pattern( regexp = "[a-zA-Z][-a-zA-Z0-9_]+" , message = "Username must start with a letter and contain only letters, numbers, hyphens or underscores")
-	@NotNull(message = "This field is required")
+	@Pattern( regexp = "|[a-zA-Z][-a-zA-Z0-9_]+" , message = "Username must start with a letter and contain only letters, numbers, hyphens or underscores")
 	private String username;
 	
 //	@Size(min = 8, max =31)
@@ -21,9 +22,8 @@ public class UserForm {
 //
 //	@Size(min = 8, max =31)
 //	private String repeatPassword;
-	
-	@Pattern(regexp = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}", message = "Invalid email format")
-	@NotNull(message = "This field is required")
+	@NotBlank(message = "This field is required")
+	@Pattern(regexp = "|[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}", message = "Invalid email format")
 	private String email;
 	
 	public String getUsername() {

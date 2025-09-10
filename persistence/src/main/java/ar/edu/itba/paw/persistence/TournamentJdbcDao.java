@@ -94,40 +94,6 @@ public class TournamentJdbcDao implements TournamentDao {
     }
 
     @Override
-    public List<Tournament> findTournaments(TournamentFilter filter) {
-        StringBuilder sql = new StringBuilder("SELECT * FROM tournament t WHERE open_inscriptions = true");
-        MapSqlParameterSource params = new MapSqlParameterSource();
-
-        if (filter.getName() != null){
-            sql.append(" AND t.name LIKE :name");
-            params.addValue("name", filter.getName());
-        }if (filter.getGame_id() != null){
-            sql.append(" AND t.game_id = :game_id");
-            params.addValue("game_id", filter.getGame_id());
-        }if (filter.getElo() != null){
-            sql.append(" AND t.elo = :elo");
-            params.addValue("elo", filter.getElo(), Types.OTHER);
-        }if (filter.getRegion() != null){
-            sql.append(" AND t.region = :region");
-            params.addValue("region", filter.getRegion(), Types.OTHER);
-        }if (filter.getFormat() != null){
-            sql.append(" AND t.format = :format");
-            params.addValue("format", filter.getFormat());
-        }if (filter.getStructure() != null){
-            sql.append(" AND t.structure = :structure");
-            params.addValue("structure", filter.getStructure(), Types.OTHER);
-        }if (filter.getStart_date() != null){
-            sql.append(" AND t.start_date < :start_date");
-            params.addValue("start_date", filter.getStart_date());
-        }if (filter.getEnd_date() != null){
-            sql.append(" AND t.end_date < :end_date");
-            params.addValue("end_date", filter.getEnd_date());
-        }
-
-        return namedJdbcTemplate.query(sql.toString(), params, ROW_MAPPER);
-    }
-
-    @Override
     public List<Tournament> findGameTournaments(Long game_id){
         return jdbcTemplate.query("SELECT * FROM tournament t WHERE game_id = ? AND open_inscriptions = true", ROW_MAPPER, game_id);
     }
@@ -366,51 +332,6 @@ public class TournamentJdbcDao implements TournamentDao {
 		}
 		return result;
 	}
-    
-    @Override
-    public List<TournamentImg> findWithImg(TournamentFilter filter) {
-        StringBuilder sql = new StringBuilder(
-                "SELECT t.*, i.image " +
-                        "FROM tournament t " +
-                        "LEFT JOIN image i ON t.image_id = i.id " +
-                        "WHERE open_inscriptions = true"
-        );
-        MapSqlParameterSource params = new MapSqlParameterSource();
-
-        if (filter.getName() != null){
-            sql.append(" AND t.name LIKE = :name");
-            params.addValue("name", filter.getName());
-        }
-        if (filter.getGame_id() != null){
-            sql.append(" AND t.game_id = :game_id");
-            params.addValue("game_id", filter.getGame_id());
-        }
-        if (filter.getElo() != null){
-            sql.append(" AND t.elo = :elo");
-            params.addValue("elo", filter.getElo(), Types.OTHER);
-        }if (filter.getRegion() != null){
-            sql.append(" AND t.region = :region");
-            params.addValue("region", filter.getRegion(), Types.OTHER);
-        }
-        if (filter.getFormat() != null){
-            sql.append(" AND t.format = :format");
-            params.addValue("format", filter.getFormat());
-        }
-        if (filter.getStructure() != null){
-            sql.append(" AND t.structure = :structure");
-            params.addValue("structure", filter.getStructure(), Types.OTHER);
-        }
-        if (filter.getStart_date() != null){
-            sql.append(" AND t.start_date < :start_date");
-            params.addValue("start_date", filter.getStart_date());
-        }
-        if (filter.getEnd_date() != null){
-            sql.append(" AND t.end_date < :end_date");
-            params.addValue("end_date", filter.getEnd_date());
-        }
-
-        return namedJdbcTemplate.query(sql.toString(), params, ROW_MAPPER_IMG);
-    }
 
     public Optional<TournamentImg> findByIdWithImg(Long id){
         return jdbcTemplate.query("SELECT t.*, i.image FROM tournament t LEFT JOIN image i ON t.image_id = i.id WHERE t.id = ?", ROW_MAPPER_IMG, id
@@ -497,4 +418,64 @@ public class TournamentJdbcDao implements TournamentDao {
                 "WHERE p.user_id = ? AND t.is_finished = ?; ";
         return jdbcTemplate.query(sql, ROW_MAPPER_IMG, userId, isFinished);
     }
+
+    @Override
+    public List<Tournament> findTournaments(TournamentFilter filter) {
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        String sql = "SELECT * FROM tournament t" + buildTournamentFilterSql(filter, params);
+
+        return namedJdbcTemplate.query(sql, params, ROW_MAPPER);
+    }
+
+    @Override
+    public List<TournamentImg> findWithImg(TournamentFilter filter) {
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        String sql = "SELECT t.*, i.image " +
+                "FROM tournament t " +
+                "LEFT JOIN image i ON t.image_id = i.id" +
+                buildTournamentFilterSql(filter, params);
+
+        return namedJdbcTemplate.query(sql, params, ROW_MAPPER_IMG);
+    }
+
+    private String buildTournamentFilterSql(TournamentFilter filter, MapSqlParameterSource params) {
+        StringBuilder sql = new StringBuilder(" WHERE open_inscriptions = true");
+
+        if (filter.getName() != null) {
+            sql.append(" AND t.name LIKE :name");
+            params.addValue("name", filter.getName());
+        }
+        if (filter.getGame_id() != null) {
+            sql.append(" AND t.game_id = :game_id");
+            params.addValue("game_id", filter.getGame_id());
+        }
+        if (filter.getElo() != null) {
+            sql.append(" AND t.elo = :elo");
+            params.addValue("elo", filter.getElo(), Types.OTHER);
+        }
+        if (filter.getRegion() != null) {
+            sql.append(" AND t.region = :region");
+            params.addValue("region", filter.getRegion(), Types.OTHER);
+        }
+        if (filter.getFormat() != null) {
+            sql.append(" AND t.format = :format");
+            params.addValue("format", filter.getFormat());
+        }
+        if (filter.getStructure() != null) {
+            sql.append(" AND t.structure = :structure");
+            params.addValue("structure", filter.getStructure(), Types.OTHER);
+        }
+        if (filter.getStart_date() != null) {
+            sql.append(" AND t.start_date < :start_date");
+            params.addValue("start_date", filter.getStart_date());
+        }
+        if (filter.getEnd_date() != null) {
+            sql.append(" AND t.end_date < :end_date");
+            params.addValue("end_date", filter.getEnd_date());
+        }
+
+        return sql.toString();
+    }
+
+
 }
