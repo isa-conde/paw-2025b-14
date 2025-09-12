@@ -1,7 +1,6 @@
 package ar.edu.itba.paw.webapp.controller;
 
 import ar.edu.itba.paw.interfaces.exception.EmailAlreadyUsedException;
-import ar.edu.itba.paw.interfaces.exception.InvalidDatesException;
 import ar.edu.itba.paw.interfaces.exception.UsernameAlreadyUsedException;
 import ar.edu.itba.paw.interfaces.services.GameService;
 import ar.edu.itba.paw.interfaces.services.MailService;
@@ -181,20 +180,15 @@ public class HelloWorldController {
             return mav;
         }
 
-        try{
-            final Tournament t = ts.create(user.getId(), form.getName(), optionalGame.get().getId(),
-                    form.getRegion(), form.getElo(), form.getStart_date(), form.getEnd_date(),
-                    form.getFormat(), form.getStructure(), form.getMax_participants(), imageBytes, true, false);
-            String tournamentLink = request.getRequestURL().toString()
-                    .replace("/tournament/create", "/tournament?tournamentId=" + t.getId());
-            ms.sendTournamentCreatedEmail(user.getUsername(), t.getName(), tournamentLink, user.getEmail());
-            return new ModelAndView("redirect:/tournament?tournamentId=" + t.getId());
-        } catch (InvalidDatesException e){
-            result.rejectValue("start_date", "error.tournamentForm.invalidDates", e.getMessage());
-            ModelAndView mav = index(request, loginForm(), registerForm(), form, new TournamentFilter());
-            mav.addObject("openModal", "'createTournamentModal'");
-            return mav;
-        }
+
+        final Tournament t = ts.create(user.getId(), form.getName(), optionalGame.get().getId(),
+            form.getRegion(), form.getElo(), form.getStart_date(), form.getEnd_date(),
+            form.getFormat(), form.getStructure(), form.getMax_participants(), imageBytes, true, false);
+        String tournamentLink = request.getRequestURL().toString()
+            .replace("/tournament/create", "/tournament?tournamentId=" + t.getId());
+        ms.sendTournamentCreatedEmail(user.getUsername(), t.getName(), tournamentLink, user.getEmail());
+        return new ModelAndView("redirect:/tournament?tournamentId=" + t.getId());
+
 
     }
 

@@ -3,13 +3,14 @@ package ar.edu.itba.paw.webapp.form;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
+import ar.edu.itba.paw.webapp.constraints.ValidTournamentFormConstraint;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import javax.validation.constraints.*;
 
-
+@ValidTournamentFormConstraint
 public class TournamentForm {
 
     @Size(min = 6, max = 100, message = "Name must be between 6 and 100 characters long")
@@ -34,7 +35,6 @@ public class TournamentForm {
     @Min(value = 2, message = "There must be at least 2 participants")
     @Max(value = 32, message = "There can be at most 32 participants")
     private Integer max_participants;
-
     @NotNull(message = "You must select an image")
     private MultipartFile image;
 
