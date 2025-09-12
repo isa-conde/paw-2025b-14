@@ -1,5 +1,7 @@
 package ar.edu.itba.paw.model;
 
+import ar.edu.itba.paw.model.Tournament.TournamentNode;
+
 import java.util.ArrayList;
 import java.util.List;
 

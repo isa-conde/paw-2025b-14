@@ -1,5 +1,6 @@
-package ar.edu.itba.paw.model;
+package ar.edu.itba.paw.model.Tournament;
 
+import ar.edu.itba.paw.model.Pair;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;

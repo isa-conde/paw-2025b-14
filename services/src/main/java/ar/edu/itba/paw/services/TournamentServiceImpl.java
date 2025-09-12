@@ -8,14 +8,13 @@ import ar.edu.itba.paw.model.ParticipantUserInfo;
 import ar.edu.itba.paw.model.Match;
 import ar.edu.itba.paw.model.MatchWithPlayers;
 import ar.edu.itba.paw.model.Pair;
-import ar.edu.itba.paw.model.Tournament;
+import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.User;
-import ar.edu.itba.paw.model.TournamentImg;
+import ar.edu.itba.paw.model.Tournament.TournamentImg;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;

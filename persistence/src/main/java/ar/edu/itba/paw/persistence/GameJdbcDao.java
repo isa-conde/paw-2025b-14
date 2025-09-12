@@ -1,10 +1,9 @@
 package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.interfaces.persistence.GameDao;
-import ar.edu.itba.paw.model.Game;
-import ar.edu.itba.paw.model.GameFormat;
-import ar.edu.itba.paw.model.GameImg;
-import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.model.Game.Game;
+import ar.edu.itba.paw.model.Game.GameFormat;
+import ar.edu.itba.paw.model.Game.GameImg;
 import ar.edu.itba.paw.model.enums.Genre;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;

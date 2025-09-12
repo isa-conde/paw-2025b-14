@@ -8,7 +8,11 @@ import ar.edu.itba.paw.interfaces.services.MailService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.*;
+import ar.edu.itba.paw.model.Game.Game;
+import ar.edu.itba.paw.model.Game.GameImg;
 import ar.edu.itba.paw.model.MatchWithPlayers;
+import ar.edu.itba.paw.model.Tournament.Tournament;
+import ar.edu.itba.paw.model.Tournament.TournamentImg;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Genre;
 import ar.edu.itba.paw.model.enums.Region;
@@ -29,7 +33,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Controller
