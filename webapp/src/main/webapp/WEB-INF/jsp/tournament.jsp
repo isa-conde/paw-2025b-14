@@ -20,7 +20,7 @@
     <c:otherwise>
         <paw:banner image="data:image/png;base64,${tournamentImg.base64Img}">
             <paw:text type="title" size="m" stroke="true">${game.name}</paw:text>
-            <paw:text type="title" size="xl" stroke="true">${tournamentImg.tournament.name}</paw:text>
+            <paw:text type="title" size="xl" stroke="true"><c:out value="${tournamentImg.tournament.name}"/></paw:text>
             <div class="date-container">
                 <paw:datetime date="${tournamentImg.tournament.start_date}" weight="semi-bold"/>
                 <paw:text weight="semi-bold"> - </paw:text>
