@@ -5,9 +5,7 @@ import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.ParticipantUser;
 import ar.edu.itba.paw.model.ParticipantUserInfo;
-import ar.edu.itba.paw.model.Match;
 import ar.edu.itba.paw.model.MatchWithPlayers;
-import ar.edu.itba.paw.model.Pair;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.Tournament.TournamentImg;
@@ -84,14 +82,10 @@ public class TournamentServiceImpl implements TournamentService {
 //        tournamentDao.joinTournamentTeam(team_id, tournament_id);
 //    }
 //
-    @Override
-	public List<Match> getTournamentMatches(Long tournament_id) {
-		return tournamentDao.getTournamentMatches(tournament_id);
-	}
 
 	@Override
-	public List<MatchWithPlayers> getTournamentMatchesWithPlayers(Long tournament_id) {
-		return tournamentDao.getTournamentMatchesWithPlayers(tournament_id);
+	public Map<Integer, List<MatchWithPlayers>> getTournamentMatchesByStage(Long tournament_id) {
+		return tournamentDao.getTournamentMatchesByStage(tournament_id);
 	}
 
 	@Override
@@ -139,16 +133,6 @@ public class TournamentServiceImpl implements TournamentService {
     public void closeInscriptions(Long tournament_id){
         tournamentDao.closeInscriptions(tournament_id);
     }
-
-    @Override
-    public List<Pair<String,String>> getGenericMatches(Long tournament_id) {
-		return tournamentDao.getGenericMatches(tournament_id);
-	}
-    
-    @Override
-	public List<Pair<String,String>> getMatches(Long tournament_id) {
-		return tournamentDao.getMatches(tournament_id);
-	}
 
     @Override
     public Boolean hasJoined(Long userId, Long tournamentId) {

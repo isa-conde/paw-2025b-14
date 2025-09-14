@@ -4,15 +4,14 @@ import ar.edu.itba.paw.model.ParticipantUserInfo;
 import ar.edu.itba.paw.model.Tournament.TournamentImg;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
-import ar.edu.itba.paw.model.Match;
 import ar.edu.itba.paw.model.MatchWithPlayers;
-import ar.edu.itba.paw.model.Pair;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface TournamentService {
@@ -35,10 +34,6 @@ public interface TournamentService {
 
     public void loadScores(Long match_id, Long tournament_id, Integer local_score, Integer visitor_score);
 
-    public List<Match> getTournamentMatches(Long tournament_id);
-
-    public List<MatchWithPlayers> getTournamentMatchesWithPlayers(Long tournament_id);
-
     //public void joinTournamentTeam(Long team_id, Long tournament_id);
 
     public List<TournamentImg> findWithImg(TournamentFilter tournamentFilter);
@@ -51,11 +46,9 @@ public interface TournamentService {
 
     public void closeInscriptions(Long tournament_id);
 
-    public List<Pair<String,String>> getGenericMatches(Long tournament_id);
-    
-    public List<Pair<String,String>> getMatches(Long tournament_id);
-
     public Boolean hasJoined(Long userId, Long tournamentId);
+
+    public Map<Integer, List<MatchWithPlayers>> getTournamentMatchesByStage(Long tournament_id);
 
     public void setMatchWinner(Long matchId, Long tournamentId, Integer winner);
 

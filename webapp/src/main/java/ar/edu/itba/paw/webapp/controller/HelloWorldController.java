@@ -255,15 +255,8 @@ public class HelloWorldController {
             return new ModelAndView("redirect:/");
         }
         Optional<TournamentImg> optionalTournament = ts.findByIdWithImg(tournamentId);
-        List <MatchWithPlayers> matches = ts.getTournamentMatchesWithPlayers(tournamentId);
+        Map<Integer, List<MatchWithPlayers>> matchesByStage = ts.getTournamentMatchesByStage(tournamentId);
 
-        Map<Integer, List<MatchWithPlayers>> matchesByStage = new LinkedHashMap<>();
-        if (!matches.isEmpty() && optionalTournament.isPresent()) {
-            for (MatchWithPlayers match : matches) {
-                int stage = match.getStage();
-                matchesByStage.computeIfAbsent(stage, k -> new ArrayList<>()).add(match);
-            }
-        }
         if(optionalTournament.isPresent()) {
             TournamentImg t = optionalTournament.get();
             Optional<Game> optionalGame = gs.findById(t.getTournament().getGame_id());
@@ -274,7 +267,6 @@ public class HelloWorldController {
             mav.addObject("tournamentImg", t);
             mav.addObject("game", optionalGame.get());
             mav.addObject("creator", optionalUser.get());
-            mav.addObject("genericMatches", ts.getMatches(tournamentId));
             mav.addObject("matchesByStage", matchesByStage);
         } else {
             return new ModelAndView("index");
