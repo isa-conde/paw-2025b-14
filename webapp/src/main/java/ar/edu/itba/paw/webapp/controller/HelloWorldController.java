@@ -98,7 +98,7 @@ public class HelloWorldController {
         mav.addObject("games", allGames);
         mav.addObject("regions", Arrays.stream(Region.values()).toList());
         mav.addObject("elos", Arrays.stream(Elo.values()).toList());
-        mav.addObject("structures", Arrays.stream(Structure.values()).filter(s -> s == Structure.LEAGUE).toList());
+        mav.addObject("structures", Arrays.stream(Structure.values()).toList());
         mav.addObject("loginForm", loginForm);
         mav.addObject("registerForm", registerForm);
         mav.addObject("tournamentForm", tournamentForm);
@@ -255,19 +255,21 @@ public class HelloWorldController {
             return new ModelAndView("redirect:/");
         }
         Optional<TournamentImg> optionalTournament = ts.findByIdWithImg(tournamentId);
-        Map<Integer, List<MatchWithPlayers>> matchesByStage = ts.getTournamentMatchesByStage(tournamentId);
 
         if(optionalTournament.isPresent()) {
             TournamentImg t = optionalTournament.get();
             Optional<Game> optionalGame = gs.findById(t.getTournament().getGame_id());
             Optional<User> optionalUser = us.findById(t.getTournament().getCreator_id());
             mav.addObject("hasJoined", ts.hasJoined(user.getId(), tournamentId));
-            mav.addObject("participants", ts.getTournamentParticipants(tournamentId));
+            mav.addObject("participants", ts.getTournamentParticipantsByGroup(tournamentId));
             mav.addObject("user", user);
             mav.addObject("tournamentImg", t);
             mav.addObject("game", optionalGame.get());
             mav.addObject("creator", optionalUser.get());
-            mav.addObject("matchesByStage", matchesByStage);
+            mav.addObject("matchesByGroup", ts.getTournamentMatchesByGroup(tournamentId));
+            mav.addObject("LEAGUE", Structure.LEAGUE);
+            mav.addObject("ELIMINATION", Structure.ELIMINATION);
+            mav.addObject("HYBRID", Structure.HYBRID);
         } else {
             return new ModelAndView("index");
         }

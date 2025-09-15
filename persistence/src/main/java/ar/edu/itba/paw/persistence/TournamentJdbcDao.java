@@ -263,7 +263,7 @@ public class TournamentJdbcDao implements TournamentDao {
 
     public void createMatchesHybrid(Tournament t, List<ParticipantUser> participants) {
         int n = participants.size();
-        if (n > 16){
+        if (n > 8){
             int groupsCount = calculateGroups(n);
             List<Integer> distribution = distributeParticipants(n);
             int index = 0;
@@ -349,11 +349,8 @@ public class TournamentJdbcDao implements TournamentDao {
         return distribution;
     }
 
-
     @Override
-    public Map<Integer, List<MatchWithPlayers>> getTournamentMatchesByStage(Long tournament_id) {
-        Tournament t = findById(tournament_id).orElse(null);
-
+    public List<MatchWithPlayers> getTournamentMatches(Long tournament_id) {
         String sql = "SELECT m.id, m.tournament_id, m.local_id, m.visitor_id, " +
                     "COALESCE(local_user.username, 'TBD') as local_player_name, " +
                     "COALESCE(visitor_user.username, 'TBD') as visitor_player_name, " +
@@ -364,7 +361,7 @@ public class TournamentJdbcDao implements TournamentDao {
                     "WHERE m.tournament_id = ? " +
                     "ORDER BY m.stage, m.id";
 
-        List <MatchWithPlayers> matches = jdbcTemplate.query(sql, (rs, rowNum) -> new MatchWithPlayers(
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new MatchWithPlayers(
             rs.getLong("id"),
             rs.getLong("tournament_id"),
             rs.getObject("local_id") != null ? rs.getLong("local_id") : null,
@@ -374,23 +371,16 @@ public class TournamentJdbcDao implements TournamentDao {
             rs.getObject("local_score") != null ? rs.getInt("local_score") : null,
             rs.getObject("visitor_score") != null ? rs.getInt("visitor_score") : null,
             rs.getObject("winner") != null ? rs.getInt("winner") : null,
-            rs.getObject("stage") != null ? rs.getInt("stage") : null
-        ), tournament_id);
-
-        Map<Integer, List<MatchWithPlayers>> matchesByStage = new LinkedHashMap<>();
-        if (!matches.isEmpty() && t != null) {
-            for (MatchWithPlayers match : matches) {
-                int stage = match.getStage();
-                matchesByStage.computeIfAbsent(stage, k -> new ArrayList<>()).add(match);
-            }
-        }
-        return matchesByStage;
+            rs.getObject("stage") != null ? rs.getInt("stage") : null,
+            rs.getObject("group_number") != null ? rs.getInt("group_number") : null
+            ), tournament_id);
     }
 
     public Optional<TournamentImg> findByIdWithImg(Long id){
         return jdbcTemplate.query("SELECT t.*, i.image FROM tournament t LEFT JOIN image i ON t.image_id = i.id WHERE t.id = ?", ROW_MAPPER_IMG, id
         ).stream().findFirst();
     }
+
     @Override
     public List<TournamentImg> findByCreatorImg(Long creator_id) {
         return jdbcTemplate.query("SELECT * FROM tournament t LEFT JOIN image i ON t.image_id = i.id WHERE creator_id = ?", ROW_MAPPER_IMG, creator_id);

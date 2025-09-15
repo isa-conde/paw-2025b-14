@@ -55,7 +55,7 @@ public interface TournamentDao {
 
     public void closeInscriptions(Long tournament_id);
 
-    public Map<Integer, List<MatchWithPlayers>> getTournamentMatchesByStage(Long tournament_id);
+    public List<MatchWithPlayers> getTournamentMatches(Long tournament_id);
 
     public void setMatchWinner(Long matchId, Long tournamentId, Integer winner);
 }
