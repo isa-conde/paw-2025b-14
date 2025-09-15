@@ -60,6 +60,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 import javax.sql.DataSource;
+import java.util.Optional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = TestConfig.class)
@@ -89,5 +90,97 @@ public class UserJdbcDaoTest {
         Assert.assertEquals(USERNAME,user.getUsername());
         Assert.assertEquals(EMAIL, user.getEmail());
         Assert.assertEquals(1, JdbcTestUtils.countRowsInTable(jdbcTemplate,"users"));
+    }
+
+    @Test(expected = Exception.class)
+    public void testNoUsername(){
+        final User user = userJdbcDao.create(USERNAME, null);
+    }
+
+    @Test(expected = Exception.class)
+    public void testNoEmail(){
+        final User user = userJdbcDao.create(null, EMAIL);
+    }
+
+    @Test(expected = Exception.class)
+    public void testRepeatUsername(){
+        final User user1 = userJdbcDao.create(USERNAME,EMAIL);
+        final User user2 = userJdbcDao.create(USERNAME,"another@mail.com");
+    }
+
+    @Test(expected = Exception.class)
+    public void testRepeatMail(){
+        final User user1 = userJdbcDao.create(USERNAME,EMAIL);
+        final User user2 = userJdbcDao.create("janedoe",EMAIL);
+    }
+
+    @Test
+    public void testAuthenticate(){
+        final User user = userJdbcDao.create(USERNAME,EMAIL);
+        final Optional<User> ans = userJdbcDao.authenticate(USERNAME,EMAIL);
+
+        Assert.assertNotNull(ans);
+        Assert.assertTrue(ans.isPresent());
+        Assert.assertEquals(USERNAME,ans.get().getUsername());
+        Assert.assertEquals(EMAIL, ans.get().getEmail());
+        Assert.assertEquals(ans.get().getId(), user.getId());
+    }
+
+    @Test
+    public void testAuthenticateNonExistent(){
+        final Optional<User> ans = userJdbcDao.authenticate(USERNAME,EMAIL);
+
+        Assert.assertNotNull(ans);
+        Assert.assertTrue(ans.isEmpty());
+    }
+
+    @Test
+    public void testCheckUsernameExists(){
+        final User user = userJdbcDao.create(USERNAME,EMAIL);
+        final boolean ans = userJdbcDao.checkUsernameExists(user.getUsername());
+
+        Assert.assertTrue(ans);
+    }
+
+    @Test
+    public void testCheckEmailExists(){
+        final User user = userJdbcDao.create(USERNAME,EMAIL);
+        final boolean ans = userJdbcDao.checkEmailExists(user.getEmail());
+
+        Assert.assertTrue(ans);
+    }
+
+    @Test
+    public void testCheckUsernameNotExists(){
+        final boolean ans = userJdbcDao.checkUsernameExists(USERNAME);
+
+        Assert.assertFalse(ans);
+    }
+
+    @Test
+    public void testCheckEmailNotExists(){
+        final boolean ans = userJdbcDao.checkEmailExists(EMAIL);
+
+        Assert.assertFalse(ans);
+    }
+
+    @Test
+    public void testFindById(){
+        final User user = userJdbcDao.create(USERNAME,EMAIL);
+        final Optional<User> ans = userJdbcDao.findById(user.getId());
+
+        Assert.assertNotNull(ans);
+        Assert.assertTrue(ans.isPresent());
+        Assert.assertEquals(USERNAME,ans.get().getUsername());
+        Assert.assertEquals(EMAIL, ans.get().getEmail());
+        Assert.assertEquals(ans.get().getId(), user.getId());
+    }
+
+    @Test
+    public void testFindNonExistent(){
+        final Optional<User> ans = userJdbcDao.findById(3);
+
+        Assert.assertNotNull(ans);
+        Assert.assertTrue(ans.isEmpty());
     }
 }
