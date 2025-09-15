@@ -1,5 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
 <paw:layout user="${user}" isIndex="false">
     <c:choose>
@@ -8,7 +9,7 @@
         </c:when>
         <c:otherwise>
             <paw:banner size="s" image="${pageContext.request.contextPath}/images/moonlight.jpg">
-                <paw:text type="title" size="xl" stroke="true">Games</paw:text>
+                <paw:text type="title" size="xl" stroke="true"><spring:message code="games.title"/></paw:text>
             </paw:banner>
             <div class="content-container">
                 <paw:elements-grid elements="${games}" id="games-grid" isGame="true"/>

@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
 <%@ attribute name="path" required="true"%>
 <%@ attribute name="label" required="true"%>
@@ -17,7 +18,7 @@
 <c:choose>
     <c:when test="${inputType != 'submit'}">
         <form:label path="${path}" class="input-label ${inline == 'true' ? 'inline-input-container' : (containerType == 'half' ? 'half-input-container' : 'input-container')}">
-            <paw:text weight="3" size="l"><c:out value="${label}"/></paw:text>
+            <paw:text weight="3" size="l"><spring:message code="${label}"/></paw:text>
             <c:choose>
                 <c:when test="${inputType == 'input' || inputType == null}">
                     <form:input path="${path}" class="input"/>
@@ -27,7 +28,7 @@
                         <c:when test="${itemLabel != null && itemValue != null}">
                             <form:select path="${path}" cssClass="input">
                                 <c:if test="${emptyOption != null}">
-                                    <form:option value="" label="${emptyOption}"/>
+                                    <form:option value="${null}" label="${emptyOption}"/>
                                 </c:if>
                                 <form:options items="${items}" itemLabel="${itemLabel}" itemValue="${itemValue}"/>
                             </form:select>
@@ -71,7 +72,8 @@
     </c:when>
     <c:otherwise>
         <div class="inline-input-container submit-container">
-            <input type="submit" class="btn submit" value="${label}"/>
+            <spring:message code="${label}" var="msg"/>
+            <input type="submit" class="btn submit" value="${msg}">
         </div>
     </c:otherwise>
 </c:choose>

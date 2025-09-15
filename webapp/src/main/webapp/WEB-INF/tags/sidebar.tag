@@ -8,19 +8,19 @@
     <div class="sidebar-content">
         <paw:sidebar-button 
             icon="${pageContext.request.contextPath}/images/home.png" 
-            text="Home" 
+            text="sidebar.home"
             href="${pageContext.request.contextPath}/"
             active="${pageContext.request.requestURI.endsWith('/') || pageContext.request.requestURI.endsWith('/index.jsp') ? 'true' : 'false'}"/>
         
         <paw:sidebar-button 
             icon="${pageContext.request.contextPath}/images/joystick.png" 
-            text="Games" 
+            text="sidebar.games"
             href="${pageContext.request.contextPath}/gamesPage"
             active="${pageContext.request.requestURI.contains('/gamesPage') ? 'true' : 'false'}"/>
 
         <paw:sidebar-button 
             icon="${pageContext.request.contextPath}/images/cup.png" 
-            text="Tourneys" 
+            text="sidebar.tourneys"
             href="${pageContext.request.contextPath}/tournamentsPage"
             active="${pageContext.request.requestURI.contains('/tournamentsPage') ? 'true' : 'false'}"/>
 
@@ -28,7 +28,7 @@
             <c:when test="${isLoggedIn}">
                 <paw:sidebar-button
                         icon="${pageContext.request.contextPath}/images/badge.png"
-                        text="My Tourneys"
+                        text="sidebar.myTourneys"
                         href="${pageContext.request.contextPath}/myTournaments"
                         active="${pageContext.request.requestURI.contains('/myTournaments') ? 'true' : 'false'}"/>
             </c:when>

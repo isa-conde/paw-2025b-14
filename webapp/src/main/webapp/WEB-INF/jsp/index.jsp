@@ -2,6 +2,7 @@
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<spring:message code="home.createTournament.emptyOption" var="emptyOption"/>
 
 <paw:layout user="${user != null ? user : null}" function="${openModal}" isIndex="true">
 <c:choose>
@@ -18,94 +19,94 @@
     <c:url value="/register" var="userRegisterPath"/>
     <c:url value="/tournament/create" var="createTournamentPath"/>
 
-    <paw:modal id="loginModal" title="Log in">
+    <paw:modal id="loginModal" title="home.login.title">
         <form:form cssClass="form" modelAttribute="loginForm" action="${userLoginPath}" method="post">
             <div class="row">
-                <paw:input path="username" label="Username" hasConstraint="true"/>
+                <paw:input path="username" label="home.login.username" hasConstraint="true"/>
             </div>
             <div class="row">
-                <paw:input path="email" label="Email" inputType="email" hasConstraint="true"/>
+                <paw:input path="email" label="home.login.email" inputType="email" hasConstraint="true"/>
             </div>
             <div class="row center">
-                <paw:input path="" label="Log in" containerType="half" inputType="submit"/>
+                <paw:input path="" label="home.login.title" containerType="half" inputType="submit"/>
             </div>
         </form:form>
     </paw:modal>
-    <paw:modal id="registerModal" title="Register">
+    <paw:modal id="registerModal" title="home.register.title">
         <form:form cssClass="form" modelAttribute="registerForm" action="${userRegisterPath}" method="post">
             <div class="row">
-                <paw:input path="username" label="Username" hasConstraint="true"/>
+                <paw:input path="username" label="home.register.username" hasConstraint="true"/>
             </div>
             <div class="row">
-                <paw:input path="email" label="Email" inputType="email" hasConstraint="true"/>
+                <paw:input path="email" label="home.register.email" inputType="email" hasConstraint="true"/>
             </div>
             <div class="row center">
-                <paw:input path="" label="Register" containerType="half" inputType="submit"/>
+                <paw:input path="" label="home.register.title" containerType="half" inputType="submit"/>
             </div>
         </form:form>
     </paw:modal>
 
     <paw:banner size="l" image="${pageContext.request.contextPath}/images/arcane.jpg">
-        <paw:text type="title" size="xl"><spring:message code="welcome.title"/></paw:text>
+        <paw:text type="title" size="xl"><spring:message code="home.welcome.title"/></paw:text>
         <br>
-        <paw:text type="title" size="l"><spring:message code="welcome.subtitle"/></paw:text>
+        <paw:text type="title" size="l"><spring:message code="home.welcome.subtitle"/></paw:text>
     </paw:banner>
     <div class="content-container">
         <div class="cards-container">
             <c:choose>
                 <c:when test="${user != null}">
                     <paw:button-card
-                            title="Become an Organizer"
-                            butText="Create a Tournament"
+                            title="home.createTournament.title"
+                            butText="home.createTournament.butText"
                             onclick="openModal('createTournamentModal')"
                             texture="true"/>
                 </c:when>
                 <c:otherwise>
                     <paw:button-card
-                            title="Become an Organizer"
-                            butText="Create a Tournament"
+                            title="home.createTournament.title"
+                            butText="home.createTournament.butText"
                             onclick="openModal('loginModal')"
                             texture="true"/>
                 </c:otherwise>
             </c:choose>
-            <paw:modal id="createTournamentModal" title="Create a Tournament">
+            <paw:modal id="createTournamentModal" title="home.createTournament.title">
                 <form:form cssClass="form" modelAttribute="tournamentForm" action="${createTournamentPath}" method="post" enctype="multipart/form-data">
                     <div class="row">
-                        <paw:input path="name" label="Tournament Name" hasConstraint="true"/>
+                        <paw:input path="name" label="home.createTournament.name" hasConstraint="true"/>
                     </div>
                     <div class="row">
-                        <paw:input path="game_id" label="Game" containerType="half" inputType="select" items="${games}" itemValue="game.id" itemLabel="game.name" hasConstraint="true"/>
-                        <paw:input path="region" label="Region" containerType="half" inputType="select" items="${regions}" hasConstraint="true"/>
+                        <paw:input path="game_id" label="home.createTournament.game" containerType="half" inputType="select" items="${games}" itemValue="game.id" itemLabel="game.name" hasConstraint="true" emptyOption="${emptyOption}"/>
+                        <paw:input path="region" label="home.createTournament.region" containerType="half" inputType="select" items="${regions}" hasConstraint="true" emptyOption="${emptyOption}"/>
                     </div>
                     <div class="row">
-                        <paw:input path="start_date" label="Start Date" containerType="half" inputType="date" hasConstraint="true"/>
-                        <paw:input path="end_date" label="End Date" containerType="half" inputType="date" hasConstraint="true"/>
+                        <paw:input path="start_date" label="home.createTournament.startDate" containerType="half" inputType="date" hasConstraint="true"/>
+                        <paw:input path="end_date" label="home.createTournament.endDate" containerType="half" inputType="date" hasConstraint="true"/>
                     </div>
                     <div class="row center">
-                        <paw:input path="max_participants" label="Max Participants" containerType="half" inputType="number" hasConstraint="true"/>
-                        <paw:input path="structure" label="Structure" containerType="half" inputType="select" items="${structures}"/>
+                        <paw:input path="max_participants" label="home.createTournament.maxParticipants" containerType="half" inputType="number" hasConstraint="true"/>
+                        <paw:input path="structure" label="home.createTournament.structure" containerType="half" inputType="select" items="${structures}" emptyOption="${emptyOption}"/>
                     </div>
                     <div class="row">
-                        <paw:input path="format" label="Format" containerType="half" hasConstraint="true"/>
-                        <paw:input path="elo" label="Skill level" containerType="half" inputType="select" items="${elos}" hasConstraint="true"/>
+                        <paw:input path="format" label="home.createTournament.format" containerType="half" hasConstraint="true"/>
+                        <paw:input path="elo" label="home.createTournament.skillLevel" containerType="half" inputType="select" items="${elos}" hasConstraint="true" emptyOption="${emptyOption}"/>
                     </div>
                     <div class="row">
-                        <paw:input path="image" label="Image" inputType="file" hasConstraint="true"/>
+                        <paw:input path="image" label="home.createTournament.image" inputType="file" hasConstraint="true"/>
                     </div>
                     <div class="row center">
-                        <paw:input path="" label="Create" containerType="half" inputType="submit"/>
+                        <paw:input path="" label="home.createTournament.create" containerType="half" inputType="submit"/>
                     </div>
                 </form:form>
             </paw:modal>
-            <paw:button-card title="Test your abilities" butText="Join a Tournament" onclick="${joinTournamentFunction}" texture="true"/>
+            <paw:button-card title="home.joinTournament.title" butText="home.joinTournament.butText" onclick="${joinTournamentFunction}" texture="true"/>
         </div>
         <div class="content-title">
-            <paw:text type="title" size="l"><spring:message code="games"/></paw:text>
+            <paw:text type="title" size="l"><spring:message code="home.games"/></paw:text>
         </div>
         <paw:carrousel id="game-list" elements="${games}" isGame="true"/>
 
         <div class="content-title">
-            <paw:text type="title" size="l"><spring:message code="tournaments"/></paw:text>
+            <paw:text type="title" size="l"><spring:message code="home.tournaments"/></paw:text>
         </div>
 
         <c:forEach var="game" items="${games}" varStatus="status">

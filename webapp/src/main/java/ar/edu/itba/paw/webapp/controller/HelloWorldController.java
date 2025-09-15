@@ -136,7 +136,8 @@ public class HelloWorldController {
             return new ModelAndView("redirect:/?userId=" + user.get().getId());
         } else {
             ModelAndView mav = new ModelAndView("index");
-            mav.addObject("loginError", "Invalid credentials");
+            result.rejectValue("email", "error.loginForm.invalidCredentials");
+            mav.addObject("openModal", "'loginModal'");
             return mav;
         }
     }
@@ -268,7 +269,6 @@ public class HelloWorldController {
             mav.addObject("tournamentImg", t);
             mav.addObject("game", optionalGame.get());
             mav.addObject("creator", optionalUser.get());
-            mav.addObject("genericMatches", ts.getMatches(tournamentId));
             mav.addObject("matchesByStage", matchesByStage);
         } else {
             return new ModelAndView("index");

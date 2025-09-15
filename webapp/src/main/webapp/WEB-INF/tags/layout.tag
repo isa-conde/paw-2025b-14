@@ -26,18 +26,18 @@
             <paw:header>
                 <c:choose>
                     <c:when test="${isLoggedIn}">
-                        <paw:profileButton text="${user.username}" onclick="openModal('logoutModal')"/>
-                        <paw:modal id="logoutModal" title="Logout">
+                        <paw:profileButton text="${user.username}" onclick="openModal('logoutModal')" isNotSafe="true"/>
+                        <paw:modal id="logoutModal" title="layout.logout">
                             <div class="row center">
-                                <paw:button text="Log out" onclick="window.location.href='${logoutUrl}'"/>
+                                <paw:button text="layout.logout" onclick="window.location.href='${logoutUrl}'"/>
                             </div>
                         </paw:modal>
                     </c:when>
                     <c:otherwise>
                         <c:if test="${isIndex == 'true'}">
                             <div>
-                                <paw:button text="Log in" size="m" onclick="openModal('loginModal')"/>
-                                <paw:button text="Register" size="m" onclick="openModal('registerModal')"/>
+                                <paw:button text="layout.login" size="m" onclick="openModal('loginModal')"/>
+                                <paw:button text="layout.register" size="m" onclick="openModal('registerModal')"/>
                             </div>
                         </c:if>
                     </c:otherwise>

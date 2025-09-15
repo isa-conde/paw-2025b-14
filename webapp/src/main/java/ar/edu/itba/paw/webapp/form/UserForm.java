@@ -12,9 +12,9 @@ public class UserForm {
 	//password text NOT NULL,
 	//CONSTRAINT username_length CHECK (char_length(username) < 15)
 
-	@NotBlank(message = "This field is required")
-	@Size(min = 6, max = 31, message = "Username must be between 6 and 31 characters long")
-	@Pattern( regexp = "|[a-zA-Z][-a-zA-Z0-9_]+" , message = "Username must start with a letter and contain only letters, numbers, hyphens or underscores")
+	@NotBlank(message = "{form.requiredField}")
+	@Size(max = 31)
+	@Pattern( regexp = "|[a-zA-Z][-a-zA-Z0-9_]+" , message = "{home.login.usernameFormat}")
 	private String username;
 	
 //	@Size(min = 8, max =31)
@@ -22,8 +22,8 @@ public class UserForm {
 //
 //	@Size(min = 8, max =31)
 //	private String repeatPassword;
-	@NotBlank(message = "This field is required")
-	@Pattern(regexp = "|[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}", message = "Invalid email format")
+	@NotBlank(message = "{form.requiredField}")
+	@Pattern(regexp = "|[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}", message = "{form.email.invalidFormat}")
 	private String email;
 	
 	public String getUsername() {

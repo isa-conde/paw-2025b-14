@@ -13,29 +13,31 @@ import javax.validation.constraints.*;
 @ValidTournamentFormConstraint
 public class TournamentForm {
 
-    @Size(min = 6, max = 100, message = "Name must be between 6 and 100 characters long")
+    @NotBlank(message = "{home.createTournament.notNull}")
+    @Size(max = 100)
     private String name;
-    @NotNull
+    @NotNull(message = "{home.createTournament.notNull}")
     private Long game_id;
-    @NotNull
+    @NotNull(message = "{home.createTournament.notNull}")
     private Region region;
-    @NotNull
+    @NotNull(message = "{home.createTournament.notNull}")
     private Elo elo;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @NotNull(message = "Your must select a start date")
+    @NotNull(message = "{home.createTournament.notNull}")
     private LocalDate start_date;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @NotNull(message = "Your must select an end date")
+    @NotNull(message = "{home.createTournament.notNull}")
     private LocalDate end_date;
     @Size(max = 255, message = "Format must be at most 255 characters long")
-    @NotNull(message = "This field is required")
+    @NotBlank(message = "{home.createTournament.notNull}")
     private String format;
+    @NotNull(message = "{home.createTournament.notNull}")
     private Structure structure;
-    @NotNull(message = "This field is required")
-    @Min(value = 2, message = "There must be at least 2 participants")
-    @Max(value = 32, message = "There can be at most 32 participants")
+    @NotNull(message = "{home.createTournament.notNull}")
+    @Min(value = 2, message = "{home.createTournament.minParticipants}")
+    @Max(value = 32, message = "{home.createTournament.maxParticipantsError}")
     private Integer max_participants;
-    @NotNull(message = "You must select an image")
+    @NotNull(message = "{home.createTournament.notNull}")
     private MultipartFile image;
 
     public String getName() {

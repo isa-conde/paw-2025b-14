@@ -307,32 +307,6 @@ public class TournamentJdbcDao implements TournamentDao {
         ), tournament_id);
     }
 
-    @Override
-    public List<Pair<String,String>> getMatches(Long tournament_id) {
-		List<Match> matches = getTournamentMatches(tournament_id);
-		int size = getCurrentParticipants(tournament_id);
-    	System.out.println(size);
-    	System.out.println(findById(tournament_id).get().getMax_participants());
-		if (matches.isEmpty()) return List.of();
-		List<Pair<String,String>> result = new ArrayList<>();
-		UserDao userDao = new UserJdbcDao(jdbcTemplate.getDataSource());
-		for(Match m : matches) {
-			String local, visitor;
-			if(m.getLocalId() == null || userDao.findById(m.getLocalId()).isEmpty()) {
-				local = "TBD";
-			}else {
-				local = userDao.findById(m.getLocalId()).get().getUsername();
-			}
-			if(m.getVisitorId() == null || userDao.findById(m.getVisitorId()).isEmpty()) {
-				visitor = "TBD";
-			}else {
-				visitor = userDao.findById(m.getVisitorId()).get().getUsername();
-			}
-			result.add(new Pair<>(local, visitor));
-		}
-		return result;
-	}
-
     public Optional<TournamentImg> findByIdWithImg(Long id){
         return jdbcTemplate.query("SELECT t.*, i.image FROM tournament t LEFT JOIN image i ON t.image_id = i.id WHERE t.id = ?", ROW_MAPPER_IMG, id
         ).stream().findFirst();
@@ -356,14 +330,6 @@ public class TournamentJdbcDao implements TournamentDao {
     @Override
     public List<ParticipantUser> getTournamentParticipantUsers(Long tournament_id) {
         return jdbcTemplate.query("SELECT * FROM participant_user WHERE tournament_id = ?", ROW_MAPPER_PARTICIPANT_USER, tournament_id);
-    }
-
-    @Override
-    public List<Pair<String,String>> getGenericMatches(Long tournament_id) {
-    	Structure structure = getTournamentStructure(tournament_id).orElse(null);
-    	if (structure == null) return List.of();
-    	int maxParticipants = jdbcTemplate.queryForObject("SELECT max_participants FROM tournament WHERE id = ?", Integer.class, tournament_id);
-    	return structure.buildMatches(maxParticipants);
     }
 
     @Override

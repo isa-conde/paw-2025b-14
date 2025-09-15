@@ -52,10 +52,6 @@ public interface TournamentDao {
 
     public void setFinished(Long tournament_id);
 
-    public List<Pair<String,String>> getGenericMatches(Long tournament_id);
-    
-    public List<Pair<String,String>> getMatches(Long tournament_id);
-
     public Boolean hasJoined(Long userId, Long tournamentId);
 
     public List<TournamentImg> findUserActiveTournaments(Long userId);

@@ -1,6 +1,10 @@
 <%@ taglib prefix="c"   uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<spring:message code="tournaments.game.emptyOption" var="allGames"/>
+<spring:message code="tournaments.region.emptyOption" var="allRegions"/>
+<spring:message code="tournaments.skillLevel.emptyOption" var="allLevels"/>
 
 <paw:layout user="${user}" isIndex="false">
   <c:choose>
@@ -10,16 +14,16 @@
     <c:otherwise>
       <paw:banner image="${pageContext.request.contextPath}/images/tournament.jpeg">
         <div class="page-title">
-          <paw:text type="title" size="xl" stroke="true">Tournaments</paw:text>
+          <paw:text type="title" size="xl" stroke="true"><spring:message code="tournaments.title"/></paw:text>
         </div>
       </paw:banner>
       <div class="content-container">
         <form:form cssClass="form" modelAttribute="filterForm" method="post">
           <div class="filter-container">
-            <paw:input path="game_id" label="Game" inputType="select" items="${games}" itemValue="id" itemLabel="name" emptyOption="All Games" inline="true"/>
-            <paw:input path="region" label="Region" inputType="select" items="${regions}" emptyOption="All Regions" inline="true"/>
-            <paw:input path="elo" label="Level" inputType="select" items="${elos}" emptyOption="All Levels" inline="true"/>
-            <paw:input path="" label="Filter" inputType="submit" inline="true"/>
+            <paw:input path="game_id" label="tournaments.game" inputType="select" items="${games}" itemValue="id" itemLabel="name" emptyOption="${allGames}" inline="true"/>
+            <paw:input path="region" label="tournaments.region" inputType="select" items="${regions}" emptyOption="${allRegions}" inline="true"/>
+            <paw:input path="elo" label="tournaments.skillLevel" inputType="select" items="${elos}" emptyOption="${allLevels}" inline="true"/>
+            <paw:input path="" label="tournaments.filter" inputType="submit" inline="true"/>
           </div>
         </form:form>
 
