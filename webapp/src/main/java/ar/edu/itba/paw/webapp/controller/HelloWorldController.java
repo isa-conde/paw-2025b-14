@@ -246,9 +246,7 @@ public class HelloWorldController {
         final ModelAndView mav = new ModelAndView("tournament");
         User user = (User) request.getSession().getAttribute("user");
         mav.addObject("user", user);
-        if (user == null){
-            return new ModelAndView("redirect:/");
-        }
+
         Optional<TournamentImg> optionalTournament = ts.findByIdWithImg(tournamentId);
         List <MatchWithPlayers> matches = ts.getTournamentMatchesWithPlayers(tournamentId);
 
@@ -263,7 +261,7 @@ public class HelloWorldController {
             TournamentImg t = optionalTournament.get();
             Optional<Game> optionalGame = gs.findById(t.getTournament().getGame_id());
             Optional<User> optionalUser = us.findById(t.getTournament().getCreator_id());
-            mav.addObject("hasJoined", ts.hasJoined(user.getId(), tournamentId));
+            mav.addObject("hasJoined", user != null? ts.hasJoined(user.getId(), tournamentId): false);
             mav.addObject("participants", ts.getTournamentParticipants(tournamentId));
             mav.addObject("user", user);
             mav.addObject("tournamentImg", t);

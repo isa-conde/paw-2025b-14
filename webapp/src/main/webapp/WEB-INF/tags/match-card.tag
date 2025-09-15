@@ -9,6 +9,8 @@
 <%@ attribute name="isCreator" required="false" rtexprvalue="true" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+
 
 <div class="match-card">
     <div class="match-players">
@@ -43,7 +45,8 @@
                     <input type="hidden" name="tournamentId" value="${tournamentId}"/>
                     <input type="hidden" name="winner" value="2"/>
                     <button type="submit" class="action-button visitor-win">
-                        <paw:text size="xs"><c:out value="${visitorPlayer} wins"/></paw:text>
+                        <spring:message code="tournament.wins" var="wins"/>
+                        <paw:text size="xs"><c:out value="${visitorPlayer} ${wins}"/></paw:text>
                     </button>
                 </form>
             </div>
@@ -53,7 +56,8 @@
             <div class="match-result">
                 <div class="result-text">
                     <paw:text size="xs" weight="bold">
-                        <c:out value="${winner == 1 ? localPlayer : visitorPlayer} won"/>
+                        <spring:message code="tournament.won" var="won"/>
+                        <c:out value="${winner == 1 ? localPlayer : visitorPlayer} ${won}"/>
                     </paw:text>
                 </div>
             </div>
