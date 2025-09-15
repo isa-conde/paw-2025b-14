@@ -1,36 +1,106 @@
-//package ar.edu.itba.paw.services;
-//
-//import ar.edu.itba.paw.interfaces.persistence.UserDao;
-//import ar.edu.itba.paw.model.User;
-//import org.junit.Test;
-//import org.junit.runner.RunWith;
-//import org.mockito.InjectMocks;
-//import org.mockito.Mock;
-//import org.mockito.junit.MockitoJUnitRunner;
-//
-//import java.util.Optional;
-//
-//import static org.junit.Assert.*;
-//
-//@RunWith(MockitoJUnitRunner.class)
-//public class UserServiceImplTest {
-//
-//    private static final long VALID_ID = 1;
-//
-//    @InjectMocks
-//    private UserServiceImpl us;
-//
-//    @Mock
-//    private UserDao userDaoMock;
-//
-//    @Test
-//    public void testFindByIdSuccess() {
-//        Optional<User> maybeUser = us.findById(VALID_ID);
-//
-//        assertNotNull(maybeUser);
-//        assertTrue(maybeUser.isPresent());
-//        assertEquals(VALID_ID, maybeUser.get().getId());
-//
-//    }
-//
-//}
+package ar.edu.itba.paw.services;
+
+import ar.edu.itba.paw.interfaces.exception.EmailAlreadyUsedException;
+import ar.edu.itba.paw.interfaces.exception.UsernameAlreadyUsedException;
+import ar.edu.itba.paw.interfaces.persistence.UserDao;
+import ar.edu.itba.paw.model.User;
+import org.junit.Assert;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
+
+import java.util.Optional;
+
+@RunWith(MockitoJUnitRunner.class)
+public class UserServiceImplTest{
+    private static final String USERNAME="johndoe";
+    private static final String EMAIL="some@mail.com";
+
+    @Mock
+    private UserDao mockDao;
+
+    @InjectMocks
+    private UserServiceImpl userService;
+
+    @Test
+    public void testCreate(){
+        Mockito.when(mockDao.checkUsernameExists(USERNAME)).thenReturn(false);
+        Mockito.when(mockDao.checkEmailExists(EMAIL)).thenReturn(false);
+        Mockito.when(mockDao.create(Mockito.eq(USERNAME),Mockito.eq(EMAIL))).thenReturn(new User(1,USERNAME,EMAIL));
+
+        User maybeUser = userService.create(USERNAME,EMAIL);
+
+        Assert.assertNotNull(maybeUser);
+        Assert.assertEquals(USERNAME, maybeUser.getUsername());
+        Assert.assertEquals(EMAIL,maybeUser.getEmail());
+        Mockito.verify(mockDao).checkUsernameExists(USERNAME);
+        Mockito.verify(mockDao).checkEmailExists(EMAIL);
+        Mockito.verify(mockDao).create(USERNAME, EMAIL);
+        Mockito.verifyNoMoreInteractions(mockDao);
+    }
+
+    @Test(expected = UsernameAlreadyUsedException.class)
+    public void testUsernameExists(){
+        Mockito.when(mockDao.checkUsernameExists(USERNAME)).thenReturn(true);
+        Mockito.when(mockDao.checkEmailExists(EMAIL)).thenReturn(false);
+        Mockito.when(mockDao.create(Mockito.eq(USERNAME),Mockito.eq(EMAIL))).thenReturn(new User(1,USERNAME,EMAIL));
+
+        User maybeUser = userService.create(USERNAME,EMAIL);
+    }
+
+    @Test(expected = EmailAlreadyUsedException.class)
+    public void testEmailExists(){
+        Mockito.when(mockDao.checkUsernameExists(USERNAME)).thenReturn(false);
+        Mockito.when(mockDao.checkEmailExists(EMAIL)).thenReturn(true);
+        Mockito.when(mockDao.create(Mockito.eq(USERNAME),Mockito.eq(EMAIL))).thenReturn(new User(1,USERNAME,EMAIL));
+
+        User maybeUser = userService.create(USERNAME,EMAIL);
+    }
+
+    @Test
+    public void testFindById(){
+        Mockito.when(mockDao.findById(1)).thenReturn(Optional.of(new User(1, USERNAME, EMAIL)));
+
+        Optional<User> maybeUser = userService.findById(1);
+
+        Assert.assertNotNull(maybeUser);
+        Assert.assertTrue(maybeUser.isPresent());
+        Assert.assertEquals(USERNAME, maybeUser.get().getUsername());
+        Assert.assertEquals(EMAIL, maybeUser.get().getEmail());
+    }
+
+    @Test
+    public void testFindNonExistent(){
+        Mockito.when(mockDao.findById(1)).thenReturn(Optional.empty());
+
+        Optional<User> maybeUser = userService.findById(1);
+
+        Assert.assertNotNull(maybeUser);
+        Assert.assertFalse(maybeUser.isPresent());
+    }
+
+    @Test
+    public void testAuthenticate(){
+        Mockito.when(mockDao.authenticate(USERNAME,EMAIL)).thenReturn(Optional.of(new User(1, USERNAME, EMAIL)));
+
+        Optional<User> maybeUser = userService.authenticate(USERNAME,EMAIL);
+
+        Assert.assertNotNull(maybeUser);
+        Assert.assertTrue(maybeUser.isPresent());
+        Assert.assertEquals(USERNAME, maybeUser.get().getUsername());
+        Assert.assertEquals(EMAIL, maybeUser.get().getEmail());
+    }
+
+    @Test
+    public void testAuthenticateNonExistent(){
+        Mockito.when(mockDao.authenticate(USERNAME,EMAIL)).thenReturn(Optional.empty());
+
+        Optional<User> maybeUser = userService.authenticate(USERNAME,EMAIL);
+
+        Assert.assertNotNull(maybeUser);
+        Assert.assertFalse(maybeUser.isPresent());
+    }
+}
