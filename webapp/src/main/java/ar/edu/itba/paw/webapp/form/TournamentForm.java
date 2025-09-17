@@ -13,6 +13,9 @@ import javax.validation.constraints.*;
 @ValidTournamentFormConstraint
 public class TournamentForm {
 
+    public interface StepOne {}
+    public interface StepTwo {}
+
     @NotBlank(message = "{home.createTournament.notNull}")
     @Size(max = 100)
     private String name;
@@ -110,3 +113,4 @@ public class TournamentForm {
         this.image = image;
     }
 }
+

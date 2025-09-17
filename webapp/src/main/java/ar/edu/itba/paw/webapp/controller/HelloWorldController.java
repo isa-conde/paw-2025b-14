@@ -24,6 +24,7 @@ import ar.edu.itba.paw.webapp.form.TournamentForm;
 import ar.edu.itba.paw.webapp.form.UserForm;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -150,7 +151,8 @@ public class HelloWorldController {
 
     @RequestMapping("/create")
     public ModelAndView profile(@RequestParam("username") final String username) {
-        User newUser = us.create(username, username + "@email.com");        return new ModelAndView("redirect:/?userId = " + newUser.getId());
+        User newUser = us.create(username, username + "@email.com");
+        return new ModelAndView("redirect:/?userId = " + newUser.getId());
     }
 
     @RequestMapping(value = "/tournament/create", method = { RequestMethod.POST })
@@ -327,6 +329,8 @@ public class HelloWorldController {
         mav.addObject("structures", Arrays.stream(Structure.values()).toList());
         mav.addObject("regions", Arrays.stream(Region.values()).toList());
         mav.addObject("elos", Arrays.stream(Elo.values()).toList());
+        mav.addObject("genres", Arrays.stream(Genre.values()).toList());
+        mav.addObject("teamSizes", List.of(1,2,3,4,5));
 
         tf.setGame_id(filterForm.getGame_id());
         tf.setRegion(filterForm.getRegion());

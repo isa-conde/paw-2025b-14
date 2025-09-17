@@ -405,7 +405,20 @@ public class TournamentJdbcDao implements TournamentDao {
     }
 
     private String buildTournamentFilterSql(TournamentFilter filter, MapSqlParameterSource params) {
-        StringBuilder sql = new StringBuilder(" WHERE open_inscriptions = true");
+
+        StringBuilder sql = new StringBuilder();
+
+        boolean needsGameJoin = filter.getGenre() != null;
+        boolean needsFormatJoin = filter.getPlayersPerTeam() != null;
+
+        if (needsGameJoin) {
+            sql.append(" JOIN game g ON t.game_id = g.id");
+        }
+        if (needsFormatJoin) {
+            sql.append(" LEFT JOIN game_format gf ON t.game_id = gf.game_id");
+        }
+
+        sql.append(" WHERE open_inscriptions = true");
 
         if (filter.getName() != null) {
             sql.append(" AND t.name LIKE :name");
@@ -439,9 +452,14 @@ public class TournamentJdbcDao implements TournamentDao {
             sql.append(" AND t.end_date < :end_date");
             params.addValue("end_date", filter.getEnd_date());
         }
-
+        if (filter.getPlayersPerTeam() != null) {
+            sql.append(" AND gf.players_per_team = :playersPerTeam");
+            params.addValue("playersPerTeam", filter.getPlayersPerTeam());
+        }
+        if (filter.getGenre() != null) {
+            sql.append(" AND g.genre = :genre");
+            params.addValue("genre", filter.getGenre(), Types.OTHER);
+        }
         return sql.toString();
     }
-
-
 }

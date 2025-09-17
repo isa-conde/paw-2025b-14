@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.model.filters;
 
 import ar.edu.itba.paw.model.enums.Elo;
+import ar.edu.itba.paw.model.enums.Genre;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 
@@ -16,6 +17,8 @@ public class TournamentFilter {
     private LocalDate end_date;
     private String format;
     private Structure structure;
+    private Genre genre;
+    private Integer playersPerTeam;
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -40,6 +43,12 @@ public class TournamentFilter {
 
     public Structure getStructure() { return structure;}
     public void setStructure(Structure structure) { this.structure = structure;}
+
+    public Genre getGenre() {return genre;}
+    public void setGenre(Genre genre) { this.genre = genre; }
+
+    public Integer getPlayersPerTeam() { return playersPerTeam; }
+    public void setPlayersPerTeam(Integer playersPerTeam) { this.playersPerTeam = playersPerTeam; }
 
     public boolean isEmpty(){
         return name == null && game_id == null && region == null && elo == null && start_date == null && end_date == null && format == null && structure == null;

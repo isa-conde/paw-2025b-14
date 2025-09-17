@@ -66,7 +66,7 @@
                         </c:choose>
                     </div>
                     <c:if test="${not empty participants}">
-                        <paw:text type="title" size="l"><spring:message code="tournament.joinCard.butText"/></paw:text>
+                        <paw:text type="title" size="l"><spring:message code="tournament.participants.title"/></paw:text>
                         <paw:board participants="${participants}"/>
                     </c:if>
                     <c:if test="${user.id == tournamentImg.tournament.creator_id && tournamentImg.tournament.openInscriptions}">
