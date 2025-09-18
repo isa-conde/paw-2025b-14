@@ -55,7 +55,7 @@ public class GameJdbcDao implements GameDao {
 
     @Override
     public List<Game> searchByName(String name) {
-        String sql = "SELECT * FROM game WHERE name ILIKE '%' || ? || '%'";
+        String sql = "SELECT * FROM game WHERE LOWER(name) LIKE '%' || LOWER(?) || '%'";
         return jdbcTemplate.query(sql, ROW_MAPPER, name);
     }
 
