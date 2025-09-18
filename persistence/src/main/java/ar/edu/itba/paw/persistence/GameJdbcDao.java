@@ -58,8 +58,8 @@ public class GameJdbcDao implements GameDao {
     @Override
     public List<GameImg> searchByName(String name) {
         String sql = "SELECT g.*, i.image FROM game g " +
-                     "LEFT JOIN image i ON g.image_id = i.id " +
-                     "WHERE LOWER(g.name) LIKE '%' || LOWER(?) || '%'";
+            "LEFT JOIN image i ON g.image_id = i.id " +
+            "WHERE LOWER(g.name) LIKE '%' || LOWER(?) || '%'";
         return jdbcTemplate.query(sql, ROW_MAPPER_IMG, name);
     }
 
