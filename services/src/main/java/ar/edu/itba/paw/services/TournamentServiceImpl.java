@@ -86,17 +86,19 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public Map<Integer, Map<Integer, List<MatchWithPlayers>>> getTournamentMatchesByGroup(Long tournament_id) {
         List<MatchWithPlayers> matches = tournamentDao.getTournamentMatches(tournament_id);
-        Map<Integer, Map<Integer, List<MatchWithPlayers>>> tournamentMatchesByGroup = new HashMap<>();
+        Map<Integer, Map<Integer, List<MatchWithPlayers>>> tournamentMatchesByGroup = new TreeMap<>();
         Tournament t = findById(tournament_id).orElse(null);
 
         if (!matches.isEmpty() && t != null) {
             for (MatchWithPlayers match : matches) {
-                int group = match.getGroupNumber();
-                int stage = match.getStage();
-                tournamentMatchesByGroup.putIfAbsent(group, new LinkedHashMap<>());
-                Map<Integer, List<MatchWithPlayers>> matchesByStage = tournamentMatchesByGroup.get(group);
-                matchesByStage.putIfAbsent(stage, new ArrayList<>());
-                matchesByStage.get(stage).add(match);
+                if (match.getGroupNumber() != null && match.getStage() != null) {
+                    int group = match.getGroupNumber();
+                    int stage = match.getStage();
+                    tournamentMatchesByGroup.putIfAbsent(group, new TreeMap<>());
+                    Map<Integer, List<MatchWithPlayers>> matchesByStage = tournamentMatchesByGroup.get(group);
+                    matchesByStage.putIfAbsent(stage, new ArrayList<>());
+                    matchesByStage.get(stage).add(match);
+                }
             }
         }
         return tournamentMatchesByGroup;
@@ -126,10 +128,16 @@ public class TournamentServiceImpl implements TournamentService {
 
         Map<Integer, Set<Long>> groupUserIds = new HashMap<>();
         for (MatchWithPlayers match : matches) {
-            groupUserIds.computeIfAbsent(match.getGroupNumber(), g -> new HashSet<>())
-                    .add(match.getLocalId());
-            groupUserIds.computeIfAbsent(match.getGroupNumber(), g -> new HashSet<>())
-                    .add(match.getVisitorId());
+            if (match.getGroupNumber() != null) {
+                if (match.getLocalId() != null) {
+                    groupUserIds.computeIfAbsent(match.getGroupNumber(), g -> new HashSet<>())
+                            .add(match.getLocalId());
+                }
+                if (match.getVisitorId() != null) {
+                    groupUserIds.computeIfAbsent(match.getGroupNumber(), g -> new HashSet<>())
+                            .add(match.getVisitorId());
+                }
+            }
         }
 
         Map<Integer, List<ParticipantUserInfo>> participantsByGroup = new TreeMap<>();

@@ -74,7 +74,11 @@
                         <c:when test="${tournamentImg.tournament.structure == LEAGUE}">
                             <c:if test="${not empty participants}">
                                 <paw:text type="title" size="l">Standings</paw:text>
-                                <paw:board participants="${participants[0]}"/>
+                                <c:forEach var="g" items="${participants}">
+                                    <c:if test="${g.key == 0}">
+                                        <paw:board participants="${g.value}"/>
+                                    </c:if>
+                                </c:forEach>
                             </c:if>
                         </c:when>
                         <c:when test="${tournamentImg.tournament.structure == ELIMINATION}">
@@ -82,17 +86,27 @@
                         </c:when>
                         <c:when test="${tournamentImg.tournament.structure == 'HYBRID'}">
                             <c:choose>
-                                <c:when test="${not empty participants[0]}">
-                                    <!-- Show bracket -->
-                                </c:when>
-                                <c:otherwise>
+                                <c:when test="${not empty participants}">
+                                    <c:set var="hasGroupZero" value="false" />
                                     <c:forEach var="g" items="${participants}">
-                                        <paw:text type="title" size="l">
-                                            Group ${g.key} Standings
-                                        </paw:text>
-                                        <paw:board participants="${g.value}"/>
+                                        <c:if test="${g.key == 0}">
+                                            <c:set var="hasGroupZero" value="true" />
+                                        </c:if>
                                     </c:forEach>
-                                </c:otherwise>
+                                    <c:choose>
+                                        <c:when test="${hasGroupZero}">
+                                            <!-- Show bracket -->
+                                        </c:when>
+                                        <c:otherwise>
+                                            <c:forEach var="g" items="${participants}">
+                                                <paw:text type="title" size="l">
+                                                    Group ${g.key} Standings
+                                                </paw:text>
+                                                <paw:board participants="${g.value}"/>
+                                            </c:forEach>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </c:when>
                             </c:choose>
                         </c:when>
                     </c:choose>
@@ -107,33 +121,74 @@
                 </c:when>
                 <c:when test="${activeSection == 'Matches'}">
                     <c:choose>
-                        <c:when test="${tournamentImg.tournament.structure == 'HYBRID' && empty matchesByGroup[0]}">
-                            <c:set var="subNavbarSections" value="${[]}" />
-                            <c:forEach var="groupEntry" items="${matchesByGroup}">
-                                <c:set var="subNavbarSections" value="${subNavbarSections += ['Group ' += groupEntry.key]}" />
-                            </c:forEach>
-                            <c:set var="subActiveSection" value="${param.section != null ? param.section : subNavbarSections[0]}" />
-
-                            <paw:navbar sections="${subNavbarSections}" activeSection="${subActiveSection}" />
-                            <c:forEach var="groupEntry" items="${matchesByGroup}">
-                                <c:if test="${subActiveSection == ('Group ' += groupEntry.key)}">
-                                    <c:forEach var="stageEntry" items="${groupEntry.value}">
-                                        <paw:date-matches dateNumber="${stageEntry.key}" matches="${stageEntry.value}" tournamentId="${tournamentImg.tournament.id}" isCreator="${isCreator}"/>
-                                    </c:forEach>
-                                </c:if>
-                            </c:forEach>
+                        <c:when test="${empty matchesByGroup}">
+                            <div class="no-cards-container">
+                                <paw:text size="l" weight="thin">No matches available</paw:text>
+                            </div>
                         </c:when>
                         <c:otherwise>
-                            <c:when test="${empty matchesByGroup[0]}">
-                                <div class="no-cards-container">
-                                    <paw:text size="l" weight="thin">No matches available</paw:text>
-                                </div>
-                            </c:when>
-                            <c:otherwise>
-                                <c:forEach var="stageEntry" items="${matchesByGroup[0]}">
-                                    <paw:date-matches dateNumber="${stageEntry.key}" matches="${stageEntry.value}" tournamentId="${tournamentImg.tournament.id}" isCreator="${isCreator}"/>
-                                </c:forEach>
-                            </c:otherwise>
+                            <c:choose>
+                                <c:when test="${tournamentImg.tournament.structure == 'HYBRID'}">
+                                    <c:set var="hasGroupZero" value="false" />
+                                    <c:set var="groupZeroMatches" value="0" />
+                                    <c:forEach var="groupEntry" items="${matchesByGroup}">
+                                        <c:if test="${groupEntry.key == 0}">
+                                            <c:set var="hasGroupZero" value="true" />
+                                            <c:forEach var="stageEntry" items="${groupEntry.value}">
+                                                <c:set var="groupZeroMatches" value="${groupZeroMatches + stageEntry.value.size()}" />
+                                            </c:forEach>
+                                        </c:if>
+                                    </c:forEach>
+                                    
+                                    <c:choose>
+                                        <c:when test="${hasGroupZero && groupZeroMatches > 0}">
+                                            <c:forEach var="groupEntry" items="${matchesByGroup}">
+                                                <c:if test="${groupEntry.key == 0}">
+                                                    <c:forEach var="stageEntry" items="${groupEntry.value}">
+                                                        <paw:date-matches dateNumber="${stageEntry.key}" matches="${stageEntry.value}" tournamentId="${tournamentImg.tournament.id}" isCreator="${isCreator}"/>
+                                                    </c:forEach>
+                                                </c:if>
+                                            </c:forEach>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <c:set var="subActiveSection" value="${param.group != null ? 'Group ' + param.group : 'Group 1'}" />
+                                            <div class="navbar">
+                                                <c:forEach var="groupEntry" items="${matchesByGroup}">
+                                                    <c:set var="groupName" value="Group ${groupEntry.key}" />
+                                                    <c:choose>
+                                                        <c:when test="${subActiveSection == groupName}">
+                                                            <div class="navbar-item active">${groupName}</div>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <div class="navbar-item">
+                                                                <a href="?tournamentId=${tournamentImg.tournament.id}&section=Matches&group=${groupEntry.key}">${groupName}</a>
+                                                            </div>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </c:forEach>
+                                            </div>
+                                            
+                                            <c:forEach var="groupEntry" items="${matchesByGroup}">
+                                                <c:set var="groupName" value="Group ${groupEntry.key}" />
+                                                <c:if test="${subActiveSection == groupName}">
+                                                    <c:forEach var="stageEntry" items="${groupEntry.value}">
+                                                        <paw:date-matches dateNumber="${stageEntry.key}" matches="${stageEntry.value}" tournamentId="${tournamentImg.tournament.id}" isCreator="${isCreator}"/>
+                                                    </c:forEach>
+                                                </c:if>
+                                            </c:forEach>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </c:when>
+                                <c:otherwise>
+                                    <c:forEach var="groupEntry" items="${matchesByGroup}">
+                                        <c:if test="${groupEntry.key == 0}">
+                                            <c:forEach var="stageEntry" items="${groupEntry.value}">
+                                                <paw:date-matches dateNumber="${stageEntry.key}" matches="${stageEntry.value}" tournamentId="${tournamentImg.tournament.id}" isCreator="${isCreator}"/>
+                                            </c:forEach>
+                                        </c:if>
+                                    </c:forEach>
+                                </c:otherwise>
+                            </c:choose>
                         </c:otherwise>
                     </c:choose>
                 </c:when>

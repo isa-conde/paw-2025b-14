@@ -354,7 +354,7 @@ public class TournamentJdbcDao implements TournamentDao {
         String sql = "SELECT m.id, m.tournament_id, m.local_id, m.visitor_id, " +
                     "COALESCE(local_user.username, 'TBD') as local_player_name, " +
                     "COALESCE(visitor_user.username, 'TBD') as visitor_player_name, " +
-                    "m.local_score, m.visitor_score, m.winner, m.stage " +
+                    "m.local_score, m.visitor_score, m.winner, m.stage, m.group_number " +
                     "FROM match m " +
                     "LEFT JOIN users local_user ON m.local_id = local_user.id " +
                     "LEFT JOIN users visitor_user ON m.visitor_id = visitor_user.id " +

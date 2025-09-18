@@ -284,7 +284,8 @@ public class HelloWorldController {
         }
         Optional<Tournament> t = ts.findById(tournamentId);
         String tournamentLink = request.getRequestURL().toString()
-                .replace("/tournament/join", "/tournament?tournamentId=" + t.get().getId());        ms.sendTournamentJoinedEmail(user.getUsername(), t.get().getName(), tournamentLink, us.findById(t.get().getCreator_id()).get().getEmail(), user.getEmail());
+                .replace("/tournament/join", "/tournament?tournamentId=" + t.get().getId());
+        ms.sendTournamentJoinedEmail(user.getUsername(), t.get().getName(), tournamentLink, us.findById(t.get().getCreator_id()).get().getEmail(), user.getEmail());
         ts.joinTournamentUser(user.getId(), tournamentId);
         return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
     }
