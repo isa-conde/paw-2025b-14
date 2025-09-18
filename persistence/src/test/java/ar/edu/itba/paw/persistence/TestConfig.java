@@ -20,7 +20,7 @@ public class TestConfig {
     @Value("classpath:db/init.sql")
     private Resource initSql;
 
-    @Value("classpath:db/initdb/schema.sql")
+    @Value("classpath:db/schema.sql")
     private Resource schemaSql;
 
     @Bean

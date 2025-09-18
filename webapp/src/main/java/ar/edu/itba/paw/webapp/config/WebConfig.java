@@ -33,7 +33,7 @@ import javax.sql.DataSource;
 })
 public class WebConfig implements WebMvcConfigurer {
 
-    @Value("classpath:db/initdb/schema.sql")
+    @Value("classpath:db/schema.sql")
     private Resource schemaSql;
 
     @Bean

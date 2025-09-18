@@ -8,8 +8,7 @@ public interface UserService {
 
     Optional<User> findById(long id);
 
-    User create(String username, String email);
+    User create(String username, String email, String password);
 
-    Optional<User> authenticate(String username, String email);
-
+    Optional<User> findByUsername(String username);
 }

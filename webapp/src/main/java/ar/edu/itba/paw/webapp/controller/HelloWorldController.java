@@ -68,7 +68,7 @@ public class HelloWorldController {
             return mav;
         }
 
-        User user = us.create(form.getUsername(), form.getEmail());
+        User user = us.create(form.getUsername(), form.getEmail(), "lol");
         request.getSession().setAttribute("user", user);
         return new ModelAndView("redirect:/?userId=" + user.getId());
     }
@@ -115,27 +115,13 @@ public class HelloWorldController {
             mav.addObject("openModal", "'loginModal'");
             return mav;
         }
-
-        Optional<User> user = us.authenticate(form.getUsername(), form.getEmail());
-        if (user.isPresent()) {
-            request.getSession().setAttribute("user", user.get());
-            return new ModelAndView("redirect:/?userId=" + user.get().getId());
-        } else {
-            ModelAndView mav = new ModelAndView("index");
-            mav.addObject("loginError", "Invalid credentials");
-            return mav;
-        }
+        return new ModelAndView();
     }
 
     @RequestMapping("/logout")
     public ModelAndView logout(HttpServletRequest request) {
         request.getSession().invalidate();
         return new ModelAndView("redirect:/");
-    }
-
-    @RequestMapping("/create")
-    public ModelAndView profile(@RequestParam("username") final String username) {
-        User newUser = us.create(username, username + "@email.com");        return new ModelAndView("redirect:/?userId = " + newUser.getId());
     }
 
     @RequestMapping(value = "/tournament/create", method = { RequestMethod.POST })

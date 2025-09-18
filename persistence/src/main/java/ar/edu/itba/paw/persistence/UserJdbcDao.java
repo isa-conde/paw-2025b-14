@@ -17,7 +17,7 @@ public class UserJdbcDao implements UserDao {
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
 
-    private static final RowMapper<User> ROW_MAPPER = (rs, rowNum) -> new User(rs.getLong("id"), rs.getString("username"), rs.getString("email"));
+    private static final RowMapper<User> ROW_MAPPER = (rs, rowNum) -> new User(rs.getLong("id"), rs.getString("username"), rs.getString("email"), rs.getString("password"));
 
     public UserJdbcDao(final DataSource ds) {
         jdbcTemplate = new JdbcTemplate(ds);
@@ -32,20 +32,30 @@ public class UserJdbcDao implements UserDao {
     }
 
     @Override
-    public User create(String username, String email) {
-        final Map<String, Object> values = Map.of("username", username, "email", email);
+    public User create(String username, String email, String password) {
+        final Map<String, Object> values = Map.of("username", username, "email", email, "password", password);
         final Number key = jdbcInsert.executeAndReturnKey(values);
 
-        return new User(key.longValue(), username, email);
+        return new User(key.longValue(), username, email, password);
     }
 
     @Override
-    public Optional<User> authenticate(String username, String email) {
+    public Optional<User> authenticate(String username, String email, String password) {
         return jdbcTemplate.query(
-                "SELECT * FROM users WHERE username = ? AND email = ?",
+                "SELECT * FROM users WHERE username = ? AND email = ? AND password = ?",
                 ROW_MAPPER,
                 username,
-                email
+                email,
+                password
+        ).stream().findFirst();
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return jdbcTemplate.query(
+                "SELECT * FROM users WHERE username = ?",
+                ROW_MAPPER,
+                username
         ).stream().findFirst();
     }
 
