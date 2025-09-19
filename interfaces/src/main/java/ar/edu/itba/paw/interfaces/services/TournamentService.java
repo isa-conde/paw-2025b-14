@@ -58,4 +58,6 @@ public interface TournamentService {
     public List<TournamentImg> findUserActiveTournaments(Long userId);
 
     public List<TournamentImg> findUserPastTournaments(Long userId);
+
+    public List<TournamentImg> searchByName(String name);
 }

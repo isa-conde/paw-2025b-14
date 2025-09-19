@@ -25,7 +25,7 @@
             <paw:input path="game_id" label="tournaments.game" inputType="select" items="${games}" itemValue="id" itemLabel="name" emptyOption="${allGames}" inline="true"/>
             <paw:input path="region" label="tournaments.region" inputType="select" items="${regions}" emptyOption="${allRegions}" inline="true"/>
             <paw:input path="elo" label="tournaments.skillLevel" inputType="select" items="${elos}" emptyOption="${allLevels}" inline="true"/>
-            <paw:input path="genre" label="tournaments.genre" inputType="select" items="${genres}" emptyOption="${allGenres}" inline="true"/>
+              <paw:input path="genre" label="tournaments.genre" inputType="select" items="${genres}" emptyOption="${allGenres}" inline="true"/>
             <paw:input path="playersPerTeam" label="tournaments.playerAmount" inputType="select" items="${teamSizes}" emptyOption="${allSizes}" inline="true"/>
             <paw:input path="" label="tournaments.filter" inputType="submit" inline="true"/>
           </div>

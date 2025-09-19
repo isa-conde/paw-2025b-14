@@ -60,4 +60,6 @@ public interface TournamentDao {
     public void closeInscriptions(Long tournament_id);
 
     public void setMatchWinner(Long matchId, Long tournamentId, Integer winner);
+
+    public List<TournamentImg> searchByName(String name);
 }

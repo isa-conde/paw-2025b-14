@@ -14,7 +14,7 @@ public interface GameService {
 
     Optional<Game> findByName(String name);
 
-    public List<Game> searchByName(String name);
+    public List<GameImg> searchByName(String name);
 
     public List<Game> searchByGenre(Genre genre);
 

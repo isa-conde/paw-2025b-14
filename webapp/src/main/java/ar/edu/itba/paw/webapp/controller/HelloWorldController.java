@@ -400,4 +400,15 @@ public class HelloWorldController {
         ms.sendSimpleMessage("brunitaccone@gmail.com", "Test Subject", "hola mundo  ");
         return new ModelAndView("index");
     }
+
+    @RequestMapping("/search")
+    public ModelAndView search(@RequestParam("q") final String q, HttpServletRequest request){
+        final ModelAndView mav = new ModelAndView("searchResults");
+
+        mav.addObject("user", request.getSession().getAttribute("user"));
+        mav.addObject("games", gs.searchByName(q));
+        mav.addObject("tournaments", ts.searchByName(q));
+
+        return mav;
+    }
 }

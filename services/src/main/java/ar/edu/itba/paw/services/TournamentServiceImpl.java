@@ -156,4 +156,10 @@ public class TournamentServiceImpl implements TournamentService {
     public List<TournamentImg> findUserPastTournaments(Long userId) {
         return tournamentDao.findUserPastTournaments(userId);
     }
+
+    @Override
+    public List<TournamentImg> searchByName(String name){
+        return tournamentDao.searchByName(name);
+    }
+
 }

@@ -60,7 +60,7 @@
                         <form:input path="${path}" type="file" class="file-input" id="file-${path}" accept="image/*" onchange="updateFileName('file-${path}', 'file-text-${path}')"/>
                         <label for="file-${path}" class="file-input-label">
                             <img src="${pageContext.request.contextPath}/images/upload.png" alt="Upload" class="file-input-icon"/>
-                            <span class="file-input-text" id="file-text-${path}">Upload image</span>
+                            <span class="file-input-text" id="file-text-${path}"><spring:message code="input.uploadImage"/></span>
                         </label>
                     </div>
                 </c:when>

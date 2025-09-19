@@ -1,13 +1,13 @@
 <%@ taglib prefix="c"   uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ attribute name="user" required="true" type="ar.edu.itba.paw.model.User" %>
 <%@ attribute name="function" required="false" type="java.lang.String" %>
 <%@ attribute name="isIndex" required="true"%>
 
 <c:set var="isLoggedIn" value="${user != null}"/>
 <c:url value="/logout" var="logoutUrl"/>
-
 <html>
     <head>
         <link rel="stylesheet" href="<c:url value='/css/components.css'/>">
@@ -24,6 +24,7 @@
         <div class="container">
             <paw:sidebar user="${user}"/>
             <paw:header>
+                <paw:searchBar/>
                 <c:choose>
                     <c:when test="${isLoggedIn}">
                         <paw:profileButton text="${user.username}" onclick="openModal('logoutModal')" isNotSafe="true"/>
@@ -34,12 +35,12 @@
                         </paw:modal>
                     </c:when>
                     <c:otherwise>
-                        <c:if test="${isIndex == 'true'}">
-                            <div>
+                        <div>
+                            <c:if test="${isIndex == 'true'}">
                                 <paw:button text="layout.login" size="m" onclick="openModal('loginModal')"/>
                                 <paw:button text="layout.register" size="m" onclick="openModal('registerModal')"/>
-                            </div>
-                        </c:if>
+                            </c:if>
+                        </div>
                     </c:otherwise>
                 </c:choose>
             </paw:header>

@@ -12,7 +12,7 @@ public interface GameDao {
 
     public Optional<Game> findById(long id);
 
-    public List<Game> searchByName(String name);
+    public List<GameImg> searchByName(String name);
 
     public List<Game> searchByGenre(Genre genre);
 

@@ -853,6 +853,37 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(1);
 }
 
+
+/* -------SEARCH BAR--------*/
+
+.search-container {
+    display: flex;
+    align-items: center;
+    background-color: var(--background-secondary);
+    border: 2px solid var(--primary-button);
+    border-radius: 30px;
+    padding: 10px;
+    margin-top: 12px;
+    max-width: 400px;
+}
+
+
+.search-bar {
+    border: none;
+    background: transparent;
+    color: var(--primary-text);
+    font-family: var(--font-main), serif;
+    font-size: 20px;
+    flex: 1;
+    outline: none;
+}
+
+.search-icon {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
 /* ------- FILE INPUT ------- */
 
 .file-input-container {
