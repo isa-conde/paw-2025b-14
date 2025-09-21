@@ -27,6 +27,7 @@
         <c:set var="navbarSections" value="${['Overview', 'Matches']}"/>
         <c:set var="activeSection" value="${param.section != null ? param.section : 'Overview'}"/>
         <c:set var="isCreator" value="${user.id == tournamentImg.tournament.creator_id}"/>
+        
         <paw:navbar sections="${navbarSections}" activeSection="${activeSection}"/>
         <div class="content-container">
             <c:choose>
@@ -145,7 +146,7 @@
                                             <c:forEach var="groupEntry" items="${matchesByGroup}">
                                                 <c:if test="${groupEntry.key == 0}">
                                                     <c:forEach var="stageEntry" items="${groupEntry.value}">
-                                                        <paw:date-matches dateNumber="${stageEntry.key}" matches="${stageEntry.value}" tournamentId="${tournamentImg.tournament.id}" isCreator="${isCreator}"/>
+                                                        <paw:date-matches dateNumber="${stageEntry.key}" matches="${stageEntry.value}" tournamentId="${tournamentImg.tournament.id}" isCreator="${isCreator}" tournamentStructure="${tournamentImg.tournament.structure}" groupNumber="${groupEntry.key}" totalMatches="${stageEntry.value.size()}"/>
                                                     </c:forEach>
                                                 </c:if>
                                             </c:forEach>
@@ -172,7 +173,7 @@
                                                 <c:set var="groupName" value="Group ${groupEntry.key}" />
                                                 <c:if test="${subActiveSection == groupName}">
                                                     <c:forEach var="stageEntry" items="${groupEntry.value}">
-                                                        <paw:date-matches dateNumber="${stageEntry.key}" matches="${stageEntry.value}" tournamentId="${tournamentImg.tournament.id}" isCreator="${isCreator}"/>
+                                                        <paw:date-matches dateNumber="${stageEntry.key}" matches="${stageEntry.value}" tournamentId="${tournamentImg.tournament.id}" isCreator="${isCreator}" tournamentStructure="${tournamentImg.tournament.structure}" groupNumber="${groupEntry.key}" totalMatches="${stageEntry.value.size()}"/>
                                                     </c:forEach>
                                                 </c:if>
                                             </c:forEach>
@@ -183,7 +184,7 @@
                                     <c:forEach var="groupEntry" items="${matchesByGroup}">
                                         <c:if test="${groupEntry.key == 0}">
                                             <c:forEach var="stageEntry" items="${groupEntry.value}">
-                                                <paw:date-matches dateNumber="${stageEntry.key}" matches="${stageEntry.value}" tournamentId="${tournamentImg.tournament.id}" isCreator="${isCreator}"/>
+                                                 <paw:date-matches dateNumber="${stageEntry.key}" matches="${stageEntry.value}" tournamentId="${tournamentImg.tournament.id}" isCreator="${isCreator}" tournamentStructure="${tournamentImg.tournament.structure}" groupNumber="${groupEntry.key}" totalMatches="${stageEntry.value.size()}"/>
                                             </c:forEach>
                                         </c:if>
                                     </c:forEach>

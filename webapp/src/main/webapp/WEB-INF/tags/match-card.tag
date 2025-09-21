@@ -28,7 +28,7 @@
     </div>
     
     <c:if test="${isCreator == true}">
-        <c:if test="${winner == 0}">
+        <c:if test="${winner == 0 && localPlayerId != null && visitorPlayerId != null}">
             <div class="match-actions">
                 <form method="post" action="${pageContext.request.contextPath}/tournament/setWinner" style="display: inline;">
                     <input type="hidden" name="matchId" value="${matchId}"/>
