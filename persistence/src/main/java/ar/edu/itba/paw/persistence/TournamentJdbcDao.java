@@ -255,6 +255,7 @@ public class TournamentJdbcDao implements TournamentDao {
                 values.put("visitor_score", null);
                 values.put("winner", null);
                 values.put("stage", round);
+                values.put("group_number", 0);
                 jdbcInsertMatch.execute(values);
             }
             matchesThisRound /= 2;
@@ -267,10 +268,12 @@ public class TournamentJdbcDao implements TournamentDao {
             int groupsCount = calculateGroups(n);
             List<Integer> distribution = distributeParticipants(n);
             int index = 0;
+            int nextId = 1;
             for (int g = 0; g < groupsCount; g++) {
                 int size = distribution.get(g);
                 List<ParticipantUser> group = new ArrayList<>(participants.subList(index, index + size));
-                createMatchesLeague(t, group, g + 1, g * size + 1 );
+                createMatchesLeague(t, group, g + 1, nextId);
+                nextId += (size * (size - 1)) / 2;
                 index += size;
             }
         }else{
@@ -440,7 +443,7 @@ public class TournamentJdbcDao implements TournamentDao {
         Structure structure = getTournamentStructure(tournamentId).isPresent()? getTournamentStructure(tournamentId).get() : null;
         if(structure != null) {
             if(structure.equals(Structure.ELIMINATION) && !isFinished) {
-                setNextMatchInfo(matchId, tournamentId, winner);
+                setNextMatchInfo(matchId, tournamentId, winnerId);
             }else if(structure.equals(Structure.HYBRID)) {
                 Integer group_number = jdbcTemplate.queryForObject(
                         "SELECT group_number FROM match WHERE tournament_id = ? AND id = ?",
@@ -454,7 +457,7 @@ public class TournamentJdbcDao implements TournamentDao {
                     );
                     isFinished = totalMatches.equals(finishedMatches);
                 } else if (group_number == 0) {
-                    setNextMatchInfo(matchId, tournamentId, winner);
+                    setNextMatchInfo(matchId, tournamentId, winnerId);
                 }
             }
             else{
@@ -467,34 +470,46 @@ public class TournamentJdbcDao implements TournamentDao {
         }
     }
 
-    public void setNextMatchInfo(Long matchId, Long tournamentId, Integer winnerId) {
-        Map<String, Object> match = jdbcTemplate.queryForMap(
-                "SELECT stage, id FROM match WHERE id = ? AND tournament_id = ?",
-                matchId, tournamentId
+    private void setNextMatchInfo(Long matchId, Long tournamentId, Long winnerId) {
+        Integer currentStage = jdbcTemplate.queryForObject(
+                "SELECT stage FROM match WHERE id = ? AND tournament_id = ?",
+                Integer.class, matchId, tournamentId
         );
 
-        int currentStage = ((Number) match.get("stage")).intValue();
+        List<Long> idsThisStage = jdbcTemplate.queryForList(
+                "SELECT id FROM match WHERE tournament_id = ? AND stage = ? ORDER BY id",
+                Long.class, tournamentId, currentStage
+        );
 
-        List<Map<String, Object>> nextMatches = jdbcTemplate.queryForList(
+        int indexInStage = idsThisStage.indexOf(matchId);
+        if (indexInStage < 0) {
+            return;
+        }
+        int parentOffset = indexInStage / 2;
+        List<Long> nextMatches = jdbcTemplate.queryForList(
                 "SELECT id FROM match WHERE tournament_id = ? AND stage = ? ORDER BY id LIMIT 1 OFFSET ?",
-                tournamentId, currentStage + 1, (matchId - 1) / 2
+                Long.class, tournamentId, currentStage + 1, parentOffset
         );
 
-        if (!nextMatches.isEmpty()) {
-            Map<String, Object> nextMatch = nextMatches.get(0);
-            Long nextMatchId = ((Number) nextMatch.get("id")).longValue();
+        if (nextMatches.isEmpty()) {
+            return;
+        }
+        Long nextMatchId = nextMatches.get(0);
 
-            int position = (matchId % 2 == 1) ? 1 : 2;
-            if (position == 1) {
-                jdbcTemplate.update("UPDATE match SET local_id = ? WHERE id = ? AND tournament_id = ?",
-                        winnerId, nextMatchId, tournamentId);
-            } else {
-                jdbcTemplate.update("UPDATE match SET visitor_id = ? WHERE id = ? AND tournament_id = ?",
-                        winnerId, nextMatchId, tournamentId);
-            }
+        boolean isLeftChild = (indexInStage % 2 == 0);
+
+        if (isLeftChild) {
+            jdbcTemplate.update(
+                    "UPDATE match SET local_id = ? WHERE id = ? AND tournament_id = ?",
+                    winnerId, nextMatchId, tournamentId
+            );
+        } else {
+            jdbcTemplate.update(
+                    "UPDATE match SET visitor_id = ? WHERE id = ? AND tournament_id = ?",
+                    winnerId, nextMatchId, tournamentId
+            );
         }
     }
-
 
     @Override
     public List<TournamentImg> findUserActiveTournaments(Long userId) {

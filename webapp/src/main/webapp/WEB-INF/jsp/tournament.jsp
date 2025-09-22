@@ -54,7 +54,7 @@
                                     </c:when>
                                     <c:when test="${tournamentImg.tournament.structure == HYBRID}">
                                         <c:set var="title" value="Get advantage and beat them all" />
-                                        <c:set var="text" value="Get a top position in your team and then win every match" />
+                                        <c:set var="text" value="Get a top position in your group and then win every match" />
                                         <c:set var="icon" value="bracket.png" />
                                     </c:when>
                                 </c:choose>
@@ -83,7 +83,11 @@
                             </c:if>
                         </c:when>
                         <c:when test="${tournamentImg.tournament.structure == ELIMINATION}">
-                            <!-- Show bracket -->
+                            <c:forEach var="groupEntry" items="${matchesByGroup}">
+                                <c:if test="${groupEntry.key == 0}">
+                                    <paw:bracket matchesByStage="${groupEntry.value}" tournamentId="${tournamentImg.tournament.id}" isCreator="${isCreator}"/>
+                                </c:if>
+                            </c:forEach>
                         </c:when>
                         <c:when test="${tournamentImg.tournament.structure == 'HYBRID'}">
                             <c:choose>
@@ -96,7 +100,11 @@
                                     </c:forEach>
                                     <c:choose>
                                         <c:when test="${hasGroupZero}">
-                                            <!-- Show bracket -->
+                                            <c:forEach var="groupEntry" items="${matchesByGroup}">
+                                                <c:if test="${groupEntry.key == 0}">
+                                                    <paw:bracket matchesByStage="${groupEntry.value}" tournamentId="${tournamentImg.tournament.id}" isCreator="${isCreator}"/>
+                                                </c:if>
+                                            </c:forEach>
                                         </c:when>
                                         <c:otherwise>
                                             <c:forEach var="g" items="${participants}">
