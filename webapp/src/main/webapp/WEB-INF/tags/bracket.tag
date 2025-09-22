@@ -9,32 +9,7 @@
     <div class="bracket">
         <c:forEach var="stageEntry" items="${matchesByStage}">
             <c:set var="stageMatches" value="${stageEntry.value}"/>
-            <c:set var="participantsInStage" value="${stageEntry.value.size() * 2}"/>
-
             <div class="bracket-round">
-                <c:choose>
-                    <c:when test="${participantsInStage >= 64}">
-                        <paw:text type="title" size="m">Round of 64</paw:text>
-                    </c:when>
-                    <c:when test="${participantsInStage >= 32}">
-                        <paw:text type="title" size="m">Round of 32</paw:text>
-                    </c:when>
-                    <c:when test="${participantsInStage >= 16}">
-                        <paw:text type="title" size="m">Round of 16</paw:text>
-                    </c:when>
-                    <c:when test="${participantsInStage >= 8}">
-                        <paw:text type="title" size="m">Quarter Final</paw:text>
-                    </c:when>
-                    <c:when test="${participantsInStage >= 4}">
-                        <paw:text type="title" size="m">Semi Final</paw:text>
-                    </c:when>
-                    <c:when test="${participantsInStage >= 2}">
-                        <paw:text type="title" size="m">Final</paw:text>
-                    </c:when>
-                    <c:otherwise>
-                        <paw:text type="title" size="m">Round of ${participantsInStage}</paw:text>
-                    </c:otherwise>
-                </c:choose>
                 <div class="bracket-matches">
                     <c:forEach var="match" items="${stageMatches}">
                         <div class="bracket-match">
