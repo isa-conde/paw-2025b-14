@@ -11,8 +11,8 @@
             <c:set var="stageMatches" value="${stageEntry.value}"/>
             <div class="bracket-round">
                 <div class="bracket-matches">
-                    <c:forEach var="match" items="${stageMatches}">
-                        <div class="bracket-match">
+                    <c:forEach var="match" items="${stageMatches}" varStatus="loop">
+                        <div class="bracket-match round-${stageEntry.key} match-${loop.index}">
                             <div class="bracket-team ${match.winner == 1 ? 'winner' : ''}">
                                 <span><c:out value="${match.localPlayerName}"/></span>
                             </div>

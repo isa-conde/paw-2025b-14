@@ -83,6 +83,7 @@
                             </c:if>
                         </c:when>
                         <c:when test="${tournamentImg.tournament.structure == ELIMINATION}">
+                            <paw:text type="title" size="l">Standings</paw:text>
                             <c:forEach var="groupEntry" items="${matchesByGroup}">
                                 <c:if test="${groupEntry.key == 0}">
                                     <paw:bracket matchesByStage="${groupEntry.value}" tournamentId="${tournamentImg.tournament.id}" isCreator="${isCreator}"/>
@@ -100,6 +101,7 @@
                                     </c:forEach>
                                     <c:choose>
                                         <c:when test="${hasGroupZero}">
+                                            <paw:text type="title" size="l">Standings</paw:text>
                                             <c:forEach var="groupEntry" items="${matchesByGroup}">
                                                 <c:if test="${groupEntry.key == 0}">
                                                     <paw:bracket matchesByStage="${groupEntry.value}" tournamentId="${tournamentImg.tournament.id}" isCreator="${isCreator}"/>

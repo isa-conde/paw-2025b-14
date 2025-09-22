@@ -1066,50 +1066,68 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 /* ------- BRACKET ------- */
 
+:root {
+    --base-gap: 20px;
+    --match-height: 60px;
+    --conn-w: 40px;
+}
+
 .bracket-container {
     width: 100%;
-    overflow-x: auto;
     padding: 20px 0;
-    background: var(--background);
+    background: var(--background-secondary);
     display: flex;
     justify-content: center;
     align-items: center;
+    border-radius: 15px;
 }
 
 .bracket {
     display: flex;
-    gap: 80px; /* espacio entre rondas */
-    min-width: 1200px;
+    gap: 80px;
     justify-content: center;
-    align-items: center; /* centrado vertical */
+    align-items: center;
     position: relative;
-    min-height: 70vh;
 }
 
 .bracket-round {
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
-    gap: 60px; /* espacio entre partidos de la misma ronda */
     position: relative;
     min-width: 180px;
 }
 
-/* cada partido */
 .bracket-match {
     background: var(--background-card);
-    border: 2px solid var(--secondary-details);
+    border: 2px solid var(--primary-button);
     border-radius: 8px;
     padding: 12px;
-    min-height: 60px;
+    min-height: var(--match-height);
     display: flex;
     flex-direction: column;
     justify-content: center;
     position: relative;
     width: 160px;
+    z-index: 1;
 }
 
-/* equipo */
+/* Fórmula Yn = 2^n y + (2^n - 1)x */
+.bracket-round:nth-child(1) .bracket-match {
+    margin: calc(var(--base-gap) / 2) 0;
+}
+.bracket-round:nth-child(2) .bracket-match {
+    margin: calc((2 * var(--base-gap) + 1 * var(--match-height)) / 2) 0;
+}
+.bracket-round:nth-child(3) .bracket-match {
+    margin: calc((4 * var(--base-gap) + 3 * var(--match-height)) / 2) 0;
+}
+.bracket-round:nth-child(4) .bracket-match {
+    margin: calc((8 * var(--base-gap) + 7 * var(--match-height)) / 2) 0;
+}
+.bracket-round:nth-child(5) .bracket-match {
+    margin: calc((16 * var(--base-gap) + 15 * var(--match-height)) / 2) 0;
+}
+
 .bracket-team {
     padding: 6px 10px;
     margin: 1px 0;
@@ -1127,39 +1145,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     background-color: var(--primary-button);
     color: var(--background);
     font-weight: 600;
-}
-
-/* Línea horizontal que sale de cada partido */
-.bracket-match::after {
-    content: '';
-    position: absolute;
-    right: -40px;   /* largo horizontal */
-    top: 50%;
-    width: 40px;
-    height: 2px;
-    background: var(--secondary-details);
-    transform: translateY(-50%);
-}
-
-/* Línea vertical que conecta 2 partidos de la ronda a la siguiente */
-.bracket-matches {
-    position: relative;
-}
-
-.bracket-matches .bracket-match:nth-child(2n)::before {
-    content: '';
-    position: absolute;
-    right: -40px;
-    top: -50%;
-    width: 2px;
-    height: calc(100% + 60px); /* une los dos partidos */
-    background: var(--secondary-details);
-}
-
-/* Ocultar las líneas en la última ronda (final) */
-.bracket-round:last-child .bracket-match::after,
-.bracket-round:last-child .bracket-match::before {
-    display: none;
 }
 
 @media (max-width: 768px) {
@@ -1181,8 +1166,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         max-width: 300px;
     }
 
-    .bracket-match::after,
-    .bracket-match::before {
+    .bracket-match::after {
         display: none;
     }
 }
