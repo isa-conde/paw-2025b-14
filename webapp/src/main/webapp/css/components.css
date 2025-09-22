@@ -988,11 +988,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     max-width: 600px;
 }
 
-.match-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
 .match-players {
     display: flex;
     align-items: center;
@@ -1101,7 +1096,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .bracket-title {
-    font-size: var(--text-16);
+    font-size: var(--text-15);
     font-weight: 600;
     color: var(--primary-text);
     margin-bottom: 30px;
@@ -1137,20 +1132,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.bracket-match:hover {
-    border-color: var(--primary-button);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-}
-
-.bracket-match.final-match {
-    border-color: var(--primary-button);
-    background: linear-gradient(135deg, var(--background-card), var(--primary-button-light));
-    min-height: 80px;
-    width: 180px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-}
-
 .bracket-team {
     padding: 6px 10px;
     margin: 1px 0;
@@ -1172,13 +1153,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-weight: 600;
 }
 
-.bracket-actions {
-    margin-top: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-}
-
 .bracket-btn {
     padding: 3px 6px;
     border: 1px solid var(--primary-button);
@@ -1187,7 +1161,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     border-radius: 3px;
     cursor: pointer;
     transition: all 0.2s ease;
-    font-size: var(--text-11);
+    font-size: var(--text-12);
 }
 
 .bracket-btn:hover {
@@ -1245,7 +1219,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     display: none;
 }
 
-/* Responsive bracket */
 @media (max-width: 768px) {
     .bracket {
         display: flex;
@@ -1255,17 +1228,17 @@ input[type="date"]::-webkit-calendar-picker-indicator {
         padding: 20px 0;
         min-height: auto;
     }
-    
+
     .bracket-round {
         min-width: auto;
         width: 100%;
     }
-    
+
     .bracket-match {
         width: 100%;
         max-width: 300px;
     }
-    
+
     .bracket-round::after,
     .bracket-match::before,
     .bracket-match::after {

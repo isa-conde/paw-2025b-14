@@ -419,6 +419,18 @@ public class TournamentJdbcDao implements TournamentDao {
 
     @Override
     public void setMatchWinner(Long matchId, Long tournamentId, Integer winner) {
+        Map<String, Object> match = jdbcTemplate.queryForMap(
+                "SELECT local_id, visitor_id FROM match WHERE id = ? AND tournament_id = ?",
+                matchId, tournamentId
+        );
+
+        Long localId = (Long) match.get("local_id");
+        Long visitorId = (Long) match.get("visitor_id");
+
+        if (localId == null || visitorId == null) {
+            throw new IllegalStateException("Cannot set winner for TBD matches");
+        }
+
         jdbcTemplate.update("UPDATE match SET winner = ? WHERE id = ? AND tournament_id = ?",
                            winner, matchId, tournamentId);
 
