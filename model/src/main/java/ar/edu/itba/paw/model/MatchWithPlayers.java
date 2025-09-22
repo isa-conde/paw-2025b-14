@@ -11,10 +11,11 @@ public class MatchWithPlayers {
     private final Integer visitorScore;
     private final Integer winner;
     private final Integer stage;
+    private final Integer groupNumber;
 
     public MatchWithPlayers(Long id, Long tournamentId, Long localId, Long visitorId, 
                            String localPlayerName, String visitorPlayerName,
-                           Integer localScore, Integer visitorScore, Integer winner, Integer stage) {
+                           Integer localScore, Integer visitorScore, Integer winner, Integer stage, Integer groupNumber) {
         this.id = id;
         this.tournamentId = tournamentId;
         this.localId = localId;
@@ -25,6 +26,7 @@ public class MatchWithPlayers {
         this.visitorScore = visitorScore;
         this.winner = winner;
         this.stage = stage;
+        this.groupNumber = groupNumber;
     }
 
     public Long getId() {
@@ -65,5 +67,9 @@ public class MatchWithPlayers {
 
     public Integer getStage() {
         return stage;
+    }
+
+    public Integer getGroupNumber() {
+        return groupNumber;
     }
 }

@@ -5,9 +5,6 @@ import ar.edu.itba.paw.model.ParticipantUser;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.Tournament.TournamentImg;
 import ar.edu.itba.paw.model.User;
-import ar.edu.itba.paw.model.Match;
-import ar.edu.itba.paw.model.Pair;
-import ar.edu.itba.paw.interfaces.persistence.UserDao;
 import ar.edu.itba.paw.model.*;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
@@ -76,18 +73,6 @@ public class TournamentJdbcDao implements TournamentDao {
             rs.getString("format"), Structure.valueOf(rs.getString("structure")), rs.getInt("max_participants"), rs.getInt("image_id"),
             rs.getBoolean("open_inscriptions"), rs.getBoolean("is_finished")), Base64.getEncoder().encodeToString(rs.getBytes("image")));
 
-    private static final RowMapper<Match> ROW_MAPPER_MATCH = (rs, rowNum) -> new Match(
-            rs.getLong("id"),
-            rs.getLong("tournament_id"),
-            rs.getObject("local_id") != null ? rs.getLong("local_id") : null,
-            rs.getObject("visitor_id") != null ? rs.getLong("visitor_id") : null,
-            rs.getObject("local_score") != null ? rs.getInt("local_score") : null,
-            rs.getObject("visitor_score") != null ? rs.getInt("visitor_score") : null,
-            rs.getObject("winner") != null ? rs.getInt("winner") : null,
-            rs.getObject("stage") != null ? rs.getInt("stage") : null
-    );
-
-
     @Override
     public Optional<Tournament> findById(Long id) {
         return jdbcTemplate.query("SELECT * FROM tournament WHERE id = ?", ROW_MAPPER, id).stream().findFirst();
@@ -132,36 +117,6 @@ public class TournamentJdbcDao implements TournamentDao {
         values.put("tournament_id", tournament_id);
         values.put("points", 0);
 
-/////// STASHITO
-//      jdbcInsertUser.execute(values);
-//    	Tournament t = findById(tournament_id).orElse(null);
-//    	int size = getCurrentParticipants(tournament_id);
-//    	System.out.println(size);
-//    	System.out.println(t.getMax_participants());
-////    	List<User> participants = getTournamentParticipants(tournament_id);
-//    	if (t != null) {
-//    		List<Pair<Integer, Integer>> firstMatches = t.firstMatches(size-1);
-//
-//    		for (Pair<Integer, Integer> match : firstMatches) {
-//    			if(match.getRight() == 0) {
-//    				jdbcTemplate.update("UPDATE match SET local_id = ? WHERE id = ? AND tournament_id = ?", user_id, match.getLeft(), tournament_id);
-//    			}else {
-//					jdbcTemplate.update("UPDATE match SET visitor_id = ? WHERE id = ? AND tournament_id = ?", user_id, match.getLeft(), tournament_id);
-//				}
-//    		}
-//
-//	        Map<String, Object> valuesParticipants = new HashMap<>();
-//
-//	        valuesParticipants.put("user_id", user_id);
-//	        valuesParticipants.put("tournament_id", tournament_id);
-//	        valuesParticipants.put("points", 0);
-//
-//	        jfbcInsertParticipant.execute(valuesParticipants);
-//	        
-//	        if(size + 1 >= t.getMax_participants()) {
-//	        	jdbcTemplate.update("UPDATE tournament SET open_inscriptions = false WHERE id = ?", tournament_id);
-//	        }
-//    	}
         jdbcInsertParticipantUser.execute(values);
 
         List<ParticipantUser> participantUsers = getTournamentParticipantUsers(tournament_id);
@@ -200,114 +155,231 @@ public class TournamentJdbcDao implements TournamentDao {
 
     @Override
     public Optional<Structure> getTournamentStructure(Long tournament_id) {
-        Tournament t = findById(tournament_id).orElse(null);
-        if (t != null) {
-            return Optional.of(t.getStructure());
-        }
-        return Optional.empty();
-    }
-//
-//    public Integer getTournamentMaxParticipants(Long tournament_id) {
-//		Tournament t = findById(tournament_id).orElse(null);
-//		if (t != null) {
-//
-//		}
-//    }
+    	Tournament t = findById(tournament_id).orElse(null);
+    	if (t != null) {
+			return Optional.of(t.getStructure());
+		}
+    	return Optional.empty();
+	}
 
     @Override
-//////STASHITO
-//    public void createMatches(Long tournament_id) {
-//		Tournament t = findById(tournament_id).orElse(null);
-//		if (t != null) {
-//			int rounds = t.amountOfMatches();
-//			for(int i = 0; i < rounds; i++) {
-//				Map<String, Object> values = new HashMap<>();
-//				values.put("id", i);
-//				values.put("tournament_id", tournament_id);
-//				values.put("local_id", null);
-//				values.put("visitor_id", null);
-//				values.put("local_score", null);
-//				values.put("visitor_score", null);
-//				jfbcInsertMatch.execute(values);
-//			}
-//		}
-//	}
-
     public void createMatches(Long tournamentId) {
         Tournament t = findById(tournamentId).orElse(null);
         List<ParticipantUser> participants = getTournamentParticipantUsers(tournamentId);
 
         if (t != null && !participants.isEmpty()) {
-            int n = participants.size();
-
-            // Odd # of participants -> add fictional participant
-            if (n % 2 != 0) {
-                participants.add(null);
-                n++;
-            }
-
-            int rounds = n - 1;
-            int halfSize = n / 2;
-
-            List<ParticipantUser> rotated = new ArrayList<>(participants);
-            int matchId = 1;
-
-            for (int round = 0; round < rounds; round++) {
-                for (int i = 0; i < halfSize; i++) {
-                    ParticipantUser home = rotated.get(i);
-                    ParticipantUser away = rotated.get(n - 1 - i);
-
-                    if (home != null && away != null) {
-                        Map<String, Object> values = new HashMap<>();
-                        values.put("id", matchId++);
-                        values.put("tournament_id", tournamentId);
-                        values.put("local_id", home.getUser_id());
-                        values.put("visitor_id", away.getUser_id());
-                        values.put("local_score", null);
-                        values.put("visitor_score", null);
-                        values.put("winner", null);
-                        values.put("stage", round + 1);
-                        jdbcInsertMatch.execute(values);
-                    }
-                }
-                ParticipantUser first = rotated.remove(1);
-                rotated.add(first);
+            if(t.getStructure().equals(Structure.ELIMINATION)) {
+                createMatchesBracket(t, participants, 1);
+            } else if (t.getStructure().equals(Structure.HYBRID)) {
+                createMatchesHybrid(t, participants);
+            } else {
+                createMatchesLeague(t, participants);
             }
         }
     }
 
-    @Override
-    public List<Match> getTournamentMatches(Long tournament_id) {
-        return jdbcTemplate.query("SELECT * FROM match WHERE tournament_id = ?", ROW_MAPPER_MATCH, tournament_id);
+    public void createMatchesLeague(Tournament t, List<ParticipantUser> participants) {
+        createMatchesLeague(t, participants, 0, 1);
+    }
+
+    public void createMatchesLeague(Tournament t, List<ParticipantUser> participants, Integer groupNumber, int firstMatchId) {
+
+        int n = participants.size();
+
+        // Odd # of participants -> add fictional participant
+        if (n % 2 != 0) {
+            participants.add(null);
+            n++;
+        }
+        int totalRounds = n - 1;
+        int matchId = firstMatchId;
+
+        List<ParticipantUser> rotated = new ArrayList<>(participants);
+
+        for (int round = 1; round <= totalRounds; round++) {
+            for (int i = 0; i < n / 2; i++) {
+                ParticipantUser home = rotated.get(i);
+                ParticipantUser away = rotated.get(n - 1 - i);
+
+                if (home != null && away != null) {
+                    Map<String, Object> values = new HashMap<>();
+                    values.put("id", matchId++);
+                    values.put("tournament_id", t.getId());
+                    values.put("local_id", home.getUser_id());
+                    values.put("visitor_id", away.getUser_id());
+                    values.put("local_score", null);
+                    values.put("visitor_score", null);
+                    values.put("winner", null);
+                    values.put("stage", round);
+                    values.put("group_number", groupNumber);
+                    jdbcInsertMatch.execute(values);
+                }
+            }
+            ParticipantUser first = rotated.remove(1);
+            rotated.add(first);
+        }
+    }
+
+    public void createMatchesBracket(Tournament t, List<ParticipantUser> participants, int firstMatchId) {
+         int n = participants.size();
+
+        // Use the closest power of 2 (adding fictional participants)
+        int powerOfTwo = 1;
+        while (powerOfTwo < n) {
+            powerOfTwo *= 2;
+        }
+        while (participants.size() < powerOfTwo) {
+            participants.add(null);
+        }
+
+        int totalRounds = (int) (Math.log(participants.size()) / Math.log(2));
+        int matchId = firstMatchId;
+
+        int matchesThisRound = participants.size() / 2;
+        for (int round = 1; round <= totalRounds; round++) {
+            for (int i = 0; i < matchesThisRound; i++) {
+                ParticipantUser home = null;
+                ParticipantUser away = null;
+
+                if (round == 1) {
+                    home = participants.get(2 * i);
+                    away = participants.get(2 * i + 1);
+                }
+
+                Map<String, Object> values = new HashMap<>();
+                values.put("id", matchId++);
+                values.put("tournament_id", t.getId());
+                values.put("local_id", home != null ? home.getUser_id() : null);
+                values.put("visitor_id", away != null ? away.getUser_id() : null);
+                values.put("local_score", null);
+                values.put("visitor_score", null);
+                values.put("winner", null);
+                values.put("stage", round);
+                values.put("group_number", 0);
+                jdbcInsertMatch.execute(values);
+            }
+            matchesThisRound /= 2;
+        }
+    }
+
+    public void createMatchesHybrid(Tournament t, List<ParticipantUser> participants) {
+        int n = participants.size();
+        if (n > 8){
+            int groupsCount = calculateGroups(n);
+            List<Integer> distribution = distributeParticipants(n);
+            int index = 0;
+            int nextId = 1;
+            for (int g = 0; g < groupsCount; g++) {
+                int size = distribution.get(g);
+                List<ParticipantUser> group = new ArrayList<>(participants.subList(index, index + size));
+                createMatchesLeague(t, group, g + 1, nextId);
+                nextId += (size * (size - 1)) / 2;
+                index += size;
+            }
+        }else{
+            createMatchesBracket(t, participants, 1);
+        }
+    }
+
+    public void createBracketFromGroups(Long tournamentId) {
+        Tournament t = findById(tournamentId).orElse(null);
+
+        if (t != null && t.getStructure().equals(Structure.HYBRID)) {
+            List<Long> firstPlaces = new ArrayList<>();
+            List<Long> secondPlaces = new ArrayList<>();
+
+            List<Map<String, Object>> groups = jdbcTemplate.queryForList(
+                    "SELECT DISTINCT group_number FROM match WHERE tournament_id = ?",
+                    tournamentId
+            );
+
+            for (Map<String, Object> g : groups) {
+                int groupNum = ((Number) g.get("group_number")).intValue();
+
+                Long first = jdbcTemplate.queryForObject(
+                        "SELECT user_id FROM participant_user WHERE tournament_id = ? AND group_number = ? ORDER BY points DESC LIMIT 1",
+                        Long.class, tournamentId, groupNum
+                );
+
+                Long second = jdbcTemplate.queryForObject(
+                        "SELECT user_id FROM participant_user WHERE tournament_id = ? AND group_number = ? ORDER BY points DESC OFFSET 1 LIMIT 1",
+                        Long.class, tournamentId, groupNum
+                );
+
+                firstPlaces.add(first);
+                secondPlaces.add(second);
+            }
+
+            List<ParticipantUser> classifiedParticipants = new ArrayList<>();
+            for (int i = 0; i < firstPlaces.size(); i++) {
+                ParticipantUser local = getTournamentParticipantByUserId(tournamentId, firstPlaces.get(i));
+                ParticipantUser visitor = getTournamentParticipantByUserId(tournamentId, secondPlaces.get((i + 1) % secondPlaces.size()));
+                classifiedParticipants.add(local);
+                classifiedParticipants.add(visitor);
+            }
+
+            Integer maxId = jdbcTemplate.queryForObject(
+                    "SELECT COALESCE(MAX(id), 0) FROM match WHERE tournament_id = ?",
+                    Integer.class, tournamentId
+            );
+
+            createMatchesBracket(t, classifiedParticipants, maxId + 1);
+        }
+    }
+
+
+    private int calculateGroups(int n) {
+        int groups = Math.max(1, n / 3);   // min 3 participants per group
+        groups = Math.min(groups, 16);     // máx 16  groups
+        return groups;
+    }
+
+    private List<Integer> distributeParticipants(int participantsCount) {
+        int groups = calculateGroups(participantsCount);
+
+        int baseSize = participantsCount / groups;
+        int extra = participantsCount % groups;
+
+        List<Integer> distribution = new ArrayList<>();
+
+        for (int i = 0; i < groups; i++) {
+            if (i < extra) {
+                distribution.add(baseSize + 1);
+            } else {
+                distribution.add(baseSize);
+            }
+        }
+        return distribution;
     }
 
     @Override
-    public List<MatchWithPlayers> getTournamentMatchesWithPlayers(Long tournament_id) {
+    public List<MatchWithPlayers> getTournamentMatches(Long tournament_id) {
         String sql = "SELECT m.id, m.tournament_id, m.local_id, m.visitor_id, " +
-                "COALESCE(local_user.username, 'TBD') as local_player_name, " +
-                "COALESCE(visitor_user.username, 'TBD') as visitor_player_name, " +
-                "m.local_score, m.visitor_score, m.winner, m.stage " +
-                "FROM match m " +
-                "LEFT JOIN users local_user ON m.local_id = local_user.id " +
-                "LEFT JOIN users visitor_user ON m.visitor_id = visitor_user.id " +
-                "WHERE m.tournament_id = ? " +
-                "ORDER BY m.stage, m.id";
+                    "COALESCE(local_user.username, 'TBD') as local_player_name, " +
+                    "COALESCE(visitor_user.username, 'TBD') as visitor_player_name, " +
+                    "m.local_score, m.visitor_score, m.winner, m.stage, m.group_number " +
+                    "FROM match m " +
+                    "LEFT JOIN users local_user ON m.local_id = local_user.id " +
+                    "LEFT JOIN users visitor_user ON m.visitor_id = visitor_user.id " +
+                    "WHERE m.tournament_id = ? " +
+                    "ORDER BY m.stage, m.id";
 
         return jdbcTemplate.query(sql, (rs, rowNum) -> new MatchWithPlayers(
-                rs.getLong("id"),
-                rs.getLong("tournament_id"),
-                rs.getObject("local_id") != null ? rs.getLong("local_id") : null,
-                rs.getObject("visitor_id") != null ? rs.getLong("visitor_id") : null,
-                rs.getString("local_player_name"),
-                rs.getString("visitor_player_name"),
-                rs.getObject("local_score") != null ? rs.getInt("local_score") : null,
-                rs.getObject("visitor_score") != null ? rs.getInt("visitor_score") : null,
-                rs.getObject("winner") != null ? rs.getInt("winner") : null,
-                rs.getObject("stage") != null ? rs.getInt("stage") : null
-        ), tournament_id);
+            rs.getLong("id"),
+            rs.getLong("tournament_id"),
+            rs.getObject("local_id") != null ? rs.getLong("local_id") : null,
+            rs.getObject("visitor_id") != null ? rs.getLong("visitor_id") : null,
+            rs.getString("local_player_name"),
+            rs.getString("visitor_player_name"),
+            rs.getObject("local_score") != null ? rs.getInt("local_score") : null,
+            rs.getObject("visitor_score") != null ? rs.getInt("visitor_score") : null,
+            rs.getObject("winner") != null ? rs.getInt("winner") : null,
+            rs.getObject("stage") != null ? rs.getInt("stage") : null,
+            rs.getObject("group_number") != null ? rs.getInt("group_number") : null
+            ), tournament_id);
     }
 
-    public Optional<TournamentImg> findByIdWithImg(Long id) {
+    public Optional<TournamentImg> findByIdWithImg(Long id){
         return jdbcTemplate.query("SELECT t.*, i.image FROM tournament t LEFT JOIN image i ON t.image_id = i.id WHERE t.id = ?", ROW_MAPPER_IMG, id
         ).stream().findFirst();
     }
@@ -333,6 +405,12 @@ public class TournamentJdbcDao implements TournamentDao {
         return jdbcTemplate.query("SELECT * FROM participant_user WHERE tournament_id = ?", ROW_MAPPER_PARTICIPANT_USER, tournament_id);
     }
 
+    public ParticipantUser getTournamentParticipantByUserId(Long tournament_id, Long user_id) {
+        return jdbcTemplate.query("SELECT * FROM participant_user " +
+                "WHERE tournament_id = ? AND user_id = ?"
+                , ROW_MAPPER_PARTICIPANT_USER, tournament_id, user_id).stream().findFirst().orElse(null);
+    }
+
     @Override
     public Boolean hasJoined(Long userId, Long tournamentId) {
         String sql = "SELECT EXISTS (SELECT 1 FROM participant_user WHERE user_id = ? AND tournament_id = ?)";
@@ -341,6 +419,18 @@ public class TournamentJdbcDao implements TournamentDao {
 
     @Override
     public void setMatchWinner(Long matchId, Long tournamentId, Integer winner) {
+        Map<String, Object> match = jdbcTemplate.queryForMap(
+                "SELECT local_id, visitor_id FROM match WHERE id = ? AND tournament_id = ?",
+                matchId, tournamentId
+        );
+
+        Long localId = (Long) match.get("local_id");
+        Long visitorId = (Long) match.get("visitor_id");
+
+        if (localId == null || visitorId == null) {
+            throw new IllegalStateException("Cannot set winner for TBD matches");
+        }
+
         jdbcTemplate.update("UPDATE match SET winner = ? WHERE id = ? AND tournament_id = ?",
                 winner, matchId, tournamentId);
 
@@ -349,8 +439,6 @@ public class TournamentJdbcDao implements TournamentDao {
                         "FROM match WHERE id = ? AND tournament_id = ?",
                 Long.class, winner, winner, matchId, tournamentId
         );
-
-        jdbcTemplate.update("UPDATE participant_user SET points = points + 3 WHERE user_id = ?", winnerId);
 
         Integer totalMatches = jdbcTemplate.queryForObject(
                 "SELECT COUNT(*) FROM match WHERE tournament_id = ?",
@@ -362,8 +450,76 @@ public class TournamentJdbcDao implements TournamentDao {
                 Integer.class, tournamentId
         );
 
-        if (totalMatches.equals(finishedMatches) && totalMatches > 0) {
+        boolean isFinished = totalMatches.equals(finishedMatches) && totalMatches > 0;
+
+        Structure structure = getTournamentStructure(tournamentId).isPresent()? getTournamentStructure(tournamentId).get() : null;
+        if(structure != null) {
+            if(structure.equals(Structure.ELIMINATION) && !isFinished) {
+                setNextMatchInfo(matchId, tournamentId, winnerId);
+            }else if(structure.equals(Structure.HYBRID)) {
+                Integer group_number = jdbcTemplate.queryForObject(
+                        "SELECT group_number FROM match WHERE tournament_id = ? AND id = ?",
+                        Integer.class, tournamentId, matchId
+                );
+                if(isFinished && group_number > 0) {
+                    createBracketFromGroups(tournamentId);
+                    totalMatches = jdbcTemplate.queryForObject(
+                            "SELECT COUNT(*) FROM match WHERE tournament_id = ?",
+                            Integer.class, tournamentId
+                    );
+                    isFinished = totalMatches.equals(finishedMatches);
+                } else if (group_number == 0) {
+                    setNextMatchInfo(matchId, tournamentId, winnerId);
+                }
+            }
+            else{
+                jdbcTemplate.update("UPDATE participant_user SET points = points + 3 WHERE user_id = ?", winnerId);
+            }
+        }
+
+        if (isFinished) {
             setFinished(tournamentId);
+        }
+    }
+
+    private void setNextMatchInfo(Long matchId, Long tournamentId, Long winnerId) {
+        Integer currentStage = jdbcTemplate.queryForObject(
+                "SELECT stage FROM match WHERE id = ? AND tournament_id = ?",
+                Integer.class, matchId, tournamentId
+        );
+
+        List<Long> idsThisStage = jdbcTemplate.queryForList(
+                "SELECT id FROM match WHERE tournament_id = ? AND stage = ? ORDER BY id",
+                Long.class, tournamentId, currentStage
+        );
+
+        int indexInStage = idsThisStage.indexOf(matchId);
+        if (indexInStage < 0) {
+            return;
+        }
+        int parentOffset = indexInStage / 2;
+        List<Long> nextMatches = jdbcTemplate.queryForList(
+                "SELECT id FROM match WHERE tournament_id = ? AND stage = ? ORDER BY id LIMIT 1 OFFSET ?",
+                Long.class, tournamentId, currentStage + 1, parentOffset
+        );
+
+        if (nextMatches.isEmpty()) {
+            return;
+        }
+        Long nextMatchId = nextMatches.get(0);
+
+        boolean isLeftChild = (indexInStage % 2 == 0);
+
+        if (isLeftChild) {
+            jdbcTemplate.update(
+                    "UPDATE match SET local_id = ? WHERE id = ? AND tournament_id = ?",
+                    winnerId, nextMatchId, tournamentId
+            );
+        } else {
+            jdbcTemplate.update(
+                    "UPDATE match SET visitor_id = ? WHERE id = ? AND tournament_id = ?",
+                    winnerId, nextMatchId, tournamentId
+            );
         }
     }
 

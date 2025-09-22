@@ -5,15 +5,14 @@ import ar.edu.itba.paw.model.Tournament.TournamentImg;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
-import ar.edu.itba.paw.model.Match;
 import ar.edu.itba.paw.model.MatchWithPlayers;
-import ar.edu.itba.paw.model.Pair;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface TournamentDao {
@@ -40,10 +39,6 @@ public interface TournamentDao {
 
     public void loadScores(Long match_id, Long tournament_id, Integer local_score, Integer visitor_score);
 
-    public List<Match> getTournamentMatches(Long tournament_id);
-
-    public List<MatchWithPlayers> getTournamentMatchesWithPlayers(Long tournament_id);
-
     public List<TournamentImg> findWithImg(TournamentFilter tournamentFilter);
 
     public Optional<TournamentImg> findByIdWithImg(Long id);
@@ -57,7 +52,10 @@ public interface TournamentDao {
     public List<TournamentImg> findUserActiveTournaments(Long userId);
 
     public List<TournamentImg> findUserPastTournaments(Long userId);
+
     public void closeInscriptions(Long tournament_id);
+
+    public List<MatchWithPlayers> getTournamentMatches(Long tournament_id);
 
     public void setMatchWinner(Long matchId, Long tournamentId, Integer winner);
 
