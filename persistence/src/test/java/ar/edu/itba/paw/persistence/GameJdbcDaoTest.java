@@ -56,6 +56,26 @@ public class GameJdbcDaoTest {
         final Game game = gameJdbcDao.create(null, GENRE, 1);
     }
 
+    @Test(expected = Exception.class)
+    public void testCreateGenreless(){
+        final Game game = gameJdbcDao.create(NAME, null, 1);
+    }
+
+    @Test
+    public void testCheckNameExists(){
+        final Game game = gameJdbcDao.create(NAME, GENRE, 1);
+        boolean ans = gameJdbcDao.checkNameExists(NAME);
+
+        Assert.assertTrue(ans);
+    }
+
+    @Test
+    public void testCheckNameDoesntExist(){
+        boolean ans = gameJdbcDao.checkNameExists(NAME);
+
+        Assert.assertFalse(ans);
+    }
+
     @Test
     public void testFindWithId(){
         final Game game = gameJdbcDao.create(NAME, GENRE, 1);

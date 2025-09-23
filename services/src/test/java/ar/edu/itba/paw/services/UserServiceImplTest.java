@@ -36,6 +36,7 @@ public class UserServiceImplTest{
         Assert.assertNotNull(maybeUser);
         Assert.assertEquals(USERNAME, maybeUser.getUsername());
         Assert.assertEquals(EMAIL,maybeUser.getEmail());
+        Assert.assertEquals(1L,maybeUser.getId());
         Mockito.verify(mockDao).checkUsernameExists(USERNAME);
         Mockito.verify(mockDao).checkEmailExists(EMAIL);
         Mockito.verify(mockDao).create(USERNAME, EMAIL);
@@ -70,6 +71,9 @@ public class UserServiceImplTest{
         Assert.assertTrue(maybeUser.isPresent());
         Assert.assertEquals(USERNAME, maybeUser.get().getUsername());
         Assert.assertEquals(EMAIL, maybeUser.get().getEmail());
+        Assert.assertEquals(1L, maybeUser.get().getId());
+        Mockito.verify(mockDao).findById(1);
+        Mockito.verifyNoMoreInteractions(mockDao);
     }
 
     @Test
@@ -80,6 +84,8 @@ public class UserServiceImplTest{
 
         Assert.assertNotNull(maybeUser);
         Assert.assertFalse(maybeUser.isPresent());
+        Mockito.verify(mockDao).findById(1);
+        Mockito.verifyNoMoreInteractions(mockDao);
     }
 
     @Test
@@ -92,6 +98,9 @@ public class UserServiceImplTest{
         Assert.assertTrue(maybeUser.isPresent());
         Assert.assertEquals(USERNAME, maybeUser.get().getUsername());
         Assert.assertEquals(EMAIL, maybeUser.get().getEmail());
+        Assert.assertEquals(1L, maybeUser.get().getId());
+        Mockito.verify(mockDao).authenticate(USERNAME,EMAIL);
+        Mockito.verifyNoMoreInteractions(mockDao);
     }
 
     @Test
@@ -102,5 +111,7 @@ public class UserServiceImplTest{
 
         Assert.assertNotNull(maybeUser);
         Assert.assertFalse(maybeUser.isPresent());
+        Mockito.verify(mockDao).authenticate(USERNAME,EMAIL);
+        Mockito.verifyNoMoreInteractions(mockDao);
     }
 }

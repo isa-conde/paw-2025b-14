@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.services;
 
+import ar.edu.itba.paw.interfaces.exception.NameAlreadyUsedException;
 import ar.edu.itba.paw.interfaces.persistence.GameDao;
 import ar.edu.itba.paw.interfaces.services.GameService;
 import ar.edu.itba.paw.model.Game.Game;
@@ -47,6 +48,9 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public Game create(String name, Genre genre, Integer image_id) {
+        if(gameDao.checkNameExists(name)){
+            throw new NameAlreadyUsedException(name);
+        }
         return gameDao.create(name, genre, image_id);
     }
 
