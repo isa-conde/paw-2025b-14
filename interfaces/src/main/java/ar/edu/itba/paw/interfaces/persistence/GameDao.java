@@ -27,4 +27,6 @@ public interface GameDao {
     public List<GameImg> findAllWithImg();
 
     public Optional<GameImg> findByIdWithImage(long id);
+
+    public boolean checkNameExists(String name);
 }
