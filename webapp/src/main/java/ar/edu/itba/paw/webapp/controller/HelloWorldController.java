@@ -216,31 +216,7 @@ public class HelloWorldController {
         }
 
         final Game g = gs.createWithFormats(form.getName(), form.getGenre(), form.getFormats(), imageBytes);
-        return new ModelAndView("redirect:/game?game_id=" + g.getId());
-    }
-
-    @RequestMapping("/game")
-    public ModelAndView game(HttpServletRequest request, @RequestParam("game_id") final long game_id, @ModelAttribute("filterForm") FilterForm filterForm, TournamentFilter tf){
-        final ModelAndView mav = new ModelAndView("game");
-        Optional<GameImg> optionalGame = gs.findByIdWithImage(game_id);
-        if(optionalGame.isPresent()) {
-            mav.addObject("game", optionalGame.get());
-        } else {
-            return new ModelAndView("index");
-        }
-        mav.addObject("user", request.getSession().getAttribute("user"));
-        mav.addObject("structures", Arrays.stream(Structure.values()).toList());
-        mav.addObject("regions", Arrays.stream(Region.values()).toList());
-        mav.addObject("elos", Arrays.stream(Elo.values()).toList());
-
-        tf.setGame_id(game_id);
-        tf.setRegion(filterForm.getRegion());
-        tf.setElo(filterForm.getElo());
-
-        mav.addObject("tournaments", ts.findWithImg(tf));
-        mav.addObject("isFiltered", !tf.isEmpty());
-
-        return mav;
+        return new ModelAndView("redirect:/" + g.getId());
     }
 
     @RequestMapping("/tournament")
