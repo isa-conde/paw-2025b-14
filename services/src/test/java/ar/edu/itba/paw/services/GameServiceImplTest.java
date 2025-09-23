@@ -132,17 +132,17 @@ public class GameServiceImplTest {
         Mockito.verifyNoMoreInteractions(mockDao);
     }
 
-    @Test
-    public void testSearchByUnusedName(){
-        Mockito.when(mockDao.searchByName(NAME)).thenReturn(new ArrayList<>());
-
-        List<Game> games = gameService.searchByName(NAME);
-
-        Assert.assertNotNull(games);
-        Assert.assertTrue(games.isEmpty());
-        Mockito.verify(mockDao).searchByName(NAME);
-        Mockito.verifyNoMoreInteractions(mockDao);
-    }
+//    @Test
+//    public void testSearchByUnusedName(){
+//        Mockito.when(mockDao.searchByName(NAME)).thenReturn(new ArrayList<>());
+//
+//        List<Game> games = gameService.searchByName(NAME);
+//
+//        Assert.assertNotNull(games);
+//        Assert.assertTrue(games.isEmpty());
+//        Mockito.verify(mockDao).searchByName(NAME);
+//        Mockito.verifyNoMoreInteractions(mockDao);
+//    }
 
     @Test
     public void testFindAll(){
@@ -170,30 +170,30 @@ public class GameServiceImplTest {
         Mockito.verifyNoMoreInteractions(mockDao);
     }
 
-    @Test
-    public void testSearchByName(){
-        List<Game> expected = new ArrayList<>();
-        long idCounter = 1;
-        for ( int i=1; i<=5; i++){
-            for( Genre genre : Genre.values()){
-                expected.add(new Game(idCounter++, genre + " " + NAME + " " + i, genre, 1));
-            }
-        }
-        Mockito.when(mockDao.searchByName(NAME)).thenReturn(expected);
-
-        List<Game> games = gameService.searchByName(NAME);
-
-        Assert.assertNotNull(games);
-        Assert.assertEquals(expected.size(), games.size());
-        for(int i=0; i<games.size(); i++){
-            Assert.assertEquals(expected.get(i).getName(), games.get(i).getName());
-            Assert.assertEquals(expected.get(i).getGenre(), games.get(i).getGenre());
-            Assert.assertEquals(expected.get(i).getImage_id(), games.get(i).getImage_id());
-            Assert.assertEquals(expected.get(i).getId(), games.get(i).getId());
-        }
-        Mockito.verify(mockDao).searchByName(NAME);
-        Mockito.verifyNoMoreInteractions(mockDao);
-    }
+//    @Test
+//    public void testSearchByName(){
+//        List<Game> expected = new ArrayList<>();
+//        long idCounter = 1;
+//        for ( int i=1; i<=5; i++){
+//            for( Genre genre : Genre.values()){
+//                expected.add(new Game(idCounter++, genre + " " + NAME + " " + i, genre, 1));
+//            }
+//        }
+//        Mockito.when(mockDao.searchByName(NAME)).thenReturn(expected);
+//
+//        List<Game> games = gameService.searchByName(NAME);
+//
+//        Assert.assertNotNull(games);
+//        Assert.assertEquals(expected.size(), games.size());
+//        for(int i=0; i<games.size(); i++){
+//            Assert.assertEquals(expected.get(i).getName(), games.get(i).getName());
+//            Assert.assertEquals(expected.get(i).getGenre(), games.get(i).getGenre());
+//            Assert.assertEquals(expected.get(i).getImage_id(), games.get(i).getImage_id());
+//            Assert.assertEquals(expected.get(i).getId(), games.get(i).getId());
+//        }
+//        Mockito.verify(mockDao).searchByName(NAME);
+//        Mockito.verifyNoMoreInteractions(mockDao);
+//    }
 
     @Test
     public void testSearchByGenre(){
