@@ -59,13 +59,13 @@
                                         <c:set var="icon" value="grid.png" />
                                     </c:when>
                                     <c:when test="${tournamentImg.tournament.structure == ELIMINATION}">
-                                        <c:set var="title" value="Beat them all and take the prize" />
-                                        <c:set var="text" value="Avoid being eliminated by winning every match" />
+                                        <c:set var="title" value="tournament.joinCard.title" />
+                                        <c:set var="text" value="tournament.joinCard.text" />
                                         <c:set var="icon" value="bracket.png" />
                                     </c:when>
                                     <c:when test="${tournamentImg.tournament.structure == HYBRID}">
-                                        <c:set var="title" value="Get advantage and beat them all" />
-                                        <c:set var="text" value="Get a top position in your group and then win every match" />
+                                        <c:set var="title" value="tournament.joinCard.title" />
+                                        <c:set var="text" value="tournament.joinCard.text" />
                                         <c:set var="icon" value="bracket.png" />
                                     </c:when>
                                 </c:choose>

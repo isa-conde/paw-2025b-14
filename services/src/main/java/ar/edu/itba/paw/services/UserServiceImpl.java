@@ -65,7 +65,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void requestPasswordReset(String email) {
         Optional<User> user = findByEmail(email);
-        if(user.isEmpty()) {
+        if (user.isEmpty()) {
             // TODO: handle unaffiliated email
             return;
         }
