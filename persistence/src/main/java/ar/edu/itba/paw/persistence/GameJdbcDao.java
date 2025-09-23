@@ -110,4 +110,9 @@ public class GameJdbcDao implements GameDao {
         ).stream().findFirst();
     }
 
+    @Override
+    public boolean checkNameExists(String name){
+        Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM game WHERE name = ?", Integer.class, name);
+        return count > 0;
+    }
 }
