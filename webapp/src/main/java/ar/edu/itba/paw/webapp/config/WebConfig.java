@@ -10,6 +10,11 @@ import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.jdbc.datasource.init.DataSourceInitializer;
+import org.springframework.jdbc.datasource.init.DatabasePopulator;
+import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.validation.Validator;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 import org.springframework.web.servlet.ViewResolver;
@@ -44,8 +49,21 @@ public class WebConfig implements WebMvcConfigurer {
     	messageSource.setDefaultEncoding(StandardCharsets.UTF_8.displayName());
     	messageSource.setCacheSeconds(5);
     	return messageSource;
-	} 
-    
+	}
+
+    @Bean
+    public LocalValidatorFactoryBean validator(MessageSource messageSource) {
+        LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
+        bean.setValidationMessageSource(messageSource);
+        return bean;
+    }
+
+    @Override
+    public Validator getValidator() {
+        return validator(messageSource());
+    }
+
+
     @Bean
     public ViewResolver viewResolver() {
         InternalResourceViewResolver vr = new InternalResourceViewResolver();
@@ -71,6 +89,20 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
         configurer.enable();
+    }
+
+    @Bean
+    public DataSourceInitializer dsi() {
+        final DataSourceInitializer dsi = new DataSourceInitializer();
+        dsi.setDataSource(dataSource());
+        dsi.setDatabasePopulator(dataSourcePopulator());
+        return dsi;
+    }
+
+    private DatabasePopulator dataSourcePopulator() {
+        final ResourceDatabasePopulator dbp = new ResourceDatabasePopulator();
+        //dbp.addScript(schemaSql);
+        return dbp;
     }
 
     @Bean

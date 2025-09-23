@@ -7,6 +7,9 @@ import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.Token;
 import ar.edu.itba.paw.model.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import ar.edu.itba.paw.interfaces.exception.BusinessException;
+import ar.edu.itba.paw.interfaces.exception.EmailAlreadyUsedException;
+import ar.edu.itba.paw.interfaces.exception.UsernameAlreadyUsedException;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -37,8 +40,15 @@ public class UserServiceImpl implements UserService {
         return userDao.findById(id);
     }
 
+
     @Override
-    public User create(String username, String email, String password) {
+    public User create(String username, String email, String password) throws BusinessException {
+        if (userDao.checkUsernameExists(username)){
+            throw new UsernameAlreadyUsedException(username);
+        }
+        if (userDao.checkEmailExists(email)){
+            throw new EmailAlreadyUsedException(email);
+        }
         return userDao.create(username, email, passwordEncoder.encode(password));
     }
 

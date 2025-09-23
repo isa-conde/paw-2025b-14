@@ -1,10 +1,9 @@
 package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.interfaces.persistence.GameDao;
-import ar.edu.itba.paw.model.Game;
-import ar.edu.itba.paw.model.GameFormat;
-import ar.edu.itba.paw.model.GameImg;
-import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.model.Game.Game;
+import ar.edu.itba.paw.model.Game.GameFormat;
+import ar.edu.itba.paw.model.Game.GameImg;
 import ar.edu.itba.paw.model.enums.Genre;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -55,9 +54,11 @@ public class GameJdbcDao implements GameDao {
     }
 
     @Override
-    public List<Game> searchByName(String name) {
-        String sql = "SELECT * FROM game WHERE name ILIKE '%' || ? || '%'";
-        return jdbcTemplate.query(sql, ROW_MAPPER, name);
+    public List<GameImg> searchByName(String name) {
+        String sql = "SELECT g.*, i.image FROM game g " +
+                     "LEFT JOIN image i ON g.image_id = i.id " +
+                     "WHERE LOWER(g.name) LIKE '%' || LOWER(?) || '%'";
+        return jdbcTemplate.query(sql, ROW_MAPPER_IMG, name);
     }
 
     @Override

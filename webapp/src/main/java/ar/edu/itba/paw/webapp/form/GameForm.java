@@ -1,6 +1,6 @@
 package ar.edu.itba.paw.webapp.form;
 
-import ar.edu.itba.paw.model.GameFormat;
+import ar.edu.itba.paw.model.Game.GameFormat;
 import ar.edu.itba.paw.model.enums.Genre;
 import org.springframework.web.multipart.MultipartFile;
 

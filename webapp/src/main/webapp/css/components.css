@@ -597,7 +597,7 @@ a.element-card:hover {
 
 .carrousel-item {
     flex: 0 0 380px;
-    width: 380px;
+    max-width: 380px;
     min-width: 0;
 }
 
@@ -733,12 +733,15 @@ a.element-card:hover {
     gap: 30px;
     margin: 50px 0;
     width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .grid .element-card {
-    width: 100%;
+    width: 80%;
     max-width: 350px;
     justify-self: center;
+    min-width: 0;
 }
 
 @media (max-width: 1200px) {
@@ -903,6 +906,37 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     display: flex;
     align-items: center;
     margin-top: 10px;
+}
+
+
+/* -------SEARCH BAR--------*/
+
+.search-container {
+    display: flex;
+    align-items: center;
+    background-color: var(--background-secondary);
+    border: 2px solid var(--primary-button);
+    border-radius: 30px;
+    padding: 10px;
+    margin-top: 12px;
+    max-width: 400px;
+}
+
+
+.search-bar {
+    border: none;
+    background: transparent;
+    color: var(--primary-text);
+    font-family: var(--font-main), serif;
+    font-size: 20px;
+    flex: 1;
+    outline: none;
+}
+
+.search-icon {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
 }
 
 /* ------- FILE INPUT ------- */
@@ -1083,9 +1117,15 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .matches-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 20px;
     margin-bottom: 20px;
+}
+
+@media (max-width: 768px) {
+    .matches-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .match-card {
@@ -1095,11 +1135,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     padding: 20px;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     max-width: 600px;
-}
-
-.match-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .match-players {
@@ -1176,4 +1211,111 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-size: var(--text-14);
     font-weight: 600;
     margin: 5px 0;
+}
+
+/* ------- BRACKET ------- */
+
+:root {
+    --base-gap: 20px;
+    --match-height: 60px;
+    --conn-w: 40px;
+}
+
+.bracket-container {
+    width: 100%;
+    padding: 20px 0;
+    background: var(--background-secondary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 15px;
+}
+
+.bracket {
+    display: flex;
+    gap: 80px;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.bracket-round {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    min-width: 180px;
+}
+
+.bracket-match {
+    background: var(--background-card);
+    border: 2px solid var(--primary-button);
+    border-radius: 8px;
+    padding: 12px;
+    min-height: var(--match-height);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    width: 160px;
+    z-index: 1;
+}
+
+/* Fórmula Yn = 2^n y + (2^n - 1)x */
+.bracket-round:nth-child(1) .bracket-match {
+    margin: calc(var(--base-gap) / 2) 0;
+}
+.bracket-round:nth-child(2) .bracket-match {
+    margin: calc((2 * var(--base-gap) + 1 * var(--match-height)) / 2) 0;
+}
+.bracket-round:nth-child(3) .bracket-match {
+    margin: calc((4 * var(--base-gap) + 3 * var(--match-height)) / 2) 0;
+}
+.bracket-round:nth-child(4) .bracket-match {
+    margin: calc((8 * var(--base-gap) + 7 * var(--match-height)) / 2) 0;
+}
+.bracket-round:nth-child(5) .bracket-match {
+    margin: calc((16 * var(--base-gap) + 15 * var(--match-height)) / 2) 0;
+}
+
+.bracket-team {
+    padding: 6px 10px;
+    margin: 1px 0;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: var(--text-14);
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.bracket-team.winner {
+    background-color: var(--primary-button);
+    color: var(--background);
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .bracket {
+        flex-direction: column;
+        gap: 30px;
+        min-width: auto;
+        min-height: auto;
+    }
+
+    .bracket-round {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .bracket-match {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .bracket-match::after {
+        display: none;
+    }
 }

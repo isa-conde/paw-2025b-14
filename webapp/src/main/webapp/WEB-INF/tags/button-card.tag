@@ -4,6 +4,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <%@ attribute name="title" required="true" %>
 <%@ attribute name="text" required="false" %>
@@ -23,11 +24,11 @@
     <div class="card-content-container">
         <div>
             <div class="card-title">
-                <paw:text type="title" size="l"><c:out value="${title}"/></paw:text>
+                <paw:text type="title" size="l"><spring:message code="${title}"/></paw:text>
             </div>
             <c:if test="${not empty fn:trim(cardText)}">
                 <div class="card-text">
-                    <paw:text size="l" weight="thin"><c:out value="${text}"/></paw:text>
+                    <paw:text size="l" weight="thin"><spring:message code="${text}"/></paw:text>
                 </div>
             </c:if>
             <c:if test="${not empty fn:trim(buttonText)}">

@@ -1,6 +1,7 @@
 <%@ taglib prefix="c"   uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ attribute name="user" required="true" type="ar.edu.itba.paw.model.User" %>
 <%@ attribute name="function" required="false" type="java.lang.String" %>
 <%@ attribute name="isIndex" required="true"%>
@@ -27,13 +28,14 @@
         <div class="container">
             <paw:sidebar user="${user}"/>
             <paw:header>
+                <paw:searchBar/>
                 <c:choose>
                     <c:when test="${isLoggedIn}">
-                        <paw:profileButton text="${user.username}" onclick="openModal('logoutModal')"/>
-                        <paw:modal id="logoutModal" title="Logout">
+                        <paw:profileButton text="${user.username}" onclick="openModal('logoutModal')" isNotSafe="true"/>
+                        <paw:modal id="logoutModal" title="layout.logout">
                             <div class="row center">
                                 <form:form method="post" action="${logoutUrl}">
-                                    <paw:input path="" label="Log Out" inputType="submit"/>
+                                    <paw:input path="" label="layout.logout" inputType="submit"/>
                                 </form:form>
                             </div>
                         </paw:modal>
@@ -41,8 +43,8 @@
                     <c:otherwise>
                         <c:if test="${isIndex == 'true'}">
                             <div>
-                                <paw:button text="Log in" size="m" onclick="window.location.href='${loginUrl}'"/>
-                                <paw:button text="Register" size="m" onclick="window.location.href='${registerUrl}'"/>
+                                <paw:button text="layout.login" size="m" onclick="window.location.href='${loginUrl}'"/>
+                                <paw:button text="layout.register" size="m" onclick="window.location.href='${registerUrl}'"/>
                             </div>
                         </c:if>
                     </c:otherwise>

@@ -4,6 +4,7 @@ import ar.edu.itba.paw.interfaces.persistence.UserDao;
 import ar.edu.itba.paw.model.User;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
@@ -61,5 +62,16 @@ public class UserJdbcDao implements UserDao {
     @Override
     public Optional<User> findByEmail(String email) {
         return jdbcTemplate.query("SELECT * FROM users WHERE email = ?", ROW_MAPPER, email).stream().findFirst();
+    }
+    @Override
+    public Boolean checkUsernameExists (String username) {
+        Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM users WHERE username = ?", Integer.class , username);
+        return count != null && count > 0;
+    }
+
+    @Override
+    public Boolean checkEmailExists(String email) {
+        Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM users WHERE email = ?", Integer.class , email);
+        return count != null && count > 0;
     }
 }

@@ -843,6 +843,16 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(1);
 }
 
+.search-bar {
+    background-color: var(--background-secondary);
+    border: 2px solid var(--primary-button);
+    color: var(--primary-text);
+    font-family: var(--font-main), serif;
+    font-size: 20px;
+    padding: 10px;
+    border-radius: 30px;
+}
+
 /* ------- NAVBAR ------- */
 
 .navbar {

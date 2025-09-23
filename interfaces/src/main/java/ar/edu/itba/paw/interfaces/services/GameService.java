@@ -1,8 +1,8 @@
 package ar.edu.itba.paw.interfaces.services;
 
-import ar.edu.itba.paw.model.Game;
-import ar.edu.itba.paw.model.GameFormat;
-import ar.edu.itba.paw.model.GameImg;
+import ar.edu.itba.paw.model.Game.Game;
+import ar.edu.itba.paw.model.Game.GameFormat;
+import ar.edu.itba.paw.model.Game.GameImg;
 import ar.edu.itba.paw.model.enums.Genre;
 
 import java.util.List;
@@ -14,7 +14,7 @@ public interface GameService {
 
     Optional<Game> findByName(String name);
 
-    public List<Game> searchByName(String name);
+    public List<GameImg> searchByName(String name);
 
     public List<Game> searchByGenre(Genre genre);
 

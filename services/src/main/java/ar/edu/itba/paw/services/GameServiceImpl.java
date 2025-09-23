@@ -2,9 +2,9 @@ package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.persistence.GameDao;
 import ar.edu.itba.paw.interfaces.services.GameService;
-import ar.edu.itba.paw.model.Game;
-import ar.edu.itba.paw.model.GameFormat;
-import ar.edu.itba.paw.model.GameImg;
+import ar.edu.itba.paw.model.Game.Game;
+import ar.edu.itba.paw.model.Game.GameFormat;
+import ar.edu.itba.paw.model.Game.GameImg;
 import ar.edu.itba.paw.model.enums.Genre;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +31,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public List<Game> searchByName(String name) {
+    public List<GameImg> searchByName(String name) {
         return gameDao.searchByName(name);
     }
 

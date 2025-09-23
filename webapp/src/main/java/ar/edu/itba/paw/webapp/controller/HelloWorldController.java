@@ -1,11 +1,17 @@
 package ar.edu.itba.paw.webapp.controller;
 
+import ar.edu.itba.paw.interfaces.exception.EmailAlreadyUsedException;
+import ar.edu.itba.paw.interfaces.exception.UsernameAlreadyUsedException;
 import ar.edu.itba.paw.interfaces.services.GameService;
 import ar.edu.itba.paw.interfaces.services.MailService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.*;
+import ar.edu.itba.paw.model.Game.Game;
+import ar.edu.itba.paw.model.Game.GameImg;
 import ar.edu.itba.paw.model.MatchWithPlayers;
+import ar.edu.itba.paw.model.Tournament.Tournament;
+import ar.edu.itba.paw.model.Tournament.TournamentImg;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Genre;
 import ar.edu.itba.paw.model.enums.Region;
@@ -15,6 +21,7 @@ import ar.edu.itba.paw.webapp.form.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,6 +46,9 @@ public class HelloWorldController {
     @ModelAttribute("loginForm")
     public UserForm loginForm() { return new UserForm(); }
 
+    @ModelAttribute("registerForm")
+    public UserForm registerForm() { return new UserForm();  }
+
     @ModelAttribute("tournamentForm")
     public TournamentForm tournamentForm() {
         return new TournamentForm();
@@ -58,10 +68,20 @@ public class HelloWorldController {
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ModelAndView register(@Valid @ModelAttribute("registerForm") UserForm form, final BindingResult result) {
-        if(result.hasErrors()) {
+        if (result.hasErrors()) {
             return registerPage(form);
         }
-        User user = us.create(form.getUsername(), form.getEmail(), form.getPassword());
+
+        User user = null;
+        try {
+            user = us.create(form.getUsername(), form.getEmail(), form.getPassword());
+        } catch (EmailAlreadyUsedException e) {
+            result.rejectValue("email", "error.registerForm.emailUsed", e.getMessage());
+            // TODO: add mav return?
+        } catch (UsernameAlreadyUsedException e) {
+            result.rejectValue("username", "error.registerForm.usernameUsed", e.getMessage());
+            // TODO: add mav return?
+        }
         us.sendVerificationEmail(form.getEmail());
         return new ModelAndView("redirect:/verify?userId=" + user.getId());
     }
@@ -161,7 +181,7 @@ public class HelloWorldController {
         mav.addObject("games", allGames);
         mav.addObject("regions", Arrays.stream(Region.values()).toList());
         mav.addObject("elos", Arrays.stream(Elo.values()).toList());
-        mav.addObject("structures", Arrays.stream(Structure.values()).filter(s -> s == Structure.LEAGUE).toList());
+        mav.addObject("structures", Arrays.stream(Structure.values()).toList());
         mav.addObject("tournamentForm", tournamentForm);
 
         List<GameImg> topGamesWithTournaments = allGames.stream()
@@ -203,25 +223,29 @@ public class HelloWorldController {
         }
         User user = us.findByUsername(principal.getName()).orElse(null);
         Optional<Game> optionalGame = gs.findById(form.getGame_id());
-        if (optionalGame.isEmpty()){
-            return new ModelAndView("game");
-        }
 
         byte[] imageBytes = null;
         try {
             if (form.getImage() != null && !form.getImage().isEmpty()) {
                 imageBytes = form.getImage().getBytes();
+            }else {
+                result.rejectValue("image", "error.tournamentForm.emptyImage");
+                ModelAndView mav = index(form, new TournamentFilter(), principal);
+                mav.addObject("openModal", "'createTournamentModal'");
+                return mav;
             }
         } catch (IOException e) {
-            //TBD
-            return new ModelAndView("index");
+            result.rejectValue("image", "error.tournamentForm.invalidImage", e.getMessage());
+            ModelAndView mav = index(form, new TournamentFilter(), principal);
+            mav.addObject("openModal", "'createTournamentModal'");
+            return mav;
         }
 
         final Tournament t = ts.create(user.getId(), form.getName(), optionalGame.get().getId(),
-                form.getRegion(), form.getElo(), form.getStart_date(), form.getEnd_date(),
-                form.getFormat(), form.getStructure(), form.getMax_participants(), imageBytes, true, false);
+            form.getRegion(), form.getElo(), form.getStart_date(), form.getEnd_date(),
+            form.getFormat(), form.getStructure(), form.getMax_participants(), imageBytes, true, false);
         String tournamentLink = request.getRequestURL().toString()
-                .replace("/tournament/create", "/tournament?tournamentId=" + t.getId());
+            .replace("/tournament/create", "/tournament?tournamentId=" + t.getId());
         ms.sendTournamentCreatedEmail(user.getUsername(), t.getName(), tournamentLink, user.getEmail());
         return new ModelAndView("redirect:/tournament?tournamentId=" + t.getId());
     }
@@ -279,31 +303,23 @@ public class HelloWorldController {
         final ModelAndView mav = new ModelAndView("tournament");
         User user = us.findByUsername(principal.getName()).orElse(null);
         mav.addObject("user", user);
-        if (user == null){
-            return new ModelAndView("redirect:/");
-        }
-        Optional<TournamentImg> optionalTournament = ts.findByIdWithImg(tournamentId);
-        List <MatchWithPlayers> matches = ts.getTournamentMatchesWithPlayers(tournamentId);
 
-        Map<Integer, List<MatchWithPlayers>> matchesByStage = new LinkedHashMap<>();
-        if (!matches.isEmpty() && optionalTournament.isPresent()) {
-            for (MatchWithPlayers match : matches) {
-                int stage = match.getStage();
-                matchesByStage.computeIfAbsent(stage, k -> new ArrayList<>()).add(match);
-            }
-        }
+        Optional<TournamentImg> optionalTournament = ts.findByIdWithImg(tournamentId);
+
         if(optionalTournament.isPresent()) {
             TournamentImg t = optionalTournament.get();
             Optional<Game> optionalGame = gs.findById(t.getTournament().getGame_id());
             Optional<User> optionalUser = us.findById(t.getTournament().getCreator_id());
             mav.addObject("hasJoined", ts.hasJoined(user.getId(), tournamentId));
-            mav.addObject("participants", ts.getTournamentParticipants(tournamentId));
+            mav.addObject("participants", ts.getTournamentParticipantsByGroup(tournamentId));
             mav.addObject("user", user);
             mav.addObject("tournamentImg", t);
             mav.addObject("game", optionalGame.get());
             mav.addObject("creator", optionalUser.get());
-            mav.addObject("genericMatches", ts.getMatches(tournamentId));
-            mav.addObject("matchesByStage", matchesByStage);
+            mav.addObject("matchesByGroup", ts.getTournamentMatchesByGroup(tournamentId));
+            mav.addObject("LEAGUE", Structure.LEAGUE);
+            mav.addObject("ELIMINATION", Structure.ELIMINATION);
+            mav.addObject("HYBRID", Structure.HYBRID);
         } else {
             return new ModelAndView("index");
         }
@@ -318,7 +334,8 @@ public class HelloWorldController {
         }
         Optional<Tournament> t = ts.findById(tournamentId);
         String tournamentLink = request.getRequestURL().toString()
-                .replace("/tournament/join", "/tournament?tournamentId=" + t.get().getId());        ms.sendTournamentJoinedEmail(user.getUsername(), t.get().getName(), tournamentLink, us.findById(t.get().getCreator_id()).get().getEmail(), user.getEmail());
+                .replace("/tournament/join", "/tournament?tournamentId=" + t.get().getId());
+        ms.sendTournamentJoinedEmail(user.getUsername(), t.get().getName(), tournamentLink, us.findById(t.get().getCreator_id()).get().getEmail(), user.getEmail());
         ts.joinTournamentUser(user.getId(), tournamentId);
         return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
     }
@@ -363,6 +380,8 @@ public class HelloWorldController {
         mav.addObject("structures", Arrays.stream(Structure.values()).toList());
         mav.addObject("regions", Arrays.stream(Region.values()).toList());
         mav.addObject("elos", Arrays.stream(Elo.values()).toList());
+        mav.addObject("genres", Arrays.stream(Genre.values()).toList());
+        mav.addObject("teamSizes", List.of(1,2,3,4,5));
 
         tf.setGame_id(filterForm.getGame_id());
         tf.setRegion(filterForm.getRegion());
@@ -424,6 +443,17 @@ public class HelloWorldController {
         mav.addObject("onGoingTournaments", onGoingTournaments);
         mav.addObject("finishedTournaments", finishedTournaments);
         mav.addObject("joinedTournaments", joinedTournaments);
+
+        return mav;
+    }
+
+    @RequestMapping("/search")
+    public ModelAndView search(@RequestParam("q") final String q, HttpServletRequest request){
+        final ModelAndView mav = new ModelAndView("searchResults");
+
+        mav.addObject("user", request.getSession().getAttribute("user"));
+        mav.addObject("games", gs.searchByName(q));
+        mav.addObject("tournaments", ts.searchByName(q));
 
         return mav;
     }
