@@ -14,7 +14,7 @@
     </c:when>
     <c:otherwise>
         <c:forEach var="participant" items="${participants}">
-            <c:if test="${participant.user_id == user.id}">
+            <c:if test="${participant.value.user_id == user.id}">
                 <c:set var="isParticipant" value="true"/>
             </c:if>
         </c:forEach>
@@ -54,18 +54,18 @@
                             <c:when test="${!hasJoined && tournamentImg.tournament.openInscriptions}">
                                 <c:choose>
                                     <c:when test="${tournamentImg.tournament.structure == LEAGUE}">
-                                        <c:set var="title" value="tournament.joinCard.title" />
-                                        <c:set var="text" value="tournament.joinCard.text" />
+                                        <c:set var="title" value="tournament.joinCard.title.league" />
+                                        <c:set var="text" value="tournament.joinCard.text.league" />
                                         <c:set var="icon" value="grid.png" />
                                     </c:when>
                                     <c:when test="${tournamentImg.tournament.structure == ELIMINATION}">
-                                        <c:set var="title" value="Beat them all and take the prize" />
-                                        <c:set var="text" value="Avoid being eliminated by winning every match" />
+                                        <c:set var="title" value="tournament.joinCard.title.elimination" />
+                                        <c:set var="text" value="tournament.joinCard.text.elimination" />
                                         <c:set var="icon" value="bracket.png" />
                                     </c:when>
                                     <c:when test="${tournamentImg.tournament.structure == HYBRID}">
-                                        <c:set var="title" value="Get advantage and beat them all" />
-                                        <c:set var="text" value="Get a top position in your group and then win every match" />
+                                        <c:set var="title" value="tournament.joinCard.title.hybrid" />
+                                        <c:set var="text" value="tournament.joinCard.text.hybrid" />
                                         <c:set var="icon" value="bracket.png" />
                                     </c:when>
                                 </c:choose>
@@ -85,7 +85,7 @@
                     <c:choose>
                         <c:when test="${tournamentImg.tournament.structure == LEAGUE}">
                             <c:if test="${not empty participants}">
-                                <paw:text type="title" size="l"><spring:message code="tournament.participants.title"/></paw:text>
+                                <paw:text type="title" size="l"><spring:message code="tournament.standings"/></paw:text>
                                 <paw:board participants="${participants}"/>
                                 <c:forEach var="g" items="${participants}">
                                     <c:if test="${g.key == 0}">
@@ -95,9 +95,11 @@
                             </c:if>
                         </c:when>
                         <c:when test="${tournamentImg.tournament.structure == ELIMINATION}">
-                            <paw:text type="title" size="l">Standings</paw:text>
                             <c:forEach var="groupEntry" items="${matchesByGroup}">
                                 <c:if test="${groupEntry.key == 0}">
+                                    <paw:text type="title" size="l">
+                                        <spring:message code="tournament.standings"/>
+                                    </paw:text>
                                     <paw:bracket matchesByStage="${groupEntry.value}" tournamentId="${tournamentImg.tournament.id}" isCreator="${isCreator}"/>
                                 </c:if>
                             </c:forEach>
@@ -113,7 +115,9 @@
                                     </c:forEach>
                                     <c:choose>
                                         <c:when test="${hasGroupZero}">
-                                            <paw:text type="title" size="l">Standings</paw:text>
+                                            <paw:text type="title" size="l">
+                                                <spring:message code="tournament.standings"/>
+                                            </paw:text>
                                             <c:forEach var="groupEntry" items="${matchesByGroup}">
                                                 <c:if test="${groupEntry.key == 0}">
                                                     <paw:bracket matchesByStage="${groupEntry.value}" tournamentId="${tournamentImg.tournament.id}" isCreator="${isCreator}"/>
@@ -123,7 +127,7 @@
                                         <c:otherwise>
                                             <c:forEach var="g" items="${participants}">
                                                 <paw:text type="title" size="l">
-                                                    Group ${g.key} Standings
+                                                    <spring:message code="tournament.groupStandings" arguments="${g.key}"/>
                                                 </paw:text>
                                                 <paw:board participants="${g.value}"/>
                                             </c:forEach>

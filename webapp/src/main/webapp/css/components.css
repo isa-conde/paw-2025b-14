@@ -48,6 +48,11 @@ body, html {
     transform: scale(1.02);
 }
 
+button:disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
+}
+
 /* ------- FONTS ------- */
 
 @font-face {
