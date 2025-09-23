@@ -113,6 +113,11 @@ public class GameJdbcDao implements GameDao {
     }
 
     @Override
+    public boolean checkNameExists(String name){
+        Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM game WHERE name = ?", Integer.class, name);
+        return count > 0;
+    }
+    @Override
     public List<GameFormat> getFormats(Long gameId) {
         return jdbcTemplate.query("SELECT * FROM game_format WHERE game_id = ?", ROW_MAPPER_FORMAT, gameId);
     }
