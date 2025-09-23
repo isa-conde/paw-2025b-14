@@ -1,9 +1,13 @@
 package ar.edu.itba.paw.webapp.form;
 
+import ar.edu.itba.paw.webapp.validation.PasswordMatches;
+import ar.edu.itba.paw.webapp.validation.PasswordValidation;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.validation.constraints.Pattern;
 
+@PasswordMatches
 public class UserForm {
 	//id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
 	//email text NOT NULL UNIQUE,
@@ -16,12 +20,13 @@ public class UserForm {
 	@NotNull(message = "This field is required")
 	private String username;
 	
-//	@Size(min = 8, max =31)
-//	private String password;
-//
-//	@Size(min = 8, max =31)
-//	private String repeatPassword;
-	
+	@PasswordValidation
+	@NotNull(message = "This field is required")
+	private String password;
+
+	@NotNull(message = "This field is required")
+	private String repeatPassword;
+
 	@Pattern(regexp = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}", message = "Invalid email format")
 	@NotNull(message = "This field is required")
 	private String email;
@@ -32,18 +37,18 @@ public class UserForm {
 	public void setUsername(String username) {
 		this.username = username;
 	}
-//	public String getPassword() {
-//		return password;
-//	}
-//	public void setPassword(String password) {
-//		this.password = password;
-//	}
-//	public String getRepeatPassword() {
-//		return repeatPassword;
-//	}
-//	public void setRepeatPassword(String repeatPassword) {
-//		this.repeatPassword = repeatPassword;
-//	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	public String getRepeatPassword() {
+		return repeatPassword;
+	}
+	public void setRepeatPassword(String repeatPassword) {
+		this.repeatPassword = repeatPassword;
+	}
 	public String getEmail() {
 		return email;
 	}

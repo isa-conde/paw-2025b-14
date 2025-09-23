@@ -8,9 +8,14 @@ public interface UserDao {
 
     Optional<User> findById(long id);
 
-    User create(String username, String email, String password);
-
-    Optional<User> authenticate(String username, String email, String password);
+    Optional<User> findByEmail(String email);
 
     Optional<User> findByUsername(String username);
+
+    User create(String username, String email, String password);
+
+    void changePassword(long user_id, String newPassword);
+
+    void verifyUser(long user_id);
+
 }

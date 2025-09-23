@@ -5,13 +5,15 @@ public class User {
     private final long id;
     private final String username;
     private final String email;
-    private final String password;
+    private String password;
+    private boolean verified;
 
-    public User(final long id, final String username, final String email, final String password) {
+    public User(final long id, final String username, final String email, String password) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
+        this.verified = false;
     }
 
     public long getId() {
@@ -30,4 +32,15 @@ public class User {
         return password;
     }
 
+    public boolean isVerified() {
+        return verified;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setVerified(boolean verified) {
+        this.verified = verified;
+    }
 }

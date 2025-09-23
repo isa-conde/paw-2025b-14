@@ -30,15 +30,6 @@ public class MailServiceImpl implements MailService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MailServiceImpl.class);
 
     @Override
-    public void sendSimpleMessage(String to, String subject, String text) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo("tvarettoni@itba.edu.ar", "isconde@itba.edu.ar", "ncanzonieri@itba.edu.ar", "btaccone@itba.edu.ar");
-        message.setSubject(subject);
-        message.setText(text);
-        mailSender.send(message);
-    }
-
-    @Override
     public void sendTournamentCreatedEmail(String userName, String tournamentName, String tournamentLink, String recipient) {
         Context ctx = new Context();
         ctx.setVariable("userName", userName);
@@ -47,19 +38,7 @@ public class MailServiceImpl implements MailService {
 
         String body = templateEngine.process("tournament-creation-confirmation", ctx);
 
-        MimeMessage mimeMessage = mailSender.createMimeMessage();
-        try {
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, StandardCharsets.UTF_8.name());
-            helper.setTo(recipient);
-            helper.setSubject("Tournament Created!");
-            helper.setText(body, true);
-
-            mailSender.send(mimeMessage);
-        } catch (MessagingException e) {
-            throw new RuntimeException("Failed to build email", e);
-        } catch (MailException e) {
-            throw e;
-        }
+        sendEmail(recipient, "You just created " + tournamentName + "!", body);
     }
 
     @Override
@@ -72,13 +51,39 @@ public class MailServiceImpl implements MailService {
 
         String body = templateEngine.process("tournament-joined-confirmation", ctx);
 
+        sendEmail(recipient, "You just joined " + tournamentName + "!", body);
+    }
+
+    @Override
+    public void sendVerificationEmail(Long userId, String userName, Long token, String recipient) {
+        Context ctx = new Context();
+        ctx.setVariable("userName", userName);
+        String verificationUrl = "http://localhost:8080/webapp_war_exploded/verify/confirm?token=" + token.toString() + "&userId=" + userId.toString();
+        ctx.setVariable("verificationUrl", verificationUrl);
+
+        String body = templateEngine.process("verification-email", ctx);
+
+        sendEmail(recipient, "Email Verification", body);
+    }
+
+    @Override
+    public void sendResetPasswordEmail(Long userId, Long token, String recipient) {
+        Context ctx = new Context();
+        String resetPasswordUrl = "http://localhost:8080/webapp_war_exploded/resetPassword?token=" + token.toString() + "&userId=" + userId;
+        ctx.setVariable("resetPasswordUrl", resetPasswordUrl);
+
+        String body = templateEngine.process("reset-password", ctx);
+
+        sendEmail(recipient, "Reset your Password", body);
+    }
+
+    private void sendEmail(String recipient, String subject, String body) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, StandardCharsets.UTF_8.name());
             helper.setTo(recipient);
-            helper.setSubject("You just joined a tournament!");
+            helper.setSubject(subject);
             helper.setText(body, true);
-
             mailSender.send(mimeMessage);
         } catch (MessagingException e) {
             throw new RuntimeException("Failed to build email", e);

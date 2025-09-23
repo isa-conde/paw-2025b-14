@@ -6,6 +6,9 @@
 <%@ attribute name="isIndex" required="true"%>
 
 <c:set var="isLoggedIn" value="${user != null}"/>
+
+<c:url value="/register" var="registerUrl"/>
+<c:url value="/login" var="loginUrl"/>
 <c:url value="/logout" var="logoutUrl"/>
 
 <html>
@@ -29,15 +32,17 @@
                         <paw:profileButton text="${user.username}" onclick="openModal('logoutModal')"/>
                         <paw:modal id="logoutModal" title="Logout">
                             <div class="row center">
-                                <paw:button text="Log out" onclick="window.location.href='${logoutUrl}'"/>
+                                <form:form method="post" action="${logoutUrl}">
+                                    <paw:input path="" label="Log Out" inputType="submit"/>
+                                </form:form>
                             </div>
                         </paw:modal>
                     </c:when>
                     <c:otherwise>
                         <c:if test="${isIndex == 'true'}">
                             <div>
-                                <paw:button text="Log in" size="m" onclick="openModal('loginModal')"/>
-                                <paw:button text="Register" size="m" onclick="openModal('registerModal')"/>
+                                <paw:button text="Log in" size="m" onclick="window.location.href='${loginUrl}'"/>
+                                <paw:button text="Register" size="m" onclick="window.location.href='${registerUrl}'"/>
                             </div>
                         </c:if>
                     </c:otherwise>

@@ -3,23 +3,18 @@ package ar.edu.itba.paw.webapp.config;
 import ar.edu.itba.paw.webapp.auth.PawUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
-import org.springframework.security.config.annotation.SecurityBuilder;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.web.WebSecurityConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Filter;
 
 @EnableWebSecurity
 @Configuration
@@ -29,6 +24,9 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private PawUserDetailsService userDetailsService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Value("classpath:rememberme.key")
     private Resource rememberMeKey;
 
@@ -36,17 +34,15 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.userDetailsService(userDetailsService)
         .sessionManagement()
-            .invalidSessionUrl("/login")
+            .invalidSessionUrl("/")
         .and().authorizeRequests()
-            .antMatchers("/login", "/create").anonymous()
+            .antMatchers("/login", "/register").anonymous()
+            .antMatchers("/", "/verify", "/verify/confirm").permitAll()
         .and().formLogin()
             .defaultSuccessUrl("/", false)
             .usernameParameter("j_username")
             .passwordParameter("j_password")
             .loginPage("/login")
-        .and().logout()
-            .logoutUrl("/logout")
-            .logoutSuccessUrl("/")
         .and().rememberMe()
             .rememberMeParameter("j_rememberme")
             .key(readRememberMeKey())
@@ -67,20 +63,15 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
         }
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         super.configure(auth);
-        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
     }
 
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring()
-                .antMatchers("/css/**", "/js/**", "/images/**", "favicon.ico");
+                .antMatchers("/css/**", "/js/**", "/images/**", "favicon.ico", "/fonts/**");
     }
 }

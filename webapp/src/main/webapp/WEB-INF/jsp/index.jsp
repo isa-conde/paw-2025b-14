@@ -18,33 +18,6 @@
     <c:url value="/register" var="userRegisterPath"/>
     <c:url value="/tournament/create" var="createTournamentPath"/>
 
-    <paw:modal id="loginModal" title="Log in">
-        <form:form cssClass="form" modelAttribute="loginForm" action="${userLoginPath}" method="post">
-            <div class="row">
-                <paw:input path="username" label="Username" hasConstraint="true"/>
-            </div>
-            <div class="row">
-                <paw:input path="email" label="Email" inputType="email" hasConstraint="true"/>
-            </div>
-            <div class="row center">
-                <paw:input path="" label="Log in" containerType="half" inputType="submit"/>
-            </div>
-        </form:form>
-    </paw:modal>
-    <paw:modal id="registerModal" title="Register">
-        <form:form cssClass="form" modelAttribute="registerForm" action="${userRegisterPath}" method="post">
-            <div class="row">
-                <paw:input path="username" label="Username" hasConstraint="true"/>
-            </div>
-            <div class="row">
-                <paw:input path="email" label="Email" inputType="email" hasConstraint="true"/>
-            </div>
-            <div class="row center">
-                <paw:input path="" label="Register" containerType="half" inputType="submit"/>
-            </div>
-        </form:form>
-    </paw:modal>
-
     <paw:banner size="l" image="${pageContext.request.contextPath}/images/arcane.jpg">
         <paw:text type="title" size="xl"><spring:message code="welcome.title"/></paw:text>
         <br>

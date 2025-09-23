@@ -7,8 +7,6 @@ import java.util.Collection;
 
 public class PawUserDetails extends org.springframework.security.core.userdetails.User {
 
-
-
     private User pawUser;
 
     public PawUserDetails(User user, Collection<? extends GrantedAuthority> authorities) {

@@ -66,6 +66,9 @@
                         </label>
                     </div>
                 </c:when>
+                <c:when test="${inputType == 'password'}">
+                    <form:input type="password" path="${path}" class="input"/>
+                </c:when>
             </c:choose>
         </form:label>
     </c:when>

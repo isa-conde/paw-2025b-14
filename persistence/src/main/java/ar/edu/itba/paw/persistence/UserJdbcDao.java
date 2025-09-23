@@ -33,21 +33,10 @@ public class UserJdbcDao implements UserDao {
 
     @Override
     public User create(String username, String email, String password) {
-        final Map<String, Object> values = Map.of("username", username, "email", email, "password", password);
+        final Map<String, Object> values = Map.of("username", username, "email", email, "password", password, "verified", false);
         final Number key = jdbcInsert.executeAndReturnKey(values);
 
         return new User(key.longValue(), username, email, password);
-    }
-
-    @Override
-    public Optional<User> authenticate(String username, String email, String password) {
-        return jdbcTemplate.query(
-                "SELECT * FROM users WHERE username = ? AND email = ? AND password = ?",
-                ROW_MAPPER,
-                username,
-                email,
-                password
-        ).stream().findFirst();
     }
 
     @Override
@@ -59,4 +48,18 @@ public class UserJdbcDao implements UserDao {
         ).stream().findFirst();
     }
 
+    @Override
+    public void changePassword(long user_id, String newPassword) {
+        jdbcTemplate.update("UPDATE users SET password = ? WHERE id = ?", newPassword, user_id);
+    }
+
+    @Override
+    public void verifyUser(long user_id) {
+        jdbcTemplate.update("UPDATE users SET verified = true WHERE id = ?", user_id);
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return jdbcTemplate.query("SELECT * FROM users WHERE email = ?", ROW_MAPPER, email).stream().findFirst();
+    }
 }

@@ -227,7 +227,7 @@ public class TournamentJdbcDao implements TournamentDao {
     */
     @Override
     public List<User> getTournamentUsers(Long tournament_id) {
-        return jdbcTemplate.query("SELECT u.id, u.username, u.email FROM users u " +
+        return jdbcTemplate.query("SELECT u.id, u.username, u.email, u.password FROM users u " +
                 "JOIN participant_user p ON u.id = p.user_id " +
                 "WHERE p.tournament_id = ?", ROW_MAPPER_USER, tournament_id);
     }
@@ -274,7 +274,6 @@ public class TournamentJdbcDao implements TournamentDao {
         if (t != null && !participants.isEmpty()) {
             int n = participants.size();
 
-            // Odd # of participants -> add fictional participant
             if (n % 2 != 0) {
                 participants.add(null);
                 n++;
