@@ -48,6 +48,8 @@ package ar.edu.itba.paw.persistence;
 
 
 import ar.edu.itba.paw.model.User;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -69,6 +71,7 @@ public class UserJdbcDaoTest {
     private static final String USERNAME = "johndoe";
     private static final String EMAIL = "some@mail.com";
     private static final String PASSWORD = "1234567890";
+    private static final Log log = LogFactory.getLog(UserJdbcDaoTest.class);
 
     @Autowired
     private DataSource ds;
@@ -117,25 +120,27 @@ public class UserJdbcDaoTest {
         final User user2 = userJdbcDao.create("janedoe",EMAIL,PASSWORD);
     }
 
-//    @Test
-//    public void testAuthenticate(){
-//        final User user = userJdbcDao.create(USERNAME,EMAIL,PASSWORD);
-//        final Optional<User> ans = userJdbcDao.authenticate(USERNAME,EMAIL);
-//
-//        Assert.assertNotNull(ans);
-//        Assert.assertTrue(ans.isPresent());
-//        Assert.assertEquals(USERNAME,ans.get().getUsername());
-//        Assert.assertEquals(EMAIL, ans.get().getEmail());
-//        Assert.assertEquals(ans.get().getId(), user.getId());
-//    }
+    @Test
+    public void testChangePassword(){
+        final User user = userJdbcDao.create(USERNAME,EMAIL,PASSWORD + "_old");
+        userJdbcDao.changePassword(user.getId(),PASSWORD);
+        final Optional<User> userUpdated = userJdbcDao.findById(user.getId());
 
-//    @Test
-//    public void testAuthenticateNonExistent(){
-//        final Optional<User> ans = userJdbcDao.authenticate(USERNAME,EMAIL);
-//
-//        Assert.assertNotNull(ans);
-//        Assert.assertTrue(ans.isEmpty());
-//    }
+        Assert.assertTrue(userUpdated.isPresent());
+        Assert.assertNotEquals(PASSWORD + "_old", userUpdated.get().getPassword());
+        Assert.assertEquals(PASSWORD, userUpdated.get().getPassword());
+    }
+
+    @Test
+    public void testVerify(){
+        final User user = userJdbcDao.create(USERNAME,EMAIL,PASSWORD);
+        userJdbcDao.verifyUser(user.getId());
+        final Optional<User> userVerified = userJdbcDao.findById(user.getId());
+
+        Assert.assertTrue(userVerified.isPresent());
+        Assert.assertFalse(user.isVerified());
+        Assert.assertTrue(userVerified.get().isVerified());
+    }
 
     @Test
     public void testCheckUsernameExists(){
