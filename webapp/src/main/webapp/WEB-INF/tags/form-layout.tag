@@ -5,8 +5,9 @@
 
 <html>
 <head>
-    <title><spring:message code="${title}"/></title>
     <link rel="stylesheet" href="<c:url value='/css/components.css'/>">
+    <link rel="icon" type="image/x-icon" href="<c:url value="/public/favicon.ico"/>">
+    <title>RankUp</title>
 </head>
 <body class="form-page">
     <jsp:doBody/>
