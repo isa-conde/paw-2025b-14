@@ -12,6 +12,6 @@
     <paw:text type="title"><spring:message code="passwordReset.sent.title"/></paw:text>
     <paw:text size="l"><spring:message code="passwordReset.sent.instruction"/></paw:text>
     <br>
-    <paw:button onclick="window.location.href='${loginUrl}'" text="requestPasswordResetPage.goToLoginButton"/>
+    <paw:button onclick="window.location.href='${loginUrl}'" text="passwordReset.sent.buttonLabel"/>
 
 </paw:form-layout>
