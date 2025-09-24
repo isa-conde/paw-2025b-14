@@ -5,6 +5,7 @@
 <%@ attribute name="id" required="true" rtexprvalue="true" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
 <c:set var="tournamentGame" value=""/>
 <c:set var="hasHeader" value="${not empty headerElements}"/>
@@ -13,7 +14,9 @@
 
 <c:choose>
     <c:when test="${elements.size() <= '0'}">
-        <div class="no-cards-container"><paw:text size="l" weight="thin">(No ${isGame? 'games' : 'tournaments'})</paw:text></div>
+        <spring:message code="elementGrid.noGames" var="noGames"/>
+        <spring:message code="elementGrid.noTournaments" var="noTournaments"/>
+        <div class="no-cards-container"><paw:text size="l" weight="thin">${isGame? noGames : noTournaments}</paw:text></div>
     </c:when>
     <c:otherwise>
         <div class="grid">
