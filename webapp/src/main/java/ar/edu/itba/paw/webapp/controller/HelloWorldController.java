@@ -22,6 +22,9 @@ import ar.edu.itba.paw.webapp.form.GameForm;
 import ar.edu.itba.paw.webapp.form.SetWinnerForm;
 import ar.edu.itba.paw.webapp.form.TournamentForm;
 import ar.edu.itba.paw.webapp.form.UserForm;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -220,6 +223,8 @@ public class HelloWorldController {
         return new ModelAndView("redirect:/" + g.getId());
     }
 
+    @Autowired
+    private MessageSource messageSource;
     @RequestMapping("/tournament")
     public ModelAndView tournamentPage(HttpServletRequest request, @RequestParam("tournamentId") final long tournamentId) {
         final ModelAndView mav = new ModelAndView("tournament");
@@ -231,11 +236,10 @@ public class HelloWorldController {
         Map<Integer, Map<Integer, List<MatchWithPlayers>>> matchesByGroup = ts.getTournamentMatchesByGroup(tournamentId);
 
         List<Integer> groupSections = new ArrayList<>(matchesByGroup.keySet());
-
+        Locale locale = LocaleContextHolder.getLocale();
         List<String> groupLabels = groupSections.stream()
-                .map(key -> "Group " + key)
+                .map(key -> messageSource.getMessage("tournament.group", new Object[]{key}, locale))
                 .collect(Collectors.toList());
-        mav.addObject("groupLabels", groupLabels);
 
         if(optionalTournament.isPresent()) {
             TournamentImg t = optionalTournament.get();

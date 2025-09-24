@@ -313,13 +313,27 @@ public class TournamentJdbcDao implements TournamentDao {
                 int groupNum = ((Number) g.get("group_number")).intValue();
 
                 Long first = jdbcTemplate.queryForObject(
-                        "SELECT user_id FROM participant_user WHERE tournament_id = ? AND group_number = ? ORDER BY points DESC LIMIT 1",
-                        Long.class, tournamentId, groupNum
+                        "SELECT pu.user_id " +
+                                "FROM participant_user pu " +
+                                "WHERE pu.tournament_id = ? AND pu.user_id IN (" +
+                                "   SELECT DISTINCT m.local_id FROM match m WHERE m.tournament_id = ? AND m.group_number = ? " +
+                                "   UNION " +
+                                "   SELECT DISTINCT m.visitor_id FROM match m WHERE m.tournament_id = ? AND m.group_number = ?" +
+                                ") " +
+                                "ORDER BY pu.points DESC LIMIT 1",
+                        Long.class, tournamentId, tournamentId, groupNum, tournamentId, groupNum
                 );
 
                 Long second = jdbcTemplate.queryForObject(
-                        "SELECT user_id FROM participant_user WHERE tournament_id = ? AND group_number = ? ORDER BY points DESC OFFSET 1 LIMIT 1",
-                        Long.class, tournamentId, groupNum
+                        "SELECT pu.user_id " +
+                                "FROM participant_user pu " +
+                                "WHERE pu.tournament_id = ? AND pu.user_id IN (" +
+                                "   SELECT DISTINCT m.local_id FROM match m WHERE m.tournament_id = ? AND m.group_number = ? " +
+                                "   UNION " +
+                                "   SELECT DISTINCT m.visitor_id FROM match m WHERE m.tournament_id = ? AND m.group_number = ?" +
+                                ") " +
+                                "ORDER BY pu.points DESC OFFSET 1 LIMIT 1",
+                        Long.class, tournamentId, tournamentId, groupNum, tournamentId, groupNum
                 );
 
                 firstPlaces.add(first);
@@ -480,13 +494,16 @@ public class TournamentJdbcDao implements TournamentDao {
                         "SELECT group_number FROM match WHERE tournament_id = ? AND id = ?",
                         Integer.class, tournamentId, matchId
                 );
-                if(isFinished && group_number > 0) {
-                    createBracketFromGroups(tournamentId);
-                    totalMatches = jdbcTemplate.queryForObject(
-                            "SELECT COUNT(*) FROM match WHERE tournament_id = ?",
-                            Integer.class, tournamentId
-                    );
-                    isFinished = totalMatches.equals(finishedMatches);
+                if(group_number > 0) {
+                    jdbcTemplate.update("UPDATE participant_user SET points = points + 3 WHERE user_id = ?", winnerId);
+                    if(isFinished) {
+                        createBracketFromGroups(tournamentId);
+                        totalMatches = jdbcTemplate.queryForObject(
+                                "SELECT COUNT(*) FROM match WHERE tournament_id = ?",
+                                Integer.class, tournamentId
+                        );
+                        isFinished = totalMatches.equals(finishedMatches);
+                    }
                 } else if (group_number == 0) {
                     setNextMatchInfo(matchId, tournamentId, winnerId);
                 }

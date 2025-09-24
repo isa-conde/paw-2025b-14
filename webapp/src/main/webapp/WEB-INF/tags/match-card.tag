@@ -28,7 +28,7 @@
             <paw:text size="s" weight="semi-bold"><c:out value="${visitorPlayer}"/></paw:text>
         </div>
     </div>
-    
+    <spring:message code="tournament.wins" var="wins"/>
     <c:if test="${isCreator == true && winner == 0 && localPlayerId > 0 && visitorPlayerId > 0}">
         <div class="match-actions">
             <form method="post" action="${pageContext.request.contextPath}/tournament/setWinner" style="display: inline;">
@@ -36,8 +36,7 @@
                 <input type="hidden" name="tournamentId" value="${tournamentId}"/>
                 <input type="hidden" name="winner" value="1"/>
                 <button type="submit" class="action-button local-win">
-                    <spring:message code="tournament.wins" var="wins"/>
-                    <paw:text size="xs"><c:out value="${visitorPlayer} ${wins}"/></paw:text>
+                    <paw:text size="xs"><c:out value="${localPlayer} ${wins}"/></paw:text>
                 </button>
             </form>
             <form method="post" action="${pageContext.request.contextPath}/tournament/setWinner" style="display: inline;">
@@ -45,7 +44,6 @@
                 <input type="hidden" name="tournamentId" value="${tournamentId}"/>
                 <input type="hidden" name="winner" value="2"/>
                 <button type="submit" class="action-button visitor-win">
-                    <spring:message code="tournament.wins" var="wins"/>
                     <paw:text size="xs"><c:out value="${visitorPlayer} ${wins}"/></paw:text>
                 </button>
             </form>
