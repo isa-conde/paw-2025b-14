@@ -186,7 +186,7 @@ public class HelloWorldController {
 
         final Tournament t = ts.create(user.getId(), form.getName(), optionalGame.get().getId(),
             form.getRegion(), form.getElo(), form.getStart_date(), form.getEnd_date(),
-            form.getFormat(), form.getStructure(), form.getMax_participants(), imageBytes, true, false, 0L);
+            form.getFormat(), form.getStructure(), form.getMax_participants(), imageBytes, true, false);
         String tournamentLink = request.getRequestURL().toString()
             .replace("/tournament/create", "/tournament?tournamentId=" + t.getId());
         ms.sendTournamentCreatedEmail(user.getUsername(), t.getName(), tournamentLink, user.getEmail());

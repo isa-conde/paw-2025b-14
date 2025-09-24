@@ -53,11 +53,15 @@
                     </div>
                     <c:choose>
                         <c:when test="${tournamentWinner != null && tournamentWinner > 0}">
-                            <c:forEach var="p" items="${participants.get(0)}">
-                                <c:if test="${p.user_id == tournamentWinner}">
-                                    <div class="cards-container">
-                                        <paw:winner-card winnerName="${p.username}"/>
-                                    </div>
+                            <c:forEach var="g" items="${participants}">
+                                <c:if test="${g.key == 0}">
+                                    <c:forEach var="p" items="${g.value}">
+                                        <c:if test="${p.user_id == tournamentWinner}">
+                                            <div class="cards-container">
+                                                <paw:winner-card winnerName="${p.username}"/>
+                                            </div>
+                                        </c:if>
+                                    </c:forEach>
                                 </c:if>
                             </c:forEach>
                         </c:when>

@@ -79,8 +79,8 @@ public class TournamentJdbcDao implements TournamentDao {
             rs.getLong("tournament_id"),
             rs.getObject("local_id") != null ? rs.getLong("local_id") : null,
             rs.getObject("visitor_id") != null ? rs.getLong("visitor_id") : null,
-            rs.getString("local_player_name"),
-            rs.getString("visitor_player_name"),
+            null,
+            null,
             rs.getObject("local_score") != null ? rs.getInt("local_score") : null,
             rs.getObject("visitor_score") != null ? rs.getInt("visitor_score") : null,
             rs.getObject("winner") != null ? rs.getInt("winner") : null,
@@ -99,7 +99,7 @@ public class TournamentJdbcDao implements TournamentDao {
     }
 
     @Override
-    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, byte[] image, Boolean open_inscriptions, Boolean is_finished, Long tournament_winner) {
+    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, byte[] image, Boolean open_inscriptions, Boolean is_finished) {
 
         SqlParameterSource img = new MapSqlParameterSource().addValue("image", image);
         Integer image_id = jdbcInsertImage.executeAndReturnKey(img).intValue();
@@ -118,11 +118,11 @@ public class TournamentJdbcDao implements TournamentDao {
                 .addValue("image_id", image_id)
                 .addValue("open_inscriptions", open_inscriptions)
                 .addValue("is_finished", is_finished)
-                .addValue("tournament_winner", tournament_winner);
+                .addValue("tournament_winner", null);
 
         Number key = jdbcInsert.executeAndReturnKey(values);
         createMatches(key.longValue());
-        return new Tournament(key.longValue(), creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, tournament_winner);
+        return new Tournament(key.longValue(), creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, null);
     }
 
     @Override
@@ -185,7 +185,7 @@ public class TournamentJdbcDao implements TournamentDao {
 
         if (t != null && !participants.isEmpty()) {
             if(t.getStructure().equals(Structure.ELIMINATION)) {
-                createMatchesBracket(t, participants, 1);
+                createMatchesBracket(t, participants, 1L);
             } else if (t.getStructure().equals(Structure.HYBRID)) {
                 createMatchesHybrid(t, participants);
             } else {
@@ -236,7 +236,7 @@ public class TournamentJdbcDao implements TournamentDao {
         }
     }
 
-    public void createMatchesBracket(Tournament t, List<ParticipantUser> participants, int firstMatchId) {
+    public void createMatchesBracket(Tournament t, List<ParticipantUser> participants, Long firstMatchId) {
          int n = participants.size();
 
         // Use the closest power of 2 (adding fictional participants)
@@ -249,7 +249,7 @@ public class TournamentJdbcDao implements TournamentDao {
         }
 
         int totalRounds = (int) (Math.log(participants.size()) / Math.log(2));
-        int matchId = firstMatchId;
+        Long matchId = firstMatchId;
 
         int matchesThisRound = participants.size() / 2;
         for (int round = 1; round <= totalRounds; round++) {
@@ -293,7 +293,7 @@ public class TournamentJdbcDao implements TournamentDao {
                 index += size;
             }
         }else{
-            createMatchesBracket(t, participants, 1);
+            createMatchesBracket(t, participants, 1L);
         }
     }
 
@@ -334,9 +334,9 @@ public class TournamentJdbcDao implements TournamentDao {
                 classifiedParticipants.add(visitor);
             }
 
-            Integer maxId = jdbcTemplate.queryForObject(
+            Long maxId = jdbcTemplate.queryForObject(
                     "SELECT COALESCE(MAX(id), 0) FROM match WHERE tournament_id = ?",
-                    Integer.class, tournamentId
+                    Long.class, tournamentId
             );
 
             createMatchesBracket(t, classifiedParticipants, maxId + 1);
@@ -654,7 +654,7 @@ public class TournamentJdbcDao implements TournamentDao {
             return ;
         }
 
-        Long winner = 0L;
+        Long winner = null;
 
         if (t.getStructure() == Structure.LEAGUE) {
             Integer maxPoints = jdbcTemplate.queryForObject(

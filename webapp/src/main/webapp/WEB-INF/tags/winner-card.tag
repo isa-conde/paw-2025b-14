@@ -12,7 +12,7 @@
         <div class="card-title">
             <spring:message code="tournament.winner" var="winner" arguments="${winnerName}"/>
             <paw:text type="title" size="l"><c:out value="${winner}"/></paw:text>
-            <img src="${pageContext.request.contextPath}/images/medal.png" alt="winner"/>
         </div>
+        <img src="${pageContext.request.contextPath}/images/medal.png" alt="winner"/>
     </div>
 </div>
