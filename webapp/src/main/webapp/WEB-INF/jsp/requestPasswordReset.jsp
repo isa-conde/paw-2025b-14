@@ -1,10 +1,15 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
-<paw:form-layout title="Password reset request sent">
+<c:url value="/login" var="loginUrl"/>
 
-    <paw:text type="title">Password reset request sent</paw:text>
-    <paw:text size="l">Please check your inbox to finish resetting your password.</paw:text>
+<paw:form-layout title="requestPasswordResetPage.pageTitle">
+
+    <paw:text type="title"><spring:message code="requestPasswordResetPage.pageHeader"/></paw:text>
+    <paw:text size="l"><spring:message code="requestPasswordResetPage.description"/></paw:text>
+    <br>
+    <paw:button onclick="window.location.href='${loginUrl}'" text="requestPasswordResetPage.goToLoginButton"/>
 
 </paw:form-layout>

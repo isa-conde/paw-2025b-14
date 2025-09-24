@@ -1,15 +1,20 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
 <c:url var="resendVerificationUrl" value="/verify?userId=${user.id}"/>
 
-<paw:form-layout title="Verify account">
+<paw:form-layout title="requestVerificationPage.pageTitle">
 
-    <paw:text type="title">Verify your account</paw:text>
-    <paw:text size="l">Please check your inbox to verify your account. If your link has expired, please resend the verification.</paw:text>
+    <paw:text type="title">
+        <spring:message code="requestVerificationPage.pageHeader"/>
+    </paw:text>
+    <paw:text size="l">
+        <spring:message code="requestVerificationPage.pageDescription"/>
+    </paw:text>
     <form:form method="post" action="${resendVerificationUrl}">
-        <paw:input path="" label="Resend Verification" inputType="submit"/>
+        <paw:input path="" label="requestVerificationPage.resendVerification" inputType="submit"/>
     </form:form>
 
 </paw:form-layout>

@@ -38,6 +38,10 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
         .and().authorizeRequests()
             .antMatchers("/login", "/register").anonymous()
             .antMatchers("/", "/verify", "/verify/confirm").permitAll()
+            .antMatchers("/tournament/create",
+                    "/tournament/join",
+                    "/tournament/closeInscriptions",
+                    "tournament/setWinner").hasRole("VERIFIED")
         .and().formLogin()
             .defaultSuccessUrl("/", false)
             .usernameParameter("j_username")

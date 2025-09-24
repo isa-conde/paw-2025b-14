@@ -205,8 +205,12 @@ public class HelloWorldController {
     }
 
     @RequestMapping(value = "/login")
-    public ModelAndView login() {
-        return new ModelAndView("loginPage");
+    public ModelAndView login(@RequestParam(value = "error", required = false) String error) {
+        ModelAndView mav = new ModelAndView("loginPage");
+        if(error != null) {
+            mav.addObject("invalidCredentials", true);
+        }
+        return mav;
     }
 
     @RequestMapping("/logout")
@@ -221,7 +225,11 @@ public class HelloWorldController {
             mav.addObject("openModal", "'createTournamentModal'");
             return mav;
         }
-        User user = us.findByUsername(principal.getName()).orElse(null);
+        User user = null;
+        if (principal != null) {
+            Optional<User> userOpt = us.findByUsername(principal.getName());
+            user = userOpt.orElse(null);
+        }
         Optional<Game> optionalGame = gs.findById(form.getGame_id());
 
         byte[] imageBytes = null;
@@ -278,12 +286,17 @@ public class HelloWorldController {
     public ModelAndView game(Principal principal, @RequestParam("game_id") final long game_id, @ModelAttribute("filterForm") FilterForm filterForm, TournamentFilter tf){
         final ModelAndView mav = new ModelAndView("game");
         Optional<GameImg> optionalGame = gs.findByIdWithImage(game_id);
+        User user = null;
+        if (principal != null) {
+            Optional<User> userOpt = us.findByUsername(principal.getName());
+            user = userOpt.orElse(null);
+        }
         if(optionalGame.isPresent()) {
             mav.addObject("game", optionalGame.get());
         } else {
             return new ModelAndView("index");
         }
-        mav.addObject("user", us.findByUsername(principal.getName()).orElse(null));
+        mav.addObject("user", user);
         mav.addObject("structures", Arrays.stream(Structure.values()).toList());
         mav.addObject("regions", Arrays.stream(Region.values()).toList());
         mav.addObject("elos", Arrays.stream(Elo.values()).toList());
@@ -301,7 +314,11 @@ public class HelloWorldController {
     @RequestMapping("/tournament")
     public ModelAndView tournamentPage(Principal principal, @RequestParam("tournamentId") final long tournamentId) {
         final ModelAndView mav = new ModelAndView("tournament");
-        User user = us.findByUsername(principal.getName()).orElse(null);
+        User user = null;
+        if (principal != null) {
+            Optional<User> userOpt = us.findByUsername(principal.getName());
+            user = userOpt.orElse(null);
+        }
         mav.addObject("user", user);
 
         Optional<TournamentImg> optionalTournament = ts.findByIdWithImg(tournamentId);
@@ -328,7 +345,11 @@ public class HelloWorldController {
 
     @RequestMapping(value = "/tournament/join", method = { RequestMethod.POST })
     public ModelAndView joinTournament(Principal principal, HttpServletRequest request, @RequestParam("tournamentId") final long tournamentId) {
-        User user = us.findByUsername(principal.getName()).orElse(null);
+        User user = null;
+        if (principal != null) {
+            Optional<User> userOpt = us.findByUsername(principal.getName());
+            user = userOpt.orElse(null);
+        }
         if (user == null) {
             return new ModelAndView("redirect:/");
         }
@@ -342,7 +363,11 @@ public class HelloWorldController {
 
     @RequestMapping(value = "/tournament/closeInscriptions", method = { RequestMethod.POST })
     public ModelAndView closeInscriptions(Principal principal, @RequestParam("tournamentId") final long tournamentId) {
-        User user = us.findByUsername(principal.getName()).orElse(null);
+        User user = null;
+        if (principal != null) {
+            Optional<User> userOpt = us.findByUsername(principal.getName());
+            user = userOpt.orElse(null);
+        }
         if (user == null) {
             return new ModelAndView("redirect:/");
         }
@@ -357,7 +382,11 @@ public class HelloWorldController {
 
     @RequestMapping(value = "/tournament/setWinner", method = { RequestMethod.POST })
     public ModelAndView setWinner(Principal principal, @ModelAttribute("setWinnerForm") SetWinnerForm form) {
-        User user = us.findByUsername(principal.getName()).orElse(null);
+        User user = null;
+        if (principal != null) {
+            Optional<User> userOpt = us.findByUsername(principal.getName());
+            user = userOpt.orElse(null);
+        }
         if (user == null) {
             return new ModelAndView("redirect:/");
         }
@@ -374,8 +403,13 @@ public class HelloWorldController {
     public ModelAndView tournamentsPage(Principal principal, @ModelAttribute("filterForm") FilterForm filterForm, TournamentFilter tf) {
         final ModelAndView mav = new ModelAndView("tournamentsPage");
         List<Game> allGames = gs.findAll();
+        User user = null;
+        if (principal != null) {
+            Optional<User> userOpt = us.findByUsername(principal.getName());
+            user = userOpt.orElse(null);
+        }
 
-        mav.addObject("user", us.findByUsername(principal.getName()).orElse(null));
+        mav.addObject("user", user);
         mav.addObject("games", allGames);
         mav.addObject("structures", Arrays.stream(Structure.values()).toList());
         mav.addObject("regions", Arrays.stream(Region.values()).toList());
@@ -412,8 +446,11 @@ public class HelloWorldController {
     public ModelAndView gamesPage(Principal principal) {
         final ModelAndView mav = new ModelAndView("gamesPage");
         List<GameImg> allGames = gs.findAllWithImg();
-        User user = us.findByUsername(principal.getName()).orElse(null);
-
+        User user = null;
+        if (principal != null) {
+            Optional<User> userOpt = us.findByUsername(principal.getName());
+            user = userOpt.orElse(null);
+        }
         mav.addObject("user", user);
         mav.addObject("games", allGames);
 
@@ -424,8 +461,11 @@ public class HelloWorldController {
     public ModelAndView myTournaments(Principal principal) {
         final ModelAndView mav = new ModelAndView("myTournaments");
 
-        User user = us.findByUsername(principal.getName()).orElse(null);
-
+        User user = null;
+        if (principal != null) {
+            Optional<User> userOpt = us.findByUsername(principal.getName());
+            user = userOpt.orElse(null);
+        }
         List<TournamentImg> allCreatedTournaments = ts.findByCreatorImg(user.getId());
 
         List<TournamentImg> onGoingTournaments = allCreatedTournaments.stream()
@@ -448,10 +488,15 @@ public class HelloWorldController {
     }
 
     @RequestMapping("/search")
-    public ModelAndView search(@RequestParam("q") final String q, HttpServletRequest request){
+    public ModelAndView search(@RequestParam("q") final String q, Principal principal){
         final ModelAndView mav = new ModelAndView("searchResults");
+        User user = null;
+        if (principal != null) {
+            Optional<User> userOpt = us.findByUsername(principal.getName());
+            user = userOpt.orElse(null);
+        }
 
-        mav.addObject("user", request.getSession().getAttribute("user"));
+        mav.addObject("user", user);
         mav.addObject("games", gs.searchByName(q));
         mav.addObject("tournaments", ts.searchByName(q));
 
