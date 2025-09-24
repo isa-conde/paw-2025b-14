@@ -21,9 +21,10 @@ public class Tournament {
     private final Integer image_id;
     private final Boolean open_inscriptions;
     private final Boolean is_finished;
+    private final Long tournament_winner;
 
 
-    public Tournament(Long id, Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Integer imageId, Boolean openInscriptions, Boolean isFinished) {
+    public Tournament(Long id, Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Integer imageId, Boolean openInscriptions, Boolean isFinished, Long tournament_winner) {
         this.id = id;
         this.creator_id = creator_id;
         this.name = name;
@@ -38,6 +39,7 @@ public class Tournament {
         this.image_id = imageId;
         this.open_inscriptions = openInscriptions;
         this.is_finished = isFinished;
+        this.tournament_winner = tournament_winner;
     }
 
     public Long getId() {
@@ -94,5 +96,9 @@ public class Tournament {
 
     public Boolean getFinished() {
         return is_finished;
+    }
+
+    public Long getTournament_winner() {
+        return tournament_winner;
     }
 }

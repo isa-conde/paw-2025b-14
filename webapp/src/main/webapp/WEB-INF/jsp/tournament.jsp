@@ -13,10 +13,12 @@
       <paw:no-access/>
     </c:when>
     <c:otherwise>
-        <c:forEach var="participant" items="${participants}">
-            <c:if test="${participant.value.user_id == user.id}">
-                <c:set var="isParticipant" value="true"/>
-            </c:if>
+        <c:forEach var="group" items="${participants}">
+            <c:forEach var="participant" items="${group.value}">
+                <c:if test="${participant.user_id == user.id}">
+                    <c:set var="isParticipant" value="true"/>
+                </c:if>
+            </c:forEach>
         </c:forEach>
         <paw:banner image="data:image/png;base64,${tournamentImg.base64Img}">
             <paw:text type="title" size="m" stroke="true">${game.name}</paw:text>
@@ -49,6 +51,17 @@
                         <paw:icon-card icon="${pageContext.request.contextPath}/images/level.png" text="${tournamentImg.tournament.elo}"/>
                         <paw:icon-card icon="${pageContext.request.contextPath}/images/members.png" text="${tournamentImg.tournament.max_participants} ${teams}"/>
                     </div>
+                    <c:choose>
+                        <c:when test="${tournamentWinner != null && tournamentWinner > 0}">
+                            <c:forEach var="p" items="${participants.get(0)}">
+                                <c:if test="${p.user_id == tournamentWinner}">
+                                    <div class="cards-container">
+                                        <paw:winner-card winnerName="${p.username}"/>
+                                    </div>
+                                </c:if>
+                            </c:forEach>
+                        </c:when>
+                    </c:choose>
                     <div class="cards-container">
                         <c:choose>
                             <c:when test="${!hasJoined && tournamentImg.tournament.openInscriptions}">

@@ -186,7 +186,7 @@ public class HelloWorldController {
 
         final Tournament t = ts.create(user.getId(), form.getName(), optionalGame.get().getId(),
             form.getRegion(), form.getElo(), form.getStart_date(), form.getEnd_date(),
-            form.getFormat(), form.getStructure(), form.getMax_participants(), imageBytes, true, false);
+            form.getFormat(), form.getStructure(), form.getMax_participants(), imageBytes, true, false, 0L);
         String tournamentLink = request.getRequestURL().toString()
             .replace("/tournament/create", "/tournament?tournamentId=" + t.getId());
         ms.sendTournamentCreatedEmail(user.getUsername(), t.getName(), tournamentLink, user.getEmail());
@@ -241,6 +241,7 @@ public class HelloWorldController {
             mav.addObject("LEAGUE", Structure.LEAGUE);
             mav.addObject("ELIMINATION", Structure.ELIMINATION);
             mav.addObject("HYBRID", Structure.HYBRID);
+            mav.addObject("tournamentWinner", t.getTournament().getTournament_winner());
         } else {
             return new ModelAndView("index");
         }

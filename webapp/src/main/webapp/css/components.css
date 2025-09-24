@@ -53,6 +53,10 @@ button:disabled {
     cursor: not-allowed;
 }
 
+.winner-card-content {
+
+}
+
 /* ------- FONTS ------- */
 
 @font-face {

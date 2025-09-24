@@ -49,8 +49,8 @@ public class TournamentServiceImpl implements TournamentService {
 
 
     @Override
-    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, byte[] image, Boolean openInscriptions, Boolean isFinished) {
-        return tournamentDao.create(creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image, openInscriptions, isFinished);
+    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, byte[] image, Boolean openInscriptions, Boolean isFinished, Long tournament_winner) {
+        return tournamentDao.create(creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image, openInscriptions, isFinished, tournament_winner);
     }
 
     @Override
@@ -172,8 +172,8 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public void setFinished(Long tournament_id) {
-        tournamentDao.setFinished(tournament_id);
+    public void setFinished(Long tournament_id, Long match_id) {
+        tournamentDao.setFinished(tournament_id, match_id);
     }
 
     @Override
@@ -205,5 +205,4 @@ public class TournamentServiceImpl implements TournamentService {
     public List<TournamentImg> searchByName(String name){
         return tournamentDao.searchByName(name);
     }
-
 }

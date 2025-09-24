@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.interfaces.persistence;
 
 import ar.edu.itba.paw.model.ParticipantUser;
+import ar.edu.itba.paw.model.ParticipantUserInfo;
 import ar.edu.itba.paw.model.Tournament.TournamentImg;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Structure;
@@ -23,7 +24,7 @@ public interface TournamentDao {
 
     public List<Tournament> findGameTournaments(Long game_id);
 
-    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, byte[] image_id, Boolean openInscriptions, Boolean isFinished);
+    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, byte[] image_id, Boolean openInscriptions, Boolean isFinished, Long tournament_winner);
 
     public void joinTournamentUser(Long user_id, Long tournament_id);
 
@@ -45,7 +46,7 @@ public interface TournamentDao {
 
     public List<TournamentImg> findByCreatorImg(Long creator_id);
 
-    public void setFinished(Long tournament_id);
+    public void setFinished(Long tournament_id, Long match_id);
 
     public Boolean hasJoined(Long userId, Long tournamentId);
 
