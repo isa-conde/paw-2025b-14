@@ -164,7 +164,7 @@ public class TournamentJdbcDao implements TournamentDao {
     */
     @Override
     public List<User> getTournamentUsers(Long tournament_id) {
-        return jdbcTemplate.query("SELECT u.id, u.username, u.email, u.password FROM users u " +
+        return jdbcTemplate.query("SELECT u.id, u.username, u.email, u.password, u.verified FROM users u " +
                 "JOIN participant_user p ON u.id = p.user_id " +
                 "WHERE p.tournament_id = ?", ROW_MAPPER_USER, tournament_id);
     }

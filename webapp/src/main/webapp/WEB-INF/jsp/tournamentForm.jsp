@@ -5,7 +5,7 @@
 <spring:message code="createTournament.emptyOption" var="emptyOption"/>
 
 
-<paw:layout user="${user}" isIndex="false">
+<paw:layout user="${user}">
     <div class="tournamentForm-page">
         <div class="tournamentForm-page__image">
             <img src="${pageContext.request.contextPath}/images/tournament.jpeg" alt="Tournament Image" />
