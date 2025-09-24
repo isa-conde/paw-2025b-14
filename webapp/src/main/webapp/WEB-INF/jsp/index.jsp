@@ -5,16 +5,8 @@
 <spring:message code="home.createTournament.emptyOption" var="emptyOption"/>
 
 <paw:layout user="${user != null ? user : null}" function="${openModal}">
-<c:choose>
-    <c:when test="${not empty user}">
-        <c:set var="createTournamentFunction" value="window.location.href='${pageContext.request.contextPath}/tournaments/new/step1'"/>
-        <c:set var="joinTournamentFunction" value="window.location.href='${pageContext.request.contextPath}/tournamentsPage'"/>
-    </c:when>
-    <c:otherwise>
-        <c:set var="createTournamentFunction" value="openModal('loginModal')"/>
-        <c:set var="joinTournamentFunction" value="openModal('loginModal')"/>
-    </c:otherwise>
-</c:choose>
+    <c:set var="createTournamentFunction" value="window.location.href='${pageContext.request.contextPath}/tournaments/new/step1'"/>
+    <c:set var="joinTournamentFunction" value="window.location.href='${pageContext.request.contextPath}/tournamentsPage'"/>
     <c:url value="/login" var="userLoginPath"/>
     <c:url value="/register" var="userRegisterPath"/>
     <c:url value="/tournaments/new/step2" var="createTournamentPath"/>
@@ -26,22 +18,11 @@
     </paw:banner>
     <div class="content-container">
         <div class="cards-container">
-            <c:choose>
-                <c:when test="${user != null}">
-                    <paw:button-card
-                            title="home.createTournament.title"
-                            butText="home.createTournament.butText"
-                            onclick="${createTournamentFunction}"
-                            texture="true"/>
-                </c:when>
-                <c:otherwise>
-                    <paw:button-card
-                            title="home.createTournament.title"
-                            butText="home.createTournament.butText"
-                            onclick="openModal('loginModal')"
-                            texture="true"/>
-                </c:otherwise>
-            </c:choose>
+            <paw:button-card
+                    title="home.createTournament.title"
+                    butText="home.createTournament.butText"
+                    onclick="${createTournamentFunction}"
+                    texture="true"/>
             <paw:button-card title="home.joinTournament.title" butText="home.joinTournament.butText" onclick="${joinTournamentFunction}" texture="true"/>
         </div>
         <div class="content-title">
