@@ -4,9 +4,8 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <c:url var="resendVerificationUrl" value="/verify?userId=${user.id}"/>
-<spring:message code='accountVerification.page.title' var="title"/>
 
-<paw:form-layout title="${title}">
+<paw:form-layout title="accountVerification.page.title">
 
     <paw:text type="title"><spring:message code="accountVerification.title"/></paw:text>
     <paw:text size="l"><spring:message code="accountVerification.instruction"/></paw:text>

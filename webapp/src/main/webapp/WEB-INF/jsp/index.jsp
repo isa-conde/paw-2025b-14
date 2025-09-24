@@ -4,7 +4,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <spring:message code="home.createTournament.emptyOption" var="emptyOption"/>
 
-<paw:layout user="${user != null ? user : null}" function="${openModal}" isIndex="true">
+<paw:layout user="${user != null ? user : null}" function="${openModal}">
 <c:choose>
     <c:when test="${not empty user}">
         <c:set var="createTournamentFunction" value="openModal('createTournamentModal')"/>

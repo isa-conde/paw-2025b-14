@@ -76,7 +76,7 @@ public class HelloWorldController {
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public ModelAndView register(@Valid @ModelAttribute("registerForm") UserForm form, final BindingResult result) {
+    public ModelAndView register(@Valid @ModelAttribute("registerForm") UserForm form, final BindingResult result, HttpServletRequest request) {
         if (result.hasErrors()) {
             return registerPage(form);
         }
@@ -91,7 +91,8 @@ public class HelloWorldController {
             result.rejectValue("username", "error.registerForm.usernameUsed", e.getMessage());
             // TODO: add mav return?
         }
-        us.sendVerificationEmail(form.getEmail());
+        String baseUrl = getBaseUrl(request);
+        us.sendVerificationEmail(form.getEmail(), baseUrl);
         return new ModelAndView("redirect:/verify?userId=" + user.getId());
     }
 
@@ -101,9 +102,10 @@ public class HelloWorldController {
     }
 
     @RequestMapping(value = "/verify", method = RequestMethod.POST)
-    public ModelAndView resendVerification(@RequestParam("userId") long userId) {
+    public ModelAndView resendVerification(@RequestParam("userId") long userId, HttpServletRequest request) {
         Optional<User> user = us.findById(userId);
-        us.sendVerificationEmail(user.get().getEmail());
+        String baseUrl = getBaseUrl(request);
+        us.sendVerificationEmail(user.get().getEmail(), baseUrl);
         return new ModelAndView("redirect:/verify?userId=" + userId);
     }
 
@@ -136,11 +138,12 @@ public class HelloWorldController {
     }
 
     @RequestMapping(value = "/forgotPassword", method = RequestMethod.POST)
-    public ModelAndView forgotPassword(@Valid @ModelAttribute("emailForm") EmailForm emailForm, BindingResult result) {
+    public ModelAndView forgotPassword(@Valid @ModelAttribute("emailForm") EmailForm emailForm, BindingResult result, HttpServletRequest request) {
         if(result.hasErrors()) {
             return forgotPasswordPage(emailForm);
         }
-        us.requestPasswordReset(emailForm.getEmail());
+        String baseUrl = getBaseUrl(request);
+        us.requestPasswordReset(emailForm.getEmail(), baseUrl);
         return new ModelAndView("redirect:/requestPasswordReset");
     }
 
@@ -523,5 +526,13 @@ public class HelloWorldController {
         mav.addObject("tournaments", ts.searchByName(q));
 
         return mav;
+    }
+
+    private String getBaseUrl(HttpServletRequest request) {
+        return request.getScheme() + "://" +
+                request.getServerName() +
+                (request.getServerPort() != 80 && request.getServerPort() != 443 ?
+                        ":" + request.getServerPort() : "") +
+                request.getContextPath();
     }
 }

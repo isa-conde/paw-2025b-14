@@ -6,7 +6,7 @@
 <c:url var="registerUrl" value="/register"/>
 <c:url var="loginUrl" value="/login"/>
 
-<paw:form-layout title="<spring:message code='register.page.title'/>">
+<paw:form-layout title="register.page.title">
     <paw:text type="title"><spring:message code="register.page.header"/></paw:text>
     <form:form cssClass="form-container" modelAttribute="registerForm" action="${registerUrl}" method="post">
         <div>

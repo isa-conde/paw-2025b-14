@@ -6,8 +6,7 @@
 <c:url value="/login" var="loginUrl"/>
 
 
-<spring:message code='passwordReset.sent.title' var="title"/>
-<paw:form-layout title="${title}">
+<paw:form-layout title="passwordReset.sent.title">
 
     <paw:text type="title"><spring:message code="passwordReset.sent.title"/></paw:text>
     <paw:text size="l"><spring:message code="passwordReset.sent.instruction"/></paw:text>

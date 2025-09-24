@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void requestPasswordReset(String email) {
+    public void requestPasswordReset(String email, String baseUrl) {
         Optional<User> user = findByEmail(email);
         if (user.isEmpty()) {
             // TODO: handle unaffiliated email
@@ -72,11 +72,11 @@ public class UserServiceImpl implements UserService {
         long userId = user.get().getId();
         String username = user.get().getUsername();
         Token token = generateToken(userId, RESET_PASSWORD_DAYS_DURATION);
-        ms.sendResetPasswordEmail(userId, token.getToken(), email);
+        ms.sendResetPasswordEmail(userId, token.getToken(), email, baseUrl);
     }
 
     @Override
-    public void sendVerificationEmail(String email) {
+    public void sendVerificationEmail(String email, String baseUrl) {
         Optional<User> user = findByEmail(email);
         if(user.isEmpty()) {
             // TODO: handle unaffiliated email
@@ -85,7 +85,7 @@ public class UserServiceImpl implements UserService {
         long userId = user.get().getId();
         String username = user.get().getUsername();
         Token token = generateToken(userId, VERIFICATION_DAYS_DURATION);
-        ms.sendVerificationEmail(userId, username, token.getToken(), email);
+        ms.sendVerificationEmail(userId, username, token.getToken(), email, baseUrl);
     }
 
     @Override
