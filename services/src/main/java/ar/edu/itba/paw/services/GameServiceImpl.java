@@ -64,4 +64,9 @@ public class GameServiceImpl implements GameService {
     public Optional<GameImg> findByIdWithImage(long id){
         return gameDao.findByIdWithImage(id);
     }
+
+    @Override
+    public List<GameFormat> getFormats(Long gameId) {
+        return gameDao.getFormats(gameId);
+    }
 }

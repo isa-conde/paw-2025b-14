@@ -1,0 +1,63 @@
+<%@ taglib prefix="c"   uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<spring:message code="createTournament.emptyOption" var="emptyOption"/>
+
+
+<paw:layout user="${user}" isIndex="false">
+    <div class="tournamentForm-page">
+        <div class="tournamentForm-page__image">
+            <img src="${pageContext.request.contextPath}/images/tournament.jpeg" alt="Tournament Image" />
+        </div>
+
+        <div class="tournamentForm-page__form">
+            <c:choose>
+                <c:when test="${step == 1}">
+                    <form:form cssClass="form center" modelAttribute="tournamentForm" action="${pageContext.request.contextPath}/tournaments/new/step1" method="post" enctype="multipart/form-data">
+                        <div>
+                            <paw:text type="title" size="xl"><spring:message code="createTournament.Step1"/></paw:text>
+                            <div class="row">
+                                <paw:input path="name" label="home.createTournament.name" hasConstraint="true"/>
+                            </div>
+                            <div class="row">
+                                <paw:input path="region" label="home.createTournament.region" inputType="select" items="${regions}" hasConstraint="true" emptyOption="${emptyOption}"/>
+                                <paw:input path="game_id" label="home.createTournament.game"  inputType="select" items="${games}" itemValue="id" itemLabel="name" hasConstraint="true" emptyOption="${emptyOption}"/>
+                            </div>
+                            <div class="row">
+                                <paw:input path="structure" label="home.createTournament.structure" inputType="select" items="${structures}" emptyOption="${emptyOption}" hasConstraint="true"/>
+                            </div>
+                            <div class="row">
+                                <paw:input path="start_date" label="home.createTournament.startDate"  inputType="date" hasConstraint="true"/>
+                                <paw:input path="end_date" label="home.createTournament.endDate" inputType="date" hasConstraint="true"/>
+                            </div>
+                            <div class="row center">
+                                <paw:input path="" label="createTournament.next" containerType="half" inputType="submit"/>
+                            </div>
+                        </div>
+                    </form:form>
+                </c:when>
+                <c:when test="${step == 2}">
+                    <form:form cssClass="form" modelAttribute="tournamentForm" action="${pageContext.request.contextPath}/tournaments/new/step2" method="post" enctype="multipart/form-data">
+                        <div>
+                            <paw:text type="title" size="xl"><spring:message code="createTournament.Step2"/></paw:text>
+                            <div class="row">
+                                <paw:input path="max_participants" label="home.createTournament.maxParticipants" inputType="number" hasConstraint="true"/>
+                                <paw:input path="format" label="home.createTournament.format" hasConstraint="true" inputType="select" items="${formats}" itemLabel="name" itemValue="name"/>
+                            </div>
+                            <div class="row center">
+                                <paw:input path="elo" label="home.createTournament.skillLevel" inputType="select" items="${elos}" hasConstraint="true" emptyOption="${emptyOption}"/>
+                                <paw:input path="image" label="home.createTournament.image" inputType="file" hasConstraint="true"/>
+                            </div>
+                            <div class="row center">
+                                <paw:input path="" label="createTournament.create" containerType="half" inputType="submit"/>
+                            </div>
+                        </div>
+                    </form:form>
+                </c:when>
+            </c:choose>
+        </div>
+
+    </div>
+</paw:layout>
+

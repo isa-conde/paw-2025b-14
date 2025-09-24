@@ -1,5 +1,6 @@
 <%@ tag language="java" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ attribute name="href" required="true" %>
 <%@ attribute name="text" required="true" %>
 <%@ attribute name="size" required="false" %>
@@ -11,6 +12,5 @@
 <a href="${href}"
    class="link-btn"
    target="${targetAttr}">
-    <c:out value="${text}"/>
+    <spring:message code="${text}" text="${text}"/>
 </a>
-

@@ -29,6 +29,8 @@ public class GameJdbcDao implements GameDao {
 
     private static final RowMapper<GameImg> ROW_MAPPER_IMG = (rs, rowNum) -> new GameImg(new Game(rs.getLong("id"), rs.getString("name"), Genre.valueOf(rs.getString("genre")), rs.getInt("image_id")), Base64.getEncoder().encodeToString(rs.getBytes("image")));
 
+    private static final RowMapper<GameFormat> ROW_MAPPER_FORMAT = (rs, rowNum) -> new GameFormat(rs.getLong("id"), rs.getString("name"), rs.getInt("players_per_team"), rs.getLong("game_id"));
+
     @Autowired
     public GameJdbcDao(final DataSource ds) {
         jdbcTemplate = new JdbcTemplate(ds);
@@ -108,6 +110,11 @@ public class GameJdbcDao implements GameDao {
     public Optional<GameImg> findByIdWithImage(long id) {
         return jdbcTemplate.query("SELECT g.*, i.image FROM game g LEFT JOIN image i ON g.image_id = i.id WHERE g.id = ?", ROW_MAPPER_IMG, id
         ).stream().findFirst();
+    }
+
+    @Override
+    public List<GameFormat> getFormats(Long gameId) {
+        return jdbcTemplate.query("SELECT * FROM game_format WHERE game_id = ?", ROW_MAPPER_FORMAT, gameId);
     }
 
 }
