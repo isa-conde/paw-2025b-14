@@ -28,7 +28,7 @@
                         <c:when test="${itemLabel != null && itemValue != null}">
                             <form:select path="${path}" cssClass="input">
                                 <c:if test="${emptyOption != null}">
-                                    <form:option value="${null}" label="${emptyOption}"/>
+                                    <form:option value="" label="${emptyOption}"/>
                                 </c:if>
                                 <form:options items="${items}" itemLabel="${itemLabel}" itemValue="${itemValue}"/>
                             </form:select>
@@ -36,7 +36,7 @@
                         <c:otherwise>
                             <form:select path="${path}" cssClass="input">
                                 <c:if test="${emptyOption != null}">
-                                    <form:option value="" label="${emptyOption}"/>
+                                    <form:option value="${null}" label="${emptyOption}"/>
                                 </c:if>
                                 <form:options items="${items}"/>
                             </form:select>

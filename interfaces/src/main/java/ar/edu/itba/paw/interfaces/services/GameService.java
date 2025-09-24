@@ -27,4 +27,6 @@ public interface GameService {
     public List<GameImg> findAllWithImg();
 
     public Optional<GameImg> findByIdWithImage(long id);
+
+    public List<GameFormat> getFormats(Long gameId);
 }
