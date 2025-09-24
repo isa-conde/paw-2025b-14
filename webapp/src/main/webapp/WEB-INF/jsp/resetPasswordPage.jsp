@@ -1,32 +1,35 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+
 
 <c:url var="resetPasswordUrl" value="/resetPassword?token=${token}&userId=${userId}"/>
 <c:url var="forgotPasswordUrl" value="/forgotPassword"/>
+<spring:message code='passwordReset.page.title' var="title"/>
 
-<paw:form-layout title="Reset Password">
+<paw:form-layout title="${title}">
     <c:choose>
         <c:when test="${validToken}">
-            <paw:text type="title">Reset Password</paw:text>
+            <paw:text type="title"><spring:message code="passwordReset.page.title"/></paw:text>
             <form:form cssClass="form-container" modelAttribute="resetPasswordForm" action="${resetPasswordUrl}" method="post">
                 <div>
-                    <paw:input path="newPassword" label="Password" inputType="password" hasConstraint="true"/>
+                    <paw:input path="newPassword" label="passwordReset.newPassword" inputType="password" hasConstraint="true"/>
                 </div>
                 <div>
-                    <paw:input path="confirmNewPassword" label="Confirm password" inputType="password" hasConstraint="true"/>
+                    <paw:input path="confirmNewPassword" label="passwordReset.confirmNewPassword" inputType="password" hasConstraint="true"/>
                 </div>
                 <div>
-                    <paw:input path="" label="Reset" inputType="submit"/>
+                    <paw:input path="" label="passwordReset.submit" inputType="submit"/>
                 </div>
             </form:form>
         </c:when>
         <c:otherwise>
-            <paw:text type="title">Password Reset failed</paw:text>
-            <paw:text size="l">Your token doesn't exist or has expired.</paw:text>
+            <paw:text type="title"><spring:message code="passwordReset.failed.title"/></paw:text>
+            <paw:text size="l"><spring:message code="passwordReset.failed.message"/></paw:text>
             <br>
-            <paw:button onclick="window.location.href='${forgotPasswordUrl}'" text="Resend Request"/>
+            <spring:message code='passwordReset.failed.resend' var="resend"/>
+            <paw:button onclick="window.location.href='${forgotPasswordUrl}'" text="${resend}"/>
         </c:otherwise>
     </c:choose>
-
 </paw:form-layout>
