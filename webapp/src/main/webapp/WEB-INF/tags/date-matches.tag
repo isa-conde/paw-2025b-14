@@ -8,6 +8,7 @@
 <%@ attribute name="totalMatches" required="false" rtexprvalue="true" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
 <div class="date-section">
     <div class="date-header">
@@ -17,25 +18,25 @@
                 
                 <c:choose>
                     <c:when test="${participantsInRound >= 64}">
-                        <paw:text type="title" size="m">Round of 64</paw:text>
+                        <paw:text type="title" size="m"><spring:message code="dateMatch.roundOf64"/></paw:text>
                     </c:when>
                     <c:when test="${participantsInRound >= 32}">
-                        <paw:text type="title" size="m">Round of 32</paw:text>
+                        <paw:text type="title" size="m"><spring:message code="dateMatch.roundOf32"/></paw:text>
                     </c:when>
                     <c:when test="${participantsInRound >= 16}">
-                        <paw:text type="title" size="m">Round of 16</paw:text>
+                        <paw:text type="title" size="m"><spring:message code="dateMatch.roundOf16"/></paw:text>
                     </c:when>
                     <c:when test="${participantsInRound >= 8}">
-                        <paw:text type="title" size="m">Quarter Final</paw:text>
+                        <paw:text type="title" size="m"><spring:message code="dateMatch.quarterFinal"/></paw:text>
                     </c:when>
                     <c:when test="${participantsInRound >= 4}">
-                        <paw:text type="title" size="m">Semi Final</paw:text>
+                        <paw:text type="title" size="m"><spring:message code="dateMatch.semiFinal"/></paw:text>
                     </c:when>
                     <c:when test="${participantsInRound >= 2}">
-                        <paw:text type="title" size="m">Final</paw:text>
+                        <paw:text type="title" size="m"><spring:message code="dateMatch.final"/></paw:text>
                     </c:when>
                     <c:otherwise>
-                        <paw:text type="title" size="m">Round of ${participantsInRound}</paw:text>
+                        <paw:text type="title" size="m"><spring:message code="dateMatch.other" arguments="${participantsInRound}"/></paw:text>
                     </c:otherwise>
                 </c:choose>
             </c:when>
