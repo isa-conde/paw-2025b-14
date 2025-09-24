@@ -1,5 +1,7 @@
 package ar.edu.itba.paw.webapp.form;
 
+import ar.edu.itba.paw.model.Game.Game;
+import ar.edu.itba.paw.model.Game.GameFormat;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
@@ -8,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import javax.validation.GroupSequence;
 import javax.validation.constraints.*;
 
 @ValidTournamentFormConstraint
@@ -16,31 +19,30 @@ public class TournamentForm {
     public interface StepOne {}
     public interface StepTwo {}
 
-    @NotBlank(message = "{home.createTournament.notNull}")
-    @Size(max = 100)
+    @NotBlank(message = "{home.createTournament.notNull}", groups = StepOne.class)
+    @Size(max = 100, groups = StepOne.class)
     private String name;
-    @NotNull(message = "{home.createTournament.notNull}")
+    @NotNull(message = "{home.createTournament.notNull}", groups = StepOne.class)
     private Long game_id;
-    @NotNull(message = "{home.createTournament.notNull}")
+    @NotNull(message = "{home.createTournament.notNull}", groups = StepOne.class)
     private Region region;
-    @NotNull(message = "{home.createTournament.notNull}")
+    @NotNull(message = "{home.createTournament.notNull}", groups = StepTwo.class)
     private Elo elo;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @NotNull(message = "{home.createTournament.notNull}")
+    @NotNull(message = "{home.createTournament.notNull}", groups = StepOne.class)
     private LocalDate start_date;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @NotNull(message = "{home.createTournament.notNull}")
+    @NotNull(message = "{home.createTournament.notNull}", groups = StepOne.class)
     private LocalDate end_date;
-    @Size(max = 255, message = "Format must be at most 255 characters long")
-    @NotBlank(message = "{home.createTournament.notNull}")
+    @NotBlank(message = "{home.createTournament.notNull}", groups = StepTwo.class)
     private String format;
-    @NotNull(message = "{home.createTournament.notNull}")
+    @NotNull(message = "{home.createTournament.notNull}", groups = StepOne.class)
     private Structure structure;
-    @NotNull(message = "{home.createTournament.notNull}")
-    @Min(value = 2, message = "{home.createTournament.minParticipants}")
-    @Max(value = 32, message = "{home.createTournament.maxParticipantsError}")
+    @NotNull(message = "{home.createTournament.notNull}", groups = StepTwo.class)
+    @Min(value = 4, message = "{home.createTournament.minParticipants}", groups = StepTwo.class)
+    @Max(value = 32, message = "{home.createTournament.maxParticipantsError}", groups = StepTwo.class)
     private Integer max_participants;
-    @NotNull(message = "{home.createTournament.notNull}")
+    @NotNull(message = "{home.createTournament.notNull}", groups = StepTwo.class)
     private MultipartFile image;
 
     public String getName() {

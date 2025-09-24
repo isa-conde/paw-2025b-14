@@ -33,6 +33,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.naming.Binding;
@@ -45,6 +46,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
+@SessionAttributes("tournamentForm")
 public class HelloWorldController {
 
     private final UserService us;
@@ -294,35 +296,6 @@ public class HelloWorldController {
         return new ModelAndView("redirect:/" + g.getId());
     }
 
-    @RequestMapping("/game")
-    public ModelAndView game(Principal principal, @RequestParam("game_id") final long game_id, @ModelAttribute("filterForm") FilterForm filterForm, TournamentFilter tf){
-        final ModelAndView mav = new ModelAndView("game");
-        Optional<GameImg> optionalGame = gs.findByIdWithImage(game_id);
-        User user = null;
-        if (principal != null) {
-            Optional<User> userOpt = us.findByUsername(principal.getName());
-            user = userOpt.orElse(null);
-        }
-        if(optionalGame.isPresent()) {
-            mav.addObject("game", optionalGame.get());
-        } else {
-            return new ModelAndView("index");
-        }
-        mav.addObject("user", user);
-        mav.addObject("structures", Arrays.stream(Structure.values()).toList());
-        mav.addObject("regions", Arrays.stream(Region.values()).toList());
-        mav.addObject("elos", Arrays.stream(Elo.values()).toList());
-
-        tf.setGame_id(game_id);
-        tf.setRegion(filterForm.getRegion());
-        tf.setElo(filterForm.getElo());
-
-        mav.addObject("tournaments", ts.findWithImg(tf));
-        mav.addObject("isFiltered", !tf.isEmpty());
-
-        return mav;
-    }
-
     @Autowired
     private MessageSource messageSource;
     @RequestMapping("/tournament")
@@ -526,6 +499,76 @@ public class HelloWorldController {
         mav.addObject("tournaments", ts.searchByName(q));
 
         return mav;
+    }
+
+    @RequestMapping("/tournaments/new/step1")
+    public ModelAndView newTournamentFormStep1(HttpServletRequest request, @ModelAttribute("tournamentForm") final TournamentForm form, Principal principal){
+        final ModelAndView mav = new ModelAndView("tournamentForm");
+
+        User user = us.findByUsername(principal.getName()).orElse(null);
+        mav.addObject("user", user);
+        mav.addObject("step", 1);
+        mav.addObject("games", gs.findAll());
+        mav.addObject("structures", Arrays.stream(Structure.values()).toList());
+        mav.addObject("regions", Arrays.stream(Region.values()).toList());
+
+        return mav;
+    }
+
+    @RequestMapping(value = "/tournaments/new/step1", method = RequestMethod.POST)
+    public ModelAndView validateStep1(@Validated(TournamentForm.StepOne.class) @ModelAttribute("tournamentForm") TournamentForm form, BindingResult result, HttpServletRequest request, Principal principal) {
+
+        ModelAndView mav = new ModelAndView("tournamentForm");
+
+        if (result.hasErrors()) {
+            return newTournamentFormStep1(request, form, principal);
+        } else {
+            return newTournamentFormStep2(request, form, principal);
+        }
+    }
+
+    @RequestMapping(value = "/tournaments/new/step2", method = { RequestMethod.GET })
+    public ModelAndView newTournamentFormStep2(HttpServletRequest request, @ModelAttribute("tournamentForm") final TournamentForm form, Principal principal){
+        final ModelAndView mav = new ModelAndView("tournamentForm");
+
+        User user = us.findByUsername(principal.getName()).orElse(null);
+        mav.addObject("user", user);
+        mav.addObject("step", 2);
+        mav.addObject("formats", gs.getFormats(form.getGame_id()));
+        mav.addObject("elos", Arrays.stream(Elo.values()).toList());
+        return mav;
+    }
+
+
+    @RequestMapping(value = "/tournaments/new/step2", method = { RequestMethod.POST })
+    public ModelAndView createTournament(Principal principal, HttpServletRequest request, @Validated(TournamentForm.StepTwo.class) @ModelAttribute("tournamentForm") final TournamentForm form, final BindingResult result, SessionStatus status) {
+        if (result.hasErrors()) {
+            return newTournamentFormStep2(request, form, principal);
+        }
+        User user = us.findByUsername(principal.getName()).orElse(null);
+        Optional<Game> optionalGame = gs.findById(form.getGame_id());
+
+        byte[] imageBytes = null;
+        try {
+            if (form.getImage() != null && !form.getImage().isEmpty()) {
+                imageBytes = form.getImage().getBytes();
+            }else {
+                result.rejectValue("image", "error.tournamentForm.emptyImage");
+                return newTournamentFormStep2(request, form,principal);
+            }
+        } catch (IOException e) {
+            result.rejectValue("image", "error.tournamentForm.invalidImage", e.getMessage());
+            return newTournamentFormStep2(request, form, principal);
+        }
+
+        final Tournament t = ts.create(user.getId(), form.getName(), optionalGame.get().getId(),
+                form.getRegion(), form.getElo(), form.getStart_date(), form.getEnd_date(),
+                form.getFormat(), form.getStructure(), form.getMax_participants(), imageBytes, true, false);
+        String tournamentLink = request.getRequestURL().toString()
+                .replace("/tournament/create", "/tournament?tournamentId=" + t.getId());
+        ms.sendTournamentCreatedEmail(user.getUsername(), t.getName(), tournamentLink, user.getEmail());
+        status.setComplete();
+        return new ModelAndView("redirect:/tournament?tournamentId=" + t.getId());
     }
 
     private String getBaseUrl(HttpServletRequest request) {
