@@ -47,7 +47,7 @@ public class GameServiceImplTest {
     @Test(expected = NameAlreadyUsedException.class)
     public void testCreateNameExists(){
         Mockito.when(mockDao.checkNameExists(NAME)).thenReturn(true);
-        Mockito.when(mockDao.create(Mockito.eq(NAME), Mockito.eq(GENRE), Mockito.eq(1))).thenReturn(new Game(1L, NAME, GENRE, 1));
+        //Mockito.when(mockDao.create(Mockito.eq(NAME), Mockito.eq(GENRE), Mockito.eq(1))).thenReturn(new Game(1L, NAME, GENRE, 1));
 
         gameService.create(NAME,GENRE,1);
     }
