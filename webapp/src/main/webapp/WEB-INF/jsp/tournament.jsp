@@ -197,28 +197,25 @@
                                             </c:forEach>
                                         </c:when>
                                         <c:otherwise>
-                                            <c:set var="subActiveSection" value="${param.group != null ? 'Group ' + param.group : 'Group 1'}" />
-                                            <div class="navbar">
-                                                <c:forEach var="groupEntry" items="${matchesByGroup}">
-                                                    <c:set var="groupName" value="Group ${groupEntry.key}" />
-                                                    <c:choose>
-                                                        <c:when test="${subActiveSection == groupName}">
-                                                            <div class="navbar-item active">${groupName}</div>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <div class="navbar-item">
-                                                                <a href="?tournamentId=${tournamentImg.tournament.id}&section=Matches&group=${groupEntry.key}">${groupName}</a>
-                                                            </div>
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                </c:forEach>
-                                            </div>
+                                            <c:set var="subActiveGroup" value="${param.group != null ? param.group : groupSections[0]}"/>
+
+                                            <paw:navbar sections="${groupSections}"
+                                                        labels="${groupLabels}"
+                                                        activeSection="${subActiveGroup}"
+                                                        paramName="group"/>
+
 
                                             <c:forEach var="groupEntry" items="${matchesByGroup}">
-                                                <c:set var="groupName" value="Group ${groupEntry.key}" />
-                                                <c:if test="${subActiveSection == groupName}">
+                                                <c:if test="${subActiveGroup == groupEntry.key}">
                                                     <c:forEach var="stageEntry" items="${groupEntry.value}">
-                                                        <paw:date-matches dateNumber="${stageEntry.key}" matches="${stageEntry.value}" tournamentId="${tournamentImg.tournament.id}" isCreator="${isCreator}" tournamentStructure="${tournamentImg.tournament.structure}" groupNumber="${groupEntry.key}" totalMatches="${stageEntry.value.size()}"/>
+                                                        <paw:date-matches
+                                                                dateNumber="${stageEntry.key}"
+                                                                matches="${stageEntry.value}"
+                                                                tournamentId="${tournamentImg.tournament.id}"
+                                                                isCreator="${isCreator}"
+                                                                tournamentStructure="${tournamentImg.tournament.structure}"
+                                                                groupNumber="${groupEntry.key}"
+                                                                totalMatches="${stageEntry.value.size()}"/>
                                                     </c:forEach>
                                                 </c:if>
                                             </c:forEach>

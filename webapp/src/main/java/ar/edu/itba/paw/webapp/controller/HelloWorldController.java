@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class HelloWorldController {
@@ -227,6 +228,15 @@ public class HelloWorldController {
 
         Optional<TournamentImg> optionalTournament = ts.findByIdWithImg(tournamentId);
 
+        Map<Integer, Map<Integer, List<MatchWithPlayers>>> matchesByGroup = ts.getTournamentMatchesByGroup(tournamentId);
+
+        List<Integer> groupSections = new ArrayList<>(matchesByGroup.keySet());
+
+        List<String> groupLabels = groupSections.stream()
+                .map(key -> "Group " + key)
+                .collect(Collectors.toList());
+        mav.addObject("groupLabels", groupLabels);
+
         if(optionalTournament.isPresent()) {
             TournamentImg t = optionalTournament.get();
             Optional<Game> optionalGame = gs.findById(t.getTournament().getGame_id());
@@ -237,7 +247,9 @@ public class HelloWorldController {
             mav.addObject("tournamentImg", t);
             mav.addObject("game", optionalGame.get());
             mav.addObject("creator", optionalUser.get());
-            mav.addObject("matchesByGroup", ts.getTournamentMatchesByGroup(tournamentId));
+            mav.addObject("matchesByGroup", matchesByGroup);
+            mav.addObject("groupSections", groupSections);
+            mav.addObject("groupLabels", groupLabels);
             mav.addObject("LEAGUE", Structure.LEAGUE);
             mav.addObject("ELIMINATION", Structure.ELIMINATION);
             mav.addObject("HYBRID", Structure.HYBRID);
