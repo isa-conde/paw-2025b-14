@@ -100,7 +100,6 @@
                     <c:when test="${tournamentImg.tournament.structure == LEAGUE}">
                         <c:if test="${not empty participants}">
                             <paw:text type="title" size="l"><spring:message code="tournament.standings"/></paw:text>
-                            <paw:board participants="${participants}"/>
                             <c:forEach var="g" items="${participants}">
                                 <c:if test="${g.key == 0}">
                                     <paw:board participants="${g.value}"/>

@@ -237,30 +237,51 @@ public class TournamentJdbcDao implements TournamentDao {
     }
 
     public void createMatchesBracket(Tournament t, List<ParticipantUser> participants, Long firstMatchId) {
-         int n = participants.size();
+        int n = participants.size();
 
-        // Use the closest power of 2 (adding fictional participants)
-        int powerOfTwo = 1;
-        while (powerOfTwo < n) {
-            powerOfTwo *= 2;
+        int floorPowerOfTwo = 1;
+        while (floorPowerOfTwo * 2 <= n) {
+            floorPowerOfTwo *= 2;
         }
-        while (participants.size() < powerOfTwo) {
-            participants.add(null);
-        }
+        int extras = n - floorPowerOfTwo;
 
-        int totalRounds = (int) (Math.log(participants.size()) / Math.log(2));
         Long matchId = firstMatchId;
+        int stage = 1;
 
-        int matchesThisRound = participants.size() / 2;
-        for (int round = 1; round <= totalRounds; round++) {
-            for (int i = 0; i < matchesThisRound; i++) {
-                ParticipantUser home = null;
-                ParticipantUser away = null;
+        List<ParticipantUser> nextRound = new ArrayList<>();
 
-                if (round == 1) {
-                    home = participants.get(2 * i);
-                    away = participants.get(2 * i + 1);
-                }
+        for (int i = 0; i < extras; i++) {
+            ParticipantUser home = participants.get(i * 2);
+            ParticipantUser away = participants.get(i * 2 + 1);
+
+            Map<String, Object> values = new HashMap<>();
+            values.put("id", matchId++);
+            values.put("tournament_id", t.getId());
+            values.put("local_id", home.getUser_id());
+            values.put("visitor_id", away.getUser_id());
+            values.put("local_score", null);
+            values.put("visitor_score", null);
+            values.put("winner", null);
+            values.put("stage", stage);
+            values.put("group_number", 0);
+            jdbcInsertMatch.execute(values);
+
+            nextRound.add(null);
+        }
+
+        for (int i = extras * 2; i < n; i++) {
+            nextRound.add(participants.get(i));
+        }
+
+        stage++;
+
+        while (nextRound.size() > 1) {
+            List<ParticipantUser> currentRound = nextRound;
+            nextRound = new ArrayList<>();
+
+            for (int i = 0; i < currentRound.size(); i += 2) {
+                ParticipantUser home = currentRound.get(i);
+                ParticipantUser away = (i + 1 < currentRound.size()) ? currentRound.get(i + 1) : null;
 
                 Map<String, Object> values = new HashMap<>();
                 values.put("id", matchId++);
@@ -270,11 +291,14 @@ public class TournamentJdbcDao implements TournamentDao {
                 values.put("local_score", null);
                 values.put("visitor_score", null);
                 values.put("winner", null);
-                values.put("stage", round);
+                values.put("stage", stage);
                 values.put("group_number", 0);
                 jdbcInsertMatch.execute(values);
+
+                nextRound.add(null);
             }
-            matchesThisRound /= 2;
+
+            stage++;
         }
     }
 
