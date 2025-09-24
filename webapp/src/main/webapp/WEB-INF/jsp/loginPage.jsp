@@ -6,33 +6,32 @@
 <c:url var="registerUrl" value="/register"/>
 <c:url var="forgotPasswordUrl" value="/forgotPassword"/>
 
-<paw:form-layout title="loginPage.pageTitle">
-    <paw:text type="title"><spring:message code="loginPage.pageHeader"/></paw:text>
-    <c:if test="${invalidCredentials}">
-        <span class="form-error"><spring:message code="loginPage.invalidCredentials"/></span>
-    </c:if>
+<paw:form-layout title="Login Page">
+    <paw:text type="title"><spring:message code="login.title" var="login"/></paw:text>
     <form method="post" action="${loginUrl}" enctype="application/x-www-form-urlencoded" class="form-container">
         <div class="input-container">
-            <label for="username" class="input-label"><spring:message code="loginPage.usernameLabel"/> </label>
+            <label for="username" class="input-label"><spring:message code="login.username"/></label>
             <input type="text" id="username" name="j_username" class="input"/>
         </div>
         <div class="input-container">
-            <label for="password" class="input-label"><spring:message code="loginPage.passwordLabel"/> </label>
+            <label for="password" class="input-label"><spring:message code="login.password"/></label>
             <input type="password" id="password" name="j_password" class="input"/>
         </div>
         <div class="remember-me-container">
             <label class="custom-checkbox">
                 <input type="checkbox" id="remember-me" name="j_rememberme">
                 <span class="checkmark"></span>
-                <span class="checkbox-label"><spring:message code="loginPage.rememberMeLabel"/> </span>
+                <span class="checkbox-label"><spring:message code="login.rememberMe"/></span>
             </label>
         </div>
         <div class="submit-container">
-            <input type="submit" value="<spring:message code='loginPage.submitButton'/>" class="btn submit"/>
+            <input type="submit" value="${login}" class="btn submit"/>
         </div>
         <div class="link-btn-container">
-            <paw:link-button href="${registerUrl}" text="loginPage.registerNowButton"/>
-            <paw:link-button href="${forgotPasswordUrl}" text="loginPage.forgotPasswordButton"/>
+            <spring:message code="login.registerNow" var="registerNow"/>
+            <spring:message code="login.ForgotPassword" var="forgotPassword"/>
+            <paw:link-button href="${registerUrl}" text="${registerNow}"/>
+            <paw:link-button href="${forgotPasswordUrl}" text="${forgotPassword}"/>
         </div>
     </form>
 </paw:form-layout>

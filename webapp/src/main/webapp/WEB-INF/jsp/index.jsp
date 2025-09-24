@@ -74,12 +74,16 @@
             <paw:button-card title="home.joinTournament.title" butText="home.joinTournament.butText" onclick="${joinTournamentFunction}" texture="true"/>
         </div>
         <div class="content-title">
-            <paw:text type="title" size="l"><spring:message code="home.games"/></paw:text>
+            <a href="${pageContext.request.contextPath}/gamesPage" class="title-link">
+                <paw:text type="title" size="l"><spring:message code="home.games"/></paw:text>
+            </a>
         </div>
         <paw:carrousel id="game-list" elements="${games}" isGame="true"/>
 
         <div class="content-title">
-            <paw:text type="title" size="l"><spring:message code="home.tournaments"/></paw:text>
+            <a href="${pageContext.request.contextPath}/tournamentsPage" class="title-link">
+                <paw:text type="title" size="l"><spring:message code="home.tournaments"/></paw:text>
+            </a>
         </div>
 
         <c:forEach var="game" items="${games}" varStatus="status">

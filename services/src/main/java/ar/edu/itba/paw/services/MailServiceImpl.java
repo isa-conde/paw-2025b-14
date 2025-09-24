@@ -69,7 +69,7 @@ public class MailServiceImpl implements MailService {
     @Override
     public void sendResetPasswordEmail(Long userId, Long token, String recipient) {
         Context ctx = new Context();
-        String resetPasswordUrl = "http://localhost:8080/webapp_war_exploded/resetPassword?token=" + token.toString() + "&userId=" + userId;
+        String resetPasswordUrl = "http://localhost:8080/resetPassword?token=" + token.toString() + "&userId=" + userId;
         ctx.setVariable("resetPasswordUrl", resetPasswordUrl);
 
         String body = templateEngine.process("reset-password", ctx);

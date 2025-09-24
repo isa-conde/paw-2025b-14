@@ -5,10 +5,12 @@
 
 <c:url value="/login" var="loginUrl"/>
 
-<paw:form-layout title="requestPasswordResetPage.pageTitle">
 
-    <paw:text type="title"><spring:message code="requestPasswordResetPage.pageHeader"/></paw:text>
-    <paw:text size="l"><spring:message code="requestPasswordResetPage.description"/></paw:text>
+<spring:message code='passwordReset.sent.title' var="title"/>
+<paw:form-layout title="${title}">
+
+    <paw:text type="title"><spring:message code="passwordReset.sent.title"/></paw:text>
+    <paw:text size="l"><spring:message code="passwordReset.sent.instruction"/></paw:text>
     <br>
     <paw:button onclick="window.location.href='${loginUrl}'" text="requestPasswordResetPage.goToLoginButton"/>
 

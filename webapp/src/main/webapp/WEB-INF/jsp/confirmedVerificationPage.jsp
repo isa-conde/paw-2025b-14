@@ -6,20 +6,20 @@
 <c:url value="/login" var="loginUrl"/>
 <c:url value="/verify?userId=${userId}" var="resendVerificationUrl"/>
 
-<paw:form-layout title="confirmVerificationPage.pageTitle">
+<paw:form-layout title="Confirmed Verification">
   <c:choose>
     <c:when test="${validToken}">
-      <paw:text type="title"><spring:message code="confirmVerificationPage.successTitle"/></paw:text>
-      <paw:text size="l"><spring:message code="confirmVerificationPage.successMessage"/></paw:text>
+      <paw:text type="title"><spring:message code="verification.successful.title"/></paw:text>
+      <paw:text size="l"><spring:message code="verification.successful.text"/></paw:text>
       <br>
-      <paw:button onclick="window.location.href='${loginUrl}'" text="confirmVerificationPage.goToLoginButton"/>
+      <paw:button onclick="window.location.href='${loginUrl}'" text="verification.login"/>
     </c:when>
     <c:otherwise>
-      <paw:text type="title"><spring:message code="confirmVerificationPage.failedTitle"/></paw:text>
-      <paw:text size="l"><spring:message code="confirmVerificationPage.failedMessage"/></paw:text>
+      <paw:text type="title"><spring:message code="verification.failed.title"/></paw:text>
+      <paw:text size="l"><spring:message code="verification.failed.text"/></paw:text>
       <br>
       <form:form method="post" action="${resendVerificationUrl}">
-        <paw:input path="" label="confirmVerificationPage.resendVerificationButton" inputType="submit"/>
+        <paw:input path="" label="verification.resend" inputType="submit"/>
       </form:form>
     </c:otherwise>
   </c:choose>

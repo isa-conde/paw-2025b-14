@@ -1,6 +1,8 @@
 <%@ tag language="java" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ attribute name="date" required="true" rtexprvalue="true" type="java.time.LocalDate"%>
 <%@ attribute name="size" required="false" rtexprvalue="true" description="Font size: xs, s, [m], l, xl"%>
 <%@ attribute name="weight" required="false" rtexprvalue="true" description="Font weight: thin, semi-bold, [bold]"%>
@@ -31,5 +33,6 @@
 <c:set var="monthName" value="${monthNames.split(',')[monthIndex]}"/>
 
 <paw:text size="${fontSize}" weight="${fontWeight}" stroke="${hasStroke}">
-    ${monthName} ${date.dayOfMonth}${daySuffix} ${date.year}
+    <spring:message code="month.${date.monthValue}" var="monthName"/>
+    <spring:message code="date.format" arguments="${date.dayOfMonth},${monthName},${date.year}"/>
 </paw:text>

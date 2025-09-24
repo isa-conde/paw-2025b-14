@@ -42,7 +42,7 @@ public interface TournamentService {
 
     public List<TournamentImg> findByCreatorImg(Long creator_id);
 
-    public void setFinished(Long tournament_id);
+    public void setFinished(Long tournament_id, Long match_id);
 
     public void closeInscriptions(Long tournament_id);
 

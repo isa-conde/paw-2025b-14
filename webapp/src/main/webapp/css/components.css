@@ -37,6 +37,26 @@ body, html {
     margin-top: 100px;
 }
 
+.title-link {
+    display: inline-block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.title-link:hover {
+    text-decoration: underline;
+    transform: scale(1.02);
+}
+
+button:disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
+}
+
+.winner-card-content {
+
+}
+
 /* ------- FONTS ------- */
 
 @font-face {

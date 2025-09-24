@@ -172,8 +172,8 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public void setFinished(Long tournament_id) {
-        tournamentDao.setFinished(tournament_id);
+    public void setFinished(Long tournament_id, Long match_id) {
+        tournamentDao.setFinished(tournament_id, match_id);
     }
 
     @Override
@@ -205,5 +205,4 @@ public class TournamentServiceImpl implements TournamentService {
     public List<TournamentImg> searchByName(String name){
         return tournamentDao.searchByName(name);
     }
-
 }
