@@ -7,6 +7,9 @@
 <c:url var="forgotPasswordUrl" value="/forgotPassword"/>
 
 <paw:form-layout title="Login Page">
+    <c:if test="${invalidCredentials}">
+        <span class="form-error"><spring:message code="login.invalidCredentials"/></span>
+    </c:if>
     <paw:text type="title"><spring:message code="login.title" var="login"/></paw:text>
     <form method="post" action="${loginUrl}" enctype="application/x-www-form-urlencoded" class="form-container">
         <div class="input-container">

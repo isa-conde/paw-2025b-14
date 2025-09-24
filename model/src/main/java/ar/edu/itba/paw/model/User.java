@@ -8,12 +8,12 @@ public class User {
     private String password;
     private boolean verified;
 
-    public User(final long id, final String username, final String email, String password) {
+    public User(final long id, final String username, final String email, String password, boolean verified) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
-        this.verified = false;
+        this.verified = verified;
     }
 
     public long getId() {

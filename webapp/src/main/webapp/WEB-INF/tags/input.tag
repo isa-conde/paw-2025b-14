@@ -69,7 +69,7 @@
                 </c:when>
             </c:choose>
             <c:if test="${hasConstraint}">
-                <form:errors path="${path}" cssClass="formError" element="h1"/>
+                <form:errors path="${path}" cssClass="form-error" element="h1"/>
             </c:if>
         </form:label>
     </c:when>
