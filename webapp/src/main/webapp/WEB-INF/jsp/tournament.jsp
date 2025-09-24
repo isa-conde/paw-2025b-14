@@ -36,14 +36,16 @@
         </paw:banner>
         <spring:message code="tournament.overview" var="overview"/>
         <spring:message code="tournament.matches" var="matches"/>
-        <c:set var="navbarSections" value="${[overview, matches]}"/>
-        <c:set var="activeSection" value="${param.section != null ? param.section : overview}"/>
+        <c:set var="sections" value="${['overview','matches']}"/>
+        <c:set var="labels" value="${[overview, matches]}"/>
+        <c:set var="activeSection" value="${param.section != null ? param.section : 'overview'}"/>
+        <paw:navbar sections="${sections}" labels="${labels}" activeSection="${activeSection}"/>
+
         <c:set var="isCreator" value="${user.id == tournamentImg.tournament.creator_id}"/>
 
-        <paw:navbar sections="${navbarSections}" activeSection="${activeSection}"/>
         <div class="content-container">
             <c:choose>
-                <c:when test="${activeSection == overview}">
+                <c:when test="${activeSection == 'overview'}">
                     <div class="icon-card-container">
                         <spring:message code="tournament.teams" var="teams"/>
                         <paw:icon-card icon="${pageContext.request.contextPath}/images/map.png" text="${tournamentImg.tournament.region}"/>
@@ -163,7 +165,7 @@
                         </div>
                     </c:if>
                 </c:when>
-                <c:when test="${activeSection == matches}">
+                <c:when test="${activeSection == 'matches'}">
                     <c:choose>
                         <c:when test="${empty matchesByGroup}">
                             <div class="no-cards-container">

@@ -289,7 +289,7 @@ public class HelloWorldController {
             ts.setMatchWinner(form.getMatchId(), form.getTournamentId(), form.getWinner());
         }
 
-        return new ModelAndView("redirect:/tournament?tournamentId=" + form.getTournamentId() + "&section=Matches");
+        return new ModelAndView("redirect:/tournament?tournamentId=" + form.getTournamentId() + "&section=matches");
     }
 
     @RequestMapping(value = "/tournamentsPage")
