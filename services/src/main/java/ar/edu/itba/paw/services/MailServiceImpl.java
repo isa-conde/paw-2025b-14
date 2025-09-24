@@ -55,10 +55,10 @@ public class MailServiceImpl implements MailService {
     }
 
     @Override
-    public void sendVerificationEmail(Long userId, String userName, Long token, String recipient) {
+    public void sendVerificationEmail(Long userId, String userName, Long token, String recipient, String baseUrl) {
         Context ctx = new Context();
         ctx.setVariable("userName", userName);
-        String verificationUrl = "http://localhost:8080/webapp_war_exploded/verify/confirm?token=" + token.toString() + "&userId=" + userId.toString();
+        String verificationUrl = baseUrl + "/verify/confirm?token=" + token.toString() + "&userId=" + userId.toString();
         ctx.setVariable("verificationUrl", verificationUrl);
 
         String body = templateEngine.process("verification-email", ctx);
@@ -67,9 +67,9 @@ public class MailServiceImpl implements MailService {
     }
 
     @Override
-    public void sendResetPasswordEmail(Long userId, Long token, String recipient) {
+    public void sendResetPasswordEmail(Long userId, Long token, String recipient, String baseUrl) {
         Context ctx = new Context();
-        String resetPasswordUrl = "http://localhost:8080/resetPassword?token=" + token.toString() + "&userId=" + userId;
+        String resetPasswordUrl = baseUrl + "/resetPassword?token=" + token.toString() + "&userId=" + userId;
         ctx.setVariable("resetPasswordUrl", resetPasswordUrl);
 
         String body = templateEngine.process("reset-password", ctx);

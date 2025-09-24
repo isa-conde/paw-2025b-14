@@ -4,9 +4,8 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 <c:url value="/login" var="loginUrl"/>
-<spring:message code='passwordReset.success.pageTitle' var="title"/>
 
-<paw:form-layout title="${title}">
+<paw:form-layout title="passwordReset.success.pageTitle">
     <paw:text type="title"><spring:message code="passwordReset.success.title"/></paw:text>
     <paw:text size="l"><spring:message code="passwordReset.success.message"/></paw:text>
     <br>

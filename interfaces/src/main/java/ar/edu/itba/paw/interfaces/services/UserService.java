@@ -15,9 +15,9 @@ public interface UserService {
 
     Optional<User> findByEmail(String email);
 
-    void requestPasswordReset(String email);
+    void requestPasswordReset(String email, String baseUrl);
 
-    void sendVerificationEmail(String email);
+    void sendVerificationEmail(String email, String baseUrl);
 
     Optional<Token> checkTokenValidity(Long token, Long userId);
 

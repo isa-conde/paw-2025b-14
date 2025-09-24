@@ -4,7 +4,6 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ attribute name="user" required="true" type="ar.edu.itba.paw.model.User" %>
 <%@ attribute name="function" required="false" type="java.lang.String" %>
-<%@ attribute name="isIndex" required="true"%>
 <%@ attribute name="pageTitle" required="false" %>
 
 <c:set var="isLoggedIn" value="${user != null}"/>
@@ -43,12 +42,10 @@
                         </paw:modal>
                     </c:when>
                     <c:otherwise>
-                        <c:if test="${isIndex == 'true'}">
-                            <div>
-                                <paw:button text="layout.login" size="m" onclick="window.location.href='${loginUrl}'"/>
-                                <paw:button text="layout.register" size="m" onclick="window.location.href='${registerUrl}'"/>
-                            </div>
-                        </c:if>
+                        <div>
+                            <paw:button text="layout.login" size="m" onclick="window.location.href='${loginUrl}'"/>
+                            <paw:button text="layout.register" size="m" onclick="window.location.href='${registerUrl}'"/>
+                        </div>
                     </c:otherwise>
                 </c:choose>
             </paw:header>

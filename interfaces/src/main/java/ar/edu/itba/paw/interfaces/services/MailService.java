@@ -13,8 +13,8 @@ public interface MailService {
                                  String recipient,
                                  String creatorMail);
 
-    void sendVerificationEmail(Long userId, String userName, Long token, String recipient);
+    void sendVerificationEmail(Long userId, String userName, Long token, String recipient, String baseUrl);
 
-    void sendResetPasswordEmail(Long userId, Long token, String recipient);
+    void sendResetPasswordEmail(Long userId, Long token, String recipient, String baseUrl);
 
 }
