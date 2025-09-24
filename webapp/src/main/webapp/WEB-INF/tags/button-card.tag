@@ -14,6 +14,7 @@
 <%@ attribute name="onclick" required="true" description="Onclick event handler" %>
 <%@ attribute name="method" required="false"%>
 <%@ attribute name="tournamentId" required="false" %>
+<%@ attribute name="disabled" required="false" %>
 
 <c:set var="cardText" value="${not empty text ? text : ''}"/>
 <c:set var="buttonText" value="${not empty butText ? butText : ''}"/>
@@ -35,7 +36,7 @@
                 <div class="card-button-container">
                     <c:choose>
                         <c:when test="${method == 'post'}">
-                            <form:form method="post" action="${onclick}">
+                            <form:form method="post" action="${onclick}" onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
                                 <c:if test="${not empty tournamentId}">
                                     <input type="hidden" name="tournamentId" value="${tournamentId}"/>
                                 </c:if>
@@ -43,7 +44,7 @@
                             </form:form>
                         </c:when>
                         <c:otherwise>
-                            <paw:button text="${butText}" onclick="${onclick}"/>
+                            <paw:button text="${butText}" onclick="${onclick}" disabled="${disabled}"/>
                         </c:otherwise>
                     </c:choose>
                 </div>

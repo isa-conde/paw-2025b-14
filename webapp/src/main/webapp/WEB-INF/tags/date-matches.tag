@@ -8,6 +8,7 @@
 <%@ attribute name="totalMatches" required="false" rtexprvalue="true" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
 <div class="date-section">
     <div class="date-header">
@@ -40,7 +41,8 @@
                 </c:choose>
             </c:when>
             <c:otherwise>
-                <paw:text type="title" size="m">Date ${dateNumber}</paw:text>
+                <spring:message code="tournament.date" arguments="${dateNumber}" var="dateLabel"/>
+                <paw:text type="title" size="m">${dateLabel}</paw:text>
             </c:otherwise>
         </c:choose>
     </div>

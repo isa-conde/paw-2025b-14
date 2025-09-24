@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.interfaces.persistence;
 
 import ar.edu.itba.paw.model.ParticipantUser;
+import ar.edu.itba.paw.model.ParticipantUserInfo;
 import ar.edu.itba.paw.model.Tournament.TournamentImg;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Structure;
@@ -45,7 +46,7 @@ public interface TournamentDao {
 
     public List<TournamentImg> findByCreatorImg(Long creator_id);
 
-    public void setFinished(Long tournament_id);
+    public void setFinished(Long tournament_id, Long match_id);
 
     public Boolean hasJoined(Long userId, Long tournamentId);
 

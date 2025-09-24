@@ -18,6 +18,14 @@ import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
 import ar.edu.itba.paw.webapp.form.*;
+import ar.edu.itba.paw.webapp.form.FilterForm;
+import ar.edu.itba.paw.webapp.form.GameForm;
+import ar.edu.itba.paw.webapp.form.SetWinnerForm;
+import ar.edu.itba.paw.webapp.form.TournamentForm;
+import ar.edu.itba.paw.webapp.form.UserForm;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -34,6 +42,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class HelloWorldController {
@@ -271,33 +280,11 @@ public class HelloWorldController {
         }
 
         final Game g = gs.createWithFormats(form.getName(), form.getGenre(), form.getFormats(), imageBytes);
-        return new ModelAndView("redirect:/game?game_id=" + g.getId());
+        return new ModelAndView("redirect:/" + g.getId());
     }
 
-    @RequestMapping("/game")
-    public ModelAndView game(Principal principal, @RequestParam("game_id") final long game_id, @ModelAttribute("filterForm") FilterForm filterForm, TournamentFilter tf){
-        final ModelAndView mav = new ModelAndView("game");
-        Optional<GameImg> optionalGame = gs.findByIdWithImage(game_id);
-        if(optionalGame.isPresent()) {
-            mav.addObject("game", optionalGame.get());
-        } else {
-            return new ModelAndView("index");
-        }
-        mav.addObject("user", us.findByUsername(principal.getName()).orElse(null));
-        mav.addObject("structures", Arrays.stream(Structure.values()).toList());
-        mav.addObject("regions", Arrays.stream(Region.values()).toList());
-        mav.addObject("elos", Arrays.stream(Elo.values()).toList());
-
-        tf.setGame_id(game_id);
-        tf.setRegion(filterForm.getRegion());
-        tf.setElo(filterForm.getElo());
-
-        mav.addObject("tournaments", ts.findWithImg(tf));
-        mav.addObject("isFiltered", !tf.isEmpty());
-
-        return mav;
-    }
-
+    @Autowired
+    private MessageSource messageSource;
     @RequestMapping("/tournament")
     public ModelAndView tournamentPage(Principal principal, @RequestParam("tournamentId") final long tournamentId) {
         final ModelAndView mav = new ModelAndView("tournament");
@@ -305,6 +292,14 @@ public class HelloWorldController {
         mav.addObject("user", user);
 
         Optional<TournamentImg> optionalTournament = ts.findByIdWithImg(tournamentId);
+
+        Map<Integer, Map<Integer, List<MatchWithPlayers>>> matchesByGroup = ts.getTournamentMatchesByGroup(tournamentId);
+
+        List<Integer> groupSections = new ArrayList<>(matchesByGroup.keySet());
+        Locale locale = LocaleContextHolder.getLocale();
+        List<String> groupLabels = groupSections.stream()
+                .map(key -> messageSource.getMessage("tournament.group", new Object[]{key}, locale))
+                .collect(Collectors.toList());
 
         if(optionalTournament.isPresent()) {
             TournamentImg t = optionalTournament.get();
@@ -316,10 +311,13 @@ public class HelloWorldController {
             mav.addObject("tournamentImg", t);
             mav.addObject("game", optionalGame.get());
             mav.addObject("creator", optionalUser.get());
-            mav.addObject("matchesByGroup", ts.getTournamentMatchesByGroup(tournamentId));
+            mav.addObject("matchesByGroup", matchesByGroup);
+            mav.addObject("groupSections", groupSections);
+            mav.addObject("groupLabels", groupLabels);
             mav.addObject("LEAGUE", Structure.LEAGUE);
             mav.addObject("ELIMINATION", Structure.ELIMINATION);
             mav.addObject("HYBRID", Structure.HYBRID);
+            mav.addObject("tournamentWinner", t.getTournament().getTournament_winner());
         } else {
             return new ModelAndView("index");
         }
@@ -367,7 +365,7 @@ public class HelloWorldController {
             ts.setMatchWinner(form.getMatchId(), form.getTournamentId(), form.getWinner());
         }
 
-        return new ModelAndView("redirect:/tournament?tournamentId=" + form.getTournamentId() + "&section=Matches");
+        return new ModelAndView("redirect:/tournament?tournamentId=" + form.getTournamentId() + "&section=matches");
     }
 
     @RequestMapping(value = "/tournamentsPage")

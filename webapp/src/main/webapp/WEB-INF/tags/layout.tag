@@ -5,6 +5,7 @@
 <%@ attribute name="user" required="true" type="ar.edu.itba.paw.model.User" %>
 <%@ attribute name="function" required="false" type="java.lang.String" %>
 <%@ attribute name="isIndex" required="true"%>
+<%@ attribute name="pageTitle" required="false" %>
 
 <c:set var="isLoggedIn" value="${user != null}"/>
 
@@ -15,7 +16,8 @@
 <html>
     <head>
         <link rel="stylesheet" href="<c:url value='/css/components.css'/>">
-        <title></title>
+        <link rel="icon" type="image/x-icon" href="<c:url value="/public/favicon.ico"/>">
+        <title><c:out value="${pageTitle != null ? pageTitle : 'RankUp'}"/></title>
     </head>
     <c:choose>
         <c:when test="${function != null}">
