@@ -1,7 +1,9 @@
 CREATE TABLE IF NOT EXISTS users(
     id INTEGER IDENTITY PRIMARY KEY ,
     email varchar(100) NOT NULL UNIQUE ,
-    username varchar(100) NOT NULL UNIQUE
+    username varchar(100) NOT NULL UNIQUE ,
+    password varchar (100) NULL ,
+    verified BOOLEAN DEFAULT false NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS game(
