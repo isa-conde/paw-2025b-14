@@ -100,8 +100,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean sameAsOldPassword(String newPassword, Long userId) {
         String oldPassword = userDao.findById(userId).get().getPassword();
-        if(oldPassword == null) return true;
+        if(oldPassword == null) return false;
         return passwordEncoder.matches(newPassword, oldPassword);
+    }
+
+    @Override
+    public boolean usernameIsTaken(String username) {
+        return userDao.findByUsername(username).isPresent();
+    }
+
+    @Override
+    public boolean emailIsTaken(String email) {
+        return userDao.findByEmail(email).isPresent();
     }
 
     @Override

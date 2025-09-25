@@ -25,5 +25,9 @@ public interface UserService {
 
     boolean sameAsOldPassword(String newPassword, Long userId);
 
+    boolean usernameIsTaken(String username);
+
+    boolean emailIsTaken(String email);
+
     Optional<Token> verifyEmail(Long token, Long userId);
 }
