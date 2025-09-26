@@ -61,4 +61,8 @@ public interface TournamentDao {
     public void setMatchWinner(Long matchId, Long tournamentId, Integer winner);
 
     public List<TournamentImg> searchByName(String name);
+
+    public void startTournament(Long tournament_id);
+
+    public Map<Long, Integer> getTournamentGroupsByUser(Long tournament_id);
 }

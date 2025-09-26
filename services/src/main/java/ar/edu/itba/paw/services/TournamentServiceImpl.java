@@ -80,24 +80,38 @@ public class TournamentServiceImpl implements TournamentService {
 //
 
     @Override
-    public Map<Integer, Map<Integer, List<MatchWithPlayers>>> getTournamentMatchesByGroup(Long tournament_id) {
-        List<MatchWithPlayers> matches = tournamentDao.getTournamentMatches(tournament_id);
-        Map<Integer, Map<Integer, List<MatchWithPlayers>>> tournamentMatchesByGroup = new TreeMap<>();
-        Tournament t = findById(tournament_id).orElse(null);
+    public Map<Integer, Map<Integer, List<MatchWithPlayers>>> getTournamentMatchesByGroup(Long tournamentId) {
+        List<MatchWithPlayers> matches = tournamentDao.getTournamentMatches(tournamentId);
+        Tournament t = findById(tournamentId).orElse(null);
+        Map<Integer, Map<Integer, List<MatchWithPlayers>>> result = new TreeMap<>();
+        if (t == null || matches.isEmpty()) return result;
 
-        if (!matches.isEmpty() && t != null) {
-            for (MatchWithPlayers match : matches) {
-                if (match.getGroupNumber() != null && match.getStage() != null) {
-                    int group = match.getGroupNumber();
-                    int stage = match.getStage();
-                    tournamentMatchesByGroup.putIfAbsent(group, new TreeMap<>());
-                    Map<Integer, List<MatchWithPlayers>> matchesByStage = tournamentMatchesByGroup.get(group);
-                    matchesByStage.putIfAbsent(stage, new ArrayList<>());
-                    matchesByStage.get(stage).add(match);
-                }
+        Map<Long, Integer> userGroup = tournamentDao.getTournamentGroupsByUser(tournamentId);
+
+        for (MatchWithPlayers m : matches) {
+            Integer stage = m.getStage();
+            if (stage == null) continue;
+
+            Integer gLocal   = (m.getLocalId()   != null) ? userGroup.get(m.getLocalId())   : null;
+            Integer gVisitor = (m.getVisitorId() != null) ? userGroup.get(m.getVisitorId()) : null;
+
+            Integer group = null;
+            if (gLocal != null && gVisitor != null) {
+                if (!gLocal.equals(gVisitor)) continue;
+                group = gLocal;
+            } else if (gLocal != null) {
+                group = gLocal;
+            } else if (gVisitor != null) {
+                group = gVisitor;
+            } else {
+                continue;
             }
+
+            result.computeIfAbsent(group, g -> new TreeMap<>())
+                    .computeIfAbsent(stage, s -> new ArrayList<>())
+                    .add(m);
         }
-        return tournamentMatchesByGroup;
+        return result;
     }
 
 
@@ -107,58 +121,44 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public Map<Integer, List<ParticipantUserInfo>> getTournamentParticipantsByGroup(Long tournament_id) {
-        List<User> users = tournamentDao.getTournamentUsers(tournament_id);
-        List<ParticipantUser> participants = tournamentDao.getTournamentParticipantUsers(tournament_id);
-        List<MatchWithPlayers> matches = tournamentDao.getTournamentMatches(tournament_id);
-
-        Map<Long, Integer> userPoints = new HashMap<>();
-        for (ParticipantUser p : participants) {
-            userPoints.put(p.getUser_id(), p.getPoints());
-        }
-
+    public List<ParticipantUserInfo> getTournamentParticipants(Long tournamentId) {
+        List<User> users = tournamentDao.getTournamentUsers(tournamentId);
         Map<Long, User> usersById = new HashMap<>();
-        for (User u : users) {
-            usersById.put(u.getId(), u);
+        for (User u : users) usersById.put(u.getId(), u);
+
+        List<ParticipantUser> participants = tournamentDao.getTournamentParticipantUsers(tournamentId);
+
+        List<ParticipantUserInfo> result = new ArrayList<>(participants.size());
+        for (ParticipantUser p : participants) {
+            User u = usersById.get(p.getUser_id());
+            if (u == null) continue;
+
+            Integer groupNumber = p.getGroupNumber();
+            result.add(new ParticipantUserInfo(
+                    u.getId(),
+                    u.getUsername(),
+                    u.getEmail(),
+                    p.getPoints(),
+                    groupNumber
+            ));
         }
 
-        Map<Integer, Set<Long>> groupUserIds = new HashMap<>();
-        for (MatchWithPlayers match : matches) {
-            if (match.getGroupNumber() != null) {
-                if (match.getLocalId() != null) {
-                    groupUserIds.computeIfAbsent(match.getGroupNumber(), g -> new HashSet<>())
-                            .add(match.getLocalId());
-                }
-                if (match.getVisitorId() != null) {
-                    groupUserIds.computeIfAbsent(match.getGroupNumber(), g -> new HashSet<>())
-                            .add(match.getVisitorId());
-                }
+        result.sort((a, b) -> {
+            Integer ga = a.getGroupNumber(), gb = b.getGroupNumber();
+            if (ga == null && gb != null) return 1;
+            if (ga != null && gb == null) return -1;
+            if (ga != null && gb != null) {
+                int cmp = Integer.compare(ga, gb);
+                if (cmp != 0) return cmp;
             }
-        }
+            int ptsCmp = b.getPoints().compareTo(a.getPoints());
+            if (ptsCmp != 0) return ptsCmp;
+            return a.getUsername().compareToIgnoreCase(b.getUsername());
+        });
 
-        Map<Integer, List<ParticipantUserInfo>> participantsByGroup = new TreeMap<>();
-        for (Map.Entry<Integer, Set<Long>> entry : groupUserIds.entrySet()) {
-            int groupNumber = entry.getKey();
-            List<ParticipantUserInfo> groupList = new ArrayList<>();
-
-            for (Long userId : entry.getValue()) {
-                User user = usersById.get(userId);
-                if (user != null) {
-                    int points = userPoints.getOrDefault(userId, 0);
-                    groupList.add(new ParticipantUserInfo(
-                            user.getId(),
-                            user.getUsername(),
-                            user.getEmail(),
-                            points
-                    ));
-                }
-            }
-            groupList.sort((p1, p2) -> p2.getPoints().compareTo(p1.getPoints()));
-            participantsByGroup.put(groupNumber, groupList);
-        }
-
-        return participantsByGroup;
+        return result;
     }
+
 
 
     @Override
@@ -204,5 +204,10 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public List<TournamentImg> searchByName(String name){
         return tournamentDao.searchByName(name);
+    }
+
+    @Override
+    public void startTournament(Long tournament_id){
+        tournamentDao.startTournament(tournament_id);
     }
 }

@@ -26,7 +26,7 @@ public interface TournamentService {
 
     public void joinTournamentUser(Long user_id, Long tournament_id);
 
-    public Map<Integer, List<ParticipantUserInfo>> getTournamentParticipantsByGroup(Long tournament_id);
+    public List<ParticipantUserInfo> getTournamentParticipants(Long tournament_id);
 
     public void createMatches(Long tournament_id);
 
@@ -57,4 +57,6 @@ public interface TournamentService {
     public List<TournamentImg> findUserPastTournaments(Long userId);
 
     public List<TournamentImg> searchByName(String name);
+
+    public void startTournament(Long tournament_id);
 }
