@@ -23,7 +23,11 @@
                     butText="home.createTournament.butText"
                     onclick="${createTournamentFunction}"
                     texture="true"/>
-            <paw:button-card title="home.joinTournament.title" butText="home.joinTournament.butText" onclick="${joinTournamentFunction}" texture="true"/>
+            <paw:button-card
+                    title="home.joinTournament.title"
+                    butText="home.joinTournament.butText"
+                    onclick="${joinTournamentFunction}"
+                    texture="true"/>
         </div>
         <div class="content-title">
             <a href="${pageContext.request.contextPath}/gamesPage" class="title-link">
