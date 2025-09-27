@@ -2,11 +2,13 @@ package ar.edu.itba.paw.webapp.form;
 
 import ar.edu.itba.paw.webapp.validation.PasswordMatches;
 import ar.edu.itba.paw.webapp.validation.PasswordValidation;
+import ar.edu.itba.paw.webapp.validation.ResetPasswordMatches;
 import ar.edu.itba.paw.webapp.validation.SameAsOldPassword;
 
 import javax.validation.constraints.NotNull;
 
 @SameAsOldPassword
+@ResetPasswordMatches
 public class ResetPasswordForm {
 
     @NotNull

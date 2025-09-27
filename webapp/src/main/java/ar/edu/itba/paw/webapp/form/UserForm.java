@@ -1,7 +1,9 @@
 package ar.edu.itba.paw.webapp.form;
 
+import ar.edu.itba.paw.webapp.validation.EmailIsTaken;
 import ar.edu.itba.paw.webapp.validation.PasswordMatches;
 import ar.edu.itba.paw.webapp.validation.PasswordValidation;
+import ar.edu.itba.paw.webapp.validation.UsernameIsTaken;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -16,6 +18,7 @@ public class UserForm {
 	//password text NOT NULL,
 	//CONSTRAINT username_length CHECK (char_length(username) < 15)
 
+	@UsernameIsTaken(message = "{error.registerForm.usernameUsed}")
 	@NotBlank(message = "{form.requiredField}")
 	@Size(max = 31)
 	@Pattern( regexp = "|[a-zA-Z][-a-zA-Z0-9_]+" , message = "{home.login.usernameFormat}")
@@ -28,6 +31,7 @@ public class UserForm {
 	@NotNull(message = "{form.requiredField}")
 	private String repeatPassword;
 
+	@EmailIsTaken(message = "{error.registerForm.emailUsed}")
 	@Pattern(regexp = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}", message = "Invalid email format")
 	@NotNull(message = "{form.requiredField}")
 	private String email;
