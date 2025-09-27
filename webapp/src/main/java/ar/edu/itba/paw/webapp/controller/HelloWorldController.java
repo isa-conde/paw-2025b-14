@@ -373,6 +373,7 @@ public class HelloWorldController {
         Optional<TournamentImg> tournamentOpt = ts.findByIdWithImg(tournamentId);
         if (tournamentOpt.isPresent() && tournamentOpt.get().getTournament().getCreator_id().equals(user.getId())) {
             ts.closeInscriptions(tournamentId);
+            ts.startTournament(tournamentId);
         }
 
         return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);

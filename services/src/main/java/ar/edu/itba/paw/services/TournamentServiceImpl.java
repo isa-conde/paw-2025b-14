@@ -59,11 +59,6 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public void createMatches(Long tournament_id) {
-		tournamentDao.createMatches(tournament_id);
-	}
-
-    @Override
     public Optional<Structure> getTournamentStructure(Long tournament_id){
     	return tournamentDao.getTournamentStructure(tournament_id);
     }
@@ -95,7 +90,7 @@ public class TournamentServiceImpl implements TournamentService {
             Integer gLocal   = (m.getLocalId()   != null) ? userGroup.get(m.getLocalId())   : null;
             Integer gVisitor = (m.getVisitorId() != null) ? userGroup.get(m.getVisitorId()) : null;
 
-            Integer group = null;
+            Integer group;
             if (gLocal != null && gVisitor != null) {
                 if (!gLocal.equals(gVisitor)) continue;
                 group = gLocal;
@@ -121,45 +116,39 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public List<ParticipantUserInfo> getTournamentParticipants(Long tournamentId) {
+    public Map<Integer, List<ParticipantUserInfo>> getTournamentParticipantsByGroup(Long tournamentId) {
         List<User> users = tournamentDao.getTournamentUsers(tournamentId);
-        Map<Long, User> usersById = new HashMap<>();
+        Map<Long, User> usersById = new HashMap<>(users.size() * 2);
         for (User u : users) usersById.put(u.getId(), u);
 
         List<ParticipantUser> participants = tournamentDao.getTournamentParticipantUsers(tournamentId);
 
-        List<ParticipantUserInfo> result = new ArrayList<>(participants.size());
+        Map<Integer, List<ParticipantUserInfo>> byGroup = new TreeMap<>();
         for (ParticipantUser p : participants) {
             User u = usersById.get(p.getUser_id());
-            if (u == null) continue;
-
-            Integer groupNumber = p.getGroupNumber();
-            result.add(new ParticipantUserInfo(
+            if (u == null) {
+                continue;
+            }
+            Integer group = (p.getGroupNumber() != null) ? p.getGroupNumber() : 0;
+            ParticipantUserInfo info = new ParticipantUserInfo(
                     u.getId(),
                     u.getUsername(),
                     u.getEmail(),
                     p.getPoints(),
-                    groupNumber
-            ));
+                    group
+            );
+
+            byGroup.computeIfAbsent(group, g -> new ArrayList<>()).add(info);
         }
-
-        result.sort((a, b) -> {
-            Integer ga = a.getGroupNumber(), gb = b.getGroupNumber();
-            if (ga == null && gb != null) return 1;
-            if (ga != null && gb == null) return -1;
-            if (ga != null && gb != null) {
-                int cmp = Integer.compare(ga, gb);
+        for (List<ParticipantUserInfo> list : byGroup.values()) {
+            list.sort((a, b) -> {
+                int cmp = b.getPoints().compareTo(a.getPoints());
                 if (cmp != 0) return cmp;
-            }
-            int ptsCmp = b.getPoints().compareTo(a.getPoints());
-            if (ptsCmp != 0) return ptsCmp;
-            return a.getUsername().compareToIgnoreCase(b.getUsername());
-        });
-
-        return result;
+                return a.getUsername().compareToIgnoreCase(b.getUsername());
+            });
+        }
+        return byGroup;
     }
-
-
 
     @Override
     public Optional<TournamentImg> findByIdWithImg(Long id){
