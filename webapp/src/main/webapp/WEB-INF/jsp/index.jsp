@@ -43,13 +43,13 @@
         </div>
 
         <c:forEach var="game" items="${games}" varStatus="status">
-            <c:set var="gameId" value="${game.game.id}"/>
+            <c:set var="gameId" value="${game.id}"/>
             <c:set var="gameTournaments" value="${requestScope['tournaments' += gameId]}"/>
             <c:set var="gameObject" value="${requestScope['game' += gameId]}"/>
 
             <c:if test="${not empty gameObject and not empty gameTournaments}">
                 <div class="carrousel-title">
-                    <paw:text type="title" size="s">${gameObject.game.name}</paw:text>
+                    <paw:text type="title" size="s">${gameObject.name}</paw:text>
                 </div>
                 <paw:carrousel id="game-${gameId}-tournaments" elements="${gameTournaments}"/>
             </c:if>

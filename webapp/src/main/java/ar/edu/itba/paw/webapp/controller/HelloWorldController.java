@@ -8,10 +8,8 @@ import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.*;
 import ar.edu.itba.paw.model.Game.Game;
-import ar.edu.itba.paw.model.Game.GameImg;
 import ar.edu.itba.paw.model.MatchWithPlayers;
 import ar.edu.itba.paw.model.Tournament.Tournament;
-import ar.edu.itba.paw.model.Tournament.TournamentImg;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Genre;
 import ar.edu.itba.paw.model.enums.Region;
@@ -183,7 +181,7 @@ public class HelloWorldController {
     @RequestMapping("/")
     public ModelAndView index(@ModelAttribute("tournamentForm") TournamentForm tournamentForm, TournamentFilter tournamentFilter, Principal principal) {
         final ModelAndView mav = new ModelAndView("index");
-        List<GameImg> allGames = gs.findAllWithImg();
+        List<Game> allGames = gs.findAll();
 
         User user = null;
         if (principal != null) {
@@ -198,22 +196,22 @@ public class HelloWorldController {
         mav.addObject("structures", Arrays.stream(Structure.values()).toList());
         mav.addObject("tournamentForm", tournamentForm);
 
-        List<GameImg> topGamesWithTournaments = allGames.stream()
+        List<Game> topGamesWithTournaments = allGames.stream()
                 .map(game -> {
-                    List<Tournament> gameTours = ts.findGameTournaments(game.getGame().getId());
+                    List<Tournament> gameTours = ts.findGameTournaments(game.getId());
                     return new Object[]{game, gameTours.size()};
                 })
                 .filter(gameData -> (Integer) gameData[1] > 0)
                 .sorted((a, b) -> Integer.compare((Integer) b[1], (Integer) a[1]))
                 .limit(5)
-                .map(gameData -> (GameImg) gameData[0])
+                .map(gameData -> (Game) gameData[0])
                 .toList();
 
-        for (GameImg game : topGamesWithTournaments) {
-            tournamentFilter.setGame_id(game.getGame().getId());
-            List<TournamentImg> gameTours = ts.findWithImg(tournamentFilter);
-            mav.addObject("tournaments" + game.getGame().getId(), gameTours);
-            mav.addObject("game" + game.getGame().getId(), game);
+        for (Game game : topGamesWithTournaments) {
+            tournamentFilter.setGame_id(game.getId());
+            List<Tournament> gameTours = ts.findTournaments(tournamentFilter);
+            mav.addObject("tournaments" + game.getId(), gameTours);
+            mav.addObject("game" + game.getId(), game);
         }
         return mav;
     }
@@ -308,7 +306,7 @@ public class HelloWorldController {
         }
         mav.addObject("user", user);
 
-        Optional<TournamentImg> optionalTournament = ts.findByIdWithImg(tournamentId);
+        Optional<Tournament> optionalTournament = ts.findById(tournamentId);
 
         Map<Integer, Map<Integer, List<MatchWithPlayers>>> matchesByGroup = ts.getTournamentMatchesByGroup(tournamentId);
 
@@ -319,13 +317,13 @@ public class HelloWorldController {
                 .collect(Collectors.toList());
 
         if(optionalTournament.isPresent()) {
-            TournamentImg t = optionalTournament.get();
-            Optional<Game> optionalGame = gs.findById(t.getTournament().getGame_id());
-            Optional<User> optionalUser = us.findById(t.getTournament().getCreator_id());
+            Tournament t = optionalTournament.get();
+            Optional<Game> optionalGame = gs.findById(t.getGame_id());
+            Optional<User> optionalUser = us.findById(t.getCreator_id());
             mav.addObject("hasJoined", ts.hasJoined(user.getId(), tournamentId));
             mav.addObject("participants", ts.getTournamentParticipantsByGroup(tournamentId));
             mav.addObject("user", user);
-            mav.addObject("tournamentImg", t);
+            mav.addObject("tournament", t);
             mav.addObject("game", optionalGame.get());
             mav.addObject("creator", optionalUser.get());
             mav.addObject("matchesByGroup", matchesByGroup);
@@ -334,7 +332,7 @@ public class HelloWorldController {
             mav.addObject("LEAGUE", Structure.LEAGUE);
             mav.addObject("ELIMINATION", Structure.ELIMINATION);
             mav.addObject("HYBRID", Structure.HYBRID);
-            mav.addObject("tournamentWinner", t.getTournament().getTournament_winner());
+            mav.addObject("tournamentWinner", t.getTournament_winner());
         } else {
             return new ModelAndView("index");
         }
@@ -370,8 +368,8 @@ public class HelloWorldController {
             return new ModelAndView("redirect:/");
         }
 
-        Optional<TournamentImg> tournamentOpt = ts.findByIdWithImg(tournamentId);
-        if (tournamentOpt.isPresent() && tournamentOpt.get().getTournament().getCreator_id().equals(user.getId())) {
+        Optional<Tournament> tournamentOpt = ts.findById(tournamentId);
+        if (tournamentOpt.isPresent() && tournamentOpt.get().getCreator_id().equals(user.getId())) {
             ts.closeInscriptions(tournamentId);
         }
 
@@ -422,12 +420,12 @@ public class HelloWorldController {
         boolean isFiltered = !tf.isEmpty();
 
         if(isFiltered) {
-            mav.addObject("tournaments", ts.findWithImg(tf));
+            mav.addObject("tournaments", ts.findTournaments(tf));
         }else{
-            Map<Long, List<TournamentImg>> gameTournaments = new HashMap<>();
+            Map<Long, List<Tournament>> gameTournaments = new HashMap<>();
             for (Game game : allGames) {
                 tf.setGame_id(game.getId());
-                List<TournamentImg> gameTours = ts.findWithImg(tf);
+                List<Tournament> gameTours = ts.findTournaments(tf);
                 if (!gameTours.isEmpty()) {
                     gameTournaments.put(game.getId(), gameTours);
                 }
@@ -443,7 +441,7 @@ public class HelloWorldController {
     @RequestMapping("/gamesPage")
     public ModelAndView gamesPage(Principal principal) {
         final ModelAndView mav = new ModelAndView("gamesPage");
-        List<GameImg> allGames = gs.findAllWithImg();
+        List<Game> allGames = gs.findAll();
         User user = null;
         if (principal != null) {
             Optional<User> userOpt = us.findByUsername(principal.getName());
@@ -464,17 +462,17 @@ public class HelloWorldController {
             Optional<User> userOpt = us.findByUsername(principal.getName());
             user = userOpt.orElse(null);
         }
-        List<TournamentImg> allCreatedTournaments = ts.findByCreatorImg(user.getId());
+        List<Tournament> allCreatedTournaments = ts.findByCreator(user.getId());
 
-        List<TournamentImg> onGoingTournaments = allCreatedTournaments.stream()
-            .filter(t -> !t.getTournament().getFinished())
+        List<Tournament> onGoingTournaments = allCreatedTournaments.stream()
+            .filter(t -> !t.getFinished())
             .toList();
 
-        List<TournamentImg> finishedTournaments = allCreatedTournaments.stream()
-            .filter(t -> t.getTournament().getFinished())
+        List<Tournament> finishedTournaments = allCreatedTournaments.stream()
+            .filter(t -> t.getFinished())
             .toList();
-        List<TournamentImg> joinedTournaments = ts.findUserActiveTournaments(user.getId());
-        List<TournamentImg> pastTournaments = ts.findUserPastTournaments(user.getId());
+        List<Tournament> joinedTournaments = ts.findUserActiveTournaments(user.getId());
+        List<Tournament> pastTournaments = ts.findUserPastTournaments(user.getId());
 
         mav.addObject("user", user);
         mav.addObject("pastTournaments", pastTournaments);

@@ -7,7 +7,6 @@ import ar.edu.itba.paw.model.ParticipantUserInfo;
 import ar.edu.itba.paw.model.MatchWithPlayers;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.User;
-import ar.edu.itba.paw.model.Tournament.TournamentImg;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
@@ -100,12 +99,6 @@ public class TournamentServiceImpl implements TournamentService {
         return tournamentMatchesByGroup;
     }
 
-
-	@Override
-    public List<TournamentImg> findWithImg(TournamentFilter tournamentFilter){
-        return tournamentDao.findWithImg(tournamentFilter);
-    }
-
     @Override
     public Map<Integer, List<ParticipantUserInfo>> getTournamentParticipantsByGroup(Long tournament_id) {
         List<User> users = tournamentDao.getTournamentUsers(tournament_id);
@@ -160,15 +153,9 @@ public class TournamentServiceImpl implements TournamentService {
         return participantsByGroup;
     }
 
-
     @Override
-    public Optional<TournamentImg> findByIdWithImg(Long id){
-        return tournamentDao.findByIdWithImg(id);
-    }
-
-    @Override
-    public List<TournamentImg> findByCreatorImg(Long creator_id) {
-        return tournamentDao.findByCreatorImg(creator_id);
+    public List<Tournament> findByCreator(Long creator_id) {
+        return tournamentDao.findByCreator(creator_id);
     }
 
     @Override
@@ -192,17 +179,17 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public List<TournamentImg> findUserActiveTournaments(Long userId) {
+    public List<Tournament> findUserActiveTournaments(Long userId) {
         return tournamentDao.findUserActiveTournaments(userId);
     }
 
     @Override
-    public List<TournamentImg> findUserPastTournaments(Long userId) {
+    public List<Tournament> findUserPastTournaments(Long userId) {
         return tournamentDao.findUserPastTournaments(userId);
     }
 
     @Override
-    public List<TournamentImg> searchByName(String name){
+    public List<Tournament> searchByName(String name){
         return tournamentDao.searchByName(name);
     }
 }

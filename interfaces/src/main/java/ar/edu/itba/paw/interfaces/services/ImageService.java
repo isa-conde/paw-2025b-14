@@ -1,8 +1,8 @@
-package ar.edu.itba.paw.interfaces.persistence;
+package ar.edu.itba.paw.interfaces.services;
 
 import java.util.Optional;
 
-public interface ImageDao {
+public interface ImageService {
 
     public Optional<byte[]> findById(Long id);
 
