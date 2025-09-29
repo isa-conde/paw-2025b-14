@@ -1,5 +1,7 @@
 package ar.edu.itba.paw.services;
 
+import ar.edu.itba.paw.interfaces.persistence.ImageDao;
+import ar.edu.itba.paw.interfaces.persistence.ParticipantDao;
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.ParticipantUser;
@@ -12,7 +14,6 @@ import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -22,9 +23,13 @@ import java.util.*;
 public class TournamentServiceImpl implements TournamentService {
 
     private final TournamentDao tournamentDao;
+    private final ImageDao imageDao;
+    private final ParticipantDao participantDao;
 
-    public TournamentServiceImpl(TournamentDao tournamentDao) {
+    public TournamentServiceImpl(TournamentDao tournamentDao, ImageDao imageDao, ParticipantDao participantDao) {
         this.tournamentDao = tournamentDao;
+        this.imageDao = imageDao;
+        this.participantDao = participantDao;
     }
 
 
@@ -49,12 +54,8 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Override
     public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, byte[] image, Boolean openInscriptions, Boolean isFinished) {
-        return tournamentDao.create(creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image, openInscriptions, isFinished);
-    }
-
-    @Override
-    public void joinTournamentUser(Long user_id, Long tournament_id) {
-        tournamentDao.joinTournamentUser(user_id, tournament_id);
+        Integer image_id = imageDao.insertImage(image);
+        return tournamentDao.create(creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, openInscriptions, isFinished);
     }
 
     @Override
@@ -62,10 +63,6 @@ public class TournamentServiceImpl implements TournamentService {
     	return tournamentDao.getTournamentStructure(tournament_id);
     }
 
-    @Override
-    public void loadScores(Long match_id, Long tournament_id, Integer local_score, Integer visitor_score) {
-    	tournamentDao.loadScores(match_id, tournament_id, local_score, visitor_score);
-    }
 //
 //    @Override
 //    public void joinTournamentTeam(Long team_id, Long tournament_id) {
@@ -105,7 +102,7 @@ public class TournamentServiceImpl implements TournamentService {
             usersById.put(u.getId(), u);
         }
 
-        List<ParticipantUser> participants = tournamentDao.getTournamentParticipantUsers(tournamentId);
+        List<ParticipantUser> participants = participantDao.getTournamentParticipantUsers(tournamentId);
 
         Map<Integer, List<ParticipantUserInfo>> byGroup = new TreeMap<>();
         for (ParticipantUser p : participants) {
@@ -148,12 +145,7 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Override
     public void closeInscriptions(Long tournament_id){
-        tournamentDao.closeInscriptions(tournament_id);
-    }
-
-    @Override
-    public Boolean hasJoined(Long userId, Long tournamentId) {
-        return tournamentDao.hasJoined(userId, tournamentId);
+        tournamentDao.closeInscriptions(tournament_id, participantDao.getTournamentParticipantUsers(tournament_id));
     }
 
     @Override
@@ -178,7 +170,7 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Override
     public void startTournament(Long tournament_id){
-        tournamentDao.startTournament(tournament_id);
+        tournamentDao.startTournament(tournament_id, participantDao.getTournamentParticipantUsers(tournament_id));
     }
 
     @Override

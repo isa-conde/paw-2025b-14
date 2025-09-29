@@ -4,6 +4,8 @@ import java.util.Optional;
 
 public interface ImageDao {
 
-    public Optional<byte[]> findById(Long id);
+    Optional<byte[]> findById(Long id);
+
+    Integer insertImage(byte[] img);
 
 }
