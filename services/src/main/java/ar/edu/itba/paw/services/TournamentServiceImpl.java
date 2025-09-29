@@ -87,20 +87,9 @@ public class TournamentServiceImpl implements TournamentService {
             Integer stage = m.getStage();
             if (stage == null) continue;
 
-            Integer gLocal   = (m.getLocalId()   != null) ? userGroup.get(m.getLocalId())   : null;
-            Integer gVisitor = (m.getVisitorId() != null) ? userGroup.get(m.getVisitorId()) : null;
-
-            Integer group;
-            if (gLocal != null && gVisitor != null) {
-                if (!gLocal.equals(gVisitor)) continue;
-                group = gLocal;
-            } else if (gLocal != null) {
-                group = gLocal;
-            } else if (gVisitor != null) {
-                group = gVisitor;
-            } else {
-                continue;
-            }
+            int gLocal   = (m.getLocalId()   != null) ? userGroup.getOrDefault(m.getLocalId(), 0)   : 0;
+            int gVisitor = (m.getVisitorId() != null) ? userGroup.getOrDefault(m.getVisitorId(), 0) : 0;
+            int group = (gLocal > 0 && gLocal == gVisitor) ? gLocal : 0;
 
             result.computeIfAbsent(group, g -> new TreeMap<>())
                     .computeIfAbsent(stage, s -> new ArrayList<>())
@@ -109,8 +98,7 @@ public class TournamentServiceImpl implements TournamentService {
         return result;
     }
 
-
-	@Override
+    @Override
     public List<TournamentImg> findWithImg(TournamentFilter tournamentFilter){
         return tournamentDao.findWithImg(tournamentFilter);
     }
@@ -118,8 +106,10 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public Map<Integer, List<ParticipantUserInfo>> getTournamentParticipantsByGroup(Long tournamentId) {
         List<User> users = tournamentDao.getTournamentUsers(tournamentId);
-        Map<Long, User> usersById = new HashMap<>(users.size() * 2);
-        for (User u : users) usersById.put(u.getId(), u);
+        Map<Long, User> usersById = new HashMap<>();
+        for (User u : users) {
+            usersById.put(u.getId(), u);
+        }
 
         List<ParticipantUser> participants = tournamentDao.getTournamentParticipantUsers(tournamentId);
 
@@ -143,7 +133,9 @@ public class TournamentServiceImpl implements TournamentService {
         for (List<ParticipantUserInfo> list : byGroup.values()) {
             list.sort((a, b) -> {
                 int cmp = b.getPoints().compareTo(a.getPoints());
-                if (cmp != 0) return cmp;
+                if (cmp != 0) {
+                    return cmp;
+                }
                 return a.getUsername().compareToIgnoreCase(b.getUsername());
             });
         }
