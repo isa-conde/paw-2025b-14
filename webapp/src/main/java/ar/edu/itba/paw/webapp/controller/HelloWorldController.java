@@ -294,8 +294,6 @@ public class HelloWorldController {
         return new ModelAndView("redirect:/" + g.getId());
     }
 
-
-
     @Autowired
     private MessageSource messageSource;
     @RequestMapping("/tournament")
@@ -398,7 +396,7 @@ public class HelloWorldController {
         return new ModelAndView("redirect:/tournament?tournamentId=" + form.getTournamentId() + "&section=matches");
     }
 
-    @RequestMapping(value = "/tournamentsPage")
+    @RequestMapping(value = "/tournamentsPage", method = RequestMethod.GET)
     public ModelAndView tournamentsPage(Principal principal, @ModelAttribute("filterForm") FilterForm filterForm, TournamentFilter tf) {
         final ModelAndView mav = new ModelAndView("tournamentsPage");
         List<Game> allGames = gs.findAll();

@@ -15,7 +15,7 @@
       </div>
     </paw:banner>
     <div class="content-container">
-      <form:form cssClass="form" modelAttribute="filterForm" method="post">
+      <form:form cssClass="form" modelAttribute="filterForm" method="get">
         <div class="filter-container">
           <paw:input path="game_id" label="tournaments.game" inputType="select" items="${games}" itemValue="id" itemLabel="name" emptyOption="${allGames}" inline="true"/>
           <paw:input path="region" label="tournaments.region" inputType="select" items="${regions}" emptyOption="${allRegions}" inline="true"/>
