@@ -294,6 +294,8 @@ public class HelloWorldController {
         return new ModelAndView("redirect:/" + g.getId());
     }
 
+
+
     @Autowired
     private MessageSource messageSource;
     @RequestMapping("/tournament")
@@ -371,6 +373,7 @@ public class HelloWorldController {
         Optional<Tournament> tournamentOpt = ts.findById(tournamentId);
         if (tournamentOpt.isPresent() && tournamentOpt.get().getCreator_id().equals(user.getId())) {
             ts.closeInscriptions(tournamentId);
+            ts.startTournament(tournamentId);
         }
 
         return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);

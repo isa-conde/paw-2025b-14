@@ -25,9 +25,7 @@ public interface TournamentService {
 
     public void joinTournamentUser(Long user_id, Long tournament_id);
 
-    public List<ParticipantUserInfo> getTournamentParticipants(Long tournament_id);
-
-    public void createMatches(Long tournament_id);
+    public Map<Integer, List<ParticipantUserInfo>> getTournamentParticipantsByGroup(Long tournamentId);
 
     public Optional<Structure> getTournamentStructure(Long tournament_id);
 
@@ -54,4 +52,8 @@ public interface TournamentService {
     public List<Tournament> searchByName(String name);
 
     public void startTournament(Long tournament_id);
+
+    void swapGroups(Long tournament_id, Long user1, Long user2);
+
+    void swapMatchesMembers(Long tournament_id, Long match1, Long match2, Long user1, Long user2);
 }

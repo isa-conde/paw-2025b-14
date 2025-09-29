@@ -117,17 +117,12 @@
                             </c:if>
                         </c:forEach>
                     </c:when>
-                    <c:when test="${tournament.structure == 'HYBRID'}">
+                    <c:when test="${tournament.structure == HYBRID}">
                         <c:choose>
                             <c:when test="${not empty participants}">
                                 <c:set var="hasGroupZero" value="false" />
-                                <c:forEach var="g" items="${participants}">
-                                    <c:if test="${g.key == 0}">
-                                        <c:set var="hasGroupZero" value="true" />
-                                    </c:if>
-                                </c:forEach>
                                 <c:choose>
-                                    <c:when test="${hasGroupZero}">
+                                    <c:when test="${!tournament.is_group_stage}">
                                         <paw:text type="title" size="l">
                                             <spring:message code="tournament.standings"/>
                                         </paw:text>
@@ -169,11 +164,9 @@
                     <c:otherwise>
                         <c:choose>
                             <c:when test="${tournament.structure == 'HYBRID'}">
-                                <c:set var="hasGroupZero" value="false" />
                                 <c:set var="groupZeroMatches" value="0" />
                                 <c:forEach var="groupEntry" items="${matchesByGroup}">
                                     <c:if test="${groupEntry.key == 0}">
-                                        <c:set var="hasGroupZero" value="true" />
                                         <c:forEach var="stageEntry" items="${groupEntry.value}">
                                             <c:set var="groupZeroMatches" value="${groupZeroMatches + stageEntry.value.size()}" />
                                         </c:forEach>
@@ -181,7 +174,7 @@
                                 </c:forEach>
 
                                 <c:choose>
-                                    <c:when test="${hasGroupZero && groupZeroMatches > 0}">
+                                    <c:when test="${!tournament.is_group_stage && groupZeroMatches > 0}">
                                         <c:forEach var="groupEntry" items="${matchesByGroup}">
                                             <c:if test="${groupEntry.key == 0}">
                                                 <c:forEach var="stageEntry" items="${groupEntry.value}">
