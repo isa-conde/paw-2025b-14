@@ -190,4 +190,9 @@ public class TournamentServiceImpl implements TournamentService {
     public void swapMatchesMembers(Long tournament_id, Long match1, Long match2, Long user1, Long user2){
         tournamentDao.swapMatchesMembers(tournament_id, match1, match2, user1, user2);
     }
+
+    @Override
+    public Map<Long,List<Tournament>> getHomeTournaments() {
+        return tournamentDao.getHomeTournaments();
+    }
 }

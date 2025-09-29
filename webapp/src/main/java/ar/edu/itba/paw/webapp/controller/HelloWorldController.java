@@ -196,22 +196,11 @@ public class HelloWorldController {
         mav.addObject("structures", Arrays.stream(Structure.values()).toList());
         mav.addObject("tournamentForm", tournamentForm);
 
-        List<Game> topGamesWithTournaments = allGames.stream()
-                .map(game -> {
-                    List<Tournament> gameTours = ts.findGameTournaments(game.getId());
-                    return new Object[]{game, gameTours.size()};
-                })
-                .filter(gameData -> (Integer) gameData[1] > 0)
-                .sorted((a, b) -> Integer.compare((Integer) b[1], (Integer) a[1]))
-                .limit(5)
-                .map(gameData -> (Game) gameData[0])
-                .toList();
-
-        for (Game game : topGamesWithTournaments) {
-            tournamentFilter.setGame_id(game.getId());
-            List<Tournament> gameTours = ts.findTournaments(tournamentFilter);
-            mav.addObject("tournaments" + game.getId(), gameTours);
-            mav.addObject("game" + game.getId(), game);
+        Map<Long, List<Tournament>> tournaments = ts.getHomeTournaments();
+        mav.addObject("gameIds", tournaments.keySet());
+        for (Long game_id : tournaments.keySet()) {
+            mav.addObject("tournaments" + game_id, tournaments.get(game_id));
+            mav.addObject("game" + game_id, gs.findById(game_id).get());
         }
         return mav;
     }

@@ -3,7 +3,6 @@ package ar.edu.itba.paw.persistence;
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.model.ParticipantUser;
 import ar.edu.itba.paw.model.Tournament.Tournament;
-import ar.edu.itba.paw.model.Tournament.TournamentImg;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.*;
 import ar.edu.itba.paw.model.enums.Elo;
@@ -847,5 +846,29 @@ public class TournamentJdbcDao implements TournamentDao {
                     user1, tournament_id, match2
             );
         }
+    }
+
+    @Override
+    public Map<Long,List<Tournament>> getHomeTournaments() {
+        String sql = """
+            SELECT t.*
+            FROM tournament t
+            WHERE t.game_id IN (
+                SELECT g.id
+                FROM game g
+                JOIN tournament t2 ON g.id = t2.game_id
+                GROUP BY g.id
+                ORDER BY COUNT(t2.id) DESC
+                LIMIT 5
+            )
+            ORDER BY t.game_id, t.start_date
+        """;
+        List<Tournament> tournaments = jdbcTemplate.query(sql, ROW_MAPPER);
+
+        return tournaments.stream()
+                .collect(Collectors.groupingBy(Tournament::getGame_id,
+                        LinkedHashMap::new,
+                        Collectors.toList()));
+
     }
 }
