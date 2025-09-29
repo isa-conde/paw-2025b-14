@@ -296,6 +296,8 @@ public class HelloWorldController {
         return new ModelAndView("redirect:/" + g.getId());
     }
 
+
+
     @Autowired
     private MessageSource messageSource;
     @RequestMapping("/tournament")

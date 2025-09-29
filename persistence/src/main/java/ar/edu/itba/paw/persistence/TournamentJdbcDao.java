@@ -11,6 +11,7 @@ import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -18,6 +19,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
 import java.sql.Array;
@@ -507,6 +509,10 @@ public class TournamentJdbcDao implements TournamentDao {
 
     @Override
     public void setMatchWinner(Long matchId, Long tournamentId, Integer winner) {
+        if (!isTournamentStarted(tournamentId)) {
+            throw new IllegalStateException("Results cannot be set before the tournament starts");
+        }
+
         if (winner == null || (winner != 1 && winner != 2)) {
             throw new IllegalArgumentException("winner must be 1 (local) or 2 (visitor)");
         }
@@ -742,23 +748,12 @@ public class TournamentJdbcDao implements TournamentDao {
                     tournamentId, maxPoints
             );
         } else {
-            Match finalMatch = jdbcTemplate.queryForObject(
-                    "SELECT * FROM match WHERE tournament_id = ? AND id = ?",
-                    ROW_MAPPER_MATCH, tournamentId, matchId
-            );
+            Match finalMatch = getMatch(tournamentId, matchId);
 
             if (finalMatch != null && finalMatch.getWinner() != null &&  finalMatch.getWinner() > 0) {
-                Long winnerId = (finalMatch.getWinner() == 1)
+                winner = (finalMatch.getWinner() == 1)
                         ? finalMatch.getLocalId()
                         : finalMatch.getVisitorId();
-
-                winner = jdbcTemplate.queryForObject(
-                        "SELECT pu.user_id " +
-                                "FROM participant_user pu " +
-                                "WHERE pu.tournament_id = ? AND pu.user_id = ?",
-                        (rs, rowNum) -> rs.getLong("user_id"),
-                        tournamentId, winnerId
-                );
             }
         }
         jdbcTemplate.update("UPDATE tournament SET tournament_winner = ? WHERE id = ?", winner, tournamentId);
@@ -776,5 +771,106 @@ public class TournamentJdbcDao implements TournamentDao {
                 r -> ((Number) r.get("user_id")).longValue(),
                 r -> r.get("group_number") == null ? 0 : ((Number) r.get("group_number")).intValue()
         ));
+    }
+
+    private Integer getGroupNumber(long tournamentId, long userId) {
+        try {
+            return jdbcTemplate.queryForObject(
+                    "SELECT group_number FROM participant_user WHERE tournament_id=? AND user_id=?",
+                    Integer.class, tournamentId, userId
+            );
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
+    }
+
+    private Match getMatch(long tournamentId, long matchId) {
+         return jdbcTemplate.queryForObject(
+                "SELECT * FROM match WHERE tournament_id = ? AND id = ?",
+                ROW_MAPPER_MATCH, tournamentId, matchId
+        );
+    }
+
+    private boolean isTournamentStarted(Long tournamentId) {
+        return jdbcTemplate.queryForObject(
+                "SELECT tournament_started FROM tournament WHERE id = ?",
+                Boolean.class, tournamentId
+        );
+    }
+
+    @Override
+    @Transactional
+    public void swapGroups(Long tournament_id, Long user1, Long user2){
+        if (isTournamentStarted(tournament_id)) {
+            throw new IllegalStateException("Members cannot be swapped after the tournament has started");
+        }
+
+        Integer g1 = getGroupNumber(tournament_id, user1);
+        Integer g2 = getGroupNumber(tournament_id, user2);
+
+        if (g1 == null || g2 == null) {
+            throw new IllegalArgumentException("Both users must exist in the tournament");
+        }
+        if (g1.equals(g2)) {
+            return;
+        }
+
+        jdbcTemplate.update(
+                "UPDATE participant_user " +
+                        "SET group_number = CASE " +
+                        "  WHEN user_id = ? THEN ? " +
+                        "  WHEN user_id = ? THEN ? " +
+                        "  ELSE group_number END " +
+                        "WHERE tournament_id = ? AND user_id IN (?, ?)",
+                user1, g2,
+                user2, g1,
+                tournament_id, user1, user2
+        );
+    }
+
+    @Override
+    @Transactional
+    public void swapMatchesMembers(Long tournament_id, Long match1, Long match2, Long user1, Long user2){
+        if (isTournamentStarted(tournament_id)) {
+            throw new IllegalStateException("Members cannot be swapped after the tournament has started");
+        }
+
+        Match m1 = getMatch(tournament_id, match1);
+        Match m2 = getMatch(tournament_id, match2);
+        if (m1 == null || m2 == null) {
+            throw new IllegalArgumentException("Both matches must exist in the tournament");
+        }
+
+        boolean u1IsLocalM1 = m1.getLocalId() != null && m1.getLocalId().equals(user1);
+        boolean u1IsVisitM1 = m1.getVisitorId() != null && m1.getVisitorId().equals(user1);
+        boolean u2IsLocalM2 = m2.getLocalId() != null && m2.getLocalId().equals(user2);
+        boolean u2IsVisitM2 = m2.getVisitorId() != null && m2.getVisitorId().equals(user2);
+
+        if ((!u1IsLocalM1 && !u1IsVisitM1) || (!u2IsLocalM2 && !u2IsVisitM2)) {
+            throw new IllegalArgumentException("user1 must be in match1 and user2 must be in match2");
+        }
+
+        if (u1IsLocalM1) {
+            jdbcTemplate.update(
+                    "UPDATE match SET local_id=? WHERE tournament_id=? AND id=?",
+                    user2, tournament_id, match1
+            );
+        } else {
+            jdbcTemplate.update(
+                    "UPDATE match SET visitor_id=? WHERE tournament_id=? AND id=?",
+                    user2, tournament_id, match1
+            );
+        }
+        if (u2IsLocalM2) {
+            jdbcTemplate.update(
+                    "UPDATE match SET local_id=? WHERE tournament_id=? AND id=?",
+                    user1, tournament_id, match2
+            );
+        } else {
+            jdbcTemplate.update(
+                    "UPDATE match SET visitor_id=? WHERE tournament_id=? AND id=?",
+                    user1, tournament_id, match2
+            );
+        }
     }
 }

@@ -191,4 +191,14 @@ public class TournamentServiceImpl implements TournamentService {
     public void startTournament(Long tournament_id){
         tournamentDao.startTournament(tournament_id);
     }
+
+    @Override
+    public void swapGroups(Long tournament_id, Long user1, Long user2){
+        tournamentDao.swapGroups(tournament_id, user1, user2);
+    }
+
+    @Override
+    public void swapMatchesMembers(Long tournament_id, Long match1, Long match2, Long user1, Long user2){
+        tournamentDao.swapMatchesMembers(tournament_id, match1, match2, user1, user2);
+    }
 }
