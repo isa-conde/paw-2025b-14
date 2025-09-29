@@ -37,8 +37,8 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public List<Tournament> findTournaments(TournamentFilter tournamentFilter) {
-        return tournamentDao.findTournaments(tournamentFilter);
+    public List<Tournament> findTournaments(TournamentFilter tournamentFilter, Long page) {
+        return tournamentDao.findTournaments(tournamentFilter, page);
     }
 
     @Override
@@ -192,7 +192,12 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public Map<Long,List<Tournament>> getHomeTournaments() {
-        return tournamentDao.getHomeTournaments();
+    public Map<Long,List<Tournament>> getUnfilteredTournamentPages(Long page) {
+        return tournamentDao.getUnfilteredTournamentPages(page);
+    }
+
+    @Override
+    public Integer getPageAmount(Integer pageSize, TournamentFilter tf){
+        return tournamentDao.getPageAmount(pageSize, tf);
     }
 }

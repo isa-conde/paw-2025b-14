@@ -18,7 +18,7 @@ public interface TournamentDao {
 
     public Optional<Tournament> findById(Long id);
 
-    public List<Tournament> findTournaments(TournamentFilter tournamentFilter);
+    public List<Tournament> findTournaments(TournamentFilter tournamentFilter, Long page);
 
     public List<Tournament> findGameTournaments(Long game_id);
 
@@ -64,5 +64,7 @@ public interface TournamentDao {
 
     void swapMatchesMembers(Long tournament_id, Long match1, Long match2, Long user1, Long user2);
 
-    Map<Long,List<Tournament>> getHomeTournaments();
+    Map<Long,List<Tournament>> getUnfilteredTournamentPages(Long page);
+
+    Integer getPageAmount(Integer pageSize, TournamentFilter tf);
 }

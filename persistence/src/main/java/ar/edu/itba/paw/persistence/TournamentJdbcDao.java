@@ -626,11 +626,20 @@ public class TournamentJdbcDao implements TournamentDao {
     }
 
     @Override
-    public List<Tournament> findTournaments(TournamentFilter filter) {
+    public List<Tournament> findTournaments(TournamentFilter filter, Long page) {
         MapSqlParameterSource params = new MapSqlParameterSource();
-        String sql = "SELECT * FROM tournament t" + buildTournamentFilterSql(filter, params);
+        StringBuilder sql = new StringBuilder("SELECT DISTINCT ON (t.id) t.* FROM tournament t");
 
-        return namedJdbcTemplate.query(sql, params, ROW_MAPPER);
+        sql.append(buildTournamentFilterSql(filter, params));
+
+        int pageSize = 9;
+        int offset = (page != null && page > 0) ? (int) ((page - 1) * pageSize) : 0;
+
+        sql.append(" LIMIT :limit OFFSET :offset");
+        params.addValue("limit", 9);
+        params.addValue("offset", 9*page);
+
+        return namedJdbcTemplate.query(sql.toString(), params, ROW_MAPPER);
     }
 
     private String buildTournamentFilterSql(TournamentFilter filter, MapSqlParameterSource params) {
@@ -849,7 +858,7 @@ public class TournamentJdbcDao implements TournamentDao {
     }
 
     @Override
-    public Map<Long,List<Tournament>> getHomeTournaments() {
+    public Map<Long,List<Tournament>> getUnfilteredTournamentPages(Long page) {
         String sql = """
             SELECT t.*
             FROM tournament t
@@ -859,16 +868,37 @@ public class TournamentJdbcDao implements TournamentDao {
                 JOIN tournament t2 ON g.id = t2.game_id
                 GROUP BY g.id
                 ORDER BY COUNT(t2.id) DESC
-                LIMIT 5
+                LIMIT 3
+                OFFSET ?
             )
             ORDER BY t.game_id, t.start_date
         """;
-        List<Tournament> tournaments = jdbcTemplate.query(sql, ROW_MAPPER);
+        List<Tournament> tournaments = jdbcTemplate.query(sql, ROW_MAPPER, page * 3);
 
         return tournaments.stream()
                 .collect(Collectors.groupingBy(Tournament::getGame_id,
                         LinkedHashMap::new,
                         Collectors.toList()));
 
+    }
+
+    @Override
+    public Integer getPageAmount(Integer pageSize, TournamentFilter tf) {
+        MapSqlParameterSource params = new MapSqlParameterSource();
+
+        StringBuilder sql = new StringBuilder("SELECT ");
+
+        if (tf.getGame_id() != null) {
+            sql.append("COUNT(*) ");
+        } else {
+            sql.append("COUNT(DISTINCT t.game_id) ");
+        }
+
+        sql.append("FROM tournament t");
+        sql.append(buildTournamentFilterSql(tf, params));
+
+        Integer count = namedJdbcTemplate.queryForObject(sql.toString(), params, Integer.class);
+
+        return (int) Math.ceil((double) count / pageSize);
     }
 }
