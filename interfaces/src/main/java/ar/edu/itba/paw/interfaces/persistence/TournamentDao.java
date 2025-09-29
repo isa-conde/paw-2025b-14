@@ -1,8 +1,6 @@
 package ar.edu.itba.paw.interfaces.persistence;
 
 import ar.edu.itba.paw.model.ParticipantUser;
-import ar.edu.itba.paw.model.ParticipantUserInfo;
-import ar.edu.itba.paw.model.Tournament.TournamentImg;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
@@ -40,19 +38,15 @@ public interface TournamentDao {
 
     public void loadScores(Long match_id, Long tournament_id, Integer local_score, Integer visitor_score);
 
-    public List<TournamentImg> findWithImg(TournamentFilter tournamentFilter);
-
-    public Optional<TournamentImg> findByIdWithImg(Long id);
-
-    public List<TournamentImg> findByCreatorImg(Long creator_id);
+    public List<Tournament> findByCreator(Long creator_id);
 
     public void setFinished(Long tournament_id, Long match_id);
 
     public Boolean hasJoined(Long userId, Long tournamentId);
 
-    public List<TournamentImg> findUserActiveTournaments(Long userId);
+    public List<Tournament> findUserActiveTournaments(Long userId);
 
-    public List<TournamentImg> findUserPastTournaments(Long userId);
+    public List<Tournament> findUserPastTournaments(Long userId);
 
     public void closeInscriptions(Long tournament_id);
 
@@ -60,7 +54,7 @@ public interface TournamentDao {
 
     public void setMatchWinner(Long matchId, Long tournamentId, Integer winner);
 
-    public List<TournamentImg> searchByName(String name);
+    public List<Tournament> searchByName(String name);
 
     public void startTournament(Long tournament_id);
 

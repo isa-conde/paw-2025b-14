@@ -70,13 +70,6 @@ public class TournamentJdbcDao implements TournamentDao {
         return participant;
     };
 
-    private static final RowMapper<TournamentImg> ROW_MAPPER_IMG = (rs, rowNum) -> new TournamentImg(new Tournament(rs.getLong("id"),
-            rs.getLong("creator_id"), rs.getString("name"), rs.getLong("game_id"), Region.valueOf(rs.getString("region")),
-            Elo.valueOf(rs.getString("elo")), rs.getDate("start_date").toLocalDate(), rs.getDate("end_date").toLocalDate(),
-            rs.getString("format"), Structure.valueOf(rs.getString("structure")), rs.getInt("max_participants"), rs.getInt("image_id"),
-            rs.getBoolean("open_inscriptions"), rs.getBoolean("is_finished")), (Base64.getEncoder().encodeToString(rs.getBytes("image")))
-            );
-
     public static final RowMapper<Match> ROW_MAPPER_MATCH = (rs, rowNum) -> new Match(
             rs.getLong("id"),
             rs.getLong("tournament_id"),
@@ -442,14 +435,9 @@ public class TournamentJdbcDao implements TournamentDao {
         ), tournament_id);
     }
 
-    public Optional<TournamentImg> findByIdWithImg(Long id){
-        return jdbcTemplate.query("SELECT t.*, i.image FROM tournament t LEFT JOIN image i ON t.image_id = i.id WHERE t.id = ?", ROW_MAPPER_IMG, id
-        ).stream().findFirst();
-    }
-
     @Override
-    public List<TournamentImg> findByCreatorImg(Long creator_id) {
-        return jdbcTemplate.query("SELECT * FROM tournament t LEFT JOIN image i ON t.image_id = i.id WHERE creator_id = ?", ROW_MAPPER_IMG, creator_id);
+    public List<Tournament> findByCreator(Long creator_id) {
+        return jdbcTemplate.query("SELECT * FROM tournament t WHERE creator_id = ?", ROW_MAPPER, creator_id);
     }
 
     @Override
@@ -623,22 +611,21 @@ public class TournamentJdbcDao implements TournamentDao {
     }
 
     @Override
-    public List<TournamentImg> findUserActiveTournaments(Long userId) {
+    public List<Tournament> findUserActiveTournaments(Long userId) {
         return findUserTournaments(userId, false);
     }
 
     @Override
-    public List<TournamentImg> findUserPastTournaments(Long userId) {
+    public List<Tournament> findUserPastTournaments(Long userId) {
         return findUserTournaments(userId, true);
     }
 
-    private List<TournamentImg> findUserTournaments(Long userId, Boolean isFinished) {
-        String sql = "SELECT t.*, i.image " +
+    private List<Tournament> findUserTournaments(Long userId, Boolean isFinished) {
+        String sql = "SELECT t.* " +
                 "FROM tournament t " +
-                "LEFT JOIN image i ON t.image_id = i.id " +
                 "INNER JOIN participant_user p ON p.tournament_id = t.id " +
                 "WHERE p.user_id = ? AND t.is_finished = ?; ";
-        return jdbcTemplate.query(sql, ROW_MAPPER_IMG, userId, isFinished);
+        return jdbcTemplate.query(sql, ROW_MAPPER, userId, isFinished);
     }
 
     @Override
@@ -647,17 +634,6 @@ public class TournamentJdbcDao implements TournamentDao {
         String sql = "SELECT * FROM tournament t" + buildTournamentFilterSql(filter, params);
 
         return namedJdbcTemplate.query(sql, params, ROW_MAPPER);
-    }
-
-    @Override
-    public List<TournamentImg> findWithImg(TournamentFilter filter) {
-        MapSqlParameterSource params = new MapSqlParameterSource();
-        String sql = "SELECT t.*, i.image " +
-                "FROM tournament t " +
-                "LEFT JOIN image i ON t.image_id = i.id" +
-                buildTournamentFilterSql(filter, params);
-
-        return namedJdbcTemplate.query(sql, params, ROW_MAPPER_IMG);
     }
 
     private String buildTournamentFilterSql(TournamentFilter filter, MapSqlParameterSource params) {
@@ -719,13 +695,12 @@ public class TournamentJdbcDao implements TournamentDao {
         return sql.toString();
     }
 
-    public List<TournamentImg> searchByName(String name){
-        String sql = "SELECT t.*, i.image " +
-                "FROM tournament t " +
-                "LEFT JOIN image i ON t.image_id = i.id " +
+    public List<Tournament> searchByName(String name){
+        String sql = "SELECT * " +
+                "FROM tournament " +
                 "WHERE LOWER(name) LIKE '%' || LOWER(?) || '%'";
 
-        return jdbcTemplate.query(sql, ROW_MAPPER_IMG, name);
+        return jdbcTemplate.query(sql, ROW_MAPPER, name);
     }
 
     private void setTournamentWinner(Long tournamentId, Long matchId) {

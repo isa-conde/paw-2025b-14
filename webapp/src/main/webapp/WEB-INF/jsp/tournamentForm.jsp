@@ -38,11 +38,11 @@
                     </form:form>
                 </c:when>
                 <c:when test="${step == 2}">
-                    <form:form cssClass="form" modelAttribute="tournamentForm" action="${pageContext.request.contextPath}/tournaments/new/step2" method="post" enctype="multipart/form-data">
+                    <form:form cssClass="form" modelAttribute="tournamentForm" action="${pageContext.request.contextPath}/tournaments/new/step2" method="post" enctype="multipart/form-data" onsubmit="this.querySelector('button, input[type=submit]').disabled=true;" >
                         <div>
                             <paw:text type="title" size="xl"><spring:message code="createTournament.Step2"/></paw:text>
                             <div class="row">
-                                <paw:input path="max_participants" label="home.createTournament.maxParticipants" inputType="number" hasConstraint="true"/>
+                                <paw:input path="max_participants" label="home.createTournament.maxParticipants" inputType="number" hasConstraint="true" />
                                 <paw:input path="format" label="home.createTournament.format" hasConstraint="true" inputType="select" items="${formats}" itemLabel="name" itemValue="name"/>
                             </div>
                             <div class="row center">

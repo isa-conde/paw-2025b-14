@@ -17,11 +17,11 @@
             <c:forEach var="e" items="${elements}" varStatus="status">
                 <div class="carrousel-item">
                     <paw:element-card 
-                        image="data:image/png;base64,${e.base64Img}"
-                        title="${isGame? e.game.name : e.tournament.name}"
-                        start_date="${isGame? '' : e.tournament.start_date}"
-                        end_date="${isGame? '' : e.tournament.end_date}"
-                        id="${isGame? e.game.id : e.tournament.id}"
+                        image="${pageContext.request.contextPath}/image/${e.image_id}"
+                        title="${isGame? e.name : e.name}"
+                        start_date="${isGame? '' : e.start_date}"
+                        end_date="${isGame? '' : e.end_date}"
+                        id="${isGame? e.id : e.id}"
                         isGame="${isGame}"/>
                 </div>
             </c:forEach>

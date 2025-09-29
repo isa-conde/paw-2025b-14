@@ -6,7 +6,7 @@
 <paw:layout user="${user}">
     <paw:banner image="${pageContext.request.contextPath}/images/tree.jpg" cropTop="true">
         <div class="page-title">
-            <paw:text type="title" size="xl" stroke="true">My Tournaments</paw:text>
+            <paw:text type="title" size="xl" stroke="true"><spring:message code="myTournaments.title"/></paw:text>
         </div>
     </paw:banner>
     <spring:message code="tournament.navbar.active" var="activeLabel"/>
