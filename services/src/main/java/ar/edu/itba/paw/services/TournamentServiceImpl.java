@@ -7,7 +7,6 @@ import ar.edu.itba.paw.model.ParticipantUserInfo;
 import ar.edu.itba.paw.model.MatchWithPlayers;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.User;
-import ar.edu.itba.paw.model.Tournament.TournamentImg;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
@@ -38,8 +37,8 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public List<Tournament> findTournaments(TournamentFilter tournamentFilter) {
-        return tournamentDao.findTournaments(tournamentFilter);
+    public List<Tournament> findTournaments(TournamentFilter tournamentFilter, Long page) {
+        return tournamentDao.findTournaments(tournamentFilter, page);
     }
 
     @Override
@@ -59,11 +58,6 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public void createMatches(Long tournament_id) {
-		tournamentDao.createMatches(tournament_id);
-	}
-
-    @Override
     public Optional<Structure> getTournamentStructure(Long tournament_id){
     	return tournamentDao.getTournamentStructure(tournament_id);
     }
@@ -80,95 +74,71 @@ public class TournamentServiceImpl implements TournamentService {
 //
 
     @Override
-    public Map<Integer, Map<Integer, List<MatchWithPlayers>>> getTournamentMatchesByGroup(Long tournament_id) {
-        List<MatchWithPlayers> matches = tournamentDao.getTournamentMatches(tournament_id);
-        Map<Integer, Map<Integer, List<MatchWithPlayers>>> tournamentMatchesByGroup = new TreeMap<>();
-        Tournament t = findById(tournament_id).orElse(null);
+    public Map<Integer, Map<Integer, List<MatchWithPlayers>>> getTournamentMatchesByGroup(Long tournamentId) {
+        List<MatchWithPlayers> matches = tournamentDao.getTournamentMatches(tournamentId);
+        Tournament t = findById(tournamentId).orElse(null);
+        Map<Integer, Map<Integer, List<MatchWithPlayers>>> result = new TreeMap<>();
+        if (t == null || matches.isEmpty()) return result;
 
-        if (!matches.isEmpty() && t != null) {
-            for (MatchWithPlayers match : matches) {
-                if (match.getGroupNumber() != null && match.getStage() != null) {
-                    int group = match.getGroupNumber();
-                    int stage = match.getStage();
-                    tournamentMatchesByGroup.putIfAbsent(group, new TreeMap<>());
-                    Map<Integer, List<MatchWithPlayers>> matchesByStage = tournamentMatchesByGroup.get(group);
-                    matchesByStage.putIfAbsent(stage, new ArrayList<>());
-                    matchesByStage.get(stage).add(match);
-                }
-            }
+        Map<Long, Integer> userGroup = tournamentDao.getTournamentGroupsByUser(tournamentId);
+
+        for (MatchWithPlayers m : matches) {
+            Integer stage = m.getStage();
+            if (stage == null) continue;
+
+            int gLocal   = (m.getLocalId()   != null) ? userGroup.getOrDefault(m.getLocalId(), 0)   : 0;
+            int gVisitor = (m.getVisitorId() != null) ? userGroup.getOrDefault(m.getVisitorId(), 0) : 0;
+            int group = (gLocal > 0 && gLocal == gVisitor) ? gLocal : 0;
+
+            result.computeIfAbsent(group, g -> new TreeMap<>())
+                    .computeIfAbsent(stage, s -> new ArrayList<>())
+                    .add(m);
         }
-        return tournamentMatchesByGroup;
-    }
-
-
-	@Override
-    public List<TournamentImg> findWithImg(TournamentFilter tournamentFilter){
-        return tournamentDao.findWithImg(tournamentFilter);
+        return result;
     }
 
     @Override
-    public Map<Integer, List<ParticipantUserInfo>> getTournamentParticipantsByGroup(Long tournament_id) {
-        List<User> users = tournamentDao.getTournamentUsers(tournament_id);
-        List<ParticipantUser> participants = tournamentDao.getTournamentParticipantUsers(tournament_id);
-        List<MatchWithPlayers> matches = tournamentDao.getTournamentMatches(tournament_id);
-
-        Map<Long, Integer> userPoints = new HashMap<>();
-        for (ParticipantUser p : participants) {
-            userPoints.put(p.getUser_id(), p.getPoints());
-        }
-
+    public Map<Integer, List<ParticipantUserInfo>> getTournamentParticipantsByGroup(Long tournamentId) {
+        List<User> users = tournamentDao.getTournamentUsers(tournamentId);
         Map<Long, User> usersById = new HashMap<>();
         for (User u : users) {
             usersById.put(u.getId(), u);
         }
 
-        Map<Integer, Set<Long>> groupUserIds = new HashMap<>();
-        for (MatchWithPlayers match : matches) {
-            if (match.getGroupNumber() != null) {
-                if (match.getLocalId() != null) {
-                    groupUserIds.computeIfAbsent(match.getGroupNumber(), g -> new HashSet<>())
-                            .add(match.getLocalId());
-                }
-                if (match.getVisitorId() != null) {
-                    groupUserIds.computeIfAbsent(match.getGroupNumber(), g -> new HashSet<>())
-                            .add(match.getVisitorId());
-                }
+        List<ParticipantUser> participants = tournamentDao.getTournamentParticipantUsers(tournamentId);
+
+        Map<Integer, List<ParticipantUserInfo>> byGroup = new TreeMap<>();
+        for (ParticipantUser p : participants) {
+            User u = usersById.get(p.getUser_id());
+            if (u == null) {
+                continue;
             }
+            Integer group = (p.getGroupNumber() != null) ? p.getGroupNumber() : 0;
+            ParticipantUserInfo info = new ParticipantUserInfo(
+                    u.getId(),
+                    u.getUsername(),
+                    u.getEmail(),
+                    p.getPoints(),
+                    group
+            );
+
+            byGroup.computeIfAbsent(group, g -> new ArrayList<>()).add(info);
         }
-
-        Map<Integer, List<ParticipantUserInfo>> participantsByGroup = new TreeMap<>();
-        for (Map.Entry<Integer, Set<Long>> entry : groupUserIds.entrySet()) {
-            int groupNumber = entry.getKey();
-            List<ParticipantUserInfo> groupList = new ArrayList<>();
-
-            for (Long userId : entry.getValue()) {
-                User user = usersById.get(userId);
-                if (user != null) {
-                    int points = userPoints.getOrDefault(userId, 0);
-                    groupList.add(new ParticipantUserInfo(
-                            user.getId(),
-                            user.getUsername(),
-                            user.getEmail(),
-                            points
-                    ));
+        for (List<ParticipantUserInfo> list : byGroup.values()) {
+            list.sort((a, b) -> {
+                int cmp = b.getPoints().compareTo(a.getPoints());
+                if (cmp != 0) {
+                    return cmp;
                 }
-            }
-            groupList.sort((p1, p2) -> p2.getPoints().compareTo(p1.getPoints()));
-            participantsByGroup.put(groupNumber, groupList);
+                return a.getUsername().compareToIgnoreCase(b.getUsername());
+            });
         }
-
-        return participantsByGroup;
-    }
-
-
-    @Override
-    public Optional<TournamentImg> findByIdWithImg(Long id){
-        return tournamentDao.findByIdWithImg(id);
+        return byGroup;
     }
 
     @Override
-    public List<TournamentImg> findByCreatorImg(Long creator_id) {
-        return tournamentDao.findByCreatorImg(creator_id);
+    public List<Tournament> findByCreator(Long creator_id) {
+        return tournamentDao.findByCreator(creator_id);
     }
 
     @Override
@@ -192,17 +162,42 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public List<TournamentImg> findUserActiveTournaments(Long userId) {
+    public List<Tournament> findUserActiveTournaments(Long userId) {
         return tournamentDao.findUserActiveTournaments(userId);
     }
 
     @Override
-    public List<TournamentImg> findUserPastTournaments(Long userId) {
+    public List<Tournament> findUserPastTournaments(Long userId) {
         return tournamentDao.findUserPastTournaments(userId);
     }
 
     @Override
-    public List<TournamentImg> searchByName(String name){
+    public List<Tournament> searchByName(String name){
         return tournamentDao.searchByName(name);
+    }
+
+    @Override
+    public void startTournament(Long tournament_id){
+        tournamentDao.startTournament(tournament_id);
+    }
+
+    @Override
+    public void swapGroups(Long tournament_id, Long user1, Long user2){
+        tournamentDao.swapGroups(tournament_id, user1, user2);
+    }
+
+    @Override
+    public void swapMatchesMembers(Long tournament_id, Long match1, Long match2, Long user1, Long user2){
+        tournamentDao.swapMatchesMembers(tournament_id, match1, match2, user1, user2);
+    }
+
+    @Override
+    public Map<Long,List<Tournament>> getUnfilteredTournamentPages(Long page) {
+        return tournamentDao.getUnfilteredTournamentPages(page);
+    }
+
+    @Override
+    public Integer getPageAmount(Integer pageSize, TournamentFilter tf){
+        return tournamentDao.getPageAmount(pageSize, tf);
     }
 }

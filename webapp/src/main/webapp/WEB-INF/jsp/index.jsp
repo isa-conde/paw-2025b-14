@@ -23,7 +23,11 @@
                     butText="home.createTournament.butText"
                     onclick="${createTournamentFunction}"
                     texture="true"/>
-            <paw:button-card title="home.joinTournament.title" butText="home.joinTournament.butText" onclick="${joinTournamentFunction}" texture="true"/>
+            <paw:button-card
+                    title="home.joinTournament.title"
+                    butText="home.joinTournament.butText"
+                    onclick="${joinTournamentFunction}"
+                    texture="true"/>
         </div>
         <div class="content-title">
             <a href="${pageContext.request.contextPath}/gamesPage" class="title-link">
@@ -38,17 +42,13 @@
             </a>
         </div>
 
-        <c:forEach var="game" items="${games}" varStatus="status">
-            <c:set var="gameId" value="${game.game.id}"/>
+        <c:forEach var="gameId" items="${gameIds}" varStatus="status">
             <c:set var="gameTournaments" value="${requestScope['tournaments' += gameId]}"/>
             <c:set var="gameObject" value="${requestScope['game' += gameId]}"/>
-
-            <c:if test="${not empty gameObject and not empty gameTournaments}">
                 <div class="carrousel-title">
-                    <paw:text type="title" size="s">${gameObject.game.name}</paw:text>
+                    <paw:text type="title" size="s">${gameObject.name}</paw:text>
                 </div>
                 <paw:carrousel id="game-${gameId}-tournaments" elements="${gameTournaments}"/>
-            </c:if>
         </c:forEach>
 
     </div>

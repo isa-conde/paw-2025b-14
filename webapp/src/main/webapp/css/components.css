@@ -1372,3 +1372,27 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     flex-direction: column;
     justify-content: center;
 }
+
+/*----Pagination-----*/
+
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.pagination a {
+    text-decoration: none;
+    color: var(--primary-text);
+}
+
+.pagination .active-page {
+    font-weight: bold;
+    border-bottom: 2px solid var(--primary-text);
+}

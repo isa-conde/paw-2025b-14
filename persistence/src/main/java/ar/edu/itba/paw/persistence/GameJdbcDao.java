@@ -3,7 +3,6 @@ package ar.edu.itba.paw.persistence;
 import ar.edu.itba.paw.interfaces.persistence.GameDao;
 import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.Game.GameFormat;
-import ar.edu.itba.paw.model.Game.GameImg;
 import ar.edu.itba.paw.model.enums.Genre;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -26,8 +25,6 @@ public class GameJdbcDao implements GameDao {
     private final SimpleJdbcInsert jdbcInsertImage;
 
     private static final RowMapper<Game> ROW_MAPPER = (rs, rowNum) -> new Game(rs.getLong("id"), rs.getString("name"), Genre.valueOf(rs.getString("genre")), rs.getInt("image_id"));
-
-    private static final RowMapper<GameImg> ROW_MAPPER_IMG = (rs, rowNum) -> new GameImg(new Game(rs.getLong("id"), rs.getString("name"), Genre.valueOf(rs.getString("genre")), rs.getInt("image_id")), Base64.getEncoder().encodeToString(rs.getBytes("image")));
 
     private static final RowMapper<GameFormat> ROW_MAPPER_FORMAT = (rs, rowNum) -> new GameFormat(rs.getLong("id"), rs.getString("name"), rs.getInt("players_per_team"), rs.getLong("game_id"));
 
@@ -56,11 +53,10 @@ public class GameJdbcDao implements GameDao {
     }
 
     @Override
-    public List<GameImg> searchByName(String name) {
-        String sql = "SELECT g.*, i.image FROM game g " +
-            "LEFT JOIN image i ON g.image_id = i.id " +
-            "WHERE LOWER(g.name) LIKE '%' || LOWER(?) || '%'";
-        return jdbcTemplate.query(sql, ROW_MAPPER_IMG, name);
+    public List<Game> searchByName(String name) {
+        String sql = "SELECT * FROM game " +
+                     "WHERE LOWER(name) LIKE '%' || LOWER(?) || '%'";
+        return jdbcTemplate.query(sql, ROW_MAPPER, name);
     }
 
     @Override
@@ -99,17 +95,6 @@ public class GameJdbcDao implements GameDao {
             jdbcInsertFormat.execute(values);
         }
         return game;
-    }
-
-    @Override
-    public List<GameImg> findAllWithImg() {
-        return jdbcTemplate.query("SELECT g.*, i.image FROM game g LEFT JOIN image i ON g.image_id = i.id;", ROW_MAPPER_IMG);
-    }
-
-    @Override
-    public Optional<GameImg> findByIdWithImage(long id) {
-        return jdbcTemplate.query("SELECT g.*, i.image FROM game g LEFT JOIN image i ON g.image_id = i.id WHERE g.id = ?", ROW_MAPPER_IMG, id
-        ).stream().findFirst();
     }
 
     @Override

@@ -1,19 +1,17 @@
 package ar.edu.itba.paw.webapp.form;
 
-import ar.edu.itba.paw.model.Game.Game;
-import ar.edu.itba.paw.model.Game.GameFormat;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
-import ar.edu.itba.paw.webapp.constraints.ValidTournamentFormConstraint;
+import ar.edu.itba.paw.webapp.constraints.DatesConstraint;
+import ar.edu.itba.paw.webapp.constraints.ImageConstraint;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import javax.validation.GroupSequence;
 import javax.validation.constraints.*;
 
-@ValidTournamentFormConstraint
+@DatesConstraint(groups = TournamentForm.StepOne.class)
 public class TournamentForm {
 
     public interface StepOne {}
@@ -34,7 +32,7 @@ public class TournamentForm {
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @NotNull(message = "{home.createTournament.notNull}", groups = StepOne.class)
     private LocalDate end_date;
-    @NotBlank(message = "{home.createTournament.notNull}", groups = StepTwo.class)
+    @NotNull(message = "{home.createTournament.notNull}", groups = StepTwo.class)
     private String format;
     @NotNull(message = "{home.createTournament.notNull}", groups = StepOne.class)
     private Structure structure;
@@ -42,6 +40,7 @@ public class TournamentForm {
     @Min(value = 4, message = "{home.createTournament.minParticipants}", groups = StepTwo.class)
     @Max(value = 32, message = "{home.createTournament.maxParticipantsError}", groups = StepTwo.class)
     private Integer max_participants;
+    @ImageConstraint(groups = StepTwo.class)
     @NotNull(message = "{home.createTournament.notNull}", groups = StepTwo.class)
     private MultipartFile image;
 

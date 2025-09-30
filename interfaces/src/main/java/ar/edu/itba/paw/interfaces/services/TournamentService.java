@@ -1,7 +1,6 @@
 package ar.edu.itba.paw.interfaces.services;
 
 import ar.edu.itba.paw.model.ParticipantUserInfo;
-import ar.edu.itba.paw.model.Tournament.TournamentImg;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
 import ar.edu.itba.paw.model.MatchWithPlayers;
@@ -18,7 +17,7 @@ public interface TournamentService {
 
     public Optional<Tournament> findById(Long id);
 
-    public List<Tournament> findTournaments(TournamentFilter tournamentFilter);
+    public List<Tournament> findTournaments(TournamentFilter tournamentFilter, Long page);
 
     public List<Tournament> findGameTournaments(Long game_id);
 
@@ -26,9 +25,7 @@ public interface TournamentService {
 
     public void joinTournamentUser(Long user_id, Long tournament_id);
 
-    public Map<Integer, List<ParticipantUserInfo>> getTournamentParticipantsByGroup(Long tournament_id);
-
-    public void createMatches(Long tournament_id);
+    public Map<Integer, List<ParticipantUserInfo>> getTournamentParticipantsByGroup(Long tournamentId);
 
     public Optional<Structure> getTournamentStructure(Long tournament_id);
 
@@ -36,11 +33,7 @@ public interface TournamentService {
 
     //public void joinTournamentTeam(Long team_id, Long tournament_id);
 
-    public List<TournamentImg> findWithImg(TournamentFilter tournamentFilter);
-
-    public Optional<TournamentImg> findByIdWithImg(Long id);
-
-    public List<TournamentImg> findByCreatorImg(Long creator_id);
+    public List<Tournament> findByCreator(Long creator_id);
 
     public void setFinished(Long tournament_id, Long match_id);
 
@@ -52,9 +45,20 @@ public interface TournamentService {
 
     public void setMatchWinner(Long matchId, Long tournamentId, Integer winner);
 
-    public List<TournamentImg> findUserActiveTournaments(Long userId);
+    public List<Tournament> findUserActiveTournaments(Long userId);
 
-    public List<TournamentImg> findUserPastTournaments(Long userId);
+    public List<Tournament> findUserPastTournaments(Long userId);
 
-    public List<TournamentImg> searchByName(String name);
+    public List<Tournament> searchByName(String name);
+
+    public void startTournament(Long tournament_id);
+
+    void swapGroups(Long tournament_id, Long user1, Long user2);
+
+    void swapMatchesMembers(Long tournament_id, Long match1, Long match2, Long user1, Long user2);
+
+    Map<Long,List<Tournament>> getUnfilteredTournamentPages(Long page);
+
+    Integer getPageAmount(Integer pageSize, TournamentFilter tf);
+
 }

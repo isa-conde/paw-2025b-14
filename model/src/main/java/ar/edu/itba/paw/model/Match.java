@@ -1,26 +1,21 @@
 package ar.edu.itba.paw.model;
 
-public class MatchWithPlayers {
+public class Match {
     private final Long id;
     private final Long tournamentId;
     private final Long localId;
     private final Long visitorId;
-    private final String localPlayerName;
-    private final String visitorPlayerName;
     private final Integer localScore;
     private final Integer visitorScore;
     private final Integer winner;
     private final Integer stage;
 
-    public MatchWithPlayers(Long id, Long tournamentId, Long localId, Long visitorId, 
-                           String localPlayerName, String visitorPlayerName,
-                           Integer localScore, Integer visitorScore, Integer winner, Integer stage) {
+    public Match(Long id, Long tournamentId, Long localId, Long visitorId,
+                            Integer localScore, Integer visitorScore, Integer winner, Integer stage) {
         this.id = id;
         this.tournamentId = tournamentId;
         this.localId = localId;
         this.visitorId = visitorId;
-        this.localPlayerName = localPlayerName;
-        this.visitorPlayerName = visitorPlayerName;
         this.localScore = localScore;
         this.visitorScore = visitorScore;
         this.winner = winner;
@@ -43,14 +38,6 @@ public class MatchWithPlayers {
         return visitorId;
     }
 
-    public String getLocalPlayerName() {
-        return localPlayerName;
-    }
-
-    public String getVisitorPlayerName() {
-        return visitorPlayerName;
-    }
-
     public Integer getLocalScore() {
         return localScore;
     }
@@ -67,3 +54,4 @@ public class MatchWithPlayers {
         return stage;
     }
 }
+
