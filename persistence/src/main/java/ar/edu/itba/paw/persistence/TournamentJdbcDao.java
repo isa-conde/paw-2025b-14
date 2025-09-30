@@ -60,8 +60,8 @@ public class TournamentJdbcDao implements TournamentDao {
     private static final RowMapper<Tournament> ROW_MAPPER = (rs, rowNum) -> new Tournament(rs.getLong("id"),
             rs.getLong("creator_id"), rs.getString("name"), rs.getLong("game_id"), Region.valueOf(rs.getString("region")),
             Elo.valueOf(rs.getString("elo")), rs.getDate("start_date").toLocalDate(), rs.getDate("end_date").toLocalDate(),
-            rs.getString("format"), Structure.valueOf(rs.getString("structure")), rs.getInt("max_participants"), rs.getInt("image_id"),
-            rs.getBoolean("open_inscriptions"), rs.getBoolean("is_finished"), rs.getBoolean("is_group_stage"), rs.getBoolean("tournament_started"));
+            rs.getString("format"), Structure.valueOf(rs.getString("structure")), rs.getInt("max_participants"), rs.getLong("image_id"),
+            rs.getBoolean("open_inscriptions"), rs.getBoolean("is_finished"), rs.getLong("tournament_winner"), rs.getBoolean("is_group_stage"), rs.getBoolean("tournament_started"));
 
     private static final RowMapper<User> ROW_MAPPER_USER = (rs, rowNum) -> new User(rs.getLong("id"), rs.getString("username"), rs.getString("email"), rs.getString("password"), rs.getBoolean("verified"));
 
@@ -96,7 +96,7 @@ public class TournamentJdbcDao implements TournamentDao {
     public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, byte[] image, Boolean open_inscriptions, Boolean is_finished) {
 
         SqlParameterSource img = new MapSqlParameterSource().addValue("image", image);
-        Integer image_id = jdbcInsertImage.executeAndReturnKey(img).intValue();
+        Long image_id = jdbcInsertImage.executeAndReturnKey(img).longValue();
 
         SqlParameterSource values = new MapSqlParameterSource()
                 .addValue("creator_id", creator_id)
@@ -116,7 +116,7 @@ public class TournamentJdbcDao implements TournamentDao {
 
         Number key = jdbcInsert.executeAndReturnKey(values);
         createMatches(key.longValue());
-        return new Tournament(key.longValue(), creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, null, false);
+        return new Tournament(key.longValue(), creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, null, null, false);
     }
 
     @Override
@@ -846,5 +846,43 @@ public class TournamentJdbcDao implements TournamentDao {
                     user1, tournament_id, match2
             );
         }
+    }
+
+    @Override
+    public void updateTournamentInfo(Long tournamentId, String name, LocalDate startDate, LocalDate endDate, Integer maxParticipants) {
+        List<String> sets = new ArrayList<>();
+        MapSqlParameterSource p = new MapSqlParameterSource().addValue("id", tournamentId);
+
+        if (name != null) {
+            sets.add("name = :name");
+            p.addValue("name", name);
+        }
+        if (startDate != null) {
+            sets.add("start_date = :start_date");
+            p.addValue("start_date", startDate);
+        }
+        if (endDate != null) {
+            sets.add("end_date = :end_date");
+            p.addValue("end_date", endDate);
+        }
+        if (maxParticipants != null) {
+            sets.add("max_participants = :max_participants");
+            p.addValue("max_participants", maxParticipants);
+        }
+
+        if (sets.isEmpty()) {
+            return;
+        }
+
+        String sql = "UPDATE tournament SET " + String.join(", ", sets) + " WHERE id = :id";
+        namedJdbcTemplate.update(sql, p);
+    }
+
+    @Override
+    public int tournamentParticipantsCount(Long tournamentId){
+        return jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM participant_user WHERE tournament_id = ?",
+                Integer.class, tournamentId
+        );
     }
 }

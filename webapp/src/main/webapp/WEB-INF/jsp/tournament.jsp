@@ -9,6 +9,8 @@
 <c:set var="isParticipant" value="false"/>
 <c:set var="isCreator" value="${user.id == tournament.creator_id}"/>
 <c:set var="editMode" value="${param.edit eq 'true' && isCreator}"/>
+<c:url value="/images/pencil.png" var="pencilUrl"/>
+<c:set var="cornerIcon" value="${isCreator ? pencilUrl : null}"/>
 
 <paw:layout user="${user}">
     <c:forEach var="group" items="${participants}">
@@ -18,7 +20,10 @@
             </c:if>
         </c:forEach>
     </c:forEach>
-    <paw:banner image="${pageContext.request.contextPath}/image/${tournament.image_id}">
+    <paw:banner
+            image="${pageContext.request.contextPath}/image/${tournament.image_id}"
+            cornerIcon="${cornerIcon}"
+            cornerOnClick="openModal('editTournamentModal')">
         <paw:text type="title" size="m" stroke="true">${game.name}</paw:text>
         <paw:text type="title" size="xl" stroke="true"><c:out value="${tournament.name}"/></paw:text>
         <div class="date-container">
@@ -43,11 +48,11 @@
         <c:choose>
             <c:when test="${activeSection == 'overview'}">
                 <div class="icon-card-container">
-                    <spring:message code="tournament.teams" var="teams"/>
+                    <spring:message code="tournament.teams" var="teams" arguments="${tournament.max_participants}"/>
                     <paw:icon-card icon="${pageContext.request.contextPath}/images/map.png" text="${tournament.region}"/>
                     <paw:icon-card icon="${pageContext.request.contextPath}/images/team.png" text="${tournament.format}"/>
                     <paw:icon-card icon="${pageContext.request.contextPath}/images/level.png" text="${tournament.elo}"/>
-                    <paw:icon-card icon="${pageContext.request.contextPath}/images/members.png" text="${tournament.max_participants} ${teams}"/>
+                    <paw:icon-card icon="${pageContext.request.contextPath}/images/members.png" text="${teams}"/>
                 </div>
                 <c:choose>
                     <c:when test="${tournamentWinner != null && tournamentWinner > 0}">
@@ -223,7 +228,6 @@
                                                     activeSection="${subActiveGroup}"
                                                     paramName="group"/>
 
-
                                         <c:forEach var="groupEntry" items="${matchesByGroup}">
                                             <c:if test="${subActiveGroup == groupEntry.key}">
                                                 <c:forEach var="stageEntry" items="${groupEntry.value}">
@@ -256,6 +260,29 @@
             </c:when>
         </c:choose>
     </div>
+    <paw:modal title="tournament.edit.modal.title" id="editTournamentModal">
+        <form:form method="post" modelAttribute="editTournamentForm"
+                   action="${pageContext.request.contextPath}/tournament/update"
+                   enctype="multipart/form-data" cssClass="form">
+            <input type="hidden" name="tournamentId" value="${tournament.id}"/>
+            <div class="row">
+                <paw:input path="name" label="home.createTournament.name" hasConstraint="true"/>
+            </div>
+            <c:if test="${!tournament.finished}">
+                <div class="row">
+                    <c:if test="${!tournament.tournamentStarted}">
+                        <paw:input path="start_date" label="home.createTournament.startDate" inputType="date" hasConstraint="true"/>
+                    </c:if>
+                    <paw:input path="end_date" label="home.createTournament.endDate" inputType="date" hasConstraint="true"/>
+                </div>
+                <paw:input path="max_participants" label="home.createTournament.maxParticipants" inputType="number" hasConstraint="true"/>
+            </c:if>
+            <paw:input path="image" label="home.createTournament.image" inputType="file"/>
+            <div class="row center">
+                <paw:input path="" label="tournament.edit.saveChanges" containerType="half" inputType="submit"/>
+            </div>
+        </form:form>
+    </paw:modal>
 </paw:layout>
 
 <script>

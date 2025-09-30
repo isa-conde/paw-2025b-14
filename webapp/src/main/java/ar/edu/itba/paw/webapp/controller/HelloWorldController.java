@@ -24,6 +24,7 @@ import ar.edu.itba.paw.webapp.form.UserForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.support.SessionStatus;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -40,6 +42,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.security.Principal;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -231,46 +234,6 @@ public class HelloWorldController {
         return new ModelAndView("redirect:/login");
     }
 
-    @RequestMapping(value = "/tournament/create", method = { RequestMethod.POST })
-    public ModelAndView createTournament(Principal principal, HttpServletRequest request, @Valid @ModelAttribute("tournamentForm") final TournamentForm form, final BindingResult result) {
-        if (result.hasErrors()) {
-            ModelAndView mav = index(form, new TournamentFilter(), null);
-            mav.addObject("openModal", "'createTournamentModal'");
-            return mav;
-        }
-        User user = null;
-        if (principal != null) {
-            Optional<User> userOpt = us.findByUsername(principal.getName());
-            user = userOpt.orElse(null);
-        }
-        Optional<Game> optionalGame = gs.findById(form.getGame_id());
-
-        byte[] imageBytes = null;
-        try {
-            if (form.getImage() != null && !form.getImage().isEmpty()) {
-                imageBytes = form.getImage().getBytes();
-            }else {
-                result.rejectValue("image", "error.tournamentForm.emptyImage");
-                ModelAndView mav = index(form, new TournamentFilter(), principal);
-                mav.addObject("openModal", "'createTournamentModal'");
-                return mav;
-            }
-        } catch (IOException e) {
-            result.rejectValue("image", "error.tournamentForm.invalidImage", e.getMessage());
-            ModelAndView mav = index(form, new TournamentFilter(), principal);
-            mav.addObject("openModal", "'createTournamentModal'");
-            return mav;
-        }
-
-        final Tournament t = ts.create(user.getId(), form.getName(), optionalGame.get().getId(),
-            form.getRegion(), form.getElo(), form.getStart_date(), form.getEnd_date(),
-            form.getFormat(), form.getStructure(), form.getMax_participants(), imageBytes, true, false);
-        String tournamentLink = request.getRequestURL().toString()
-            .replace("/tournament/create", "/tournament?tournamentId=" + t.getId());
-        ms.sendTournamentCreatedEmail(user.getUsername(), t.getName(), tournamentLink, user.getEmail());
-        return new ModelAndView("redirect:/tournament?tournamentId=" + t.getId());
-    }
-
     @RequestMapping(value = "/game/create", method = {RequestMethod.GET})
     public ModelAndView createGameForm(@ModelAttribute("gameForm") final GameForm form){
         ModelAndView mav = new ModelAndView("addGame");
@@ -341,10 +304,41 @@ public class HelloWorldController {
         return new ModelAndView("redirect:/tournament");
     }
 
+    @RequestMapping(value = "/tournament/update", method = { RequestMethod.POST })
+    public ModelAndView updateTournament(
+            Principal principal,
+            @RequestParam("tournamentId") final long tournamentId,
+            @Valid @ModelAttribute("editTournamentForm") final EditTournamentForm form,
+            final BindingResult result)
+    {
+        User user = null;
+        if (principal != null) {
+            Optional<User> userOpt = us.findByUsername(principal.getName());
+            user = userOpt.orElse(null);
+        }
+        if (user == null) {
+            return new ModelAndView("redirect:/");
+        }
+
+        if (result.hasErrors()) {
+            return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
+        }
+        byte[] imageBytes = null;
+        try {
+            if (form.getImage() != null && !form.getImage().isEmpty()) {
+                imageBytes = form.getImage().getBytes();
+            }
+            ts.updateTournamentInfo(tournamentId, form.getName(), form.getStart_date(), form.getEnd_date(), form.getMax_participants(), imageBytes);
+        } catch (IOException e) {
+            result.rejectValue("image", "error.tournamentForm.invalidImage");
+        }
+        return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
+    }
+
     @Autowired
     private MessageSource messageSource;
-    @RequestMapping("/tournament")
-    public ModelAndView tournamentPage(Principal principal, @RequestParam("tournamentId") final long tournamentId) {
+    @RequestMapping(value = "/tournament", method = RequestMethod.GET)
+    public ModelAndView tournamentPage(Principal principal, @RequestParam("tournamentId") final long tournamentId, @ModelAttribute("editTournamentForm") final EditTournamentForm form) {
         final ModelAndView mav = new ModelAndView("tournament");
         User user = null;
         if (principal != null) {
@@ -365,6 +359,10 @@ public class HelloWorldController {
 
         if(optionalTournament.isPresent()) {
             Tournament t = optionalTournament.get();
+            form.setName(t.getName());
+            form.setStart_date(t.getStart_date());
+            form.setEnd_date(t.getEnd_date());
+            form.setMax_participants(t.getMax_participants());
             Optional<Game> optionalGame = gs.findById(t.getGame_id());
             Optional<User> optionalUser = us.findById(t.getCreator_id());
             mav.addObject("hasJoined", ts.hasJoined(user.getId(), tournamentId));
@@ -535,7 +533,7 @@ public class HelloWorldController {
             .toList();
 
         List<Tournament> finishedTournaments = allCreatedTournaments.stream()
-            .filter(t -> t.getFinished())
+            .filter(Tournament::getFinished)
             .toList();
         List<Tournament> joinedTournaments = ts.findUserActiveTournaments(user.getId());
         List<Tournament> pastTournaments = ts.findUserPastTournaments(user.getId());
@@ -628,8 +626,7 @@ public class HelloWorldController {
         final Tournament t = ts.create(user.getId(), form.getName(), optionalGame.get().getId(),
                 form.getRegion(), form.getElo(), form.getStart_date(), form.getEnd_date(),
                 form.getFormat(), form.getStructure(), form.getMax_participants(), imageBytes, true, false);
-        String tournamentLink = request.getRequestURL().toString()
-                .replace("/tournament/create", "/tournament?tournamentId=" + t.getId());
+        String tournamentLink = "/tournament?tournamentId=" + t.getId();
         ms.sendTournamentCreatedEmail(user.getUsername(), t.getName(), tournamentLink, user.getEmail());
         status.setComplete();
         return new ModelAndView("redirect:/tournament?tournamentId=" + t.getId());

@@ -56,4 +56,8 @@ public interface TournamentService {
     void swapGroups(Long tournament_id, Long user1, Long user2);
 
     void swapMatchesMembers(Long tournament_id, Long match1, Long match2, Long user1, Long user2);
+
+    void updateTournamentInfo(Long tournament_id, String name, LocalDate start_date, LocalDate end_date, Integer max_participants, byte[] image);
+
+    int tournamentParticipantsCount(Long tournamentId);
 }

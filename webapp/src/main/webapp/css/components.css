@@ -53,10 +53,6 @@ button:disabled {
     cursor: not-allowed;
 }
 
-.winner-card-content {
-
-}
-
 /* ------- FONTS ------- */
 
 @font-face {
@@ -115,9 +111,24 @@ button:disabled {
     justify-content: flex-start;
 }
 
+.btn.image.no-text {
+    padding: 6px 4px;
+    gap: 0;
+    justify-content: center;
+}
+
 .btn.empty {
     background-color: transparent;
     box-shadow: inset 0 0 0 4px var(--primary-button);
+}
+
+.btn.secondary {
+    background-color: var(--secondary-details);
+    color: var(--secondary-text);
+}
+
+.btn.secondary:hover {
+    background-color: var(--secondary-details-hover);
 }
 
 .btn.empty:hover:not(:disabled) {
@@ -129,7 +140,6 @@ button:disabled {
     width: 80%;
     height: 80%;
     border-radius: 15px;
-    background-color: var(--background-card);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -234,6 +244,16 @@ button:disabled {
     justify-content: center;
     align-items: flex-start;
     margin-top: 20px;
+}
+
+.banner-corner{
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    display: flex;
+    gap: .5rem;
+    align-items: center;
+    z-index: 2;
 }
 
 /* ------- TEXT STROKE ------- */
@@ -374,6 +394,7 @@ button:disabled {
 }
 
 .card-button-container {
+    justify-self: flex-start;
     bottom: 20px;
     left: 20px;
     padding: 30px;
@@ -827,6 +848,10 @@ dialog:not([open]) {
     justify-content: center;
 }
 
+.row.center {
+    margin: 30px 20px 20px;
+}
+
 /* ------- ICON BUTTON ------- */
 
 .icon-btn {
@@ -876,7 +901,7 @@ dialog:not([open]) {
 .submit {
     margin-top: 20px;
     padding: 15px 30px;
-    font-size: 24px;
+    font-size: var(--text-24);
     font-weight: 600;
 }
 
