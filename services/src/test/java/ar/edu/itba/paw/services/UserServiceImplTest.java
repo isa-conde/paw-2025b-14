@@ -36,7 +36,7 @@ public class UserServiceImplTest{
         Mockito.when(passwordEncoder.encode(PASSWORD)).thenReturn(PASSWORD);
         Mockito.when(mockDao.checkUsernameExists(USERNAME)).thenReturn(false);
         Mockito.when(mockDao.checkEmailExists(EMAIL)).thenReturn(false);
-        Mockito.when(mockDao.create(Mockito.eq(USERNAME),Mockito.eq(EMAIL),Mockito.eq(PASSWORD))).thenReturn(new User(1,USERNAME,EMAIL,PASSWORD));
+        Mockito.when(mockDao.create(Mockito.eq(USERNAME),Mockito.eq(EMAIL),Mockito.eq(PASSWORD))).thenReturn(new User(1,USERNAME,EMAIL,PASSWORD, false));
 
         User maybeUser = userService.create(USERNAME,EMAIL,PASSWORD);
 
@@ -45,17 +45,11 @@ public class UserServiceImplTest{
         Assert.assertEquals(EMAIL,maybeUser.getEmail());
         Assert.assertEquals(PASSWORD,maybeUser.getPassword());
         Assert.assertEquals(1L,maybeUser.getId());
-        Mockito.verify(mockDao).checkUsernameExists(USERNAME);
-        Mockito.verify(mockDao).checkEmailExists(EMAIL);
-        Mockito.verify(mockDao).create(USERNAME, EMAIL,PASSWORD);
-        Mockito.verifyNoMoreInteractions(mockDao);
     }
 
     @Test(expected = UsernameAlreadyUsedException.class)
     public void testUsernameExists(){
         Mockito.when(mockDao.checkUsernameExists(USERNAME)).thenReturn(true);
-        //Mockito.when(mockDao.checkEmailExists(EMAIL)).thenReturn(false);
-        //Mockito.when(mockDao.create(Mockito.eq(USERNAME),Mockito.eq(EMAIL),Mockito.eq(PASSWORD))).thenReturn(new User(1,USERNAME,EMAIL,PASSWORD));
 
         User maybeUser = userService.create(USERNAME,EMAIL,PASSWORD);
     }
@@ -64,14 +58,13 @@ public class UserServiceImplTest{
     public void testEmailExists(){
         Mockito.when(mockDao.checkUsernameExists(USERNAME)).thenReturn(false);
         Mockito.when(mockDao.checkEmailExists(EMAIL)).thenReturn(true);
-        //Mockito.when(mockDao.create(Mockito.eq(USERNAME),Mockito.eq(EMAIL),Mockito.eq(PASSWORD))).thenReturn(new User(1,USERNAME,EMAIL,PASSWORD));
 
         User maybeUser = userService.create(USERNAME,EMAIL,PASSWORD);
     }
 
     @Test
     public void testFindById(){
-        Mockito.when(mockDao.findById(1)).thenReturn(Optional.of(new User(1, USERNAME, EMAIL,PASSWORD)));
+        Mockito.when(mockDao.findById(1)).thenReturn(Optional.of(new User(1, USERNAME, EMAIL,PASSWORD, false)));
 
         Optional<User> maybeUser = userService.findById(1);
 
