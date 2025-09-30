@@ -4,7 +4,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 
-<c:url var="resetPasswordUrl" value="/resetPassword?token=${token}&userId=${userId}"/>
+<c:url var="resetPasswordUrl" value="/forgotPassword/reset?token=${token}&userId=${userId}"/>
 <c:url var="forgotPasswordUrl" value="/forgotPassword"/>
 
 <paw:form-layout title="passwordReset.page.title">
