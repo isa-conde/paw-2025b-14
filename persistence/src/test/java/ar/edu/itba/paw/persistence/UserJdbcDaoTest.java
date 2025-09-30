@@ -56,12 +56,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
 import javax.sql.DataSource;
+import java.util.Map;
 import java.util.Optional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -80,16 +82,19 @@ public class UserJdbcDaoTest {
     private UserJdbcDao userJdbcDao;
 
     private JdbcTemplate jdbcTemplate;
+    private SimpleJdbcInsert jdbcInsert;
 
     @Before
     public void setUp(){
         jdbcTemplate = new JdbcTemplate(ds);
+        jdbcInsert = new SimpleJdbcInsert(jdbcTemplate).usingGeneratedKeyColumns("id").withTableName("users");
         JdbcTestUtils.deleteFromTables(jdbcTemplate,"users");
     }
 
     @Test
     public void testCreate(){
         final User user = userJdbcDao.create(USERNAME,EMAIL, PASSWORD);
+
         Assert.assertNotNull(user);
         Assert.assertEquals(USERNAME,user.getUsername());
         Assert.assertEquals(EMAIL, user.getEmail());
@@ -122,13 +127,17 @@ public class UserJdbcDaoTest {
 
     @Test
     public void testChangePassword(){
-        final User user = userJdbcDao.create(USERNAME,EMAIL,PASSWORD + "_old");
-        userJdbcDao.changePassword(user.getId(),PASSWORD);
-        final Optional<User> userUpdated = userJdbcDao.findById(user.getId());
+        final Map<String,Object> values = Map.of("username",USERNAME, "email", EMAIL, "password", PASSWORD + "_old", "verified", false);
+        final Number key = jdbcInsert.executeAndReturnKey(values);
+        userJdbcDao.changePassword(key.longValue(),PASSWORD);
+        String newPassword = jdbcTemplate.queryForObject(
+                "SELECT password FROM users WHERE id = ?",
+                String.class,
+                key.longValue());
 
-        Assert.assertTrue(userUpdated.isPresent());
-        Assert.assertNotEquals(PASSWORD + "_old", userUpdated.get().getPassword());
-        Assert.assertEquals(PASSWORD, userUpdated.get().getPassword());
+        Assert.assertNotNull(newPassword);
+        Assert.assertNotEquals(PASSWORD + "_old", newPassword);
+        Assert.assertEquals(PASSWORD, newPassword);
     }
 
     @Test
