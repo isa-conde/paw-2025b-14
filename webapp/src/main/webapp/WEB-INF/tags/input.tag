@@ -5,7 +5,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
 <%@ attribute name="path" required="true"%>
-<%@ attribute name="label" required="true"%>
+<%@ attribute name="label" required="false"%>
 <%@ attribute name="containerType" required="false"%>
 <%@ attribute name="inputType" required="false"%>
 <%@ attribute name="items" type="java.util.List" required="false"%>
@@ -13,6 +13,7 @@
 <%@ attribute name="itemLabel" required="false"%>
 <%@ attribute name="emptyOption" required="false"%>
 <%@ attribute name="inline" required="false"%>
+<%@ attribute name="value" required="false"%>
 <%@ attribute name="hasConstraint" required="false" type="java.lang.Boolean" %>
 
 <c:choose>
@@ -53,7 +54,7 @@
                     <form:input path="${path}" type="email" class="input"/>
                 </c:when>
                 <c:when test="${inputType == 'hidden'}">
-                    <form:hidden path="${path}" />
+                    <form:hidden path="${path}" value="${value}"/>
                 </c:when>
                 <c:when test="${inputType == 'file'}">
                     <div class="file-input-container">

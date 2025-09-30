@@ -27,8 +27,7 @@
             <paw:text type="title"><spring:message code="passwordReset.failed.title"/></paw:text>
             <paw:text size="l"><spring:message code="passwordReset.failed.message"/></paw:text>
             <br>
-            <spring:message code="passwordReset.failed.resend" var="resend"/>
-            <paw:button onclick="window.location.href='${forgotPasswordUrl}'" text="${resend}"/>
+            <paw:button onclick="window.location.href='${forgotPasswordUrl}'" text="passwordReset.failed.resend"/>
         </c:otherwise>
     </c:choose>
 </paw:form-layout>

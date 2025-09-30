@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.naming.Binding;
 import javax.servlet.http.HttpServletRequest;
@@ -294,7 +295,51 @@ public class HelloWorldController {
         return new ModelAndView("redirect:/" + g.getId());
     }
 
+    @RequestMapping(value = "/tournament/swap/groups", method = RequestMethod.POST)
+    public ModelAndView swapGroups(
+            Principal principal,
+            @RequestParam("tournamentId") Long tournamentId,
+            @RequestParam(name="selected", required=false) List<String> selected,
+            RedirectAttributes ra) {
 
+        User user = (principal != null) ? us.findByUsername(principal.getName()).orElse(null) : null;
+        if (user == null) {
+            return new ModelAndView("redirect:/");
+        }
+
+        Long user1 = Long.valueOf(selected.get(0));
+        Long user2 = Long.valueOf(selected.get(1));
+
+        ts.swapGroups(tournamentId, user1, user2);
+
+        ra.addAttribute("tournamentId", tournamentId);
+        ra.addAttribute("edit", true);
+        return new ModelAndView("redirect:/tournament");
+    }
+
+    @RequestMapping(value = "/tournament/swap/matches", method = RequestMethod.POST)
+    public ModelAndView swapMatchesMembers(
+            Principal principal,
+            @RequestParam("tournamentId") Long tournamentId,
+            @RequestParam(name="selected", required=false) List<String> selected,
+            RedirectAttributes ra) {
+
+        User user = (principal != null) ? us.findByUsername(principal.getName()).orElse(null) : null;
+        if (user == null) {
+            return new ModelAndView("redirect:/");
+        }
+
+        String[] a = selected.get(0).split(":");
+        String[] b = selected.get(1).split(":");
+        Long match1 = Long.valueOf(a[0]), user1 = Long.valueOf(a[1]);
+        Long match2 = Long.valueOf(b[0]), user2 = Long.valueOf(b[1]);
+
+        ts.swapMatchesMembers(tournamentId, match1, match2, user1, user2);
+
+        ra.addAttribute("tournamentId", tournamentId);
+        ra.addAttribute("edit", true);
+        return new ModelAndView("redirect:/tournament");
+    }
 
     @Autowired
     private MessageSource messageSource;
@@ -373,6 +418,24 @@ public class HelloWorldController {
         Optional<Tournament> tournamentOpt = ts.findById(tournamentId);
         if (tournamentOpt.isPresent() && tournamentOpt.get().getCreator_id().equals(user.getId())) {
             ts.closeInscriptions(tournamentId);
+        }
+
+        return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
+    }
+
+    @RequestMapping(value = "/tournament/startTournament", method = { RequestMethod.POST })
+    public ModelAndView startTournament(Principal principal, @RequestParam("tournamentId") final long tournamentId) {
+        User user = null;
+        if (principal != null) {
+            Optional<User> userOpt = us.findByUsername(principal.getName());
+            user = userOpt.orElse(null);
+        }
+        if (user == null) {
+            return new ModelAndView("redirect:/");
+        }
+
+        Optional<Tournament> tournamentOpt = ts.findById(tournamentId);
+        if (tournamentOpt.isPresent() && tournamentOpt.get().getCreator_id().equals(user.getId())) {
             ts.startTournament(tournamentId);
         }
 
