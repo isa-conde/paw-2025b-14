@@ -19,4 +19,9 @@ public class ImageServiceImpl implements ImageService {
     public Optional<byte[]> findById(Long id) {
         return imageDao.findById(id);
     }
+
+    @Override
+    public Integer insertImage(byte[] img) {
+        return imageDao.insertImage(img);
+    }
 }

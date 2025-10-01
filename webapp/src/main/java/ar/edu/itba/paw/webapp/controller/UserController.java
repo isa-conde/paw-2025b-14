@@ -14,10 +14,7 @@ import ar.edu.itba.paw.model.filters.TournamentFilter;
 import ar.edu.itba.paw.webapp.form.FilterForm;
 import ar.edu.itba.paw.webapp.form.TournamentForm;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.security.Principal;
@@ -159,6 +156,30 @@ public class UserController {
         mav.addObject("user", user);
         mav.addObject("games", gs.searchByName(q));
         mav.addObject("tournaments", ts.searchByName(q));
+
+        return mav;
+    }
+
+    @RequestMapping("/profile/{id}")
+    public ModelAndView profile(Principal principal, @PathVariable Long id){
+        final ModelAndView mav = new ModelAndView("profile");
+
+        User user = null;
+        if (principal != null) {
+            Optional<User> userOpt = us.findByUsername(principal.getName());
+            user = userOpt.orElse(null);
+        }
+        mav.addObject("user", user);
+
+        Optional<User> profileOpt = us.findById(id);
+        if (profileOpt.isEmpty()){
+            //TODO REDIRIGIR A 404
+            return index(new TournamentForm(), new TournamentFilter(), principal);
+        }
+        User profile = profileOpt.get();
+        mav.addObject("profile", profile);
+        mav.addObject("favouriteGames", gs.getFavourites(profile.getId()));
+        mav.addObject("lastTournaments", ts.findUserActiveTournaments(profile.getId()));
 
         return mav;
     }
