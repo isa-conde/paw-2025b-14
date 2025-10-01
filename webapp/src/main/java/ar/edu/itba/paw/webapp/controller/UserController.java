@@ -11,12 +11,17 @@ import ar.edu.itba.paw.model.enums.Genre;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
+import ar.edu.itba.paw.webapp.form.EditProfileForm;
+import ar.edu.itba.paw.webapp.form.EditTournamentForm;
 import ar.edu.itba.paw.webapp.form.FilterForm;
 import ar.edu.itba.paw.webapp.form.TournamentForm;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.validation.Valid;
+import java.io.IOException;
 import java.security.Principal;
 import java.util.*;
 
@@ -161,7 +166,7 @@ public class UserController {
     }
 
     @RequestMapping("/profile/{id}")
-    public ModelAndView profile(Principal principal, @PathVariable Long id){
+    public ModelAndView profile(Principal principal, @PathVariable Long id, @ModelAttribute("EditProfileForm") EditProfileForm editProfileForm){
         final ModelAndView mav = new ModelAndView("profile");
 
         User user = null;
@@ -181,7 +186,50 @@ public class UserController {
         mav.addObject("favouriteGames", gs.getFavourites(profile.getId()));
         mav.addObject("lastTournaments", ts.findUserActiveTournaments(profile.getId()));
 
+        editProfileForm.setUsername(profile.getUsername());
+        editProfileForm.setBio(profile.getBio());
+
         return mav;
     }
 
+    @RequestMapping(value = "/profile/update", method = { RequestMethod.POST })
+    public ModelAndView updateProfile(Principal principal, @RequestParam("userId") final long userId, @Valid @ModelAttribute("editProfileForm") final EditProfileForm form, final BindingResult result){
+        User user = null;
+        if (principal != null) {
+            Optional<User> userOpt = us.findByUsername(principal.getName());
+            user = userOpt.orElse(null);
+        }
+        if (user == null) {
+            return new ModelAndView("redirect:/");
+        }
+
+        if (result.hasErrors()) {
+            return new ModelAndView("redirect:/profile/" + userId   );
+        }
+
+        Boolean isValid = true;
+
+        byte[] pfpBytes = null;
+        try {
+            if (form.getProfilePicture() != null && !form.getProfilePicture().isEmpty()) {
+                pfpBytes = form.getProfilePicture().getBytes();
+            }
+        } catch (IOException e) {
+            isValid = false;
+            result.rejectValue("profilePicture", "error.tournamentForm.invalidImage");
+        }
+        byte[] bannerBytes = null;
+        try {
+            if (form.getBannerPicture() != null && !form.getBannerPicture().isEmpty()) {
+                bannerBytes = form.getBannerPicture().getBytes();
+            }
+        } catch (IOException e) {
+            isValid = false;
+            result.rejectValue("bannerPicture", "error.tournamentForm.invalidImage");
+        }
+        if (isValid){
+            us.updateProfileInfo(userId, form.getUsername(), form.getBio(), pfpBytes, bannerBytes);
+        }
+        return new ModelAndView("redirect:/profile/" + userId );
+    }
 }
