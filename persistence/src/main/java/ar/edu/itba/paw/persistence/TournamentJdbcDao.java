@@ -872,7 +872,7 @@ public class TournamentJdbcDao implements TournamentDao {
                 ORDER BY COUNT(t2.id) DESC
                 LIMIT 3
                 OFFSET ?
-            )
+            ) AND t.open_inscriptions = true
             ORDER BY t.game_id, t.start_date
         """;
         List<Tournament> tournaments = jdbcTemplate.query(sql, ROW_MAPPER, page * 3);

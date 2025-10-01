@@ -54,7 +54,7 @@ public class UserController {
         mav.addObject("structures", Arrays.stream(Structure.values()).toList());
         mav.addObject("tournamentForm", tournamentForm);
 
-        Map<Long, List<Tournament>> tournaments = ts.getHomeTournaments();
+        Map<Long, List<Tournament>> tournaments = ts.getUnfilteredTournamentPages(0L);
         mav.addObject("gameIds", tournaments.keySet());
         for (Long game_id : tournaments.keySet()) {
             mav.addObject("tournaments" + game_id, tournaments.get(game_id));
@@ -109,7 +109,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/tournamentsPage", method = RequestMethod.GET)
-    public ModelAndView tournamentsPage(Principal principal, @ModelAttribute("filterForm") FilterForm filterForm, TournamentFilter tf) {
+    public ModelAndView tournamentsPage(Principal principal, @ModelAttribute("filterForm") FilterForm filterForm, TournamentFilter tf,  @RequestParam(defaultValue = "0") Long page) {
         final ModelAndView mav = new ModelAndView("tournamentsPage");
         List<Game> allGames = gs.findAll();
         User user = null;
@@ -129,22 +129,18 @@ public class UserController {
         tf.setGame_id(filterForm.getGame_id());
         tf.setRegion(filterForm.getRegion());
         tf.setElo(filterForm.getElo());
+        tf.setPlayersPerTeam(filterForm.getPlayersPerTeam());
+        tf.setGenre(filterForm.getGenre());
 
         boolean isFiltered = !tf.isEmpty();
 
         if(isFiltered) {
-            mav.addObject("tournaments", ts.findTournaments(tf));
+            mav.addObject("tournaments", ts.findTournaments(tf, page));
+            mav.addObject("totalPages", ts.getPageAmount(9, tf));
         }else{
-            Map<Long, List<Tournament>> gameTournaments = new HashMap<>();
-            for (Game game : allGames) {
-                tf.setGame_id(game.getId());
-                List<Tournament> gameTours = ts.findTournaments(tf);
-                if (!gameTours.isEmpty()) {
-                    gameTournaments.put(game.getId(), gameTours);
-                }
-            }
+            Map<Long, List<Tournament>> gameTournaments = ts.getUnfilteredTournamentPages(page);
             mav.addObject("gameTournaments", gameTournaments);
-            tf.setGame_id(null);
+            mav.addObject("totalPages", ts.getPageAmount(3, tf));
         }
 
         mav.addObject("isFiltered", isFiltered);
