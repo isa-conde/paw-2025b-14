@@ -22,4 +22,5 @@ public interface UserDao {
 
     void verifyUser(long user_id);
 
+    void updateProfileInfo(Long userId, String username, String bio, Long pfp, Long banner);
 }
