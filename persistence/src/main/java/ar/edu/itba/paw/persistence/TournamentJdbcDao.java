@@ -115,7 +115,6 @@ public class TournamentJdbcDao implements TournamentDao {
                 .addValue("tournament_started", false);
 
         Number key = jdbcInsert.executeAndReturnKey(values);
-        createMatches(key.longValue());
         return new Tournament(key.longValue(), creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, null, null, false);
     }
 

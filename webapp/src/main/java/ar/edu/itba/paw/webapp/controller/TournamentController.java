@@ -52,47 +52,6 @@ public class TournamentController {
         this.ms = ms;
     }
 
-//    @RequestMapping(value = "/tournament/create", method = { RequestMethod.POST })
-//    public ModelAndView createTournament(Principal principal, HttpServletRequest request, @Valid @ModelAttribute("tournamentForm") final TournamentForm form, final BindingResult result) {
-//        if (result.hasErrors()) {
-//            ModelAndView mav = index(form, new TournamentFilter(), null);
-//            mav.addObject("openModal", "'createTournamentModal'");
-//            return mav;
-//        }
-//        User user = null;
-//        if (principal != null) {
-//            Optional<User> userOpt = us.findByUsername(principal.getName());
-//            user = userOpt.orElse(null);
-//        }
-//        Optional<Game> optionalGame = gs.findById(form.getGame_id());
-//
-//        byte[] imageBytes = null;
-//        try {
-//            if (form.getImage() != null && !form.getImage().isEmpty()) {
-//                imageBytes = form.getImage().getBytes();
-//            }else {
-//                result.rejectValue("image", "error.tournamentForm.emptyImage");
-//                ModelAndView mav = index(form, new TournamentFilter(), principal);
-//                mav.addObject("openModal", "'createTournamentModal'");
-//                return mav;
-//            }
-//        } catch (IOException e) {
-//            result.rejectValue("image", "error.tournamentForm.invalidImage", e.getMessage());
-//            ModelAndView mav = index(form, new TournamentFilter(), principal);
-//            mav.addObject("openModal", "'createTournamentModal'");
-//            return mav;
-//        }
-//
-//        final Tournament t = ts.create(user.getId(), form.getName(), optionalGame.get().getId(),
-//            form.getRegion(), form.getElo(), form.getStart_date(), form.getEnd_date(),
-//            form.getFormat(), form.getStructure(), form.getMax_participants(), imageBytes, true, false);
-//        String tournamentLink = request.getRequestURL().toString()
-//            .replace("/tournament/create", "/tournament?tournamentId=" + t.getId());
-//        ms.sendTournamentCreatedEmail(user.getUsername(), t.getName(), tournamentLink, user.getEmail());
-//        return new ModelAndView("redirect:/tournament?tournamentId=" + t.getId());
-//    }
-
-
     // TODO: delete this!!!
     @RequestMapping(value = "/game/create", method = {RequestMethod.GET})
     public ModelAndView createGameForm(@ModelAttribute("gameForm") final GameForm form){
@@ -100,7 +59,6 @@ public class TournamentController {
         mav.addObject("genres", Genre.values()); // 🔹 paso el enum a la vista
         return mav;
     }
-
 
     // TODO: this too.......
     @RequestMapping(value = "/game/create", method = { RequestMethod.POST })
@@ -369,9 +327,6 @@ public class TournamentController {
 
     @RequestMapping(value = "/tournaments/new/step1", method = RequestMethod.POST)
     public ModelAndView validateStep1(@Validated(TournamentForm.StepOne.class) @ModelAttribute("tournamentForm") TournamentForm form, BindingResult result, HttpServletRequest request, Principal principal) {
-
-        ModelAndView mav = new ModelAndView("tournamentForm");
-
         if (result.hasErrors()) {
             return newTournamentFormStep1(request, form, principal);
         } else {
@@ -400,7 +355,7 @@ public class TournamentController {
         User user = us.findByUsername(principal.getName()).orElse(null);
         Optional<Game> optionalGame = gs.findById(form.getGame_id());
 
-        byte[] imageBytes = null;
+        byte[] imageBytes;
         try {
             if (form.getImage() != null && !form.getImage().isEmpty()) {
                 imageBytes = form.getImage().getBytes();
