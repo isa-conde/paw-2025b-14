@@ -14,10 +14,7 @@ import ar.edu.itba.paw.model.filters.TournamentFilter;
 import ar.edu.itba.paw.webapp.form.FilterForm;
 import ar.edu.itba.paw.webapp.form.TournamentForm;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.security.Principal;
@@ -54,7 +51,7 @@ public class UserController {
         mav.addObject("structures", Arrays.stream(Structure.values()).toList());
         mav.addObject("tournamentForm", tournamentForm);
 
-        Map<Long, List<Tournament>> tournaments = ts.getHomeTournaments();
+        Map<Long, List<Tournament>> tournaments = ts.getUnfilteredTournamentPages(0L);
         mav.addObject("gameIds", tournaments.keySet());
         for (Long game_id : tournaments.keySet()) {
             mav.addObject("tournaments" + game_id, tournaments.get(game_id));
@@ -103,7 +100,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/tournamentsPage", method = RequestMethod.GET)
-    public ModelAndView tournamentsPage(Principal principal, @ModelAttribute("filterForm") FilterForm filterForm, TournamentFilter tf) {
+    public ModelAndView tournamentsPage(Principal principal, @ModelAttribute("filterForm") FilterForm filterForm, TournamentFilter tf,  @RequestParam(defaultValue = "0") Long page) {
         final ModelAndView mav = new ModelAndView("tournamentsPage");
         List<Game> allGames = gs.findAll();
         User user = null;
@@ -123,22 +120,18 @@ public class UserController {
         tf.setGame_id(filterForm.getGame_id());
         tf.setRegion(filterForm.getRegion());
         tf.setElo(filterForm.getElo());
+        tf.setPlayersPerTeam(filterForm.getPlayersPerTeam());
+        tf.setGenre(filterForm.getGenre());
 
         boolean isFiltered = !tf.isEmpty();
 
         if(isFiltered) {
-            mav.addObject("tournaments", ts.findTournaments(tf));
+            mav.addObject("tournaments", ts.findTournaments(tf, page));
+            mav.addObject("totalPages", ts.getPageAmount(9, tf));
         }else{
-            Map<Long, List<Tournament>> gameTournaments = new HashMap<>();
-            for (Game game : allGames) {
-                tf.setGame_id(game.getId());
-                List<Tournament> gameTours = ts.findTournaments(tf);
-                if (!gameTours.isEmpty()) {
-                    gameTournaments.put(game.getId(), gameTours);
-                }
-            }
+            Map<Long, List<Tournament>> gameTournaments = ts.getUnfilteredTournamentPages(page);
             mav.addObject("gameTournaments", gameTournaments);
-            tf.setGame_id(null);
+            mav.addObject("totalPages", ts.getPageAmount(3, tf));
         }
 
         mav.addObject("isFiltered", isFiltered);
@@ -157,6 +150,30 @@ public class UserController {
         mav.addObject("user", user);
         mav.addObject("games", gs.searchByName(q));
         mav.addObject("tournaments", ts.searchByName(q));
+
+        return mav;
+    }
+
+    @RequestMapping("/profile/{id}")
+    public ModelAndView profile(Principal principal, @PathVariable Long id){
+        final ModelAndView mav = new ModelAndView("profile");
+
+        User user = null;
+        if (principal != null) {
+            Optional<User> userOpt = us.findByUsername(principal.getName());
+            user = userOpt.orElse(null);
+        }
+        mav.addObject("user", user);
+
+        Optional<User> profileOpt = us.findById(id);
+        if (profileOpt.isEmpty()){
+            //TODO REDIRIGIR A 404
+            return index(new TournamentForm(), new TournamentFilter(), principal);
+        }
+        User profile = profileOpt.get();
+        mav.addObject("profile", profile);
+        mav.addObject("favouriteGames", gs.getFavourites(profile.getId()));
+        mav.addObject("lastTournaments", ts.findUserActiveTournaments(profile.getId()));
 
         return mav;
     }

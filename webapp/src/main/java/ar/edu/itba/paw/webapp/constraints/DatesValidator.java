@@ -1,17 +1,17 @@
 package ar.edu.itba.paw.webapp.constraints;
 
-import ar.edu.itba.paw.webapp.form.TournamentForm;
+import ar.edu.itba.paw.webapp.form.HasDates;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.time.LocalDate;
 
-public class DatesValidator implements ConstraintValidator<DatesConstraint, TournamentForm> {
+public class DatesValidator implements ConstraintValidator<DatesConstraint, HasDates> {
     @Override
     public void initialize(DatesConstraint constraintAnnotation) {}
 
     @Override
-    public boolean isValid(TournamentForm form, ConstraintValidatorContext context) {
+    public boolean isValid(HasDates form, ConstraintValidatorContext context) {
         if (form == null) return true;
 
         LocalDate today = LocalDate.now();
@@ -19,7 +19,7 @@ public class DatesValidator implements ConstraintValidator<DatesConstraint, Tour
         LocalDate start = form.getStart_date();
         LocalDate end = form.getEnd_date();
 
-        Boolean valid = true;
+        boolean valid = true;
 
         if (start == null || end == null) return true;
 

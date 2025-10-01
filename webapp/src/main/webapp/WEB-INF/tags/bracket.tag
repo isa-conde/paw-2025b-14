@@ -2,6 +2,8 @@
 <%@ attribute name="matchesByStage" required="true" type="java.util.Map" %>
 <%@ attribute name="tournamentId" required="true" rtexprvalue="true" %>
 <%@ attribute name="isCreator" required="false" rtexprvalue="true" %>
+<%@ attribute name="isEditing" required="false" rtexprvalue="true" %>
+<%@ attribute name="formId" required="false" rtexprvalue="true" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 
@@ -15,9 +17,29 @@
                         <div class="bracket-match round-${stageEntry.key} match-${loop.index}">
                             <div class="bracket-team ${match.winner == 1 ? 'winner' : ''}">
                                 <span><c:out value="${match.localPlayerName}"/></span>
+                                <c:if test="${isEditing and match.localId != null}">
+                                    <input type="checkbox"
+                                           class="edit-check"
+                                           name="selected"
+                                           value="${match.id}:${match.localId}"
+                                           form="${formId}"
+                                           data-kind="bracket"
+                                           data-match="${match.id}"
+                                           data-user="${match.localId}"/>
+                                </c:if>
                             </div>
                             <div class="bracket-team ${match.winner == 2 ? 'winner' : ''}">
                                 <span><c:out value="${match.visitorPlayerName}"/></span>
+                                <c:if test="${isEditing and match.visitorId != null}">
+                                    <input type="checkbox"
+                                           class="edit-check"
+                                           name="selected"
+                                           value="${match.id}:${match.visitorId}"
+                                           form="${formId}"
+                                           data-kind="bracket"
+                                           data-match="${match.id}"
+                                           data-user="${match.visitorId}"/>
+                                </c:if>
                             </div>
                         </div>
                     </c:forEach>

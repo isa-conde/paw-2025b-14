@@ -17,19 +17,15 @@ public interface TournamentService {
 
     public Optional<Tournament> findById(Long id);
 
-    public List<Tournament> findTournaments(TournamentFilter tournamentFilter);
+    public List<Tournament> findTournaments(TournamentFilter tournamentFilter, Long page);
 
     public List<Tournament> findGameTournaments(Long game_id);
 
     public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, byte[] image_id, Boolean openInscriptions, Boolean isFinished);
 
-    public void joinTournamentUser(Long user_id, Long tournament_id);
-
     public Map<Integer, List<ParticipantUserInfo>> getTournamentParticipantsByGroup(Long tournamentId);
 
     public Optional<Structure> getTournamentStructure(Long tournament_id);
-
-    public void loadScores(Long match_id, Long tournament_id, Integer local_score, Integer visitor_score);
 
     //public void joinTournamentTeam(Long team_id, Long tournament_id);
 
@@ -38,8 +34,6 @@ public interface TournamentService {
     public void setFinished(Long tournament_id, Long match_id);
 
     public void closeInscriptions(Long tournament_id);
-
-    public Boolean hasJoined(Long userId, Long tournamentId);
 
     public Map<Integer, Map<Integer, List<MatchWithPlayers>>> getTournamentMatchesByGroup(Long tournament_id);
 
@@ -57,7 +51,13 @@ public interface TournamentService {
 
     void swapMatchesMembers(Long tournament_id, Long match1, Long match2, Long user1, Long user2);
 
-    Map<Long,List<Tournament>> getHomeTournaments();
+    Map<Long,List<Tournament>> getUnfilteredTournamentPages(Long page);
+
+    Integer getPageAmount(Integer pageSize, TournamentFilter tf);
+
+    void updateTournamentInfo(Long tournament_id, String name, LocalDate start_date, LocalDate end_date, Integer max_participants, byte[] image);
+
+    int tournamentParticipantsCount(Long tournamentId);
 
     List<Tournament> getCreatedAndFinishedTournaments(Long userId);
 

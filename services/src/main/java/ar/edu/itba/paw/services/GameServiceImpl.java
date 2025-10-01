@@ -54,9 +54,18 @@ public class GameServiceImpl implements GameService {
         return gameDao.createWithFormats(name, genre, formats, image);
     }
 
-
     @Override
     public List<GameFormat> getFormats(Long gameId) {
         return gameDao.getFormats(gameId);
+    }
+
+    @Override
+    public void addFavourite(Long user_id, Long game_id) {
+        gameDao.addFavourite(user_id, game_id);
+    }
+
+    @Override
+    public List<Game> getFavourites(Long user_id) {
+        return gameDao.getFavourites(user_id);
     }
 }
