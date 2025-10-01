@@ -23,6 +23,7 @@ public class GameJdbcDao implements GameDao {
     private final SimpleJdbcInsert jdbcInsert;
     private final SimpleJdbcInsert jdbcInsertFormat;
     private final SimpleJdbcInsert jdbcInsertImage;
+    private final SimpleJdbcInsert jdbcInsertFavourites;
 
     private static final RowMapper<Game> ROW_MAPPER = (rs, rowNum) -> new Game(rs.getLong("id"), rs.getString("name"), Genre.valueOf(rs.getString("genre")), rs.getInt("image_id"));
 
@@ -40,6 +41,8 @@ public class GameJdbcDao implements GameDao {
         jdbcInsertImage = new SimpleJdbcInsert(jdbcTemplate)
                 .usingGeneratedKeyColumns("id")
                 .withTableName("image");
+        jdbcInsertFavourites = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("user_favourites");
     }
 
     @Override
@@ -105,6 +108,21 @@ public class GameJdbcDao implements GameDao {
     @Override
     public List<GameFormat> getFormats(Long gameId) {
         return jdbcTemplate.query("SELECT * FROM game_format WHERE game_id = ?", ROW_MAPPER_FORMAT, gameId);
+    }
+
+    @Override
+    public void addFavourite(Long user_id, Long game_id) {
+        Map<String, Long> map = Map.of("user_id", user_id, "game_id", game_id);
+        jdbcInsertFavourites.execute(map);
+    }
+
+    @Override
+    public List<Game> getFavourites(Long user_id) {
+        String sql = "SELECT g.* " +
+                "FROM game g " +
+                "JOIN user_favourites uf ON g.id = uf.game_id " +
+                "WHERE uf.user_id = ?";
+        return jdbcTemplate.query(sql, ROW_MAPPER, user_id);
     }
 
 }

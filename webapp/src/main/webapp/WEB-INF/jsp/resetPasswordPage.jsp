@@ -4,7 +4,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 
-<c:url var="resetPasswordUrl" value="/resetPassword?token=${token}&userId=${userId}"/>
+<c:url var="resetPasswordUrl" value="/forgotPassword/reset?token=${token}&userId=${userId}"/>
 <c:url var="forgotPasswordUrl" value="/forgotPassword"/>
 
 <paw:form-layout title="passwordReset.page.title">
@@ -27,8 +27,7 @@
             <paw:text type="title"><spring:message code="passwordReset.failed.title"/></paw:text>
             <paw:text size="l"><spring:message code="passwordReset.failed.message"/></paw:text>
             <br>
-            <spring:message code="passwordReset.failed.resend" var="resend"/>
-            <paw:button onclick="window.location.href='${forgotPasswordUrl}'" text="${resend}"/>
+            <paw:button onclick="window.location.href='${forgotPasswordUrl}'" text="passwordReset.failed.resend"/>
         </c:otherwise>
     </c:choose>
 </paw:form-layout>

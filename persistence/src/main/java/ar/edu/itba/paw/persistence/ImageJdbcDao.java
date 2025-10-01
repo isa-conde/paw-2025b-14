@@ -28,4 +28,9 @@ public class ImageJdbcDao implements ImageDao {
     public Optional<byte[]> findById(Long id) {
         return template.query("SELECT * FROM image WHERE id = ?", ROW_MAPPER, id).stream().findFirst();
     }
+
+    @Override
+    public void updateImage(Long id, byte[] image){
+        template.update("UPDATE image SET image = ? WHERE id = ?", image, id);
+    }
 }

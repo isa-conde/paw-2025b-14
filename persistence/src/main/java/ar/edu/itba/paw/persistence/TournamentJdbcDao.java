@@ -60,13 +60,13 @@ public class TournamentJdbcDao implements TournamentDao {
     private static final RowMapper<Tournament> ROW_MAPPER = (rs, rowNum) -> new Tournament(rs.getLong("id"),
             rs.getLong("creator_id"), rs.getString("name"), rs.getLong("game_id"), Region.valueOf(rs.getString("region")),
             Elo.valueOf(rs.getString("elo")), rs.getDate("start_date").toLocalDate(), rs.getDate("end_date").toLocalDate(),
-            rs.getString("format"), Structure.valueOf(rs.getString("structure")), rs.getInt("max_participants"), rs.getInt("image_id"),
-            rs.getBoolean("open_inscriptions"), rs.getBoolean("is_finished"));
+            rs.getString("format"), Structure.valueOf(rs.getString("structure")), rs.getInt("max_participants"), rs.getLong("image_id"),
+            rs.getBoolean("open_inscriptions"), rs.getBoolean("is_finished"), rs.getLong("tournament_winner"), rs.getBoolean("is_group_stage"), rs.getBoolean("tournament_started"));
 
-    private static final RowMapper<User> ROW_MAPPER_USER = (rs, rowNum) -> new User(rs.getLong("id"), rs.getString("username"), rs.getString("email"), rs.getString("password"), rs.getBoolean("verified"));
+    private static final RowMapper<User> ROW_MAPPER_USER = (rs, rowNum) -> new User(rs.getLong("id"), rs.getString("username"), rs.getString("email"), rs.getString("password"), rs.getBoolean("verified"), rs.getString("bio"), rs.getLong("profile_picture_id"), rs.getLong("banner_id"));
 
     private static final RowMapper<ParticipantUser> ROW_MAPPER_PARTICIPANT_USER = (rs, rowNum) -> {
-        ParticipantUser participant = new ParticipantUser(rs.getLong("user_id"), rs.getLong("tournament_id"));
+        ParticipantUser participant = new ParticipantUser(rs.getLong("user_id"), rs.getLong("tournament_id"), rs.getInt("group_number"));
         participant.setPoints(rs.getInt("points"));
         return participant;
     };
@@ -96,7 +96,7 @@ public class TournamentJdbcDao implements TournamentDao {
     public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, byte[] image, Boolean open_inscriptions, Boolean is_finished) {
 
         SqlParameterSource img = new MapSqlParameterSource().addValue("image", image);
-        Integer image_id = jdbcInsertImage.executeAndReturnKey(img).intValue();
+        Long image_id = jdbcInsertImage.executeAndReturnKey(img).longValue();
 
         SqlParameterSource values = new MapSqlParameterSource()
                 .addValue("creator_id", creator_id)
@@ -116,7 +116,7 @@ public class TournamentJdbcDao implements TournamentDao {
 
         Number key = jdbcInsert.executeAndReturnKey(values);
         createMatches(key.longValue());
-        return new Tournament(key.longValue(), creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished);
+        return new Tournament(key.longValue(), creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, null, null, false);
     }
 
     @Override
@@ -134,6 +134,11 @@ public class TournamentJdbcDao implements TournamentDao {
         if (tournament.isPresent() && participantUsers.size() == tournament.get().getMax_participants()) {
             closeInscriptions(tournament_id);
         }
+    }
+
+    @Override
+    public void leaveTournamentUser(Long user_id, Long tournament_id){
+        jdbcTemplate.update("DELETE FROM participant_user WHERE user_id = ? AND tournament_id = ?", user_id, tournament_id);
     }
 
     public int getCurrentParticipants(Long tournament_id) {
@@ -435,7 +440,7 @@ public class TournamentJdbcDao implements TournamentDao {
 
     @Override
     public void setFinished(Long tournament_id, Long match_id) {
-        jdbcTemplate.update("UPDATE tournament SET is_finished = true WHERE id = ?", tournament_id);
+        jdbcTemplate.update("UPDATE tournament SET is_finished = true, end_date = CURRENT_DATE WHERE id = ?", tournament_id);
         if(match_id != null){
             setTournamentWinner(tournament_id, match_id);
         }
@@ -449,7 +454,7 @@ public class TournamentJdbcDao implements TournamentDao {
 
     @Override
     public void startTournament(Long tournament_id) {
-        jdbcTemplate.update("UPDATE tournament SET tournament_started = true WHERE id = ?", tournament_id);
+        jdbcTemplate.update("UPDATE tournament SET tournament_started = true, start_date = CURRENT_DATE WHERE id = ?", tournament_id);
         Tournament t = findById(tournament_id).orElse(null);
         if(t != null && t.getStructure().equals(Structure.HYBRID)){
             Map<Integer, List<ParticipantUser>> groupedParticipants = getGroupedParticipants(tournament_id);
@@ -631,9 +636,6 @@ public class TournamentJdbcDao implements TournamentDao {
         StringBuilder sql = new StringBuilder("SELECT DISTINCT ON (t.id) t.* FROM tournament t");
 
         sql.append(buildTournamentFilterSql(filter, params));
-
-        int pageSize = 9;
-        int offset = (page != null && page > 0) ? (int) ((page - 1) * pageSize) : 0;
 
         sql.append(" LIMIT :limit OFFSET :offset");
         params.addValue("limit", 9);
@@ -870,7 +872,7 @@ public class TournamentJdbcDao implements TournamentDao {
                 ORDER BY COUNT(t2.id) DESC
                 LIMIT 3
                 OFFSET ?
-            )
+            ) AND t.open_inscriptions = true
             ORDER BY t.game_id, t.start_date
         """;
         List<Tournament> tournaments = jdbcTemplate.query(sql, ROW_MAPPER, page * 3);
@@ -879,7 +881,6 @@ public class TournamentJdbcDao implements TournamentDao {
                 .collect(Collectors.groupingBy(Tournament::getGame_id,
                         LinkedHashMap::new,
                         Collectors.toList()));
-
     }
 
     @Override
@@ -900,5 +901,43 @@ public class TournamentJdbcDao implements TournamentDao {
         Integer count = namedJdbcTemplate.queryForObject(sql.toString(), params, Integer.class);
 
         return (int) Math.ceil((double) count / pageSize);
+    }
+
+    @Override
+    public void updateTournamentInfo(Long tournamentId, String name, LocalDate startDate, LocalDate endDate, Integer maxParticipants) {
+        List<String> sets = new ArrayList<>();
+        MapSqlParameterSource p = new MapSqlParameterSource().addValue("id", tournamentId);
+
+        if (name != null) {
+            sets.add("name = :name");
+            p.addValue("name", name);
+        }
+        if (startDate != null) {
+            sets.add("start_date = :start_date");
+            p.addValue("start_date", startDate);
+        }
+        if (endDate != null) {
+            sets.add("end_date = :end_date");
+            p.addValue("end_date", endDate);
+        }
+        if (maxParticipants != null) {
+            sets.add("max_participants = :max_participants");
+            p.addValue("max_participants", maxParticipants);
+        }
+
+        if (sets.isEmpty()) {
+            return;
+        }
+
+        String sql = "UPDATE tournament SET " + String.join(", ", sets) + " WHERE id = :id";
+        namedJdbcTemplate.update(sql, p);
+    }
+
+    @Override
+    public int tournamentParticipantsCount(Long tournamentId){
+        return jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM participant_user WHERE tournament_id = ?",
+                Integer.class, tournamentId
+        );
     }
 }

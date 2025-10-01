@@ -18,7 +18,8 @@ public class UserJdbcDao implements UserDao {
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
 
-    private static final RowMapper<User> ROW_MAPPER = (rs, rowNum) -> new User(rs.getLong("id"), rs.getString("username"), rs.getString("email"), rs.getString("password"), rs.getBoolean("verified"));
+
+    private static final RowMapper<User> ROW_MAPPER = (rs, rowNum) -> new User(rs.getLong("id"), rs.getString("username"), rs.getString("email"), rs.getString("password"), rs.getBoolean("verified"), rs.getString("bio"), rs.getLong("profile_picture_id"), rs.getLong("banner_id"));
 
     public UserJdbcDao(final DataSource ds) {
         jdbcTemplate = new JdbcTemplate(ds);
@@ -37,7 +38,7 @@ public class UserJdbcDao implements UserDao {
         final Map<String, Object> values = Map.of("username", username, "email", email, "password", password, "verified", false);
         final Number key = jdbcInsert.executeAndReturnKey(values);
 
-        return new User(key.longValue(), username, email, password, false);
+        return new User(key.longValue(), username, email, password, false, null, null, null);
     }
 
     @Override
