@@ -6,6 +6,6 @@ public interface ImageService {
 
     public Optional<byte[]> findById(Long id);
 
-    public Integer insertImage(byte[] img);
+    public Long insertImage(byte[] img);
 
 }

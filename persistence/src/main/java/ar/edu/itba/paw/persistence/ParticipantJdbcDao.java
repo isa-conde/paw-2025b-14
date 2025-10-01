@@ -27,7 +27,7 @@ public class ParticipantJdbcDao implements ParticipantDao {
     }
 
     private static final RowMapper<ParticipantUser> ROW_MAPPER = (rs, rowNum) -> {
-        ParticipantUser participant = new ParticipantUser(rs.getLong("user_id"), rs.getLong("tournament_id"));
+        ParticipantUser participant = new ParticipantUser(rs.getLong("user_id"), rs.getLong("tournament_id"), rs.getInt("points"));
         participant.setPoints(rs.getInt("points"));
         return participant;
     };
@@ -59,5 +59,10 @@ public class ParticipantJdbcDao implements ParticipantDao {
     public Boolean hasJoined(Long userId, Long tournamentId) {
         String sql = "SELECT EXISTS (SELECT 1 FROM participant_user WHERE user_id = ? AND tournament_id = ?)";
         return jdbcTemplate.queryForObject(sql, Boolean.class, userId, tournamentId);
+    }
+
+    @Override
+    public void leaveTournamentUser(Long user_id, Long tournament_id) {
+        jdbcTemplate.update("DELETE FROM participant_user WHERE user_id = ? AND tournament_id = ?", user_id, tournament_id);
     }
 }

@@ -22,9 +22,7 @@ public interface TournamentDao {
 
     public List<Tournament> findGameTournaments(Long game_id);
 
-    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Integer image_id, Boolean openInscriptions, Boolean isFinished);
-
-    public void leaveTournamentUser(Long user_id, Long tournament_id);
+    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Long image_id, Boolean openInscriptions, Boolean isFinished);
 
     //public void joinTournamentTeam(Long team_id, Long tournament_id);
 

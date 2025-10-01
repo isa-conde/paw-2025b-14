@@ -13,4 +13,6 @@ public interface ParticipantService {
     public ParticipantUser getTournamentParticipantByUserId(Long tournament_id, Long user_id);
 
     Boolean hasJoined(Long userId, Long tournamentId);
+
+    public void leaveTournamentUser(Long user_id, Long tournament_id);
 }

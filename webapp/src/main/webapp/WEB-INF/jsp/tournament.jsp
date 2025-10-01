@@ -149,7 +149,7 @@
                     </c:when>
                 </c:choose>
                 <c:choose>
-                    <c:when test="${user.id == tournament.creator_id && tournament.openInscriptions}">
+                    <c:when test="${user.id == tournament.creator_id && tournament.openInscriptions && participantCount > 1}">
                         <div class="cards-container">
                             <form method="post" action="${pageContext.request.contextPath}/tournament/closeInscriptions">
                                 <input type="hidden" name="tournamentId" value="${tournament.id}"/>

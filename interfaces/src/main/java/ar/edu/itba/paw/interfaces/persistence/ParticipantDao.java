@@ -14,5 +14,5 @@ public interface ParticipantDao {
 
     Boolean hasJoined(Long userId, Long tournamentId);
 
-
+    public void leaveTournamentUser(Long user_id, Long tournament_id);
 }

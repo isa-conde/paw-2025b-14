@@ -46,4 +46,9 @@ public class ParticipantServiceImpl implements ParticipantService {
     public Boolean hasJoined(Long userId, Long tournamentId) {
         return participantDao.hasJoined(userId, tournamentId);
     }
+
+    @Override
+    public void leaveTournamentUser(Long user_id, Long tournament_id) {
+        participantDao.leaveTournamentUser(user_id, tournament_id);
+    }
 }

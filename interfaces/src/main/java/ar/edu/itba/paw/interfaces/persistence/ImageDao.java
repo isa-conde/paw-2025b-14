@@ -6,7 +6,7 @@ public interface ImageDao {
 
     Optional<byte[]> findById(Long id);
 
-    Integer insertImage(byte[] img);
+    Long insertImage(byte[] img);
 
     void updateImage(Long id, byte[] image);
 }

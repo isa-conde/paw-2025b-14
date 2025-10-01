@@ -1,9 +1,6 @@
 package ar.edu.itba.paw.webapp.controller;
 
-import ar.edu.itba.paw.interfaces.services.GameService;
-import ar.edu.itba.paw.interfaces.services.MailService;
-import ar.edu.itba.paw.interfaces.services.TournamentService;
-import ar.edu.itba.paw.interfaces.services.UserService;
+import ar.edu.itba.paw.interfaces.services.*;
 import ar.edu.itba.paw.model.*;
 import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.MatchWithPlayers;
@@ -44,12 +41,14 @@ public class TournamentController {
     private final GameService gs;
     private final TournamentService ts;
     private final MailService ms;
+    private final ParticipantService ps;
 
-    public TournamentController(final UserService us, final GameService gs, final TournamentService ts, final MailService ms) {
+    public TournamentController(final UserService us, final GameService gs, final TournamentService ts, final MailService ms, final ParticipantService ps) {
         this.us = us;
         this.gs = gs;
         this.ts = ts;
         this.ms = ms;
+        this.ps = ps;
     }
 
     // TODO: delete this!!!
@@ -198,7 +197,7 @@ public class TournamentController {
             form.setMax_participants(t.getMax_participants());
             Optional<Game> optionalGame = gs.findById(t.getGame_id());
             Optional<User> optionalUser = us.findById(t.getCreator_id());
-            mav.addObject("hasJoined", ts.hasJoined(user.getId(), tournamentId));
+            mav.addObject("hasJoined", ps.hasJoined(user.getId(), tournamentId));
             mav.addObject("participants", participants);
             mav.addObject("user", user);
             mav.addObject("tournament", t);
@@ -236,7 +235,7 @@ public class TournamentController {
         String tournamentLink = request.getRequestURL().toString()
                 .replace("/tournament/join", "/tournament?tournamentId=" + t.get().getId());
         ms.sendTournamentJoinedEmail(user.getUsername(), t.get().getName(), tournamentLink, us.findById(t.get().getCreator_id()).get().getEmail(), user.getEmail());
-        ts.joinTournamentUser(user.getId(), tournamentId);
+        ps.joinTournamentUser(user.getId(), tournamentId);
         return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
     }
 
@@ -250,7 +249,7 @@ public class TournamentController {
         if (user == null) {
             return new ModelAndView("redirect:/");
         }
-        ts.leaveTournamentUser(user.getId(), tournamentId);
+        ps.leaveTournamentUser(user.getId(), tournamentId);
         return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
     }
 

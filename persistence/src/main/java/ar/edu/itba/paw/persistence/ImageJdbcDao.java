@@ -32,9 +32,9 @@ public class ImageJdbcDao implements ImageDao {
     }
 
     @Override
-    public Integer insertImage(byte[] image) {
+    public Long insertImage(byte[] image) {
         SqlParameterSource img = new MapSqlParameterSource().addValue("image", image);
-        return jdbcInsert.executeAndReturnKey(img).intValue();
+        return jdbcInsert.executeAndReturnKey(img).longValue();
     }
 
     @Override

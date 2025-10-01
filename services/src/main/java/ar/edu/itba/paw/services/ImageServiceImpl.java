@@ -21,7 +21,7 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public Integer insertImage(byte[] img) {
+    public Long insertImage(byte[] img) {
         return imageDao.insertImage(img);
     }
 }
