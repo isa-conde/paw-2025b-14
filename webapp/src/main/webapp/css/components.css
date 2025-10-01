@@ -53,8 +53,15 @@ button:disabled {
     cursor: not-allowed;
 }
 
-.winner-card-content {
-
+.chip {
+    border-radius: 15px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--background-card);
+    color: var(--primary-text);
+    padding: 0 30px;
+    gap: 6px;
 }
 
 /* ------- FONTS ------- */
@@ -105,7 +112,7 @@ button:disabled {
 }
 
 .btn:disabled {
-    opacity: 0.9;
+    opacity: 0.5;
     cursor: default;
 }
 
@@ -115,9 +122,24 @@ button:disabled {
     justify-content: flex-start;
 }
 
+.btn.image.no-text {
+    padding: 4px 4px;
+    gap: 0;
+    justify-content: center;
+}
+
 .btn.empty {
     background-color: transparent;
     box-shadow: inset 0 0 0 4px var(--primary-button);
+}
+
+.btn.secondary {
+    background-color: var(--secondary-details);
+    color: var(--secondary-text);
+}
+
+.btn.secondary:hover {
+    background-color: var(--secondary-details-hover);
 }
 
 .btn.empty:hover:not(:disabled) {
@@ -126,10 +148,9 @@ button:disabled {
 }
 
 .button-image {
-    width: 80%;
+    width: auto;
     height: 80%;
     border-radius: 15px;
-    background-color: var(--background-card);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -226,6 +247,15 @@ button:disabled {
     position: relative;
     z-index: 2;
     text-align: center;
+    text-shadow:
+        0 -2px 8px var(--secondary-details),
+        0  2px 6px var(--background);
+}
+
+.banner-content .btn {
+    box-shadow:
+            0 -2px 8px var(--secondary-details),
+            0  2px 6px var(--background);
 }
 
 .organizer-container {
@@ -234,6 +264,16 @@ button:disabled {
     justify-content: center;
     align-items: flex-start;
     margin-top: 20px;
+}
+
+.banner-corner{
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    display: flex;
+    gap: .5rem;
+    align-items: center;
+    z-index: 2;
 }
 
 /* ------- TEXT STROKE ------- */
@@ -353,7 +393,7 @@ button:disabled {
 .card {
     background-color: var(--background-card);
     border-radius: 15px;
-    padding: 20px;
+    padding: 30px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -374,6 +414,7 @@ button:disabled {
 }
 
 .card-button-container {
+    justify-self: flex-start;
     bottom: 20px;
     left: 20px;
     padding: 30px;
@@ -476,6 +517,10 @@ a.element-card:hover {
     position: relative;
     z-index: 2;
     text-align: left;
+    justify-content: flex-start;
+    text-shadow:
+            0 -2px 8px var(--background-secondary),
+            0  2px 6px var(--background);
 }
 
 .element-card-content.game {
@@ -487,6 +532,18 @@ a.element-card:hover {
 .element-card-content:not(.game) {
     margin-top: auto;
     margin-bottom: 0;
+}
+
+.element-card-date {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    text-align: left;
+    justify-content: left;
+}
+
+.bottom-blur {
+
 }
 
 /* ------- HEADER ------- */
@@ -685,10 +742,17 @@ a.element-card:hover {
 }
 
 .board-header-cell {
-    padding: 20px 30px;
     text-align: center;
     border-bottom: 5px solid var(--primary-button);
     background-color: var(--primary-button);
+}
+
+.board-header-cell.xl {
+    padding: 20px 30px;
+}
+
+.board-header-cell.l {
+    padding: 10px 30px;
 }
 
 .board-header-cell:first-child {
@@ -727,6 +791,10 @@ a.element-card:hover {
     text-align: left;
 }
 
+.board-container {
+    padding: 20px 30px;
+}
+
 /* ------- FILTER ------- */
 
 .filter-container {
@@ -762,6 +830,22 @@ a.element-card:hover {
     max-width: 350px;
     justify-self: center;
     min-width: 0;
+}
+
+.grid.users {
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.grid.users .btn {
+    max-width: 100%;
+}
+
+.users-grid-title {
+    margin-top: 100px;
+    display: flex;
+    align-items: center;
+    gap: 40px;
 }
 
 @media (max-width: 1200px) {
@@ -816,6 +900,10 @@ dialog:not([open]) {
     justify-content: center;
 }
 
+.row.center {
+    margin: 30px 20px 20px;
+}
+
 /* ------- ICON BUTTON ------- */
 
 .icon-btn {
@@ -865,8 +953,14 @@ dialog:not([open]) {
 .submit {
     margin-top: 20px;
     padding: 15px 30px;
-    font-size: 24px;
+    font-size: var(--text-24);
     font-weight: 600;
+}
+
+.btn.reverse {
+    background-color: var(--background);
+    color: var(--primary-button);
+    border: 2px solid var(--primary-button);
 }
 
 /* ------- INPUT ------- */

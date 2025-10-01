@@ -12,7 +12,7 @@ import java.time.LocalDate;
 import javax.validation.constraints.*;
 
 @DatesConstraint(groups = TournamentForm.StepOne.class)
-public class TournamentForm {
+public class TournamentForm implements HasDates{
 
     public interface StepOne {}
     public interface StepTwo {}

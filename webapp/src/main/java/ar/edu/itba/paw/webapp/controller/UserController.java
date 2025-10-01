@@ -126,6 +126,8 @@ public class UserController {
         tf.setGame_id(filterForm.getGame_id());
         tf.setRegion(filterForm.getRegion());
         tf.setElo(filterForm.getElo());
+        tf.setPlayersPerTeam(filterForm.getPlayersPerTeam());
+        tf.setGenre(filterForm.getGenre());
 
         boolean isFiltered = !tf.isEmpty();
 

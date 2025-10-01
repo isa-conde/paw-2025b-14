@@ -6,4 +6,5 @@ public interface ImageDao {
 
     public Optional<byte[]> findById(Long id);
 
+    void updateImage(Long id, byte[] image);
 }

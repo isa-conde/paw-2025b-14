@@ -1,6 +1,8 @@
 package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.persistence.GameDao;
+import ar.edu.itba.paw.interfaces.persistence.ImageDao;
+import ar.edu.itba.paw.interfaces.persistence.GameDao;
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.ParticipantUser;
@@ -24,10 +26,12 @@ import java.util.*;
 public class TournamentServiceImpl implements TournamentService {
 
     private final TournamentDao tournamentDao;
+    private final ImageDao imageDao;
     private final GameDao gameDao;
 
-    public TournamentServiceImpl(TournamentDao tournamentDao, GameDao gameDao) {
+    public TournamentServiceImpl(TournamentDao tournamentDao, ImageDao imageDao, GameDao gameDao) {
         this.tournamentDao = tournamentDao;
+        this.imageDao = imageDao;
         this.gameDao = gameDao;
     }
 
@@ -61,6 +65,11 @@ public class TournamentServiceImpl implements TournamentService {
         Optional<Tournament> t = tournamentDao.findById(tournament_id);
         gameDao.addFavourite(user_id, t.get().getGame_id());
         tournamentDao.joinTournamentUser(user_id, tournament_id);
+    }
+
+    @Override
+    public void leaveTournamentUser(Long user_id, Long tournament_id){
+        tournamentDao.leaveTournamentUser(user_id, tournament_id);
     }
 
     @Override
@@ -205,5 +214,21 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public Integer getPageAmount(Integer pageSize, TournamentFilter tf){
         return tournamentDao.getPageAmount(pageSize, tf);
+    }
+
+    @Override
+    public void updateTournamentInfo(Long tournament_id, String name, LocalDate start_date, LocalDate end_date, Integer max_participants, byte[] image){
+        Tournament t = findById(tournament_id).orElse(null);
+        if(t != null){
+            if(image != null){
+                imageDao.updateImage(t.getImage_id(), image);
+            }
+            tournamentDao.updateTournamentInfo(tournament_id, name, start_date, end_date, max_participants);
+        }
+    }
+
+    @Override
+    public int tournamentParticipantsCount(Long tournamentId) {
+    	return tournamentDao.tournamentParticipantsCount(tournamentId);
     }
 }

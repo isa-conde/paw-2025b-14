@@ -50,7 +50,6 @@
                 </div>
                 <paw:carrousel id="game-${gameId}-tournaments" elements="${gameTournaments}"/>
         </c:forEach>
-
     </div>
 </paw:layout>
 

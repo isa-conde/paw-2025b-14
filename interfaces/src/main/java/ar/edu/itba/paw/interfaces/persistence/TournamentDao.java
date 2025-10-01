@@ -26,6 +26,8 @@ public interface TournamentDao {
 
     public void joinTournamentUser(Long user_id, Long tournament_id);
 
+    public void leaveTournamentUser(Long user_id, Long tournament_id);
+
     //public void joinTournamentTeam(Long team_id, Long tournament_id);
 
     public List<User> getTournamentUsers(Long tournament_id);
@@ -67,4 +69,8 @@ public interface TournamentDao {
     Map<Long,List<Tournament>> getUnfilteredTournamentPages(Long page);
 
     Integer getPageAmount(Integer pageSize, TournamentFilter tf);
+
+    void updateTournamentInfo(Long tournament_id, String name, LocalDate start_date, LocalDate end_date, Integer max_participants);
+
+    int tournamentParticipantsCount(Long tournamentId);
 }

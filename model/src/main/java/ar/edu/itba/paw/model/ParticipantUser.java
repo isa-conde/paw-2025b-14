@@ -7,11 +7,11 @@ public class ParticipantUser {
     private Integer points;
     private final Integer group_number;
 
-    public ParticipantUser(Long userId, Long tournamentId) {
+    public ParticipantUser(Long userId, Long tournamentId, Integer groupNumber) {
         user_id = userId;
         tournament_id = tournamentId;
         points = 0;
-        group_number = null;
+        group_number = groupNumber;
     }
 
     public Long getTournament_id() {

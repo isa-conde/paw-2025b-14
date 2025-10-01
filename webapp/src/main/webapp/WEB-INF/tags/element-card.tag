@@ -21,10 +21,10 @@
     <div class="element-card-content">
         <paw:text type="title" size="s" stroke="true"><c:out value="${title}"/></paw:text>
         <c:if test="${hasDate}">
-            <div class="date-container">
-                <paw:datetime date="${start_date}" size="s" weight="thin"/>
-                <paw:text size="s" weight="thin"> - </paw:text>
-                <paw:datetime date="${end_date}" size="s" weight="thin"/>
+            <div class="element-card-date">
+                <paw:datetime date="${start_date}" size="s" weight="semi-bold"/>
+                <paw:text size="s" weight="semi-bold"> - </paw:text>
+                <paw:datetime date="${end_date}" size="s" weight="semi-bold"/>
             </div>
         </c:if>
     </div>

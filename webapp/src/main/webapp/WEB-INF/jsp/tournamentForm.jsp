@@ -57,7 +57,6 @@
                 </c:when>
             </c:choose>
         </div>
-
     </div>
 </paw:layout>
 
