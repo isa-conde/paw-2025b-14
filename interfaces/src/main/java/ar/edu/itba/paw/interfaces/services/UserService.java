@@ -31,5 +31,5 @@ public interface UserService {
 
     Optional<Token> verifyEmail(Long token, Long userId);
 
-    void authenticate(Long userId);
+    void authenticateVerifiedUser(Long userId);
 }

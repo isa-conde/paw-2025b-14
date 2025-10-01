@@ -127,8 +127,6 @@ public class UserServiceImpl implements UserService {
         if(user.isPresent()) {
             if(optToken.isPresent()) {
                 userDao.verifyUser(userId);
-            } else {
-                throw new InvalidTokenException();
             }
         } else {
             throw new UserNotFoundException();
@@ -138,7 +136,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void authenticate(Long userId) {
+    public void authenticateVerifiedUser(Long userId) {
         Optional<User> optUser = findById(userId);
         if(optUser.isPresent()) {
             User user = optUser.get();
@@ -157,6 +155,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<Token> checkTokenValidity(Long token, Long userId) {
         Optional<Token> optToken = tokenDao.findByToken(token);
+        if(findById(userId).isEmpty()) {
+            throw new UserNotFoundException();
+        }
         if(optToken.isPresent()) {
             Token foundToken = optToken.get();
             if(foundToken.getUser_id().equals(userId)) {

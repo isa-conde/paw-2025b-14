@@ -91,7 +91,7 @@ public class AuthController {
     public ModelAndView confirmedVerificationPage(@RequestParam("token") Long token, @RequestParam("userId") long userId, HttpServletRequest request) {
         ModelAndView mav = new ModelAndView("confirmedVerificationPage");
         Optional<Token> validToken = us.verifyEmail(token, userId);
-        us.authenticate(userId);
+        us.authenticateVerifiedUser(userId);
         mav.addObject("validToken", validToken.isPresent());
         mav.addObject("userId", userId);
         return mav;

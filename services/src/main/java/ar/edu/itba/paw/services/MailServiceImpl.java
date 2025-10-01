@@ -8,6 +8,8 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
@@ -29,6 +31,7 @@ public class MailServiceImpl implements MailService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MailServiceImpl.class);
 
+    @Async
     @Override
     public void sendTournamentCreatedEmail(String userName, String tournamentName, String tournamentLink, String recipient) {
         Context ctx = new Context();
@@ -41,6 +44,7 @@ public class MailServiceImpl implements MailService {
         sendEmail(recipient, "You just created " + tournamentName + "!", body);
     }
 
+    @Async
     @Override
     public void sendTournamentJoinedEmail(String userName, String tournamentName, String tournamentLink, String creatorMail, String recipient) {
         Context ctx = new Context();
@@ -54,6 +58,7 @@ public class MailServiceImpl implements MailService {
         sendEmail(recipient, "You just joined " + tournamentName + "!", body);
     }
 
+    @Async
     @Override
     public void sendVerificationEmail(Long userId, String userName, Long token, String recipient, String baseUrl) {
         Context ctx = new Context();
@@ -66,6 +71,7 @@ public class MailServiceImpl implements MailService {
         sendEmail(recipient, "Email Verification", body);
     }
 
+    @Async
     @Override
     public void sendResetPasswordEmail(Long userId, Long token, String recipient, String baseUrl) {
         Context ctx = new Context();
