@@ -31,8 +31,6 @@ public interface TournamentService {
 
     public Optional<Structure> getTournamentStructure(Long tournament_id);
 
-    public void loadScores(Long match_id, Long tournament_id, Integer local_score, Integer visitor_score);
-
     //public void joinTournamentTeam(Long team_id, Long tournament_id);
 
     public List<Tournament> findByCreator(Long creator_id);
@@ -40,8 +38,6 @@ public interface TournamentService {
     public void setFinished(Long tournament_id, Long match_id);
 
     public void closeInscriptions(Long tournament_id);
-
-    public Boolean hasJoined(Long userId, Long tournamentId);
 
     public Map<Integer, Map<Integer, List<MatchWithPlayers>>> getTournamentMatchesByGroup(Long tournament_id);
 
