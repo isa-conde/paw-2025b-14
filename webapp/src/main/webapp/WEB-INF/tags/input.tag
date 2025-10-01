@@ -14,7 +14,10 @@
 <%@ attribute name="emptyOption" required="false"%>
 <%@ attribute name="inline" required="false"%>
 <%@ attribute name="value" required="false"%>
+<%@ attribute name="secondary" required="false"%>
 <%@ attribute name="hasConstraint" required="false" type="java.lang.Boolean" %>
+
+<c:set var="secondaryClass" value="${not empty secondary && secondary == 'true' ? 'secondary' : ''}"/>
 
 <c:choose>
     <c:when test="${inputType != 'submit'}">
@@ -77,7 +80,7 @@
     <c:otherwise>
         <div class="inline-input-container submit-container">
             <spring:message code="${label}" var="msg"/>
-            <input type="submit" class="btn submit" value="${msg}">
+            <input type="submit" class="btn submit ${secondaryClass}" value="${msg}">
         </div>
     </c:otherwise>
 </c:choose>

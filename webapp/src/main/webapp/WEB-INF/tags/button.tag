@@ -6,7 +6,7 @@
 <%@ attribute name="fill" required="false" description="Fill: [true] or false" type="java.lang.Boolean"%>
 <%@ attribute name="disabled" required="false" description="Whether button is disabled" type="java.lang.Boolean"%>
 <%@ attribute name="isNotSafe" required="false" type="java.lang.Boolean" %>
-<%@ attribute name="secondary" required="false" type="java.lang.Boolean" %>
+<%@ attribute name="secondary" required="false"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>

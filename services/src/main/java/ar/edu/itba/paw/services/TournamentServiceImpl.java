@@ -61,6 +61,11 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
+    public void leaveTournamentUser(Long user_id, Long tournament_id){
+        tournamentDao.leaveTournamentUser(user_id, tournament_id);
+    }
+
+    @Override
     public Optional<Structure> getTournamentStructure(Long tournament_id){
     	return tournamentDao.getTournamentStructure(tournament_id);
     }

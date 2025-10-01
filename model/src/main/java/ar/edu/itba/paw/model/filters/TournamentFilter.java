@@ -51,6 +51,6 @@ public class TournamentFilter {
     public void setPlayersPerTeam(Integer playersPerTeam) { this.playersPerTeam = playersPerTeam; }
 
     public boolean isEmpty(){
-        return name == null && game_id == null && region == null && elo == null && start_date == null && end_date == null && format == null && structure == null;
+        return name == null && game_id == null && region == null && elo == null && start_date == null && end_date == null && format == null && structure == null && genre == null && playersPerTeam == null;
     }
 }

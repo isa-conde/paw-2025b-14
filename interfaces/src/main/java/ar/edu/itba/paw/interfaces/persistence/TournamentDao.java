@@ -26,6 +26,8 @@ public interface TournamentDao {
 
     public void joinTournamentUser(Long user_id, Long tournament_id);
 
+    public void leaveTournamentUser(Long user_id, Long tournament_id);
+
     //public void joinTournamentTeam(Long team_id, Long tournament_id);
 
     public List<User> getTournamentUsers(Long tournament_id);

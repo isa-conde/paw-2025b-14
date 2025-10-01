@@ -25,6 +25,8 @@ public interface TournamentService {
 
     public void joinTournamentUser(Long user_id, Long tournament_id);
 
+    public void leaveTournamentUser(Long user_id, Long tournament_id);
+
     public Map<Integer, List<ParticipantUserInfo>> getTournamentParticipantsByGroup(Long tournamentId);
 
     public Optional<Structure> getTournamentStructure(Long tournament_id);

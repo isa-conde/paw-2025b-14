@@ -357,6 +357,17 @@ public class HelloWorldController {
                 .map(key -> messageSource.getMessage("tournament.group", new Object[]{key}, locale))
                 .collect(Collectors.toList());
 
+        Map<Integer, List<ParticipantUserInfo>> participants = ts.getTournamentParticipantsByGroup(tournamentId);
+        List<ParticipantUserInfo> participantsList = participants.values().stream()
+                .filter(Objects::nonNull)
+                .flatMap(List::stream)
+                .toList();
+        List<ParticipantUserInfo> group0 = participants.getOrDefault(0, List.of());
+        int participantCount = participantsList.size();
+        Long userId = (user != null ? user.getId() : null);
+        boolean isParticipant = (userId != null) &&
+                participantsList.stream().anyMatch(p -> Objects.equals(p.getUser_id(), userId));
+
         if(optionalTournament.isPresent()) {
             Tournament t = optionalTournament.get();
             form.setName(t.getName());
@@ -366,7 +377,7 @@ public class HelloWorldController {
             Optional<Game> optionalGame = gs.findById(t.getGame_id());
             Optional<User> optionalUser = us.findById(t.getCreator_id());
             mav.addObject("hasJoined", ts.hasJoined(user.getId(), tournamentId));
-            mav.addObject("participants", ts.getTournamentParticipantsByGroup(tournamentId));
+            mav.addObject("participants", participants);
             mav.addObject("user", user);
             mav.addObject("tournament", t);
             mav.addObject("game", optionalGame.get());
@@ -378,6 +389,10 @@ public class HelloWorldController {
             mav.addObject("ELIMINATION", Structure.ELIMINATION);
             mav.addObject("HYBRID", Structure.HYBRID);
             mav.addObject("tournamentWinner", t.getTournament_winner());
+            mav.addObject("participantsList", participantsList);
+            mav.addObject("participantCount", participantCount);
+            mav.addObject("isParticipant", isParticipant);
+            mav.addObject("participantsGroup0", group0);
         } else {
             return new ModelAndView("index");
         }
@@ -399,6 +414,20 @@ public class HelloWorldController {
                 .replace("/tournament/join", "/tournament?tournamentId=" + t.get().getId());
         ms.sendTournamentJoinedEmail(user.getUsername(), t.get().getName(), tournamentLink, us.findById(t.get().getCreator_id()).get().getEmail(), user.getEmail());
         ts.joinTournamentUser(user.getId(), tournamentId);
+        return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
+    }
+
+    @RequestMapping(value = "/tournament/leave", method = { RequestMethod.POST })
+    public ModelAndView leaveTournament(Principal principal, HttpServletRequest request, @RequestParam("tournamentId") final long tournamentId) {
+        User user = null;
+        if (principal != null) {
+            Optional<User> userOpt = us.findByUsername(principal.getName());
+            user = userOpt.orElse(null);
+        }
+        if (user == null) {
+            return new ModelAndView("redirect:/");
+        }
+        ts.leaveTournamentUser(user.getId(), tournamentId);
         return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
     }
 
@@ -480,6 +509,8 @@ public class HelloWorldController {
         tf.setGame_id(filterForm.getGame_id());
         tf.setRegion(filterForm.getRegion());
         tf.setElo(filterForm.getElo());
+        tf.setPlayersPerTeam(filterForm.getPlayersPerTeam());
+        tf.setGenre(filterForm.getGenre());
 
         boolean isFiltered = !tf.isEmpty();
 

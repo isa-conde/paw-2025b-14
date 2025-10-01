@@ -15,10 +15,11 @@
 <%@ attribute name="method" required="false"%>
 <%@ attribute name="tournamentId" required="false" %>
 <%@ attribute name="disabled" required="false" %>
+<%@ attribute name="secondary" required="false" %>
 
 <c:set var="cardText" value="${not empty text ? text : ''}"/>
 <c:set var="buttonText" value="${not empty butText ? butText : ''}"/>
-<c:set var="texture" value="${not empty butText && texture ? 'texture' : ''}"/>
+<c:set var="texture" value="${not empty butText and texture == 'true' ? 'texture' : ''}"/>
 <c:set var="hasIcon" value="${not empty icon? 'true' : 'false'}"/>
 
 <div class="card ${texture}">
@@ -40,11 +41,11 @@
                                 <c:if test="${not empty tournamentId}">
                                     <input type="hidden" name="tournamentId" value="${tournamentId}"/>
                                 </c:if>
-                                <paw:input path="" inputType="submit" label="${butText}"/>
+                                <paw:input path="" inputType="submit" label="${butText}" secondary="${secondary}"/>
                             </form:form>
                         </c:when>
                         <c:otherwise>
-                            <paw:button text="${butText}" onclick="${onclick}" disabled="${disabled}"/>
+                            <paw:button text="${butText}" onclick="${onclick}" disabled="${disabled}" secondary="${secondary}"/>
                         </c:otherwise>
                     </c:choose>
                 </div>

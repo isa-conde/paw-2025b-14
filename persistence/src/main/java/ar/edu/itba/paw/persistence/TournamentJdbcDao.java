@@ -136,6 +136,11 @@ public class TournamentJdbcDao implements TournamentDao {
         }
     }
 
+    @Override
+    public void leaveTournamentUser(Long user_id, Long tournament_id){
+        jdbcTemplate.update("DELETE FROM participant_user WHERE user_id = ? AND tournament_id = ?", user_id, tournament_id);
+    }
+
     public int getCurrentParticipants(Long tournament_id) {
         return jdbcTemplate.queryForObject("SELECT COUNT(*) FROM participant_user WHERE tournament_id = ?", Integer.class, tournament_id);
     }
@@ -435,7 +440,7 @@ public class TournamentJdbcDao implements TournamentDao {
 
     @Override
     public void setFinished(Long tournament_id, Long match_id) {
-        jdbcTemplate.update("UPDATE tournament SET is_finished = true WHERE id = ?", tournament_id);
+        jdbcTemplate.update("UPDATE tournament SET is_finished = true, end_date = CURRENT_DATE WHERE id = ?", tournament_id);
         if(match_id != null){
             setTournamentWinner(tournament_id, match_id);
         }
@@ -449,7 +454,7 @@ public class TournamentJdbcDao implements TournamentDao {
 
     @Override
     public void startTournament(Long tournament_id) {
-        jdbcTemplate.update("UPDATE tournament SET tournament_started = true WHERE id = ?", tournament_id);
+        jdbcTemplate.update("UPDATE tournament SET tournament_started = true, start_date = CURRENT_DATE WHERE id = ?", tournament_id);
         Tournament t = findById(tournament_id).orElse(null);
         if(t != null && t.getStructure().equals(Structure.HYBRID)){
             Map<Integer, List<ParticipantUser>> groupedParticipants = getGroupedParticipants(tournament_id);
