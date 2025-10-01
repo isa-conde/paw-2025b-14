@@ -3,7 +3,7 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
-<c:url value="/login" var="loginUrl"/>
+<c:url value="/" var="homeUrl"/>
 <c:url value="/verify?userId=${userId}" var="resendVerificationUrl"/>
 
 <c:choose>
@@ -12,7 +12,7 @@
       <paw:text type="title"><spring:message code="verification.successful.title"/></paw:text>
       <paw:text size="l"><spring:message code="verification.successful.text"/></paw:text>
       <br>
-      <paw:button onclick="window.location.href='${loginUrl}'" text="verification.login"/>
+      <paw:button onclick="window.location.href='${homeUrl}'" text="verification.goToHome"/>
     </paw:form-layout>
   </c:when>
   <c:otherwise>

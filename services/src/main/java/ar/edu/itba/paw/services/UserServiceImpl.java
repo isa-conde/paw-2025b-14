@@ -1,19 +1,25 @@
 package ar.edu.itba.paw.services;
 
+import ar.edu.itba.paw.interfaces.exception.*;
 import ar.edu.itba.paw.interfaces.persistence.TokenDao;
 import ar.edu.itba.paw.interfaces.persistence.UserDao;
 import ar.edu.itba.paw.interfaces.services.MailService;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.Token;
 import ar.edu.itba.paw.model.User;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import ar.edu.itba.paw.interfaces.exception.BusinessException;
-import ar.edu.itba.paw.interfaces.exception.EmailAlreadyUsedException;
-import ar.edu.itba.paw.interfaces.exception.UsernameAlreadyUsedException;
 import org.springframework.stereotype.Service;
 
+import java.security.InvalidAlgorithmParameterException;
 import java.security.SecureRandom;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -117,10 +123,35 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<Token> verifyEmail(Long token, Long userId) {
         Optional<Token> optToken = checkTokenValidity(token, userId);
-        if(optToken.isPresent()) {
-            userDao.verifyUser(userId);
+        Optional<User> user = findById(userId);
+        if(user.isPresent()) {
+            if(optToken.isPresent()) {
+                userDao.verifyUser(userId);
+            } else {
+                throw new InvalidTokenException();
+            }
+        } else {
+            throw new UserNotFoundException();
         }
+
         return optToken;
+    }
+
+    @Override
+    public void authenticate(Long userId) {
+        Optional<User> optUser = findById(userId);
+        if(optUser.isPresent()) {
+            User user = optUser.get();
+            List<GrantedAuthority> authorities = new ArrayList<>();
+            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+            authorities.add(new SimpleGrantedAuthority("ROLE_VERIFIED"));
+
+            Authentication authentication = new UsernamePasswordAuthenticationToken(user.getUsername(), null, authorities);
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        } else {
+            throw new UserNotFoundException();
+        }
     }
 
     @Override

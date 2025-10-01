@@ -30,4 +30,6 @@ public interface UserService {
     boolean emailIsTaken(String email);
 
     Optional<Token> verifyEmail(Long token, Long userId);
+
+    void authenticate(Long userId);
 }

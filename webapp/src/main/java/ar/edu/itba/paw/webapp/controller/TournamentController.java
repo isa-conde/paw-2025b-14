@@ -144,7 +144,7 @@ public class TournamentController {
             Tournament t = optionalTournament.get();
             Optional<Game> optionalGame = gs.findById(t.getGame_id());
             Optional<User> optionalUser = us.findById(t.getCreator_id());
-            mav.addObject("hasJoined", ts.hasJoined(user.getId(), tournamentId));
+            mav.addObject("hasJoined", user != null ? ts.hasJoined(user.getId(), tournamentId) : false);
             mav.addObject("participants", ts.getTournamentParticipantsByGroup(tournamentId));
             mav.addObject("user", user);
             mav.addObject("tournament", t);
