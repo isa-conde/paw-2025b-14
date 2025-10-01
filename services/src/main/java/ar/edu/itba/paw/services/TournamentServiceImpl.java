@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.services;
 
+import ar.edu.itba.paw.interfaces.persistence.GameDao;
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.ParticipantUser;
@@ -13,6 +14,7 @@ import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -22,9 +24,11 @@ import java.util.*;
 public class TournamentServiceImpl implements TournamentService {
 
     private final TournamentDao tournamentDao;
+    private final GameDao gameDao;
 
-    public TournamentServiceImpl(TournamentDao tournamentDao) {
+    public TournamentServiceImpl(TournamentDao tournamentDao, GameDao gameDao) {
         this.tournamentDao = tournamentDao;
+        this.gameDao = gameDao;
     }
 
 
@@ -54,6 +58,8 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Override
     public void joinTournamentUser(Long user_id, Long tournament_id) {
+        Optional<Tournament> t = tournamentDao.findById(tournament_id);
+        gameDao.addFavourite(user_id, t.get().getGame_id());
         tournamentDao.joinTournamentUser(user_id, tournament_id);
     }
 

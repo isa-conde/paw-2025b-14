@@ -63,7 +63,7 @@ public class TournamentJdbcDao implements TournamentDao {
             rs.getString("format"), Structure.valueOf(rs.getString("structure")), rs.getInt("max_participants"), rs.getInt("image_id"),
             rs.getBoolean("open_inscriptions"), rs.getBoolean("is_finished"));
 
-    private static final RowMapper<User> ROW_MAPPER_USER = (rs, rowNum) -> new User(rs.getLong("id"), rs.getString("username"), rs.getString("email"), rs.getString("password"), rs.getBoolean("verified"));
+    private static final RowMapper<User> ROW_MAPPER_USER = (rs, rowNum) -> new User(rs.getLong("id"), rs.getString("username"), rs.getString("email"), rs.getString("password"), rs.getBoolean("verified"), rs.getString("bio"), rs.getLong("profile_picture_id"), rs.getLong("banner_id"));
 
     private static final RowMapper<ParticipantUser> ROW_MAPPER_PARTICIPANT_USER = (rs, rowNum) -> {
         ParticipantUser participant = new ParticipantUser(rs.getLong("user_id"), rs.getLong("tournament_id"));
@@ -867,7 +867,7 @@ public class TournamentJdbcDao implements TournamentDao {
                 ORDER BY COUNT(t2.id) DESC
                 LIMIT 3
                 OFFSET ?
-            )
+            ) AND t.open_inscriptions = false
             ORDER BY t.game_id, t.start_date
         """;
         List<Tournament> tournaments = jdbcTemplate.query(sql, ROW_MAPPER, page * 3);
@@ -876,7 +876,6 @@ public class TournamentJdbcDao implements TournamentDao {
                 .collect(Collectors.groupingBy(Tournament::getGame_id,
                         LinkedHashMap::new,
                         Collectors.toList()));
-
     }
 
     @Override
