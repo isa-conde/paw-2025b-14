@@ -181,7 +181,6 @@ public class TournamentController {
                 .filter(Objects::nonNull)
                 .flatMap(List::stream)
                 .toList();
-        List<ParticipantUserInfo> group0 = participants.getOrDefault(0, List.of());
         int participantCount = participantsList.size();
         Long userId = (user != null ? user.getId() : null);
         boolean isParticipant = (userId != null) &&
@@ -213,7 +212,6 @@ public class TournamentController {
             mav.addObject("participantsList", participantsList);
             mav.addObject("participantCount", participantCount);
             mav.addObject("isParticipant", isParticipant);
-            mav.addObject("participantsGroup0", group0);
             mav.addObject("maxStage", maxStage);
         } else {
             return new ModelAndView("index");
