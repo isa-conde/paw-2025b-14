@@ -32,16 +32,16 @@
     </paw:banner>
     <spring:message code="tournament.overview" var="overview"/>
     <spring:message code="tournament.matches" var="matches"/>
-    <spring:message code="tournament.participants.title" var="participants"/>
+    <spring:message code="tournament.participants.title" var="participantsTab"/>
     <c:set var="showMatches" value="${tournament.tournamentStarted}"/>
     <c:choose>
         <c:when test="${showMatches}">
-            <c:set var="sections" value="${['overview','matches', 'participants']}"/>
-            <c:set var="labels"   value="${[overview, matches, participants]}"/>
+            <c:set var="sections" value="${['overview','matches', 'participantsTab']}"/>
+            <c:set var="labels"   value="${[overview, matches, participantsTab]}"/>
         </c:when>
         <c:otherwise>
-            <c:set var="sections" value="${['overview', 'participants']}"/>
-            <c:set var="labels"   value="${[overview, participants]}"/>
+            <c:set var="sections" value="${['overview', 'participantsTab']}"/>
+            <c:set var="labels"   value="${[overview, participantsTab]}"/>
         </c:otherwise>
     </c:choose>
     <c:set var="activeSection" value="${param.section != null && (showMatches || param.section ne 'matches') ? param.section : 'overview'}"/>
@@ -77,10 +77,10 @@
                     <div class="cards-container">
                         <c:set var="icon" value="${tournament.structure == LEAGUE ? 'grid.png' : 'bracket.png'}"/>
                         <c:choose>
-                            <c:when test="${isParticipant && !tournament.tournamentStarted}">
+                            <c:when test="${isParticipant}">
                                 <c:set var="title" value="tournament.member" />
                                 <c:set var="text" value="tournament.notStarted" />
-                                <c:set var="butText" value="tournament.leave.butText"/>
+                                <c:set var="butText" value="${tournament.openInscriptions ? 'tournament.leave.butText' : ''}"/>
                                 <c:set var="secondary" value="true"/>
                                 <c:set var="url" value="${leaveUrl}"/>
                             </c:when>
@@ -128,7 +128,11 @@
                             <paw:text type="title" size="l">
                                 <spring:message code="tournament.standings"/>
                             </paw:text>
-                            <paw:bracket matchesByStage="${participantsGroup0}" tournamentId="${tournament.id}" isCreator="${isCreator}" isEditing="${editMode}" formId="swapMembersForm"/>
+                        <c:forEach var="groupEntry" items="${matchesByGroup}">
+                            <c:if test="${groupEntry.key == 0}">
+                                <paw:bracket matchesByStage="${groupEntry.value}" tournamentId="${tournament.id}" isCreator="${isCreator}" isEditing="${editMode}" formId="swapMembersForm"/>
+                            </c:if>
+                        </c:forEach>
                     </c:when>
                     <c:when test="${tournament.structure == HYBRID && tournament.is_group_stage}">
                         <c:set var="edit" value="tournament.edit.groups" />
@@ -221,7 +225,7 @@
                                         <c:forEach var="groupEntry" items="${matchesByGroup}">
                                             <c:if test="${groupEntry.key == 0}">
                                                 <c:forEach var="stageEntry" items="${groupEntry.value}">
-                                                    <paw:date-matches dateNumber="${stageEntry.key}" matches="${stageEntry.value}" tournamentId="${tournament.id}" isCreator="${isCreator}" tournamentStructure="${tournament.structure}" groupNumber="${groupEntry.key}" totalMatches="${stageEntry.value.size()}"/>
+                                                    <paw:date-matches dateNumber="${stageEntry.key}" matches="${stageEntry.value}" tournamentId="${tournament.id}" isCreator="${isCreator}" tournamentStructure="${tournament.structure}" groupNumber="0" totalMatches="${stageEntry.value.size()}" maxStage="${maxStage}"/>
                                                 </c:forEach>
                                             </c:if>
                                         </c:forEach>
@@ -255,7 +259,7 @@
                                 <c:forEach var="groupEntry" items="${matchesByGroup}">
                                     <c:if test="${groupEntry.key == 0}">
                                         <c:forEach var="stageEntry" items="${groupEntry.value}">
-                                             <paw:date-matches dateNumber="${stageEntry.key}" matches="${stageEntry.value}" tournamentId="${tournament.id}" isCreator="${isCreator}" tournamentStructure="${tournament.structure}" groupNumber="${groupEntry.key}" totalMatches="${stageEntry.value.size()}"/>
+                                             <paw:date-matches dateNumber="${stageEntry.key}" matches="${stageEntry.value}" tournamentId="${tournament.id}" isCreator="${isCreator}" tournamentStructure="${tournament.structure}" groupNumber="${groupEntry.key}" totalMatches="${stageEntry.value.size()}" maxStage="${maxStage}"/>
                                         </c:forEach>
                                     </c:if>
                                 </c:forEach>
@@ -264,7 +268,7 @@
                     </c:otherwise>
                 </c:choose>
             </c:when>
-            <c:when test="${activeSection == 'participants'}">
+            <c:when test="${activeSection == 'participantsTab'}">
                 <spring:message code="tournament.participants.title" var="ptitle"/>
                 <div class="users-grid-title">
                     <paw:text type="title" size="l">${ptitle}</paw:text>

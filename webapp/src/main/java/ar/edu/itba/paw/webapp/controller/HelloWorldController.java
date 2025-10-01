@@ -368,6 +368,8 @@ public class HelloWorldController {
         boolean isParticipant = (userId != null) &&
                 participantsList.stream().anyMatch(p -> Objects.equals(p.getUser_id(), userId));
 
+        Long maxStage = matchesByGroup.get(0) != null ? matchesByGroup.get(0).keySet().stream().max(Integer::compareTo).orElse(0) : 0L;
+
         if(optionalTournament.isPresent()) {
             Tournament t = optionalTournament.get();
             form.setName(t.getName());
@@ -393,6 +395,7 @@ public class HelloWorldController {
             mav.addObject("participantCount", participantCount);
             mav.addObject("isParticipant", isParticipant);
             mav.addObject("participantsGroup0", group0);
+            mav.addObject("maxStage", maxStage);
         } else {
             return new ModelAndView("index");
         }

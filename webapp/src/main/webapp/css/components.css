@@ -393,7 +393,7 @@ button:disabled {
 .card {
     background-color: var(--background-card);
     border-radius: 15px;
-    padding: 20px;
+    padding: 30px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;

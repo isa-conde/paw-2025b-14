@@ -19,7 +19,7 @@
 
 <c:set var="cardText" value="${not empty text ? text : ''}"/>
 <c:set var="buttonText" value="${not empty butText ? butText : ''}"/>
-<c:set var="texture" value="${not empty butText and texture == 'true' ? 'texture' : ''}"/>
+<c:set var="texture" value="${texture == 'true' ? 'texture' : ''}"/>
 <c:set var="hasIcon" value="${not empty icon? 'true' : 'false'}"/>
 
 <div class="card ${texture}">
