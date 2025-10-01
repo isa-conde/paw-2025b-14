@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.services;
 
+import ar.edu.itba.paw.interfaces.exception.UserNotFoundException;
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.ParticipantUser;
@@ -138,6 +139,9 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Override
     public List<Tournament> findByCreator(Long creator_id) {
+        if(findById(creator_id).isEmpty()){
+            throw new UserNotFoundException();
+        }
         return tournamentDao.findByCreator(creator_id);
     }
 
@@ -194,5 +198,17 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public Map<Long,List<Tournament>> getHomeTournaments() {
         return tournamentDao.getHomeTournaments();
+    }
+
+    @Override
+    public List<Tournament> getCreatedAndFinishedTournaments(Long userId) {
+        List<Tournament> allCreatedTournaments = findByCreator(userId);
+        return allCreatedTournaments.stream().filter(t -> t.getFinished()).toList();
+    }
+
+    @Override
+    public List<Tournament> getCreatedAndOngoingTournaments(Long userId) {
+        List<Tournament> allCreatedTournaments = findByCreator(userId);
+        return allCreatedTournaments.stream().filter(t -> !t.getFinished()).toList();
     }
 }

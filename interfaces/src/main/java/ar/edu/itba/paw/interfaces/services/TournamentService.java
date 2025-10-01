@@ -59,4 +59,8 @@ public interface TournamentService {
 
     Map<Long,List<Tournament>> getHomeTournaments();
 
+    List<Tournament> getCreatedAndFinishedTournaments(Long userId);
+
+    List<Tournament> getCreatedAndOngoingTournaments(Long userId);
+
 }

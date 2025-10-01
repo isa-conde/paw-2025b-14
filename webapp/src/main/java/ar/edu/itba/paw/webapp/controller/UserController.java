@@ -72,15 +72,9 @@ public class UserController {
             Optional<User> userOpt = us.findByUsername(principal.getName());
             user = userOpt.orElse(null);
         }
-        List<Tournament> allCreatedTournaments = ts.findByCreator(user.getId());
 
-        List<Tournament> onGoingTournaments = allCreatedTournaments.stream()
-                .filter(t -> !t.getFinished())
-                .toList();
-
-        List<Tournament> finishedTournaments = allCreatedTournaments.stream()
-                .filter(t -> t.getFinished())
-                .toList();
+        List<Tournament> onGoingTournaments = ts.getCreatedAndOngoingTournaments(user.getId());
+        List<Tournament> finishedTournaments = ts.getCreatedAndFinishedTournaments(user.getId());
         List<Tournament> joinedTournaments = ts.findUserActiveTournaments(user.getId());
         List<Tournament> pastTournaments = ts.findUserPastTournaments(user.getId());
 

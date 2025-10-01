@@ -42,7 +42,8 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                     "/tournaments/new/step2",
                     "/tournament/join",
                     "/tournament/closeInscriptions",
-                    "/tournament/setWinner").hasRole("VERIFIED")
+                    "/tournament/setWinner",
+                    "/myTournaments").hasRole("VERIFIED")
         .and().formLogin()
             .defaultSuccessUrl("/", false)
             .usernameParameter("j_username")
