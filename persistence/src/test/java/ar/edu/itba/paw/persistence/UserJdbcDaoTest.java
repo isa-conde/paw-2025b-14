@@ -109,6 +109,9 @@ public class UserJdbcDaoTest {
         Assert.assertEquals(EMAIL, user.getEmail());
         Assert.assertEquals(PASSWORD, user.getPassword());
         Assert.assertFalse(user.isVerified());
+        Assert.assertNull(user.getBio());
+        Assert.assertNull(user.getProfile_picture_id());
+        Assert.assertNull(user.getBanner_id());
         Assert.assertEquals(rows + 1, JdbcTestUtils.countRowsInTable(jdbcTemplate,"users"));
     }
 

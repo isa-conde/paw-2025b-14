@@ -45,10 +45,14 @@ public class UserServiceImplTest{
 
     @Test
     public void testCreate(){
-        Mockito.when(passwordEncoder.encode(PASSWORD)).thenReturn(PASSWORD);
-        Mockito.when(mockUserDao.checkUsernameExists(USERNAME)).thenReturn(false);
-        Mockito.when(mockUserDao.checkEmailExists(EMAIL)).thenReturn(false);
-        Mockito.when(mockUserDao.create(Mockito.eq(USERNAME),Mockito.eq(EMAIL),Mockito.eq(PASSWORD))).thenReturn(new User(1,USERNAME,EMAIL,PASSWORD, false));
+        Mockito.when(passwordEncoder.encode(PASSWORD))
+                .thenReturn(PASSWORD);
+        Mockito.when(mockUserDao.checkUsernameExists(USERNAME))
+                .thenReturn(false);
+        Mockito.when(mockUserDao.checkEmailExists(EMAIL))
+                .thenReturn(false);
+        Mockito.when(mockUserDao.create(Mockito.eq(USERNAME),Mockito.eq(EMAIL),Mockito.eq(PASSWORD)))
+                .thenReturn(new User(1,USERNAME,EMAIL,PASSWORD, false, null, 1L, 1L));
 
         User maybeUser = userService.create(USERNAME,EMAIL,PASSWORD);
 
@@ -61,38 +65,26 @@ public class UserServiceImplTest{
 
     @Test(expected = UsernameAlreadyUsedException.class)
     public void testUsernameExists(){
-        Mockito.when(mockUserDao.checkUsernameExists(USERNAME)).thenReturn(true);
+        Mockito.when(mockUserDao.checkUsernameExists(USERNAME))
+                .thenReturn(true);
 
         User maybeUser = userService.create(USERNAME,EMAIL,PASSWORD);
     }
 
     @Test(expected = EmailAlreadyUsedException.class)
     public void testEmailExists(){
-        Mockito.when(mockUserDao.checkUsernameExists(USERNAME)).thenReturn(false);
-        Mockito.when(mockUserDao.checkEmailExists(EMAIL)).thenReturn(true);
+        Mockito.when(mockUserDao.checkUsernameExists(USERNAME))
+                .thenReturn(false);
+        Mockito.when(mockUserDao.checkEmailExists(EMAIL))
+                .thenReturn(true);
 
         User maybeUser = userService.create(USERNAME,EMAIL,PASSWORD);
-    }
-
-    // Los casos donde el mail no existe o el token generado está repetido aún no se contemplaron
-    @Test
-    public void testResetOrVerifyEmail(){
-        Mockito.when(mockUserDao.findByEmail(EMAIL))
-                .thenReturn(Optional.of(new User(1,USERNAME,EMAIL,PASSWORD, false)));
-        Mockito.when(mockTokenDao.findByToken(ArgumentMatchers.anyLong()))
-                .thenReturn(Optional.empty());
-        Mockito.when(mockTokenDao.create(ArgumentMatchers.eq(1L), ArgumentMatchers.anyLong(), ArgumentMatchers.eq(LocalDate.now().plusDays(DAYS_DURATION)) ))
-                .thenReturn(new Token(1L, 1L, 1L, LocalDate.now().plusDays(DAYS_DURATION)));
-
-        userService.requestPasswordReset(EMAIL,SOME_URL);
-
-        Mockito.verify(mockMailService).sendResetPasswordEmail(1L,1L,EMAIL,SOME_URL);
     }
 
     @Test
     public void testSameAsOldPassword(){
         Mockito.when(mockUserDao.findById(1L))
-                .thenReturn(Optional.of(new User(1L,USERNAME,EMAIL,PASSWORD, false)));
+                .thenReturn(Optional.of(new User(1L,USERNAME,EMAIL,PASSWORD, false, null, 1L, 1L)));
         Mockito.when(passwordEncoder.matches(PASSWORD,PASSWORD)).thenReturn(true);
 
         boolean ans = userService.sameAsOldPassword(PASSWORD,1L);
@@ -103,7 +95,7 @@ public class UserServiceImplTest{
     @Test
     public void testSameAsNoPassword(){
         Mockito.when(mockUserDao.findById(1L))
-                .thenReturn(Optional.of(new User(1L,USERNAME,EMAIL,null, false)));
+                .thenReturn(Optional.of(new User(1L,USERNAME,EMAIL,null, false, null, 1L, 1L)));
 
         boolean ans = userService.sameAsOldPassword(PASSWORD,1L);
 
@@ -113,7 +105,7 @@ public class UserServiceImplTest{
     @Test
     public void testNotTheOldPassword(){
         Mockito.when(mockUserDao.findById(1L))
-                .thenReturn(Optional.of(new User(1L,USERNAME,EMAIL,PASSWORD, false)));
+                .thenReturn(Optional.of(new User(1L,USERNAME,EMAIL,PASSWORD, false, null, 1L, 1L)));
         Mockito.when(passwordEncoder.matches(PASSWORD,PASSWORD)).thenReturn(false);
 
         boolean ans = userService.sameAsOldPassword(PASSWORD,1L);

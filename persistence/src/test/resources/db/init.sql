@@ -3,7 +3,16 @@ CREATE TABLE IF NOT EXISTS users(
     email varchar(100) NOT NULL UNIQUE ,
     username varchar(100) NOT NULL UNIQUE ,
     password varchar (100) NULL ,
-    verified BOOLEAN DEFAULT false NOT NULL
+    verified BOOLEAN DEFAULT false NOT NULL,
+    bio varchar(255),
+    profile_picture_id integer,
+    banner_id integer
+);
+
+create table if not exists user_favourites(
+    user_id INTEGER NOT NULL ,
+    game_id INTEGER NOT NULL,
+    primary key (user_id, game_id)
 );
 
 CREATE TABLE IF NOT EXISTS game(
@@ -35,4 +44,11 @@ CREATE TABLE IF NOT EXISTS tournament(
 CREATE TABLE IF NOT EXISTS image(
     id INTEGER IDENTITY PRIMARY KEY ,
     image varbinary(1000000)
-)
+);
+
+create table if not exists game_format(
+    id integer identity primary key not null,
+    name varchar(100) not null ,
+    players_per_team integer not null ,
+    game_id integer not null
+);
