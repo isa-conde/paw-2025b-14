@@ -632,9 +632,6 @@ public class TournamentJdbcDao implements TournamentDao {
 
         sql.append(buildTournamentFilterSql(filter, params));
 
-        int pageSize = 9;
-        int offset = (page != null && page > 0) ? (int) ((page - 1) * pageSize) : 0;
-
         sql.append(" LIMIT :limit OFFSET :offset");
         params.addValue("limit", 9);
         params.addValue("offset", 9*page);
