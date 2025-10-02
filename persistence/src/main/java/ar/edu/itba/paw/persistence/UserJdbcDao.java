@@ -75,4 +75,10 @@ public class UserJdbcDao implements UserDao {
         Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM users WHERE email = ?", Integer.class , email);
         return count != null && count > 0;
     }
+
+    @Override
+    public void updateProfileInfo(Long userId, String username, String bio, Long pfp, Long banner){
+        jdbcTemplate.update("UPDATE users SET username = ?, bio = ?, profile_picture_id = ?, banner_id = ? WHERE id = ?", username, bio, pfp, banner, userId);
+    }
+
 }

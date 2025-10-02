@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.exception.*;
+import ar.edu.itba.paw.interfaces.persistence.ImageDao;
 import ar.edu.itba.paw.interfaces.persistence.TokenDao;
 import ar.edu.itba.paw.interfaces.persistence.UserDao;
 import ar.edu.itba.paw.interfaces.services.MailService;
@@ -29,16 +30,18 @@ public class UserServiceImpl implements UserService {
     private final TokenDao tokenDao;
     private final PasswordEncoder passwordEncoder;
     private final MailService ms;
+    private final ImageDao imageDao;
 
     private final static int RESET_PASSWORD_DAYS_DURATION = 1;
     private final static int VERIFICATION_DAYS_DURATION = 2;
 
 
-    public UserServiceImpl(final UserDao userDao, final TokenDao tokenDao, final PasswordEncoder passwordEncoder, final MailService ms) {
+    public UserServiceImpl(final UserDao userDao, final TokenDao tokenDao, final PasswordEncoder passwordEncoder, final MailService ms, final ImageDao imageDao) {
         this.userDao = userDao;
         this.tokenDao = tokenDao;
         this.passwordEncoder = passwordEncoder;
         this.ms = ms;
+        this.imageDao = imageDao;
     }
 
     @Override
@@ -186,5 +189,23 @@ public class UserServiceImpl implements UserService {
         LocalDate expiryDate = LocalDate.now().plusDays(validityDays);
 
         return tokenDao.create(userId, tokenValue, expiryDate);
+    }
+
+    @Override
+    public void updateProfileInfo(Long userId, String username, String bio, byte[] pfp, byte[] banner){
+        Optional<User> user = userDao.findById(userId);
+        Long bannerId = null;
+        Long pfpId = null;
+        if (pfp != null){
+            pfpId = imageDao.insertImage(pfp);
+        }else {
+            pfpId = user.get().getProfile_picture_id();
+        }
+        if (banner != null){
+            bannerId = imageDao.insertImage(pfp);
+        }else {
+            bannerId = user.get().getBanner_id();
+        }
+        userDao.updateProfileInfo(userId, username, bio, pfpId, bannerId);
     }
 }

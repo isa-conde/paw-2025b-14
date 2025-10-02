@@ -51,6 +51,11 @@ public class TournamentController {
         this.ps = ps;
     }
 
+    @ModelAttribute("tournamentForm")
+    public TournamentForm getTournamentForm() {
+        return new TournamentForm();
+    }
+
     // TODO: delete this!!!
     @RequestMapping(value = "/game/create", method = {RequestMethod.GET})
     public ModelAndView createGameForm(@ModelAttribute("gameForm") final GameForm form){

@@ -12,12 +12,17 @@ import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
 import ar.edu.itba.paw.webapp.auth.PawUserDetails;
+import ar.edu.itba.paw.webapp.form.EditProfileForm;
+import ar.edu.itba.paw.webapp.form.EditTournamentForm;
 import ar.edu.itba.paw.webapp.form.FilterForm;
 import ar.edu.itba.paw.webapp.form.TournamentForm;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.validation.Valid;
+import java.io.IOException;
 import java.security.Principal;
 import java.util.*;
 
@@ -35,9 +40,9 @@ public class UserController {
     }
 
     @RequestMapping("/")
-    public ModelAndView index(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @ModelAttribute("tournamentForm") TournamentForm tournamentForm, TournamentFilter tournamentFilter, Principal principal) {
+    public ModelAndView index(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @ModelAttribute("tournamentForm") TournamentForm tournamentForm) {
         final ModelAndView mav = new ModelAndView("index");
-        List<Game> allGames = gs.findAll();
+        List<Game> allGames = gs.findAllPaged(0L);
 
         mav.addObject("user", currentUser.orElse(null));
         mav.addObject("games", allGames);
@@ -76,12 +81,14 @@ public class UserController {
     }
 
     @RequestMapping("/gamesPage")
-    public ModelAndView gamesPage(@ModelAttribute("user") Optional<PawUserDetails> currentUser) {
+    public ModelAndView gamesPage(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam(defaultValue = "0") Long page) {
         final ModelAndView mav = new ModelAndView("gamesPage");
-        List<Game> allGames = gs.findAll();
+        List<Game> allGames = gs.findAllPaged(page);
 
         mav.addObject("user", currentUser.orElse(null));
         mav.addObject("games", allGames);
+        mav.addObject("totalPages", gs.getPageAmount());
+        mav.addObject("currentPage", page);
 
         return mav;
     }
@@ -98,6 +105,7 @@ public class UserController {
         mav.addObject("elos", Arrays.stream(Elo.values()).toList());
         mav.addObject("genres", Arrays.stream(Genre.values()).toList());
         mav.addObject("teamSizes", List.of(1,2,3,4,5));
+        mav.addObject("currentPage", page);
 
         tf.setGame_id(filterForm.getGame_id());
         tf.setRegion(filterForm.getRegion());
@@ -132,21 +140,65 @@ public class UserController {
     }
 
     @RequestMapping("/profile/{id}")
-    public ModelAndView profile(@ModelAttribute("user") Optional<PawUserDetails> currentUser, Principal principal, @PathVariable Long id){
+    public ModelAndView profile(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @PathVariable Long id, @ModelAttribute("EditProfileForm") EditProfileForm editProfileForm){
         final ModelAndView mav = new ModelAndView("profile");
 
         Optional<User> profileOpt = us.findById(id);
         if (profileOpt.isEmpty()){
             // TODO: REDIRIGIR A 404
-            return index(currentUser, new TournamentForm(), new TournamentFilter(), principal);
+            return index(currentUser, new TournamentForm());
         }
 
         mav.addObject("user", currentUser.orElse(null));
+        mav.addObject("isMyProfile", profileOpt.get().getId() == currentUser.get().getPawUser().getId());
         mav.addObject("profile", profileOpt.get());
         mav.addObject("favouriteGames", gs.getFavourites(id));
         mav.addObject("lastTournaments", ts.findUserActiveTournaments(id));
 
+        editProfileForm.setUsername(profileOpt.get().getUsername());
+        editProfileForm.setBio(profileOpt.get().getBio());
+
         return mav;
     }
 
+    @RequestMapping(value = "/profile/update", method = { RequestMethod.POST })
+    public ModelAndView updateProfile(Principal principal, @RequestParam("userId") final long userId, @Valid @ModelAttribute("editProfileForm") final EditProfileForm form, final BindingResult result){
+        User user = null;
+        if (principal != null) {
+            Optional<User> userOpt = us.findByUsername(principal.getName());
+            user = userOpt.orElse(null);
+        }
+        if (user == null) {
+            return new ModelAndView("redirect:/");
+        }
+
+        if (result.hasErrors()) {
+            return new ModelAndView("redirect:/profile/" + userId   );
+        }
+
+        Boolean isValid = true;
+
+        byte[] pfpBytes = null;
+        try {
+            if (form.getProfilePicture() != null && !form.getProfilePicture().isEmpty()) {
+                pfpBytes = form.getProfilePicture().getBytes();
+            }
+        } catch (IOException e) {
+            isValid = false;
+            result.rejectValue("profilePicture", "error.tournamentForm.invalidImage");
+        }
+        byte[] bannerBytes = null;
+        try {
+            if (form.getBannerPicture() != null && !form.getBannerPicture().isEmpty()) {
+                bannerBytes = form.getBannerPicture().getBytes();
+            }
+        } catch (IOException e) {
+            isValid = false;
+            result.rejectValue("bannerPicture", "error.tournamentForm.invalidImage");
+        }
+        if (isValid){
+            us.updateProfileInfo(userId, form.getUsername(), form.getBio(), pfpBytes, bannerBytes);
+        }
+        return new ModelAndView("redirect:/profile/" + userId );
+    }
 }

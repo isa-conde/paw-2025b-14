@@ -32,4 +32,6 @@ public interface UserService {
     Optional<Token> verifyEmail(Long token, Long userId);
 
     void authenticateVerifiedUser(Long userId);
+
+    void updateProfileInfo(Long userId, String username, String bio, byte[] pfp, byte[] banner);
 }
