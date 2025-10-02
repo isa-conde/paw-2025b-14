@@ -19,6 +19,7 @@ import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
 import org.springframework.stereotype.Service;
 
+import javax.mail.Multipart;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -38,7 +39,6 @@ public class TournamentServiceImpl implements TournamentService {
         this.imageDao = imageDao;
         this.participantDao = participantDao;
     }
-
 
     @Override
     public Optional<Tournament> findById(Long id) {

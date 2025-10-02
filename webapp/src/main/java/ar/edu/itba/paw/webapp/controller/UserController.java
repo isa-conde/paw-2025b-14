@@ -52,11 +52,13 @@ public class UserController {
         mav.addObject("tournamentForm", tournamentForm);
 
         Map<Game, List<Tournament>> tournaments = ts.getUnfilteredTournamentPages(0L);
-        mav.addObject("gameIds", tournaments.keySet());
+        List<Long> gameIds = new ArrayList<>();
         for (Game game: tournaments.keySet()) {
             mav.addObject("tournaments" + game.getId(), tournaments.get(game));
             mav.addObject("game" + game.getId(), game);
+            gameIds.add(game.getId());
         }
+        mav.addObject("gameIds", gameIds);
         return mav;
     }
 
@@ -162,30 +164,20 @@ public class UserController {
     }
 
     @RequestMapping(value = "/profile/update", method = { RequestMethod.POST })
-    public ModelAndView updateProfile(Principal principal, @RequestParam("userId") final long userId, @Valid @ModelAttribute("editProfileForm") final EditProfileForm form, final BindingResult result){
-        User user = null;
-        if (principal != null) {
-            Optional<User> userOpt = us.findByUsername(principal.getName());
-            user = userOpt.orElse(null);
-        }
-        if (user == null) {
-            return new ModelAndView("redirect:/");
-        }
-
+    public ModelAndView updateProfile(@RequestParam("userId") final long userId, @Valid @ModelAttribute("editProfileForm") final EditProfileForm form, final BindingResult result){
         if (result.hasErrors()) {
-            return new ModelAndView("redirect:/profile/" + userId   );
+            return new ModelAndView("redirect:/profile/" + userId);
         }
 
-        Boolean isValid = true;
-
+        ModelAndView mav = new ModelAndView("redirect:/profile/" + userId);
         byte[] pfpBytes = null;
         try {
             if (form.getProfilePicture() != null && !form.getProfilePicture().isEmpty()) {
                 pfpBytes = form.getProfilePicture().getBytes();
             }
         } catch (IOException e) {
-            isValid = false;
             result.rejectValue("profilePicture", "error.tournamentForm.invalidImage");
+            return mav;
         }
         byte[] bannerBytes = null;
         try {
@@ -193,12 +185,11 @@ public class UserController {
                 bannerBytes = form.getBannerPicture().getBytes();
             }
         } catch (IOException e) {
-            isValid = false;
             result.rejectValue("bannerPicture", "error.tournamentForm.invalidImage");
+            return mav;
         }
-        if (isValid){
-            us.updateProfileInfo(userId, form.getUsername(), form.getBio(), pfpBytes, bannerBytes);
-        }
-        return new ModelAndView("redirect:/profile/" + userId );
+        us.updateProfileInfo(userId, form.getUsername(), form.getBio(), pfpBytes, bannerBytes);
+
+        return mav;
     }
 }
