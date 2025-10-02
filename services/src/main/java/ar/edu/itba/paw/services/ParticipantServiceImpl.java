@@ -3,6 +3,7 @@ package ar.edu.itba.paw.services;
 import ar.edu.itba.paw.interfaces.persistence.ParticipantDao;
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.interfaces.services.ParticipantService;
+import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.ParticipantUser;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import org.springframework.stereotype.Service;
@@ -15,10 +16,12 @@ public class ParticipantServiceImpl implements ParticipantService {
 
     ParticipantDao participantDao;
     TournamentDao tournamentDao;
+    TournamentService ts;
 
-    public ParticipantServiceImpl(ParticipantDao participantDao, TournamentDao tournamentDao){
+    public ParticipantServiceImpl(ParticipantDao participantDao, TournamentDao tournamentDao, TournamentService ts){
         this.participantDao = participantDao;
         this.tournamentDao = tournamentDao;
+        this.ts = ts;
     }
 
     @Override
@@ -28,7 +31,7 @@ public class ParticipantServiceImpl implements ParticipantService {
         List<ParticipantUser> participantUsers = getTournamentParticipantUsers(tournament_id);
         Optional<Tournament> tournament = tournamentDao.findById(tournament_id);
         if (tournament.isPresent() && participantUsers.size() == tournament.get().getMax_participants()) {
-            tournamentDao.closeInscriptions(tournament_id, getTournamentParticipantUsers(tournament_id));
+            ts.closeInscriptions(tournament_id);
         }
     }
 
@@ -50,5 +53,10 @@ public class ParticipantServiceImpl implements ParticipantService {
     @Override
     public void leaveTournamentUser(Long user_id, Long tournament_id) {
         participantDao.leaveTournamentUser(user_id, tournament_id);
+    }
+
+    @Override
+    public void swapGroups(Long tournament_id, Long user1, Long user2){
+        participantDao.swapGroups(tournament_id, user1, user2);
     }
 }

@@ -40,10 +40,10 @@ public class TournamentController {
     private final UserService us;
     private final GameService gs;
     private final TournamentService ts;
-    private final MailService ms;
+    private final MatchService ms;
     private final ParticipantService ps;
 
-    public TournamentController(final UserService us, final GameService gs, final TournamentService ts, final MailService ms, final ParticipantService ps) {
+    public TournamentController(final UserService us, final GameService gs, final TournamentService ts, final MatchService ms, final ParticipantService ps) {
         this.us = us;
         this.gs = gs;
         this.ts = ts;
@@ -92,7 +92,7 @@ public class TournamentController {
         Long user1 = Long.valueOf(selected.get(0));
         Long user2 = Long.valueOf(selected.get(1));
 
-        ts.swapGroups(tournamentId, user1, user2);
+        ps.swapGroups(tournamentId, user1, user2);
 
         ra.addAttribute("tournamentId", tournamentId);
         ra.addAttribute("edit", true);
@@ -116,7 +116,7 @@ public class TournamentController {
         Long match1 = Long.valueOf(a[0]), user1 = Long.valueOf(a[1]);
         Long match2 = Long.valueOf(b[0]), user2 = Long.valueOf(b[1]);
 
-        ts.swapMatchesMembers(tournamentId, match1, match2, user1, user2);
+        ms.swapMatchesMembers(tournamentId, match1, match2, user1, user2);
 
         ra.addAttribute("tournamentId", tournamentId);
         ra.addAttribute("edit", true);
@@ -229,10 +229,6 @@ public class TournamentController {
         if (user == null) {
             return new ModelAndView("redirect:/");
         }
-        Optional<Tournament> t = ts.findById(tournamentId);
-        String tournamentLink = request.getRequestURL().toString()
-                .replace("/tournament/join", "/tournament?tournamentId=" + t.get().getId());
-        ms.sendTournamentJoinedEmail(user.getUsername(), t.get().getName(), tournamentLink, us.findById(t.get().getCreator_id()).get().getEmail(), user.getEmail());
         ps.joinTournamentUser(user.getId(), tournamentId);
         return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
     }
@@ -302,7 +298,7 @@ public class TournamentController {
 
         Optional<Tournament> tournamentOpt = ts.findById(form.getTournamentId());
         if (tournamentOpt.isPresent() && tournamentOpt.get().getCreator_id().equals(user.getId())) {
-            ts.setMatchWinner(form.getMatchId(), form.getTournamentId(), form.getWinner());
+            ms.setMatchWinner(form.getMatchId(), form.getTournamentId(), form.getWinner());
         }
 
         return new ModelAndView("redirect:/tournament?tournamentId=" + form.getTournamentId() + "&section=matches");
@@ -368,9 +364,6 @@ public class TournamentController {
         final Tournament t = ts.create(user.getId(), form.getName(), optionalGame.get().getId(),
                 form.getRegion(), form.getElo(), form.getStart_date(), form.getEnd_date(),
                 form.getFormat(), form.getStructure(), form.getMax_participants(), imageBytes, true, false);
-        String tournamentLink = request.getRequestURL().toString()
-                .replace("/tournament/create", "/tournament?tournamentId=" + t.getId());
-        ms.sendTournamentCreatedEmail(user.getUsername(), t.getName(), tournamentLink, user.getEmail());
         status.setComplete();
         return new ModelAndView("redirect:/tournament?tournamentId=" + t.getId());
     }

@@ -16,45 +16,33 @@ import java.util.Optional;
 
 public interface TournamentDao {
 
-    public Optional<Tournament> findById(Long id);
+    Optional<Tournament> findById(Long id);
 
-    public List<Tournament> findTournaments(TournamentFilter tournamentFilter, Long page);
+    List<Tournament> findTournaments(TournamentFilter tournamentFilter, Long page);
 
-    public List<Tournament> findGameTournaments(Long game_id);
+    List<Tournament> findGameTournaments(Long game_id);
 
-    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Long image_id, Boolean openInscriptions, Boolean isFinished);
+    Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Long image_id, Boolean openInscriptions, Boolean isFinished);
 
-    //public void joinTournamentTeam(Long team_id, Long tournament_id);
+    List<User> getTournamentUsers(Long tournament_id);
 
-    public List<User> getTournamentUsers(Long tournament_id);
+    Structure getTournamentStructure(Long tournament_id);
 
-    public void createMatches(Long tournament_id, List<ParticipantUser> participants);
+    List<Tournament> findByCreator(Long creator_id);
 
-    public Optional<Structure> getTournamentStructure(Long tournament_id);
+    void setFinished(Long tournament_id);
 
-    public List<Tournament> findByCreator(Long creator_id);
+    List<Tournament> findUserActiveTournaments(Long userId);
 
-    public void setFinished(Long tournament_id, Long match_id);
+    List<Tournament> findUserPastTournaments(Long userId);
 
-    public List<Tournament> findUserActiveTournaments(Long userId);
+    void closeInscriptions(Long tournament_id);
 
-    public List<Tournament> findUserPastTournaments(Long userId);
+    List<Tournament> searchByName(String name);
 
-    public void closeInscriptions(Long tournament_id, List<ParticipantUser> participants);
+    void startTournament(Long tournament_id, List<ParticipantUser> participantUsers);
 
-    public List<MatchWithPlayers> getTournamentMatches(Long tournament_id);
-
-    public void setMatchWinner(Long matchId, Long tournamentId, Integer winner);
-
-    public List<Tournament> searchByName(String name);
-
-    public void startTournament(Long tournament_id, List<ParticipantUser> participantUsers);
-
-    public Map<Long, Integer> getTournamentGroupsByUser(Long tournament_id);
-
-    void swapGroups(Long tournament_id, Long user1, Long user2);
-
-    void swapMatchesMembers(Long tournament_id, Long match1, Long match2, Long user1, Long user2);
+    Map<Long, Integer> getTournamentGroupsByUser(Long tournament_id);
 
     Map<Long,List<Tournament>> getUnfilteredTournamentPages(Long page);
 
@@ -63,4 +51,14 @@ public interface TournamentDao {
     void updateTournamentInfo(Long tournament_id, String name, LocalDate start_date, LocalDate end_date, Integer max_participants);
 
     int tournamentParticipantsCount(Long tournamentId);
+
+    void setIsGroupStage(Long tournamentId, Boolean bool);
+
+    void setTournamentWinner(Long tournament_id, Long user_id);
+
+    List<ParticipantUser> getTournamentParticipantsByPoints(Long tournamentId, Integer group_number, Integer points);
+
+    Integer getTournamentMaxPoints(Long tournamentId);
+
+    Integer getTournamentSecondMaxPoints(Long tournamentId);
 }
