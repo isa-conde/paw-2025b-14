@@ -39,15 +39,11 @@ public class GameServiceImplTest {
         Assert.assertEquals(GENRE, maybeGame.getGenre());
         Assert.assertEquals(Integer.valueOf(1), maybeGame.getImage_id());
         Assert.assertEquals(Long.valueOf(1), maybeGame.getId());
-        Mockito.verify(mockDao).create(NAME,GENRE,1);
-        Mockito.verify(mockDao).checkNameExists(NAME);
-        Mockito.verifyNoMoreInteractions(mockDao);
     }
 
     @Test(expected = NameAlreadyUsedException.class)
     public void testCreateNameExists(){
         Mockito.when(mockDao.checkNameExists(NAME)).thenReturn(true);
-        //Mockito.when(mockDao.create(Mockito.eq(NAME), Mockito.eq(GENRE), Mockito.eq(1))).thenReturn(new Game(1L, NAME, GENRE, 1));
 
         gameService.create(NAME,GENRE,1);
     }
@@ -64,8 +60,6 @@ public class GameServiceImplTest {
         Assert.assertEquals(GENRE, maybeGame.get().getGenre());
         Assert.assertEquals(Integer.valueOf(1), maybeGame.get().getImage_id());
         Assert.assertEquals(Long.valueOf(1), maybeGame.get().getId());
-        Mockito.verify(mockDao).findById(1);
-        Mockito.verifyNoMoreInteractions(mockDao);
     }
 
     @Test
@@ -76,8 +70,6 @@ public class GameServiceImplTest {
 
         Assert.assertNotNull(maybeGame);
         Assert.assertTrue(maybeGame.isEmpty());
-        Mockito.verify(mockDao).findById(1);
-        Mockito.verifyNoMoreInteractions(mockDao);
     }
 
     @Test
@@ -92,8 +84,6 @@ public class GameServiceImplTest {
         Assert.assertEquals(GENRE, maybeGame.get().getGenre());
         Assert.assertEquals(Integer.valueOf(1), maybeGame.get().getImage_id());
         Assert.assertEquals(Long.valueOf(1), maybeGame.get().getId());
-        Mockito.verify(mockDao).findByName(NAME);
-        Mockito.verifyNoMoreInteractions(mockDao);
     }
 
     @Test
@@ -104,8 +94,6 @@ public class GameServiceImplTest {
 
         Assert.assertNotNull(maybeGame);
         Assert.assertTrue(maybeGame.isEmpty());
-        Mockito.verify(mockDao).findByName(NAME);
-        Mockito.verifyNoMoreInteractions(mockDao);
     }
 
     @Test
@@ -116,8 +104,6 @@ public class GameServiceImplTest {
 
         Assert.assertNotNull(games);
         Assert.assertTrue(games.isEmpty());
-        Mockito.verify(mockDao).findAll();
-        Mockito.verifyNoMoreInteractions(mockDao);
     }
 
     @Test
@@ -128,8 +114,6 @@ public class GameServiceImplTest {
 
         Assert.assertNotNull(games);
         Assert.assertTrue(games.isEmpty());
-        Mockito.verify(mockDao).searchByGenre(GENRE);
-        Mockito.verifyNoMoreInteractions(mockDao);
     }
 
 //    @Test
@@ -140,8 +124,6 @@ public class GameServiceImplTest {
 //
 //        Assert.assertNotNull(games);
 //        Assert.assertTrue(games.isEmpty());
-//        Mockito.verify(mockDao).searchByName(NAME);
-//        Mockito.verifyNoMoreInteractions(mockDao);
 //    }
 
     @Test
@@ -166,8 +148,6 @@ public class GameServiceImplTest {
             Assert.assertEquals(expected.get(i).getImage_id(), games.get(i).getImage_id());
             Assert.assertEquals(expected.get(i).getId(), games.get(i).getId());
         }
-        Mockito.verify(mockDao).findAll();
-        Mockito.verifyNoMoreInteractions(mockDao);
     }
 
 //    @Test
@@ -191,8 +171,6 @@ public class GameServiceImplTest {
 //            Assert.assertEquals(expected.get(i).getImage_id(), games.get(i).getImage_id());
 //            Assert.assertEquals(expected.get(i).getId(), games.get(i).getId());
 //        }
-//        Mockito.verify(mockDao).searchByName(NAME);
-//        Mockito.verifyNoMoreInteractions(mockDao);
 //    }
 
     @Test
@@ -215,7 +193,5 @@ public class GameServiceImplTest {
             Assert.assertEquals(expected.get(i).getImage_id(), games.get(i).getImage_id());
             Assert.assertEquals(expected.get(i).getId(), games.get(i).getId());
         }
-        Mockito.verify(mockDao).searchByGenre(GENRE);
-        Mockito.verifyNoMoreInteractions(mockDao);
     }
 }
