@@ -1,10 +1,8 @@
 package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
-import ar.edu.itba.paw.model.ParticipantUser;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.User;
-import ar.edu.itba.paw.model.*;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
@@ -48,12 +46,6 @@ public class TournamentJdbcDao implements TournamentDao {
 
     private static final RowMapper<User> ROW_MAPPER_USER = (rs, rowNum) -> new User(rs.getLong("id"), rs.getString("username"), rs.getString("email"), rs.getString("password"), rs.getBoolean("verified"), rs.getString("bio"), rs.getLong("profile_picture_id"), rs.getLong("banner_id"));
 
-    private static final RowMapper<ParticipantUser> ROW_MAPPER_PARTICIPANT_USER = (rs, rowNum) -> {
-        ParticipantUser participant = new ParticipantUser(rs.getLong("user_id"), rs.getLong("tournament_id"), rs.getInt("group_number"));
-        participant.setPoints(rs.getInt("points"));
-        return participant;
-    };
-
     @Override
     public Optional<Tournament> findById(Long id) {
         return jdbcTemplate.query("SELECT * FROM tournament WHERE id = ?", ROW_MAPPER, id).stream().findFirst();
@@ -88,15 +80,13 @@ public class TournamentJdbcDao implements TournamentDao {
     }
 
     @Override
-    public void setIsGroupStage(Long tournamentId, Boolean bool){
-        jdbcTemplate.update("UPDATE tournament SET is_group_stage = ? WHERE id = ?", bool, tournamentId);
+    public Boolean isTournamentStarted(Long tournament_id){
+        return jdbcTemplate.queryForObject("SELECT tournament_started FROM tournament WHERE id = ?", Boolean.class, tournament_id);
     }
 
     @Override
-    public List<User> getTournamentUsers(Long tournament_id) {
-        return jdbcTemplate.query("SELECT u.id, u.username, u.email, u.password, u.verified, u.bio, u.profile_picture_id, u.banner_id FROM users u " +
-                "JOIN participant_user p ON u.id = p.user_id " +
-                "WHERE p.tournament_id = ?", ROW_MAPPER_USER, tournament_id);
+    public void setIsGroupStage(Long tournamentId, Boolean bool){
+        jdbcTemplate.update("UPDATE tournament SET is_group_stage = ? WHERE id = ?", bool, tournamentId);
     }
 
     @Override
@@ -129,74 +119,8 @@ public class TournamentJdbcDao implements TournamentDao {
     }
 
     @Override
-    public Integer getTournamentMaxPoints(Long tournamentId){
-        return jdbcTemplate.queryForObject(
-                "SELECT MAX(points) FROM participant_user WHERE tournament_id = ?",
-                Integer.class, tournamentId
-        );
-    }
-
-    @Override
-    public Integer getTournamentSecondMaxPoints(Long tournamentId){
-        return jdbcTemplate.queryForObject(
-                "SELECT MAX(points) FROM participant_user WHERE tournament_id = ? AND points < ?",
-                Integer.class, tournamentId, getTournamentMaxPoints(tournamentId)
-        );
-    }
-
-    @Override
-    public List<ParticipantUser> getLeagueTournamentTopPositions(Long tournamentId){
-        return getTournamentParticipantsByPoints(tournamentId, null, getTournamentMaxPoints(tournamentId));
-    }
-
-    @Override
-    public List<ParticipantUser> getTournamentParticipantsByPoints(Long tournamentId, Integer group_number, Integer points){
-        return jdbcTemplate.query("SELECT * FROM participant_user WHERE tournament_id = ? " +
-                "AND points = ?" +
-                "AND group_number = ?", ROW_MAPPER_PARTICIPANT_USER, tournamentId, points, group_number);
-    }
-
-    @Override
-    public Map<Integer, List<ParticipantUser>> getGroupTopPositions(Long tournament_id, Integer group_number){
-        Map<Integer, List<ParticipantUser>> out = new HashMap<>();
-        out.put(1, getTournamentParticipantsByPoints(tournament_id, group_number, getTournamentMaxPoints(tournament_id)));
-        out.put(2, getTournamentParticipantsByPoints(tournament_id, group_number, getTournamentSecondMaxPoints(tournament_id)));
-        return out;
-    }
-
-    @Override
-    public void startTournament(Long tournament_id, List<ParticipantUser> participantUsers) {
+    public void startTournament(Long tournament_id) {
         jdbcTemplate.update("UPDATE tournament SET tournament_started = true, start_date = CURRENT_DATE WHERE id = ?", tournament_id);
-        Tournament t = findById(tournament_id).orElse(null);
-        if(t != null && t.getStructure().equals(Structure.HYBRID)){
-            Map<Integer, List<ParticipantUser>> groupedParticipants = getGroupedParticipants(tournament_id, participantUsers);
-            if(groupedParticipants != null){
-                int nextId = 1;
-                for(List<ParticipantUser> participants : groupedParticipants.values()){
-                    nextId += (participants.size() * (participants.size() - 1)) / 2;
-                    createMatchesLeague(t, participants, nextId);
-                }
-            }
-        }
-    }
-
-    private Map<Integer, List<ParticipantUser>> getGroupedParticipants(Long tournamentId, List<ParticipantUser> participantUsers) {
-
-        Map<Integer, List<ParticipantUser>> grouped = new TreeMap<>(Integer::compareTo);
-
-        for (ParticipantUser p : participantUsers) {
-            if (p.getGroupNumber() == null) {
-                return null;
-            }
-            grouped.computeIfAbsent(p.getGroupNumber(), k -> new ArrayList<>()).add(p);
-        }
-        return grouped;
-    }
-
-    public ParticipantUser getTournamentParticipantByUserId(Long tournament_id, Long user_id) {
-        return jdbcTemplate.query("SELECT * FROM participant_user " +
-                "WHERE tournament_id = ? AND user_id = ?"
-                , ROW_MAPPER_PARTICIPANT_USER, tournament_id, user_id).stream().findFirst().orElse(null);
     }
 
     @Override
@@ -290,26 +214,13 @@ public class TournamentJdbcDao implements TournamentDao {
         return sql.toString();
     }
 
+    @Override
     public List<Tournament> searchByName(String name){
         String sql = "SELECT * " +
                 "FROM tournament " +
                 "WHERE LOWER(name) LIKE '%' || LOWER(?) || '%'";
 
         return jdbcTemplate.query(sql, ROW_MAPPER, name);
-    }
-
-    @Override
-    public Map<Long, Integer> getTournamentGroupsByUser(Long tournamentId) {
-        final String sql = """
-            SELECT user_id, group_number
-            FROM participant_user
-            WHERE tournament_id = ?
-        """;
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, tournamentId);
-        return rows.stream().collect(Collectors.toMap(
-                r -> ((Number) r.get("user_id")).longValue(),
-                r -> r.get("group_number") == null ? 0 : ((Number) r.get("group_number")).intValue()
-        ));
     }
 
     @Override

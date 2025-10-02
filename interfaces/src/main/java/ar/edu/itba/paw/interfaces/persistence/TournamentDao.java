@@ -4,7 +4,7 @@ import ar.edu.itba.paw.model.ParticipantUser;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
-import ar.edu.itba.paw.model.MatchWithPlayers;
+import ar.edu.itba.paw.model.MatchInfo;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
@@ -24,8 +24,6 @@ public interface TournamentDao {
 
     Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Long image_id, Boolean openInscriptions, Boolean isFinished);
 
-    List<User> getTournamentUsers(Long tournament_id);
-
     Structure getTournamentStructure(Long tournament_id);
 
     List<Tournament> findByCreator(Long creator_id);
@@ -40,9 +38,7 @@ public interface TournamentDao {
 
     List<Tournament> searchByName(String name);
 
-    void startTournament(Long tournament_id, List<ParticipantUser> participantUsers);
-
-    Map<Long, Integer> getTournamentGroupsByUser(Long tournament_id);
+    void startTournament(Long tournament_id);
 
     Map<Long,List<Tournament>> getUnfilteredTournamentPages(Long page);
 
@@ -56,9 +52,5 @@ public interface TournamentDao {
 
     void setTournamentWinner(Long tournament_id, Long user_id);
 
-    List<ParticipantUser> getTournamentParticipantsByPoints(Long tournamentId, Integer group_number, Integer points);
-
-    Integer getTournamentMaxPoints(Long tournamentId);
-
-    Integer getTournamentSecondMaxPoints(Long tournamentId);
+    Boolean isTournamentStarted(Long tournament_id);
 }

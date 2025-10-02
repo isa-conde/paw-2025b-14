@@ -3,7 +3,7 @@ package ar.edu.itba.paw.webapp.controller;
 import ar.edu.itba.paw.interfaces.services.*;
 import ar.edu.itba.paw.model.*;
 import ar.edu.itba.paw.model.Game.Game;
-import ar.edu.itba.paw.model.MatchWithPlayers;
+import ar.edu.itba.paw.model.MatchInfo;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Genre;
@@ -168,7 +168,7 @@ public class TournamentController {
 
         Optional<Tournament> optionalTournament = ts.findById(tournamentId);
 
-        Map<Integer, Map<Integer, List<MatchWithPlayers>>> matchesByGroup = ts.getTournamentMatchesByGroup(tournamentId);
+        Map<Integer, Map<Integer, List<MatchInfo>>> matchesByGroup = ms.getTournamentMatchesByGroup(tournamentId);
 
         List<Integer> groupSections = new ArrayList<>(matchesByGroup.keySet());
         Locale locale = LocaleContextHolder.getLocale();
@@ -176,16 +176,10 @@ public class TournamentController {
                 .map(key -> messageSource.getMessage("tournament.group", new Object[]{key}, locale))
                 .collect(Collectors.toList());
 
-        Map<Integer, List<ParticipantUserInfo>> participants = ts.getTournamentParticipantsByGroup(tournamentId);
-        List<ParticipantUserInfo> participantsList = participants.values().stream()
-                .filter(Objects::nonNull)
-                .flatMap(List::stream)
-                .toList();
-        int participantCount = participantsList.size();
+        List<ParticipantUserInfo> participants = ps.getTournamentParticipantUsersInfo(tournamentId);
+        int participantCount = participants.size();
         Long userId = (user != null ? user.getId() : null);
-        boolean isParticipant = (userId != null) &&
-                participantsList.stream().anyMatch(p -> Objects.equals(p.getUser_id(), userId));
-
+        boolean isParticipant = (userId != null) && participants.stream().anyMatch(p -> Objects.equals(p.getUser_id(), userId));
         Long maxStage = matchesByGroup.get(0) != null ? matchesByGroup.get(0).keySet().stream().max(Integer::compareTo).orElse(0) : 0L;
 
         if(optionalTournament.isPresent()) {
@@ -209,7 +203,6 @@ public class TournamentController {
             mav.addObject("ELIMINATION", Structure.ELIMINATION);
             mav.addObject("HYBRID", Structure.HYBRID);
             mav.addObject("tournamentWinner", t.getTournament_winner());
-            mav.addObject("participantsList", participantsList);
             mav.addObject("participantCount", participantCount);
             mav.addObject("isParticipant", isParticipant);
             mav.addObject("maxStage", maxStage);

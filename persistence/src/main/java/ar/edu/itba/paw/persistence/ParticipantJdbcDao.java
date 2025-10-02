@@ -2,6 +2,7 @@ package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.interfaces.persistence.ParticipantDao;
 import ar.edu.itba.paw.model.ParticipantUser;
+import ar.edu.itba.paw.model.ParticipantUserInfo;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -16,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Repository
 public class ParticipantJdbcDao implements ParticipantDao {
@@ -34,6 +36,15 @@ public class ParticipantJdbcDao implements ParticipantDao {
         participant.setPoints(rs.getInt("points"));
         return participant;
     };
+
+    private static final RowMapper<ParticipantUserInfo> ROW_MAPPER_INFO = (rs, rowNum) -> new ParticipantUserInfo(rs.getLong("user_id"), rs.getString("username"), rs.getString("email"), rs.getInt("points"), rs.getInt("group_number"));
+
+    @Override
+    public List<ParticipantUserInfo> getTournamentsParticipantUsersInfo(Long tournament_id) {
+        return jdbcTemplate.query("SELECT * FROM participant_user " +
+                                      "INNER JOIN users ON participant_user.user_id = users.id " +
+                                      "WHERE tournament_id = ?", ROW_MAPPER_INFO, tournament_id);
+    }
 
     @Override
     public void joinTournamentUser(Long user_id, Long tournament_id) {
@@ -85,30 +96,8 @@ public class ParticipantJdbcDao implements ParticipantDao {
         });
     }
 
-    private Integer getGroupNumber(long tournamentId, long userId) {
-        return jdbcTemplate.queryForObject(
-                "SELECT group_number FROM participant_user WHERE tournament_id=? AND user_id=?",
-                Integer.class, tournamentId, userId
-        );
-    }
-
     @Override
-    @Transactional
-    public void swapGroups(Long tournament_id, Long user1, Long user2){
-        if (isTournamentStarted(tournament_id)) {
-            throw new IllegalStateException("Members cannot be swapped after the tournament has started");
-        }
-
-        Integer g1 = getGroupNumber(tournament_id, user1);
-        Integer g2 = getGroupNumber(tournament_id, user2);
-
-        if (g1 == null || g2 == null) {
-            throw new IllegalArgumentException("Both users must exist in the tournament");
-        }
-        if (g1.equals(g2)) {
-            return;
-        }
-
+    public void swapGroups(Long tournament_id, Long user1, Long user2, Integer group1, Integer group2){
         jdbcTemplate.update(
                 "UPDATE participant_user " +
                         "SET group_number = CASE " +
@@ -116,9 +105,50 @@ public class ParticipantJdbcDao implements ParticipantDao {
                         "  WHEN user_id = ? THEN ? " +
                         "  ELSE group_number END " +
                         "WHERE tournament_id = ? AND user_id IN (?, ?)",
-                user1, g2,
-                user2, g1,
+                user1, group2,
+                user2, group1,
                 tournament_id, user1, user2
         );
+    }
+
+    @Override
+    public Integer getTournamentMaxPoints(Long tournamentId){
+        return jdbcTemplate.queryForObject(
+                "SELECT MAX(points) FROM participant_user WHERE tournament_id = ?",
+                Integer.class, tournamentId
+        );
+    }
+
+    @Override
+    public Integer getTournamentSecondMaxPoints(Long tournamentId) {
+        return jdbcTemplate.queryForObject(
+                "SELECT MAX(points) FROM participant_user WHERE tournament_id = ? AND points < ?",
+                Integer.class, tournamentId, getTournamentMaxPoints(tournamentId)
+        );
+    }
+
+    @Override
+    public Integer getGroupNumber(Long tournament_id, Long user_id){
+        return jdbcTemplate.queryForObject("SELECT group_number FROM participant_user WHERE tournament_id = ? AND user_id = ?", Integer.class, tournament_id, user_id);
+    }
+
+    @Override
+    public List<ParticipantUser> getTournamentParticipantsByPoints(Long tournamentId, Integer group_number, Integer points){
+        return jdbcTemplate.query("SELECT * FROM participant_user WHERE tournament_id = ? " +
+                "AND points = ? " +
+                "AND group_number = ?", ROW_MAPPER, tournamentId, points, group_number);
+    }
+
+    @Override
+    public Integer getTournamentGroups(Long tournamentId){
+        return jdbcTemplate.queryForObject(
+                "SELECT COUNT(DISTINCT group_number) FROM participant_user WHERE tournament_id = ?",
+                Integer.class, tournamentId
+        );
+    }
+
+    @Override
+    public void sumPoints(Long tournamentId, Long userId, Integer points){
+        jdbcTemplate.update("UPDATE participant_user SET points = points + ? WHERE user_id = ?", points, userId);
     }
 }

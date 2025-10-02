@@ -5,6 +5,7 @@ import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.interfaces.services.ParticipantService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.ParticipantUser;
+import ar.edu.itba.paw.model.ParticipantUserInfo;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import org.springframework.stereotype.Service;
 
@@ -41,6 +42,13 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
+    public List<ParticipantUserInfo> getTournamentParticipantUsersInfo(Long tournamentId) {
+        List<ParticipantUserInfo> participants = participantDao.getTournamentsParticipantUsersInfo(tournamentId);
+        participants.sort((a, b) -> b.getPoints().compareTo(a.getPoints()));
+        return participants;
+    }
+
+    @Override
     public ParticipantUser getTournamentParticipantByUserId(Long tournament_id, Long user_id) {
         return participantDao.getTournamentParticipantByUserId(tournament_id, user_id);
     }
@@ -57,6 +65,16 @@ public class ParticipantServiceImpl implements ParticipantService {
 
     @Override
     public void swapGroups(Long tournament_id, Long user1, Long user2){
-        participantDao.swapGroups(tournament_id, user1, user2);
+        if (tournamentDao.isTournamentStarted(tournament_id)) {
+            throw new IllegalStateException("Members cannot be swapped after the tournament has started");
+        }
+
+        Integer g1 = participantDao.getGroupNumber(tournament_id, user1);
+        Integer g2 = participantDao.getGroupNumber(tournament_id, user2);
+
+        if (g1.equals(g2)) {
+            return;
+        }
+        participantDao.swapGroups(tournament_id, user1, user2, g1, g2);
     }
 }

@@ -1,32 +1,135 @@
 package ar.edu.itba.paw.services;
 
-import ar.edu.itba.paw.interfaces.persistence.ImageDao;
 import ar.edu.itba.paw.interfaces.persistence.MatchDao;
 import ar.edu.itba.paw.interfaces.persistence.ParticipantDao;
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.interfaces.services.MatchService;
+import ar.edu.itba.paw.interfaces.services.TournamentService;
+import ar.edu.itba.paw.model.Match;
+import ar.edu.itba.paw.model.MatchInfo;
+import ar.edu.itba.paw.model.ParticipantUser;
+import ar.edu.itba.paw.model.Tournament.Tournament;
+import ar.edu.itba.paw.model.enums.Structure;
 import org.springframework.stereotype.Service;
+
+import java.util.*;
 
 @Service
 public class MatchServiceImpl implements MatchService {
 
-    private final TournamentDao tournamentDao;
-    private final ParticipantDao participantDao;
     private final MatchDao matchDao;
+    private final ParticipantDao participantDao;
+    private final TournamentService ts;
 
-    public MatchServiceImpl(TournamentDao tournamentDao, ParticipantDao participantDao, MatchDao matchDao) {
-        this.tournamentDao = tournamentDao;
-        this.participantDao = participantDao;
+    public MatchServiceImpl(MatchDao matchDao, ParticipantDao participantDao, TournamentService tournamentService) {
         this.matchDao = matchDao;
+        this.participantDao = participantDao;
+        this.ts = tournamentService;
     }
 
     @Override
     public void swapMatchesMembers(Long tournament_id, Long match1, Long match2, Long user1, Long user2){
-        matchDao.swapMatchesMembers(tournament_id, match1, match2, user1, user2);
+        Match m1 = matchDao.getMatch(tournament_id, match1);
+        Match m2 = matchDao.getMatch(tournament_id, match2);
+        if (m1 == null || m2 == null) {
+            throw new IllegalArgumentException("Both matches must exist in the tournament");
+        }
+
+        boolean u1IsLocalM1 = m1.getLocalId() != null && m1.getLocalId().equals(user1);
+        boolean u1IsVisitM1 = m1.getVisitorId() != null && m1.getVisitorId().equals(user1);
+        boolean u2IsLocalM2 = m2.getLocalId() != null && m2.getLocalId().equals(user2);
+        boolean u2IsVisitM2 = m2.getVisitorId() != null && m2.getVisitorId().equals(user2);
+
+        if ((!u1IsLocalM1 && !u1IsVisitM1) || (!u2IsLocalM2 && !u2IsVisitM2)) {
+            throw new IllegalArgumentException("user1 must be in match1 and user2 must be in match2");
+        }
+        if (u1IsLocalM1) {
+            matchDao.updateMatchLocal(tournament_id, match1, user2);
+        } else {
+            matchDao.updateMatchVisitor(tournament_id, match1, user2);
+        }
+        if (u2IsLocalM2) {
+            matchDao.updateMatchLocal(tournament_id, match2, user1);
+        } else {
+            matchDao.updateMatchVisitor(tournament_id, match2, user1);
+        }
+    }
+
+    @Override
+    public Map<Integer, Map<Integer, List<MatchInfo>>> getTournamentMatchesByGroup(Long tournamentId) {
+        List<MatchInfo> matches = matchDao.getTournamentMatches(tournamentId);
+        if (matches.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        Map<Integer, Map<Integer, List<MatchInfo>>> result = new TreeMap<>();
+
+        for (MatchInfo m : matches) {
+            Integer stage = m.getStage();
+            if (stage == null) {
+                continue;
+            }
+            Integer group = participantDao.getGroupNumber(tournamentId, m.getLocalId());
+            result.computeIfAbsent(group != null? group : 0, g -> new TreeMap<>())
+                    .computeIfAbsent(stage, s -> new ArrayList<>())
+                    .add(m);
+        }
+        return result;
     }
 
     @Override
     public void setMatchWinner(Long matchId, Long tournamentId, Integer winner) {
+        if (winner == null || (winner != 1 && winner != 2)) {
+            throw new IllegalArgumentException("winner must be 1 (local) or 2 (visitor)");
+        }
         matchDao.setMatchWinner(matchId, tournamentId, winner);
+        Match match = matchDao.getMatch(tournamentId, matchId);
+
+        Long localId = match.getLocalId();
+        Long visitorId = match.getVisitorId();
+        if (localId == null || visitorId == null) {
+            throw new IllegalStateException("Cannot set winner for TBD matches");
+        }
+        Long winnerId = (winner == 1) ? localId : visitorId;
+
+        boolean isFinished = matchDao.allMatchesPlayed(tournamentId);
+
+        Tournament t = ts.findById(tournamentId).orElse(null);
+        if (t == null) {
+            return;
+        }
+        Structure structure = t.getStructure();
+        boolean isGroupStage = Boolean.TRUE.equals(t.getIs_group_stage());
+
+        if(!isFinished && (structure.equals(Structure.ELIMINATION) || ( structure.equals(Structure.HYBRID) && !isGroupStage))) {
+            setNextMatchInfo(matchId, tournamentId, winnerId);
+        }else if(structure.equals(Structure.LEAGUE) || ( structure.equals(Structure.HYBRID) && isGroupStage)){
+            participantDao.sumPoints(tournamentId, winnerId, 3);
+        }
+        if (structure.equals(Structure.HYBRID) && isGroupStage && isFinished) {
+            ts.createBracketFromGroups(tournamentId);
+            isFinished = matchDao.allMatchesPlayed(tournamentId);
+        }
+        if (isFinished) {
+            ts.setFinished(tournamentId, matchId);
+        }
+    }
+
+    private void setNextMatchInfo(Long matchId, Long tournamentId, Long winnerId) {
+        Integer currentStage = matchDao.getMatchStage(tournamentId, matchId);
+        List<Long> idsThisStage = matchDao.getStageMatchIds(currentStage, tournamentId);
+        int indexInStage = idsThisStage.indexOf(matchId);
+
+        List<Long> idsNextStage = matchDao.getStageMatchIds(currentStage + 1, tournamentId);
+        if(idsNextStage.isEmpty()){
+            return;
+        }
+        Long parentMatchId = idsNextStage.get(indexInStage / 2);
+        boolean isLeftChild = (indexInStage % 2 == 0);
+
+        if (isLeftChild) {
+            matchDao.updateMatchLocal(tournamentId, parentMatchId, winnerId);
+        } else {
+            matchDao.updateMatchVisitor(tournamentId, parentMatchId, winnerId);
+        }
     }
 }

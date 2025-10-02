@@ -58,21 +58,15 @@
                     <paw:icon-card icon="${pageContext.request.contextPath}/images/level.png" text="${tournament.elo}"/>
                     <paw:icon-card icon="${pageContext.request.contextPath}/images/members.png" text="${teams}"/>
                 </div>
-                <c:choose>
-                    <c:when test="${tournamentWinner != null && tournamentWinner > 0}">
-                        <c:forEach var="g" items="${participants}">
-                            <c:if test="${g.key == 0}">
-                                <c:forEach var="p" items="${g.value}">
-                                    <c:if test="${p.user_id == tournamentWinner}">
-                                        <div class="cards-container">
-                                            <paw:winner-card winnerName="${p.username}"/>
-                                        </div>
-                                    </c:if>
-                                </c:forEach>
+                <c:if test="${tournamentWinner != null && tournamentWinner > 0}">
+                        <c:forEach var="p" items="${participants}">
+                            <c:if test="${p.user_id == tournamentWinner}">
+                                <div class="cards-container">
+                                    <paw:winner-card winnerName="${p.username}"/>
+                                </div>
                             </c:if>
                         </c:forEach>
-                    </c:when>
-                </c:choose>
+                </c:if>
                 <c:if test="${isParticipant && !tournament.tournamentStarted || !isParticipant && tournament.openInscriptions}">
                     <div class="cards-container">
                         <c:set var="icon" value="${tournament.structure == LEAGUE ? 'grid.png' : 'bracket.png'}"/>
@@ -120,7 +114,7 @@
                     <c:when test="${tournament.structure == LEAGUE}">
                         <c:if test="${not empty participants}">
                             <paw:text type="title" size="l"><spring:message code="tournament.standings"/></paw:text>
-                            <paw:board participants="${participantsList}"/>
+                            <paw:board participants="${participants}"/>
                         </c:if>
                     </c:when>
                     <c:when test="${tournament.structure == ELIMINATION || (tournament.structure == HYBRID && !tournament.is_group_stage)}">
@@ -139,12 +133,12 @@
                     <c:when test="${tournament.structure == HYBRID && tournament.is_group_stage}">
                         <c:set var="edit" value="tournament.edit.groups" />
                         <c:if test="${not empty participants}">
-                            <c:forEach var="g" items="${participants}">
+                            <c:forEach var="g" begin="1" end="${groups}" step="1">
                                 <div class="board-container">
                                     <paw:text type="title" size="m">
-                                        <spring:message code="tournament.groupStandings" arguments="${g.key}"/>
+                                        <spring:message code="tournament.groupStandings" arguments="${g}"/>
                                     </paw:text>
-                                    <paw:board participants="${g.value}" isEditing="${editMode}" size="l" formId="swapGroupsForm"/>
+                                    <paw:board participants="${participants}" isEditing="${editMode}" size="l" formId="swapGroupsForm" groupNumber="${g}"/>
                                 </div>
                             </c:forEach>
                         </c:if>
@@ -163,7 +157,7 @@
                     </c:when>
                     <c:when test="${user.id == tournament.creator_id && !tournament.tournamentStarted}">
                         <div class="cards-container">
-                            <c:if test="${tournament.structure eq 'ELIMINATION' or tournament.structure eq 'HYBRID'}">
+                            <c:if test="${tournament.structure eq ELIMINATION or tournament.structure eq HYBRID}">
                                 <c:choose>
                                     <c:when test="${not editMode}">
                                         <form method="get" action="">
@@ -204,7 +198,7 @@
                                     </c:otherwise>
                                 </c:choose>
                             </c:if>
-                            <form method="post" action="${pageContext.request.contextPath}/tournament/startTournament" style="display:inline;">
+                            <form method="post" action="${pageContext.request.contextPath}/tournament/startTournament">
                                 <input type="hidden" name="tournamentId" value="${tournament.id}"/>
                                 <button type="submit" class="btn">
                                     <paw:text size="l"><spring:message code="tournament.startTournament"/></paw:text>
@@ -223,7 +217,7 @@
                     </c:when>
                     <c:otherwise>
                         <c:choose>
-                            <c:when test="${tournament.structure == 'HYBRID'}">
+                            <c:when test="${tournament.structure == HYBRID}">
                                 <c:choose>
                                     <c:when test="${!tournament.is_group_stage}">
                                         <c:forEach var="groupEntry" items="${matchesByGroup}">
