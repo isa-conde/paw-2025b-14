@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.interfaces.services;
 
+import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.ParticipantUserInfo;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
@@ -51,7 +52,7 @@ public interface TournamentService {
 
     void swapMatchesMembers(Long tournament_id, Long match1, Long match2, Long user1, Long user2);
 
-    Map<Long,List<Tournament>> getUnfilteredTournamentPages(Long page);
+    Map<Game,List<Tournament>> getUnfilteredTournamentPages(Long page);
 
     Integer getPageAmount(Integer pageSize, TournamentFilter tf);
 

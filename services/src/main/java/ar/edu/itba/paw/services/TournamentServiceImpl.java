@@ -7,6 +7,7 @@ import ar.edu.itba.paw.interfaces.persistence.ImageDao;
 import ar.edu.itba.paw.interfaces.persistence.ParticipantDao;
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
+import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.ParticipantUser;
 import ar.edu.itba.paw.model.ParticipantUserInfo;
 import ar.edu.itba.paw.model.MatchWithPlayers;
@@ -18,7 +19,6 @@ import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -194,8 +194,13 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public Map<Long,List<Tournament>> getUnfilteredTournamentPages(Long page) {
-        return tournamentDao.getUnfilteredTournamentPages(page);
+    public Map<Game, List<Tournament>> getUnfilteredTournamentPages(Long page) {
+        Map<Long, List<Tournament>> mapWithGameIdAsKey = tournamentDao.getUnfilteredTournamentPages(page);
+        Map<Game, List<Tournament>> mapWithGameAsKey = new HashMap<>();
+        for(Long gameId : mapWithGameIdAsKey.keySet()) {
+            mapWithGameAsKey.putIfAbsent(gameDao.findById(gameId).get(), mapWithGameIdAsKey.get(gameId));
+        }
+        return mapWithGameAsKey;
     }
 
     @Override

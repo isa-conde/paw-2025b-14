@@ -11,6 +11,7 @@ import ar.edu.itba.paw.model.enums.Genre;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
+import ar.edu.itba.paw.webapp.auth.PawUserDetails;
 import ar.edu.itba.paw.webapp.form.FilterForm;
 import ar.edu.itba.paw.webapp.form.TournamentForm;
 import org.springframework.stereotype.Controller;
@@ -34,41 +35,31 @@ public class UserController {
     }
 
     @RequestMapping("/")
-    public ModelAndView index(@ModelAttribute("tournamentForm") TournamentForm tournamentForm, TournamentFilter tournamentFilter, Principal principal) {
+    public ModelAndView index(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @ModelAttribute("tournamentForm") TournamentForm tournamentForm, TournamentFilter tournamentFilter, Principal principal) {
         final ModelAndView mav = new ModelAndView("index");
         List<Game> allGames = gs.findAll();
 
-        User user = null;
-        if (principal != null) {
-            Optional<User> userOpt = us.findByUsername(principal.getName());
-            user = userOpt.orElse(null);
-        }
-
-        mav.addObject("user", user);
+        mav.addObject("user", currentUser.orElse(null));
         mav.addObject("games", allGames);
         mav.addObject("regions", Arrays.stream(Region.values()).toList());
         mav.addObject("elos", Arrays.stream(Elo.values()).toList());
         mav.addObject("structures", Arrays.stream(Structure.values()).toList());
         mav.addObject("tournamentForm", tournamentForm);
 
-        Map<Long, List<Tournament>> tournaments = ts.getUnfilteredTournamentPages(0L);
+        Map<Game, List<Tournament>> tournaments = ts.getUnfilteredTournamentPages(0L);
         mav.addObject("gameIds", tournaments.keySet());
-        for (Long game_id : tournaments.keySet()) {
-            mav.addObject("tournaments" + game_id, tournaments.get(game_id));
-            mav.addObject("game" + game_id, gs.findById(game_id).get());
+        for (Game game: tournaments.keySet()) {
+            mav.addObject("tournaments" + game.getId(), tournaments.get(game));
+            mav.addObject("game" + game.getId(), game);
         }
         return mav;
     }
 
     @RequestMapping("/myTournaments")
-    public ModelAndView myTournaments(Principal principal) {
+    public ModelAndView myTournaments(@ModelAttribute("user") Optional<PawUserDetails> currentUser) {
         final ModelAndView mav = new ModelAndView("myTournaments");
 
-        User user = null;
-        if (principal != null) {
-            Optional<User> userOpt = us.findByUsername(principal.getName());
-            user = userOpt.orElse(null);
-        }
+        User user = currentUser.orElse(null).getPawUser();
 
         List<Tournament> onGoingTournaments = ts.getCreatedAndOngoingTournaments(user.getId());
         List<Tournament> finishedTournaments = ts.getCreatedAndFinishedTournaments(user.getId());
@@ -85,31 +76,22 @@ public class UserController {
     }
 
     @RequestMapping("/gamesPage")
-    public ModelAndView gamesPage(Principal principal) {
+    public ModelAndView gamesPage(@ModelAttribute("user") Optional<PawUserDetails> currentUser) {
         final ModelAndView mav = new ModelAndView("gamesPage");
         List<Game> allGames = gs.findAll();
-        User user = null;
-        if (principal != null) {
-            Optional<User> userOpt = us.findByUsername(principal.getName());
-            user = userOpt.orElse(null);
-        }
-        mav.addObject("user", user);
+
+        mav.addObject("user", currentUser.orElse(null));
         mav.addObject("games", allGames);
 
         return mav;
     }
 
     @RequestMapping(value = "/tournamentsPage", method = RequestMethod.GET)
-    public ModelAndView tournamentsPage(Principal principal, @ModelAttribute("filterForm") FilterForm filterForm, TournamentFilter tf,  @RequestParam(defaultValue = "0") Long page) {
+    public ModelAndView tournamentsPage(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @ModelAttribute("filterForm") FilterForm filterForm, TournamentFilter tf,  @RequestParam(defaultValue = "0") Long page) {
         final ModelAndView mav = new ModelAndView("tournamentsPage");
         List<Game> allGames = gs.findAll();
-        User user = null;
-        if (principal != null) {
-            Optional<User> userOpt = us.findByUsername(principal.getName());
-            user = userOpt.orElse(null);
-        }
 
-        mav.addObject("user", user);
+        mav.addObject("user", currentUser.orElse(null));
         mav.addObject("games", allGames);
         mav.addObject("structures", Arrays.stream(Structure.values()).toList());
         mav.addObject("regions", Arrays.stream(Region.values()).toList());
@@ -129,7 +111,7 @@ public class UserController {
             mav.addObject("tournaments", ts.findTournaments(tf, page));
             mav.addObject("totalPages", ts.getPageAmount(9, tf));
         }else{
-            Map<Long, List<Tournament>> gameTournaments = ts.getUnfilteredTournamentPages(page);
+            Map<Game, List<Tournament>> gameTournaments = ts.getUnfilteredTournamentPages(page);
             mav.addObject("gameTournaments", gameTournaments);
             mav.addObject("totalPages", ts.getPageAmount(3, tf));
         }
@@ -139,15 +121,10 @@ public class UserController {
     }
 
     @RequestMapping("/search")
-    public ModelAndView search(@RequestParam("q") final String q, Principal principal){
+    public ModelAndView search(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam("q") final String q){
         final ModelAndView mav = new ModelAndView("searchResults");
-        User user = null;
-        if (principal != null) {
-            Optional<User> userOpt = us.findByUsername(principal.getName());
-            user = userOpt.orElse(null);
-        }
 
-        mav.addObject("user", user);
+        mav.addObject("user", currentUser.orElse(null));
         mav.addObject("games", gs.searchByName(q));
         mav.addObject("tournaments", ts.searchByName(q));
 
@@ -155,25 +132,19 @@ public class UserController {
     }
 
     @RequestMapping("/profile/{id}")
-    public ModelAndView profile(Principal principal, @PathVariable Long id){
+    public ModelAndView profile(@ModelAttribute("user") Optional<PawUserDetails> currentUser, Principal principal, @PathVariable Long id){
         final ModelAndView mav = new ModelAndView("profile");
-
-        User user = null;
-        if (principal != null) {
-            Optional<User> userOpt = us.findByUsername(principal.getName());
-            user = userOpt.orElse(null);
-        }
-        mav.addObject("user", user);
 
         Optional<User> profileOpt = us.findById(id);
         if (profileOpt.isEmpty()){
-            //TODO REDIRIGIR A 404
-            return index(new TournamentForm(), new TournamentFilter(), principal);
+            // TODO: REDIRIGIR A 404
+            return index(currentUser, new TournamentForm(), new TournamentFilter(), principal);
         }
-        User profile = profileOpt.get();
-        mav.addObject("profile", profile);
-        mav.addObject("favouriteGames", gs.getFavourites(profile.getId()));
-        mav.addObject("lastTournaments", ts.findUserActiveTournaments(profile.getId()));
+
+        mav.addObject("user", currentUser.orElse(null));
+        mav.addObject("profile", profileOpt.get());
+        mav.addObject("favouriteGames", gs.getFavourites(id));
+        mav.addObject("lastTournaments", ts.findUserActiveTournaments(id));
 
         return mav;
     }
