@@ -647,6 +647,12 @@ a.element-card:hover {
     grid-area: content;
 }
 
+.header-buttons {
+     display: flex;
+     gap: 10px; /* espacio entre botones */
+     align-items: center; /* opcional, centra vertical */
+ }
+
 /* ------- CARROUSEL ------- */
 
 .carrousel-container {
@@ -1516,4 +1522,21 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .profile-main {
     flex: 1;
+}
+
+/*Logout Button*/
+.logout-button {
+    background-color: #e74c3c;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+
+.logout-button:hover {
+    background-color: #c0392b; /* rojo más oscuro al hover */
 }
