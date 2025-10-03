@@ -13,6 +13,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
@@ -80,5 +81,43 @@ public class TokenJdbcDaoTest {
         Assert.assertEquals(LocalDate.now().plusDays(1),ans.getExpiry_date());
         Assert.assertFalse(inserted.get(0).isUsed());
         Assert.assertFalse(ans.isUsed());
+        Assert.assertEquals(3, JdbcTestUtils.countRowsInTable(jdbcTemplate,"tokens"));
+    }
+
+    @Test
+    public void testFindNothing(){
+        final Optional<Token> ans = tokenJdbcDao.findByToken((long) -1);
+
+        Assert.assertNotNull(ans);
+        Assert.assertTrue(ans.isEmpty());
+    }
+
+    @Test
+    public void testFindByToken(){
+        final Optional<Token> ans = tokenJdbcDao.findByToken(1L);
+
+        Assert.assertNotNull(ans);
+        Assert.assertTrue(ans.isPresent());
+        Assert.assertEquals(USED_IDS.get(0), ans.get().getId());
+        Assert.assertEquals(Long.valueOf(1), ans.get().getUser_id());
+        Assert.assertEquals(Long.valueOf(1), ans.get().getToken());
+        Assert.assertEquals(LocalDate.now().minusDays(1),ans.get().getExpiry_date());
+        Assert.assertFalse(ans.get().isUsed());
+    }
+
+    @Test
+    public void testMarkAsUsed(){
+        tokenJdbcDao.markAsUsed(USED_IDS.get(0));
+        final Boolean ans = jdbcTemplate.queryForObject("select used from tokens where id = ?",Boolean.class,USED_IDS.get(0));
+
+        Assert.assertNotNull(ans);
+        Assert.assertTrue(ans);
+    }
+
+    @Test
+    public void testDeleteExpiredTokens(){
+        tokenJdbcDao.deleteExpiredTokens();
+
+        Assert.assertEquals(0,JdbcTestUtils.countRowsInTable(jdbcTemplate,"tokens"));
     }
 }

@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
@@ -31,6 +32,7 @@ public class GameJdbcDaoTest {
     private static final Genre GENRE = Genre.MOBA;
     private List<Long> USED_IDS;
     private int rows;
+    private static final RowMapper<Game> ROW_MAPPER = (rs, rowNum) -> new Game(rs.getLong("id"), rs.getString("name"), Genre.valueOf(rs.getString("genre")), rs.getInt("image_id"));
 
     @Autowired
     private DataSource ds;
@@ -60,10 +62,17 @@ public class GameJdbcDaoTest {
     @Test
     public void testCreate(){
         final Game game = gameJdbcDao.create(NAME, GENRE, 1);
+        final List<Game> inserted = jdbcTemplate.query("select * from game where id = ?", ROW_MAPPER, game.getId());
 
+        Assert.assertNotNull(inserted);
+        Assert.assertFalse(inserted.isEmpty());
+        Assert.assertEquals(1,inserted.size());
         Assert.assertNotNull(game);
+        Assert.assertEquals(NAME, inserted.get(0).getName());
         Assert.assertEquals(NAME, game.getName());
+        Assert.assertEquals(GENRE, inserted.get(0).getGenre());
         Assert.assertEquals(GENRE, game.getGenre());
+        Assert.assertEquals(Integer.valueOf(1), inserted.get(0).getImage_id());
         Assert.assertEquals(Integer.valueOf(1), game.getImage_id());
         Assert.assertEquals(rows + 1,JdbcTestUtils.countRowsInTable(jdbcTemplate,"game"));
     }
