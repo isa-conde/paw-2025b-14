@@ -64,6 +64,25 @@ button:disabled {
     gap: 6px;
 }
 
+.chip-close {
+    margin-left: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    color: var(--secondary-details);
+}
+
+.chip-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 8px;
+    border: var(--secondary-details);
+    border-radius: 8px;
+    min-height: 40px;
+    align-items: center;
+}
+
 /* ------- FONTS ------- */
 
 @font-face {
@@ -647,6 +666,12 @@ a.element-card:hover {
     grid-area: content;
 }
 
+.header-buttons {
+     display: flex;
+     gap: 10px; /* espacio entre botones */
+     align-items: center; /* opcional, centra vertical */
+ }
+
 /* ------- CARROUSEL ------- */
 
 .carrousel-container {
@@ -922,7 +947,6 @@ dialog:not([open]) {
     justify-content: center;
     min-height: 100vh;
     width: 100%;
-    padding: 20px;
 }
 
 .form {
@@ -1436,35 +1460,41 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 /* ------- Tournament Form ------- */
 
-.tournamentForm-page {
+.Form-page {
     display: flex;
     min-height: 100vh;
+    flex-direction: row;
 }
 
-.tournamentForm-page__image {
-    width: 50vw;        /* la mitad exacta del ancho de la pantalla */
-    height: 100vh;      /* toda la altura de la ventana */
-    overflow: hidden;   /* lo que sobresale se corta */
+.Form-page__image {
+    flex: 1;             /* ocupa mitad exacta */
+    max-width: 50vw;     /* nunca más de la mitad */
+    height: 100vh;
+    overflow: hidden;
 }
 
-.tournamentForm-page__image img {
+.Form-page__image img {
     width: 100%;
     height: 100%;
-    object-fit: cover;   /* rellena el espacio sin deformarse */
-    object-position: center; /* centra la imagen en su medio */
+    object-fit: cover;   /* rellena toda la caja */
+    object-position: center;
     display: block;
 }
-.tournamentForm-page__image img {
-    max-width: 90%;
-    max-height: 90%;
-}
 
-.tournamentForm-page__form {
+.Form-page__form {
     flex: 1;
+    max-width: 50vw;
     padding: 40px;
     display: flex;
     flex-direction: column;
     justify-content: center;
+}
+
+.member-input-container{
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    gap: 15px;
 }
 
 /*----Pagination-----*/
@@ -1516,4 +1546,21 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .profile-main {
     flex: 1;
+}
+
+/*Logout Button*/
+.logout-button {
+    background-color: var(--secondary-details);
+    border: none;
+    border-radius: 10px;
+    padding: 10px 20px;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+
+.logout-button:hover {
+    background-color: var(--secondary-details-hover)
 }

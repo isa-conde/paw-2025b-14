@@ -37,14 +37,10 @@
                 <paw:searchBar/>
                 <c:choose>
                     <c:when test="${isLoggedIn}">
-                        <paw:profileButton text="${user.username}" onclick="openModal('logoutModal')" isNotSafe="true"/>
-                        <paw:modal id="logoutModal" title="layout.logout">
-                            <div class="row center">
-                                <form:form method="post" action="${logoutUrl}">
-                                    <paw:input path="" label="layout.logout" inputType="submit"/>
-                                </form:form>
-                            </div>
-                        </paw:modal>
+                        <div class="header-buttons">
+                            <paw:profileButton text="${user.username}" onclick="window.location.href='/profile/${user.id}'" isNotSafe="true"/>
+                            <paw:logoutButton/>
+                        </div>
                     </c:when>
                     <c:otherwise>
                         <div>

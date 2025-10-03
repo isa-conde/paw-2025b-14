@@ -120,4 +120,18 @@ public class GameJdbcDao implements GameDao {
         return jdbcTemplate.query(sql, ROW_MAPPER, user_id);
     }
 
+    @Override
+    public List<Game> findAllPaged(Long page){
+        String sql = "SELECT * FROM game " +
+                     "LIMIT 9 " +
+                     "OFFSET ? ";
+        return jdbcTemplate.query(sql, ROW_MAPPER, page * 9);
+    }
+
+    @Override
+    public Long getPageAmount() {
+        Double gameAmount = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM game", Double.class);
+        return (long) Math.ceil( gameAmount / 9L);
+    }
+
 }

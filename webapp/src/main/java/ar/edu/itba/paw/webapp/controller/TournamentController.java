@@ -53,7 +53,7 @@ public class TournamentController {
     }
 
     @ModelAttribute("tournamentForm")
-    public TournamentForm getTournamentForm(){
+    public TournamentForm getTournamentForm() {
         return new TournamentForm();
     }
 

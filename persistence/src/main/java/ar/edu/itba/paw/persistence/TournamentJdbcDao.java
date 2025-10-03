@@ -228,18 +228,25 @@ public class TournamentJdbcDao implements TournamentDao {
     @Override
     public Map<Long,List<Tournament>> getUnfilteredTournamentPages(Long page) {
         String sql = """
-            SELECT t.*
+        WITH top_games AS (
+            SELECT g.id
+            FROM game g
+            JOIN tournament t2 ON g.id = t2.game_id
+            GROUP BY g.id
+            ORDER BY COUNT(t2.id) DESC
+            LIMIT 3 OFFSET ?
+        ),
+        ranked_tournaments AS (
+            SELECT t.*,
+                   ROW_NUMBER() OVER (PARTITION BY t.game_id ORDER BY t.start_date) AS rn
             FROM tournament t
-            WHERE t.game_id IN (
-                SELECT g.id
-                FROM game g
-                JOIN tournament t2 ON g.id = t2.game_id
-                GROUP BY g.id
-                ORDER BY COUNT(t2.id) DESC
-                LIMIT 3
-                OFFSET ?
-            ) AND t.open_inscriptions = true
-            ORDER BY t.game_id, t.start_date
+            WHERE t.game_id IN (SELECT id FROM top_games)
+              AND t.open_inscriptions = true
+        )
+        SELECT *
+        FROM ranked_tournaments
+        WHERE rn <= 9
+        ORDER BY game_id, start_date
         """;
         List<Tournament> tournaments = jdbcTemplate.query(sql, ROW_MAPPER, page * 3);
 
