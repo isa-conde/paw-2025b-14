@@ -3,7 +3,7 @@ package ar.edu.itba.paw.webapp.controller;
 import ar.edu.itba.paw.interfaces.services.*;
 import ar.edu.itba.paw.model.*;
 import ar.edu.itba.paw.model.Game.Game;
-import ar.edu.itba.paw.model.MatchWithPlayers;
+import ar.edu.itba.paw.model.MatchInfo;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Genre;
@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -40,10 +41,10 @@ public class TournamentController {
     private final UserService us;
     private final GameService gs;
     private final TournamentService ts;
-    private final MailService ms;
+    private final MatchService ms;
     private final ParticipantService ps;
 
-    public TournamentController(final UserService us, final GameService gs, final TournamentService ts, final MailService ms, final ParticipantService ps) {
+    public TournamentController(final UserService us, final GameService gs, final TournamentService ts, final MatchService ms, final ParticipantService ps) {
         this.us = us;
         this.gs = gs;
         this.ts = ts;
@@ -97,7 +98,7 @@ public class TournamentController {
         Long user1 = Long.valueOf(selected.get(0));
         Long user2 = Long.valueOf(selected.get(1));
 
-        ts.swapGroups(tournamentId, user1, user2);
+        ps.swapGroups(tournamentId, user1, user2);
 
         ra.addAttribute("tournamentId", tournamentId);
         ra.addAttribute("edit", true);
@@ -121,7 +122,7 @@ public class TournamentController {
         Long match1 = Long.valueOf(a[0]), user1 = Long.valueOf(a[1]);
         Long match2 = Long.valueOf(b[0]), user2 = Long.valueOf(b[1]);
 
-        ts.swapMatchesMembers(tournamentId, match1, match2, user1, user2);
+        ms.swapMatchesMembers(tournamentId, match1, match2, user1, user2);
 
         ra.addAttribute("tournamentId", tournamentId);
         ra.addAttribute("edit", true);
@@ -159,8 +160,6 @@ public class TournamentController {
         return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
     }
 
-    @Autowired
-    private MessageSource messageSource;
     @RequestMapping(value = "/tournament", method = RequestMethod.GET)
     public ModelAndView tournamentPage(Principal principal, @RequestParam("tournamentId") final long tournamentId, @ModelAttribute("editTournamentForm") final EditTournamentForm form) {
         final ModelAndView mav = new ModelAndView("tournament");
@@ -173,25 +172,14 @@ public class TournamentController {
 
         Optional<Tournament> optionalTournament = ts.findById(tournamentId);
 
-        Map<Integer, Map<Integer, List<MatchWithPlayers>>> matchesByGroup = ts.getTournamentMatchesByGroup(tournamentId);
+        Map<Integer, List<MatchInfo>> matches = ms.getTournamentMatchesByStage(tournamentId);
+        long maxStage = matches != null ? matches.keySet().stream().max(Integer::compareTo).orElse(0) : 0L;
 
-        List<Integer> groupSections = new ArrayList<>(matchesByGroup.keySet());
-        Locale locale = LocaleContextHolder.getLocale();
-        List<String> groupLabels = groupSections.stream()
-                .map(key -> messageSource.getMessage("tournament.group", new Object[]{key}, locale))
-                .collect(Collectors.toList());
-
-        Map<Integer, List<ParticipantUserInfo>> participants = ts.getTournamentParticipantsByGroup(tournamentId);
-        List<ParticipantUserInfo> participantsList = participants.values().stream()
-                .filter(Objects::nonNull)
-                .flatMap(List::stream)
-                .toList();
-        int participantCount = participantsList.size();
+        Integer groups = ps.getTournamentGroups(tournamentId);
+        List<ParticipantUserInfo> participants = ps.getTournamentParticipantUsersInfo(tournamentId);
+        int participantCount = participants.size();
         Long userId = (user != null ? user.getId() : null);
-        boolean isParticipant = (userId != null) &&
-                participantsList.stream().anyMatch(p -> Objects.equals(p.getUser_id(), userId));
-
-        Long maxStage = matchesByGroup.get(0) != null ? matchesByGroup.get(0).keySet().stream().max(Integer::compareTo).orElse(0) : 0L;
+        boolean isParticipant = (userId != null) && participants.stream().anyMatch(p -> Objects.equals(p.getUser_id(), userId));
 
         if(optionalTournament.isPresent()) {
             Tournament t = optionalTournament.get();
@@ -207,14 +195,12 @@ public class TournamentController {
             mav.addObject("tournament", t);
             mav.addObject("game", optionalGame.get());
             mav.addObject("creator", optionalUser.get());
-            mav.addObject("matchesByGroup", matchesByGroup);
-            mav.addObject("groupSections", groupSections);
-            mav.addObject("groupLabels", groupLabels);
+            mav.addObject("matches", matches);
+            mav.addObject("groups", groups);
             mav.addObject("LEAGUE", Structure.LEAGUE);
             mav.addObject("ELIMINATION", Structure.ELIMINATION);
             mav.addObject("HYBRID", Structure.HYBRID);
             mav.addObject("tournamentWinner", t.getTournament_winner());
-            mav.addObject("participantsList", participantsList);
             mav.addObject("participantCount", participantCount);
             mav.addObject("isParticipant", isParticipant);
             mav.addObject("maxStage", maxStage);
@@ -234,10 +220,6 @@ public class TournamentController {
         if (user == null) {
             return new ModelAndView("redirect:/");
         }
-        Optional<Tournament> t = ts.findById(tournamentId);
-        String tournamentLink = request.getRequestURL().toString()
-                .replace("/tournament/join", "/tournament?tournamentId=" + t.get().getId());
-        ms.sendTournamentJoinedEmail(user.getUsername(), t.get().getName(), tournamentLink, us.findById(t.get().getCreator_id()).get().getEmail(), user.getEmail());
         ps.joinTournamentUser(user.getId(), tournamentId);
         return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
     }
@@ -295,7 +277,7 @@ public class TournamentController {
     }
 
     @RequestMapping(value = "/tournament/setWinner", method = { RequestMethod.POST })
-    public ModelAndView setWinner(Principal principal, @ModelAttribute("setWinnerForm") SetWinnerForm form) {
+    public ModelAndView setWinner(Principal principal, @ModelAttribute("setWinnerForm") SetWinnerForm form, @RequestParam(value = "group", required = false) Integer group) {
         User user = null;
         if (principal != null) {
             Optional<User> userOpt = us.findByUsername(principal.getName());
@@ -306,11 +288,22 @@ public class TournamentController {
         }
 
         Optional<Tournament> tournamentOpt = ts.findById(form.getTournamentId());
-        if (tournamentOpt.isPresent() && tournamentOpt.get().getCreator_id().equals(user.getId())) {
-            ts.setMatchWinner(form.getMatchId(), form.getTournamentId(), form.getWinner());
+        if (tournamentOpt.isPresent()) {
+            Tournament t = tournamentOpt.get();
+            if(t.getCreator_id().equals(user.getId())){
+                ms.setMatchWinner(form.getMatchId(), form.getTournamentId(), form.getWinner());
+            }
+            if(t.getFinished()){
+                return new ModelAndView("redirect:/tournament?tournamentId=" + t.getId());
+            }
         }
+        String redirect = UriComponentsBuilder.fromPath("/tournament")
+                .queryParam("tournamentId", form.getTournamentId())
+                .queryParam("section", "matchesTab")
+                .queryParamIfPresent("group", java.util.Optional.ofNullable(group))
+                .toUriString();
 
-        return new ModelAndView("redirect:/tournament?tournamentId=" + form.getTournamentId() + "&section=matches");
+        return new ModelAndView("redirect:" + redirect);
     }
 
     @RequestMapping("/tournaments/new/step1")
@@ -373,9 +366,6 @@ public class TournamentController {
         final Tournament t = ts.create(user.getId(), form.getName(), optionalGame.get().getId(),
                 form.getRegion(), form.getElo(), form.getStart_date(), form.getEnd_date(),
                 form.getFormat(), form.getStructure(), form.getMax_participants(), imageBytes, true, false);
-        String tournamentLink = request.getRequestURL().toString()
-                .replace("/tournament/create", "/tournament?tournamentId=" + t.getId());
-        ms.sendTournamentCreatedEmail(user.getUsername(), t.getName(), tournamentLink, user.getEmail());
         status.setComplete();
         return new ModelAndView("redirect:/tournament?tournamentId=" + t.getId());
     }

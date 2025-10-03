@@ -1,6 +1,6 @@
 package ar.edu.itba.paw.model;
 
-public class MatchWithPlayers {
+public class MatchInfo {
     private final Long id;
     private final Long tournamentId;
     private final Long localId;
@@ -11,10 +11,12 @@ public class MatchWithPlayers {
     private final Integer visitorScore;
     private final Integer winner;
     private final Integer stage;
+    private final Integer groupNumber;
+    private final Boolean isGroupStage;
 
-    public MatchWithPlayers(Long id, Long tournamentId, Long localId, Long visitorId, 
+    public MatchInfo(Long id, Long tournamentId, Long localId, Long visitorId, 
                            String localPlayerName, String visitorPlayerName,
-                           Integer localScore, Integer visitorScore, Integer winner, Integer stage) {
+                           Integer localScore, Integer visitorScore, Integer winner, Integer stage, Integer groupNumber, Boolean isGroupStage) {
         this.id = id;
         this.tournamentId = tournamentId;
         this.localId = localId;
@@ -25,6 +27,8 @@ public class MatchWithPlayers {
         this.visitorScore = visitorScore;
         this.winner = winner;
         this.stage = stage;
+        this.groupNumber = groupNumber;
+        this.isGroupStage = isGroupStage;
     }
 
     public Long getId() {
@@ -65,5 +69,13 @@ public class MatchWithPlayers {
 
     public Integer getStage() {
         return stage;
+    }
+
+    public Integer getGroupNumber() {
+        return groupNumber;
+    }
+
+    public Boolean getIsGroupStage() {
+        return isGroupStage;
     }
 }

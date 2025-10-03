@@ -12,6 +12,8 @@ public class SetWinnerForm {
     
     @NotNull
     private Integer winner; // 1 for local, 2 for visitor
+
+    private Integer group;
     
     
     public Long getMatchId() {
@@ -36,5 +38,13 @@ public class SetWinnerForm {
     
     public void setWinner(Integer winner) {
         this.winner = winner;
+    }
+
+    public Integer getGroup() {
+        return group;
+    }
+
+    public void setGroup(Integer group) {
+        this.group = group;
     }
 }

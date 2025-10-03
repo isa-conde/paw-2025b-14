@@ -7,7 +7,7 @@
 <c:choose>
     <c:when test="${participants.size() <= '0'}">
         <spring:message code="usersGrid.noParticipants" var="noParticipants"/>
-        <div class="no-cards-container"><paw:text size="l">${noParticipants}</paw:text></div>
+        <div class="no-cards-container participants"><paw:text size="l">${noParticipants}</paw:text></div>
     </c:when>
     <c:otherwise>
         <div class="grid users">
