@@ -12,7 +12,7 @@
     <c:otherwise>
         <div class="grid users">
             <c:forEach var="p" items="${participants}">
-                <paw:profileButton text="${p.username}" onclick="" isNotSafe="true" size="l" fill="false"/>
+                <paw:profileButton text="${p.username}" onclick="window.location.href='/profile/${p.user_id}'" isNotSafe="true" size="l" fill="false"/>
             </c:forEach>
         </div>
     </c:otherwise>

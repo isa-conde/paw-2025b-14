@@ -34,9 +34,6 @@
                 </div>
                 <paw:carrousel id="tourneys" elements="${lastTournaments}"/>
             </div>
-            <div class="cards-container">
-                <paw:button text="profile.logout" size="m" onclick="window.location.href='${logoutUrl}'"/>
-            </div>
         </div>
 
 

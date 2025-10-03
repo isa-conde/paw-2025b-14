@@ -10,7 +10,9 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Repository
 public class TeamJdbcDao implements TeamDao {
@@ -37,5 +39,30 @@ public class TeamJdbcDao implements TeamDao {
 
         Number id = jdbcInsert.executeAndReturnKey(values);
         return new Team(id.longValue(), name, pfp_id, banner_id, owner_id);
+    }
+
+    @Override
+    public Optional<Team> getById(Long id) {
+        return jdbcTemplate.query("SELECT * FROM team WHERE id = ?", ROW_MAPPER, id).stream().findFirst();
+    }
+
+    @Override
+    public List<Long> getActiveTournaments(Long teamId) {
+        return findTeamTournamentIds(teamId, false);
+    }
+
+    @Override
+    public List<Long> getPastTournaments(Long teamId) {
+        return findTeamTournamentIds(teamId, true);
+    }
+
+    private List<Long> findTeamTournamentIds(Long teamId, Boolean isFinished) {
+        String sql = """
+        SELECT t.id
+        FROM tournament t
+        INNER JOIN participant_user p ON p.tournament_id = t.id
+        WHERE p.team_id = ? AND t.is_finished = ?
+    """;
+        return jdbcTemplate.queryForList(sql, Long.class, teamId, isFinished);
     }
 }

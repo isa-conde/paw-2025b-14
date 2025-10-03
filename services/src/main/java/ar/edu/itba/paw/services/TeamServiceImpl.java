@@ -1,15 +1,15 @@
 package ar.edu.itba.paw.services;
 
-import ar.edu.itba.paw.interfaces.persistence.ImageDao;
-import ar.edu.itba.paw.interfaces.persistence.TeamDao;
-import ar.edu.itba.paw.interfaces.persistence.TeamMemberDao;
-import ar.edu.itba.paw.interfaces.persistence.UserDao;
+import ar.edu.itba.paw.interfaces.persistence.*;
 import ar.edu.itba.paw.interfaces.services.TeamService;
 import ar.edu.itba.paw.model.Team;
+import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.User;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TeamServiceImpl implements TeamService {
@@ -18,12 +18,14 @@ public class TeamServiceImpl implements TeamService {
     TeamDao teamDao;
     TeamMemberDao teamMemberDao;
     UserDao userDao;
+    TournamentDao tournamentDao;
 
-    public TeamServiceImpl(ImageDao imageDao, TeamDao teamDao, TeamMemberDao teamMemberDao, UserDao userDao){
+    public TeamServiceImpl(ImageDao imageDao, TeamDao teamDao, TeamMemberDao teamMemberDao, UserDao userDao, TournamentDao tournamentDao){
         this.imageDao = imageDao;
         this.teamDao = teamDao;
         this.teamMemberDao = teamMemberDao;
         this.userDao = userDao;
+        this.tournamentDao = tournamentDao;
     }
 
 
@@ -46,4 +48,30 @@ public class TeamServiceImpl implements TeamService {
 
         return team;
     }
+
+    @Override
+    public Optional<Team> getById(Long id) {
+        return teamDao.getById(id);
+    }
+
+    @Override
+    public List<Tournament> getActiveTournaments(Long team_id) {
+        return getTournamentsFromIds(teamDao.getActiveTournaments(team_id));
+
+    }
+
+    @Override
+    public List<Tournament> getPastTournaments(Long team_id) {
+        return getTournamentsFromIds(teamDao.getPastTournaments(team_id));
+    }
+
+    private List<Tournament> getTournamentsFromIds(List<Long> tournamentIds) {
+        List<Tournament> tournaments = new ArrayList<>();
+        for (Long id : tournamentIds) {
+            tournamentDao.findById(id).ifPresent(tournaments::add);
+        }
+        return tournaments;
+    }
+
+
 }
