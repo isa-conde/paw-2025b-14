@@ -40,7 +40,8 @@ public class MatchJdbcDao implements MatchDao {
             rs.getObject("local_score") != null ? rs.getInt("local_score") : null,
             rs.getObject("visitor_score") != null ? rs.getInt("visitor_score") : null,
             rs.getObject("winner") != null ? rs.getInt("winner") : null,
-            rs.getInt("stage")
+            rs.getInt("stage"),
+            rs.getObject("is_group_stage") != null ? rs.getBoolean("is_group_stage") : null
     );
 
     private static final RowMapper<MatchInfo> ROW_MAPPER_MATCH_INFO = (rs, rowNum) ->
@@ -55,12 +56,13 @@ public class MatchJdbcDao implements MatchDao {
             rs.getObject("visitor_score") != null? rs.getInt("visitor_score") : null,
             rs.getObject("winner") != null ? rs.getInt("winner") : null,
             rs.getObject("stage") != null ? rs.getInt("stage") : null,
-            rs.getObject("group_number") != null ? rs.getInt("group_number") : null
-    );
+            rs.getObject("group_number") != null ? rs.getInt("group_number") : null,
+            rs.getObject("is_group_stage") != null ? rs.getBoolean("is_group_stage") : null
+        );
 
 
     @Override
-    public void insertMatch(Long id, Long tournamentId, Long localId, Long visitorId, Integer stage, Integer localScore, Integer visitorScore, Integer winner) {
+    public void insertMatch(Long id, Long tournamentId, Long localId, Long visitorId, Integer stage, Integer localScore, Integer visitorScore, Integer winner, Boolean isGroupStage) {
         Map<String, Object> values = new HashMap<>();
         values.put("id", id);
         values.put("tournament_id", tournamentId);
@@ -70,6 +72,7 @@ public class MatchJdbcDao implements MatchDao {
         values.put("visitor_score", visitorScore);
         values.put("winner", winner);
         values.put("stage", stage);
+        values.put("is_group_stage", isGroupStage);
         jdbcInsert.execute(values);
     }
 
@@ -92,7 +95,7 @@ public class MatchJdbcDao implements MatchDao {
                 "SELECT m.id, m.tournament_id, m.local_id, m.visitor_id, " +
                         "       COALESCE(local_user.username, 'TBD')   AS local_player_name, " +
                         "       COALESCE(visitor_user.username, 'TBD') AS visitor_player_name, " +
-                        "       m.local_score, m.visitor_score, m.winner, m.stage, " +
+                        "       m.local_score, m.visitor_score, m.winner, m.stage, m.is_group_stage, " +
                         "       COALESCE(pu.group_number, 0) AS group_number " +
                         "FROM match m " +
                         "LEFT JOIN users local_user   ON m.local_id   = local_user.id " +
@@ -167,6 +170,14 @@ public class MatchJdbcDao implements MatchDao {
         return jdbcTemplate.queryForList(
                 "SELECT id FROM match WHERE tournament_id = ? AND stage = ? ORDER BY id",
                 Long.class, tournamentId, stage
+        );
+    }
+
+    @Override
+    public Integer getTournamentMaxStage(Long tournamentId){
+        return jdbcTemplate.queryForObject(
+                "SELECT MAX(stage) FROM match WHERE tournament_id = ?",
+                Integer.class, tournamentId
         );
     }
 }

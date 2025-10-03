@@ -19,11 +19,13 @@ public class MatchServiceImpl implements MatchService {
 
     private final MatchDao matchDao;
     private final ParticipantDao participantDao;
+    private final TournamentDao tournamentDao;
     private final TournamentService ts;
 
-    public MatchServiceImpl(MatchDao matchDao, ParticipantDao participantDao, TournamentService tournamentService) {
+    public MatchServiceImpl(MatchDao matchDao, ParticipantDao participantDao, TournamentDao tournamentDao, TournamentService tournamentService) {
         this.matchDao = matchDao;
         this.participantDao = participantDao;
+        this.tournamentDao = tournamentDao;
         this.ts = tournamentService;
     }
 
@@ -77,6 +79,24 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
+    public Map<Integer, List<MatchInfo>> getTournamentMatchesByStage(Long tournamentId){
+        List<MatchInfo> matches = matchDao.getTournamentMatches(tournamentId);
+        if (matches.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        Map<Integer, List<MatchInfo>> result = new TreeMap<>();
+        Boolean isGroupStage = tournamentDao.getIsGroupStage(tournamentId);
+        for (MatchInfo m : matches) {
+            Integer stage = m.getStage();
+            if (stage == null || (m.getIsGroupStage() != null && isGroupStage != null && m.getIsGroupStage() != isGroupStage)) {
+                continue;
+            }
+            result.computeIfAbsent(stage, s -> new ArrayList<>()).add(m);
+        }
+        return result;
+    }
+
+    @Override
     public void setMatchWinner(Long matchId, Long tournamentId, Integer winner) {
         if (winner == null || (winner != 1 && winner != 2)) {
             throw new IllegalArgumentException("winner must be 1 (local) or 2 (visitor)");
@@ -125,7 +145,6 @@ public class MatchServiceImpl implements MatchService {
         }
         Long parentMatchId = idsNextStage.get(indexInStage / 2);
         boolean isLeftChild = (indexInStage % 2 == 0);
-
         if (isLeftChild) {
             matchDao.updateMatchLocal(tournamentId, parentMatchId, winnerId);
         } else {

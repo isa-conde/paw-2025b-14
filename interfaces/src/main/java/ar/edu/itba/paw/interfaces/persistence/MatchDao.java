@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface MatchDao {
 
-    void insertMatch(Long id, Long tournamentId, Long localId, Long visitorId, Integer stage, Integer localScore, Integer visitorScore, Integer winner);
+    void insertMatch(Long id, Long tournamentId, Long localId, Long visitorId, Integer stage, Integer localScore, Integer visitorScore, Integer winner, Boolean isGroupStage);
 
     Long getMatchWinner(Long tournamentId, Long matchId);
 
@@ -28,4 +28,6 @@ public interface MatchDao {
     Integer getMatchStage(Long tournamentId, Long matchId);
 
     List<Long> getStageMatchIds(Integer stage, Long tournamentId);
+
+    Integer getTournamentMaxStage(Long tournamentId);
 }

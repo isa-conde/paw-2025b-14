@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -171,15 +172,14 @@ public class TournamentController {
 
         Optional<Tournament> optionalTournament = ts.findById(tournamentId);
 
-        Map<Integer, Map<Integer, List<MatchInfo>>> matchesByGroup = ms.getTournamentMatchesByGroup(tournamentId);
+        Map<Integer, List<MatchInfo>> matches = ms.getTournamentMatchesByStage(tournamentId);
+        long maxStage = matches != null ? matches.keySet().stream().max(Integer::compareTo).orElse(0) : 0L;
 
         Integer groups = ps.getTournamentGroups(tournamentId);
-
         List<ParticipantUserInfo> participants = ps.getTournamentParticipantUsersInfo(tournamentId);
         int participantCount = participants.size();
         Long userId = (user != null ? user.getId() : null);
         boolean isParticipant = (userId != null) && participants.stream().anyMatch(p -> Objects.equals(p.getUser_id(), userId));
-        Long maxStage = matchesByGroup.get(0) != null ? matchesByGroup.get(0).keySet().stream().max(Integer::compareTo).orElse(0) : 0L;
 
         if(optionalTournament.isPresent()) {
             Tournament t = optionalTournament.get();
@@ -195,7 +195,7 @@ public class TournamentController {
             mav.addObject("tournament", t);
             mav.addObject("game", optionalGame.get());
             mav.addObject("creator", optionalUser.get());
-            mav.addObject("matchesByGroup", matchesByGroup);
+            mav.addObject("matches", matches);
             mav.addObject("groups", groups);
             mav.addObject("LEAGUE", Structure.LEAGUE);
             mav.addObject("ELIMINATION", Structure.ELIMINATION);
@@ -277,7 +277,7 @@ public class TournamentController {
     }
 
     @RequestMapping(value = "/tournament/setWinner", method = { RequestMethod.POST })
-    public ModelAndView setWinner(Principal principal, @ModelAttribute("setWinnerForm") SetWinnerForm form) {
+    public ModelAndView setWinner(Principal principal, @ModelAttribute("setWinnerForm") SetWinnerForm form, @RequestParam(value = "group", required = false) Integer group) {
         User user = null;
         if (principal != null) {
             Optional<User> userOpt = us.findByUsername(principal.getName());
@@ -288,11 +288,22 @@ public class TournamentController {
         }
 
         Optional<Tournament> tournamentOpt = ts.findById(form.getTournamentId());
-        if (tournamentOpt.isPresent() && tournamentOpt.get().getCreator_id().equals(user.getId())) {
-            ms.setMatchWinner(form.getMatchId(), form.getTournamentId(), form.getWinner());
+        if (tournamentOpt.isPresent()) {
+            Tournament t = tournamentOpt.get();
+            if(t.getCreator_id().equals(user.getId())){
+                ms.setMatchWinner(form.getMatchId(), form.getTournamentId(), form.getWinner());
+            }
+            if(t.getFinished()){
+                return new ModelAndView("redirect:/tournament?tournamentId=" + t.getId());
+            }
         }
+        String redirect = UriComponentsBuilder.fromPath("/tournament")
+                .queryParam("tournamentId", form.getTournamentId())
+                .queryParam("section", "matchesTab")
+                .queryParamIfPresent("group", java.util.Optional.ofNullable(group))
+                .toUriString();
 
-        return new ModelAndView("redirect:/tournament?tournamentId=" + form.getTournamentId() + "&section=matches");
+        return new ModelAndView("redirect:" + redirect);
     }
 
     @RequestMapping("/tournaments/new/step1")

@@ -306,4 +306,12 @@ public class TournamentJdbcDao implements TournamentDao {
                 Integer.class, tournamentId
         );
     }
+
+    @Override
+    public Boolean getIsGroupStage(Long tournamentId){
+        return jdbcTemplate.queryForObject(
+                "SELECT is_group_stage FROM tournament WHERE id = ?",
+                Boolean.class, tournamentId
+        );
+    }
 }

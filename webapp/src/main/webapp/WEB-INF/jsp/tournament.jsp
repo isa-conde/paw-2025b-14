@@ -31,13 +31,13 @@
         </div>
     </paw:banner>
     <spring:message code="tournament.overview" var="overview"/>
-    <spring:message code="tournament.matches" var="matches"/>
+    <spring:message code="tournament.matches" var="matchesTab"/>
     <spring:message code="tournament.participants.title" var="participantsTab"/>
     <c:set var="showMatches" value="${tournament.tournamentStarted}"/>
     <c:choose>
         <c:when test="${showMatches}">
-            <c:set var="sections" value="${['overview','matches', 'participantsTab']}"/>
-            <c:set var="labels"   value="${[overview, matches, participantsTab]}"/>
+            <c:set var="sections" value="${['overview','matchesTab', 'participantsTab']}"/>
+            <c:set var="labels"   value="${[overview, matchesTab, participantsTab]}"/>
         </c:when>
         <c:otherwise>
             <c:set var="sections" value="${['overview', 'participantsTab']}"/>
@@ -123,11 +123,7 @@
                             <paw:text type="title" size="l">
                                 <spring:message code="tournament.standings"/>
                             </paw:text>
-                            <c:forEach var="groupEntry" items="${matchesByGroup}">
-                                <c:if test="${groupEntry.key == 0}">
-                                    <paw:bracket matchesByStage="${groupEntry.value}" tournamentId="${tournament.id}" isCreator="${isCreator}" isEditing="${editMode}" formId="swapMembersForm"/>
-                                </c:if>
-                            </c:forEach>
+                            <paw:bracket matchesByStage="${matches}" tournamentId="${tournament.id}" isCreator="${isCreator}" isEditing="${editMode}" formId="swapMembersForm"/>
                         </c:if>
                     </c:when>
                     <c:when test="${tournament.structure == HYBRID && tournament.is_group_stage}">
@@ -210,9 +206,9 @@
                     </c:when>
                 </c:choose>
             </c:when>
-            <c:when test="${activeSection == 'matches'}">
+            <c:when test="${activeSection == 'matchesTab'}">
                 <c:choose>
-                    <c:when test="${empty matchesByGroup}">
+                    <c:when test="${empty matches}">
                         <div class="no-cards-container">
                             <paw:text size="l" weight="thin"><spring:message code="tournament.noMatches"/></paw:text>
                         </div>
@@ -222,42 +218,30 @@
                             <c:when test="${tournament.structure == HYBRID}">
                                 <c:choose>
                                     <c:when test="${!tournament.is_group_stage}">
-                                        <c:forEach var="groupEntry" items="${matchesByGroup}">
-                                            <c:if test="${groupEntry.key == 0}">
-                                                <c:forEach var="stageEntry" items="${groupEntry.value}">
-                                                    <paw:date-matches dateNumber="${stageEntry.key}" matches="${stageEntry.value}" tournamentId="${tournament.id}" isCreator="${isCreator}" tournamentStructure="${tournament.structure}" groupNumber="0" totalMatches="${stageEntry.value.size()}" maxStage="${maxStage}"/>
-                                                </c:forEach>
-                                            </c:if>
+                                        <c:forEach var="stageEntry" items="${matches}">
+                                            <paw:date-matches dateNumber="${stageEntry.key}" matches="${stageEntry.value}" tournamentId="${tournament.id}" isCreator="${isCreator}" tournamentStructure="${tournament.structure}" totalMatches="${stageEntry.value.size()}" maxStage="${maxStage}"/>
                                         </c:forEach>
                                     </c:when>
                                     <c:otherwise>
                                         <c:set var="subActiveGroup" value="${param.group != null ? param.group : 1}"/>
                                         <paw:groups-navbar groups="${groups}" activeGroup="${subActiveGroup}" paramName="group"/>
-
-                                        <c:forEach var="groupEntry" items="${matchesByGroup}">
-                                            <c:if test="${subActiveGroup == groupEntry.key}">
-                                                <c:forEach var="stageEntry" items="${groupEntry.value}">
-                                                    <paw:date-matches
-                                                            dateNumber="${stageEntry.key}"
-                                                            matches="${stageEntry.value}"
-                                                            tournamentId="${tournament.id}"
-                                                            isCreator="${isCreator}"
-                                                            tournamentStructure="${tournament.structure}"
-                                                            groupNumber="${groupEntry.key}"
-                                                            totalMatches="${stageEntry.value.size()}"/>
-                                                </c:forEach>
-                                            </c:if>
+                                        <c:forEach var="stageEntry" items="${matches}">
+                                                <paw:date-matches
+                                                        dateNumber="${stageEntry.key}"
+                                                        matches="${stageEntry.value}"
+                                                        tournamentId="${tournament.id}"
+                                                        isCreator="${isCreator}"
+                                                        tournamentStructure="${tournament.structure}"
+                                                        groupStage="true"
+                                                        groupNumber="${subActiveGroup}"
+                                                        totalMatches="${stageEntry.value.size()}"/>
                                         </c:forEach>
                                     </c:otherwise>
                                 </c:choose>
                             </c:when>
                             <c:otherwise>
-                                <c:forEach var="groupEntry" items="${matchesByGroup}">
-                                    <c:if test="${groupEntry.key == 0}">
-                                        <c:forEach var="stageEntry" items="${groupEntry.value}">
-                                             <paw:date-matches dateNumber="${stageEntry.key}" matches="${stageEntry.value}" tournamentId="${tournament.id}" isCreator="${isCreator}" tournamentStructure="${tournament.structure}" groupNumber="${groupEntry.key}" totalMatches="${stageEntry.value.size()}" maxStage="${maxStage}"/>
-                                        </c:forEach>
-                                    </c:if>
+                                <c:forEach var="stageEntry" items="${matches}">
+                                     <paw:date-matches dateNumber="${stageEntry.key}" matches="${stageEntry.value}" tournamentId="${tournament.id}" isCreator="${isCreator}" tournamentStructure="${tournament.structure}" totalMatches="${stageEntry.value.size()}" maxStage="${maxStage}"/>
                                 </c:forEach>
                             </c:otherwise>
                         </c:choose>
