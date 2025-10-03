@@ -3,7 +3,7 @@
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
-<paw:layout user="${user}">
+<paw:layout user="${user}" pageTitle="${profile.username}">
 
     <paw:banner image="${pageContext.request.contextPath}/banner/${profile.banner_id}"/>
 

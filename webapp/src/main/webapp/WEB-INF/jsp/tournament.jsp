@@ -12,7 +12,7 @@
 <c:url value="/images/pencil.png" var="pencilUrl"/>
 <c:set var="cornerIcon" value="${isCreator ? pencilUrl : null}"/>
 
-<paw:layout user="${user}">
+<paw:layout user="${user}" pageTitle="${tournament.name}">
     <paw:banner
             image="${pageContext.request.contextPath}/image/${tournament.image_id}"
             cornerIcon="${cornerIcon}"

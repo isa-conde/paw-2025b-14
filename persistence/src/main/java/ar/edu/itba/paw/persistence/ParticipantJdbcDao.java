@@ -138,10 +138,20 @@ public class ParticipantJdbcDao implements ParticipantDao {
     }
 
     @Override
-    public List<ParticipantUser> getTournamentParticipantsByPoints(Long tournamentId, Integer group_number, Integer points){
-        return jdbcTemplate.query("SELECT * FROM participant_user WHERE tournament_id = ? " +
-                "AND points = ? " +
-                "AND group_number = ?", ROW_MAPPER, tournamentId, points, group_number);
+    public List<ParticipantUser> getTournamentParticipantsByPoints(
+            Long tournamentId, Integer groupNumber, Integer points) {
+
+        if (groupNumber == null) {
+            return jdbcTemplate.query(
+                    "SELECT * FROM participant_user WHERE tournament_id = ? AND points = ?",
+                    ROW_MAPPER, tournamentId, points
+            );
+        } else {
+            return jdbcTemplate.query(
+                    "SELECT * FROM participant_user WHERE tournament_id = ? AND points = ? AND group_number = ?",
+                    ROW_MAPPER, tournamentId, points, groupNumber
+            );
+        }
     }
 
     @Override

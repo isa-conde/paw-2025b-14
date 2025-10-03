@@ -7,11 +7,12 @@
 <spring:message code="tournaments.skillLevel.emptyOption" var="allLevels"/>
 <spring:message code="tournaments.genre.emptyOption" var="allGenres"/>
 <spring:message code="tournaments.playerAmount.emptyOption" var="allSizes"/>
+<spring:message code="tournaments.title" var="pageTitle"/>
 
-<paw:layout user="${user}">
+<paw:layout user="${user}" pageTitle="${pageTitle}">
     <paw:banner image="${pageContext.request.contextPath}/images/tournament.jpeg">
       <div class="page-title">
-        <paw:text type="title" size="xl" stroke="true"><spring:message code="tournaments.title"/></paw:text>
+        <paw:text type="title" size="xl" stroke="true">${pageTitle}</paw:text>
       </div>
     </paw:banner>
     <div class="content-container">

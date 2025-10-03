@@ -3,9 +3,9 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <spring:message code="createTournament.emptyOption" var="emptyOption"/>
+<spring:message code="createTournament.pageTitle" var="pageTitle"/>
 
-
-<paw:layout user="${user}">
+<paw:layout user="${user}" pageTitle="${pageTitle}">
     <div class="tournamentForm-page">
         <div class="tournamentForm-page__image">
             <img src="${pageContext.request.contextPath}/images/tournament.jpeg" alt="Tournament Image" />

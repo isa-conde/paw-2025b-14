@@ -180,4 +180,18 @@ public class MatchJdbcDao implements MatchDao {
                 Integer.class, tournamentId
         );
     }
+
+    @Override
+    public Integer getTournamentGroupMaxStage(Long tournamentId, Integer groupNumber) {
+        return jdbcTemplate.queryForObject(
+                "SELECT MAX(m.stage) " +
+                        "FROM match m " +
+                        "JOIN participant_user pu " +
+                        "  ON pu.tournament_id = m.tournament_id " +
+                        " AND pu.user_id = m.visitor_id " +
+                        "WHERE m.tournament_id = ? " +
+                        "  AND pu.group_number = ?",
+                Integer.class, tournamentId, groupNumber
+        );
+    }
 }

@@ -70,7 +70,7 @@ public class TournamentServiceImpl implements TournamentService {
             if (t.getStructure() == Structure.LEAGUE) {
                 List<ParticipantUser> tops = getLeagueTournamentTopPositions(tournament_id);
                 if (tops.size() > 1) {
-                    //TODO - new matches
+                    createMatchesLeague(t, tops, lastMatchId + 1, matchDao.getTournamentMaxStage(tournament_id) + 1, null);
                     return;
                 }
                 winner = tops.getFirst().getUser_id();
@@ -83,7 +83,9 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     private List<ParticipantUser> getLeagueTournamentTopPositions(Long tournamentId){
-        return participantDao.getTournamentParticipantsByPoints(tournamentId, null, participantDao.getTournamentMaxPoints(tournamentId));
+        Integer maxPoints = participantDao.getTournamentMaxPoints(tournamentId);
+        if (maxPoints == null) return java.util.Collections.emptyList();
+        return participantDao.getTournamentParticipantsByPoints(tournamentId, null, maxPoints);
     }
 
     @Override
@@ -157,10 +159,10 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     public void createMatchesLeague(Tournament t, List<ParticipantUser> participants) {
-        createMatchesLeague(t, participants, 1L, null);
+        createMatchesLeague(t, participants, 1L, 1, null);
     }
 
-    public void createMatchesLeague(Tournament t, List<ParticipantUser> participants, Long firstMatchId, Boolean isGroupStage) {
+    public void createMatchesLeague(Tournament t, List<ParticipantUser> participants, Long firstMatchId, Integer firstStage, Boolean isGroupStage) {
         int n = participants.size();
 
         // Odd # of participants -> add fictional participant
@@ -173,7 +175,7 @@ public class TournamentServiceImpl implements TournamentService {
 
         List<ParticipantUser> rotated = new ArrayList<>(participants);
 
-        for (int round = 1; round <= totalRounds; round++) {
+        for (int round = firstStage; round < firstStage + totalRounds; round++) {
             for (int i = 0; i < n / 2; i++) {
                 ParticipantUser home = rotated.get(i);
                 ParticipantUser away = rotated.get(n - 1 - i);
@@ -282,14 +284,18 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public void createBracketFromGroups(Long tournamentId) {
         Integer groups = participantDao.getTournamentGroups(tournamentId);
+        Tournament t = findById(tournamentId).orElse(null);
         List<ParticipantUser> classified = new ArrayList<>(groups * 2);
         for(int i = 1; i <= groups; i++){
             Map<Integer, List<ParticipantUser>> topPositions = getGroupTopPositions(tournamentId, i);
             if(topPositions.get(1).size() > 1){
-                //TODO - more matches
+                createMatchesLeague(t, topPositions.get(1), 1L, matchDao.getTournamentGroupMaxStage(tournamentId, i), true);
                 return;
             }else if(topPositions.get(2).size() > 1){
-                //TODO - more matches second place
+                // making sure the first remains at top
+                participantDao.sumPoints(tournamentId, topPositions.get(1).getFirst().getUser_id(), 3 * (topPositions.get(2).size() / 2));
+
+                createMatchesLeague(t, topPositions.get(2), 1L, matchDao.getTournamentGroupMaxStage(tournamentId, i), true);
                 return;
             }
             ParticipantUser local   = topPositions.get(1).getFirst();
@@ -299,7 +305,6 @@ public class TournamentServiceImpl implements TournamentService {
         }
 
         tournamentDao.setIsGroupStage(tournamentId, false);
-        System.out.println(classified);
         createMatchesBracket(findById(tournamentId).orElse(null), classified, matchDao.getMaxMatchId(tournamentId) + 1, false);
     }
 
@@ -315,7 +320,7 @@ public class TournamentServiceImpl implements TournamentService {
         if(groupedParticipants != null){
             long nextId = 1L;
             for(List<ParticipantUser> participants : groupedParticipants.values()){
-                createMatchesLeague(t, participants, nextId, true);
+                createMatchesLeague(t, participants, nextId, 1, true);
                 nextId += ((long) participants.size() * (participants.size() - 1)) / 2;
             }
         }
