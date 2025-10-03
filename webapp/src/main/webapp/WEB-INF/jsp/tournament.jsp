@@ -27,7 +27,7 @@
         <br/>
         <div class="organizer-container">
             <paw:text size="s"><spring:message code="tournament.organizedBy"/></paw:text>
-            <paw:profileButton text="${creator.username}" onclick="" size="xs" isNotSafe="true"/>
+            <paw:profileButton text="${creator.username}" onclick="window.location.href='/profile/${creator.id}'" size="xs" isNotSafe="true"/>
         </div>
     </paw:banner>
     <spring:message code="tournament.overview" var="overview"/>
