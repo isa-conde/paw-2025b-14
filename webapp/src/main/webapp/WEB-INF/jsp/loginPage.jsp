@@ -5,8 +5,9 @@
 <c:url var="loginUrl" value="/login"/>
 <c:url var="registerUrl" value="/register"/>
 <c:url var="forgotPasswordUrl" value="/forgotPassword"/>
+<spring:message code="login.title" var="title"/>
 
-<paw:form-layout title="login.title">
+<paw:form-layout pageTitle="${title}">
     <paw:text type="title"><spring:message code="login.title"/></paw:text>
     <c:if test="${invalidCredentials}">
         <span class="form-error"><spring:message code="login.invalidCredentials"/></span>

@@ -7,11 +7,12 @@
 <spring:message code="tournaments.skillLevel.emptyOption" var="allLevels"/>
 <spring:message code="tournaments.genre.emptyOption" var="allGenres"/>
 <spring:message code="tournaments.playerAmount.emptyOption" var="allSizes"/>
+<spring:message code="tournaments.title" var="pageTitle"/>
 
-<paw:layout user="${user}">
+<paw:layout user="${user}" pageTitle="${pageTitle}">
     <paw:banner image="${pageContext.request.contextPath}/images/tournament.jpeg">
       <div class="page-title">
-        <paw:text type="title" size="xl" stroke="true"><spring:message code="tournaments.title"/></paw:text>
+        <paw:text type="title" size="xl" stroke="true">${pageTitle}</paw:text>
       </div>
     </paw:banner>
     <div class="content-container">
@@ -44,19 +45,9 @@
             <c:if test="${totalPages > 1}">
                 <div class="pagination">
                     <c:if test="${currentPage > 0}">
-                        <c:url var="pageUrl" value="/tournamentsPage">
-                            <c:param name="page" value="${i}"/>
-                            <c:forEach var="p" items="${paramValues}">
-                                <c:forEach var="v" items="${p.value}">
-                                    <c:if test="${p.key ne 'page'}">
-                                        <c:param name="${p.key}" value="${v}"/>
-                                    </c:if>
-                                </c:forEach>
-                            </c:forEach>
-                        </c:url>
-                        <a href="${pageUrl}" class="title-link">
+                        <paw:paginationLink page="${currentPage - 1}" url="/tournamentsPage">
                             <paw:text size="l" weight="thin"><</paw:text>
-                        </a>
+                        </paw:paginationLink>
                     </c:if>
 
                     <c:forEach begin="0" end="${totalPages - 1}" var="i">
@@ -65,37 +56,17 @@
                                 <paw:text weight="bold" size="xl">${i + 1}</paw:text>
                             </c:when>
                             <c:otherwise>
-                                <c:url var="pageUrl" value="/tournamentsPage">
-                                    <c:param name="page" value="${i}"/>
-                                    <c:forEach var="p" items="${paramValues}">
-                                        <c:forEach var="v" items="${p.value}">
-                                            <c:if test="${p.key ne 'page'}">
-                                                <c:param name="${p.key}" value="${v}"/>
-                                            </c:if>
-                                        </c:forEach>
-                                    </c:forEach>
-                                </c:url>
-                                <a href="${pageUrl}" class="title-link">
+                                <paw:paginationLink page="${i}" url="/tournamentsPage">
                                     <paw:text weight="thin" size="l">${i + 1}</paw:text>
-                                </a>
+                                </paw:paginationLink>
                             </c:otherwise>
                         </c:choose>
                     </c:forEach>
 
                     <c:if test="${currentPage < totalPages - 1}">
-                        <c:url var="pageUrl" value="/tournamentsPage">
-                            <c:param name="page" value="${i}"/>
-                            <c:forEach var="p" items="${paramValues}">
-                                <c:forEach var="v" items="${p.value}">
-                                    <c:if test="${p.key ne 'page'}">
-                                        <c:param name="${p.key}" value="${v}"/>
-                                    </c:if>
-                                </c:forEach>
-                            </c:forEach>
-                        </c:url>
-                        <a href="${pageUrl}" class="title-link">
+                        <paw:paginationLink page="${currentPage + 1}" url="/tournamentsPage">
                             <paw:text size="l" weight="thin">></paw:text>
-                        </a>
+                        </paw:paginationLink>
                     </c:if>
                 </div>
             </c:if>
@@ -104,19 +75,4 @@
     </div>
 </paw:layout>
 
-<c:url var="pageUrl" value="/tournamentsPage">
-    <c:param name="page" value="${currentPage + 1}"/>
-    <c:if test="${not empty param.game_id}">
-        <c:param name="game_id" value="${param.game_id}"/>
-    </c:if>
-    <c:if test="${not empty param.region}">
-        <c:param name="region" value="${param.region}"/>
-    </c:if>
-    <c:if test="${not empty param.elo}">
-        <c:param name="elo" value="${param.elo}"/>
-    </c:if>
-    <c:if test="${not empty param.genre}">
-        <c:param name="genre" value="${param.genre}"/>
-    </c:if>
-</c:url>
 

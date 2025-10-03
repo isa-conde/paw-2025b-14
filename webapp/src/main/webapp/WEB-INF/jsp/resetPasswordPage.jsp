@@ -6,8 +6,9 @@
 
 <c:url var="resetPasswordUrl" value="/forgotPassword/reset?token=${token}&userId=${userId}"/>
 <c:url var="forgotPasswordUrl" value="/forgotPassword"/>
+<spring:message code="login.title" var="pageTitle"/>
 
-<paw:form-layout title="passwordReset.page.title">
+<paw:form-layout pageTitle="${pageTitle}">
     <c:choose>
         <c:when test="${validToken}">
             <paw:text type="title"><spring:message code="passwordReset.page.title"/></paw:text>

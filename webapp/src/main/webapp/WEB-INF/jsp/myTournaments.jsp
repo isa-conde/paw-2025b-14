@@ -3,10 +3,11 @@
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
-<paw:layout user="${user}">
+<spring:message code="myTournaments.title" var="title"/>
+<paw:layout user="${user}" pageTitle="${title}">
     <paw:banner image="${pageContext.request.contextPath}/images/tree.jpg" cropTop="true">
         <div class="page-title">
-            <paw:text type="title" size="xl" stroke="true"><spring:message code="myTournaments.title"/></paw:text>
+            <paw:text type="title" size="xl" stroke="true">${title}</paw:text>
         </div>
     </paw:banner>
     <spring:message code="tournament.navbar.active" var="activeLabel"/>

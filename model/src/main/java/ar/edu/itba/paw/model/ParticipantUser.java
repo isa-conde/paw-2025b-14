@@ -7,11 +7,11 @@ public class ParticipantUser {
     private Integer points;
     private final Integer group_number;
 
-    public ParticipantUser(Long userId, Long tournamentId, Integer groupNumber) {
-        user_id = userId;
-        tournament_id = tournamentId;
-        points = 0;
-        group_number = groupNumber;
+    public ParticipantUser(Long userId, Long tournamentId, Integer points, Integer groupNumber) {
+        this.user_id = userId;
+        this.tournament_id = tournamentId;
+        this.points = points;
+        this.group_number = groupNumber;
     }
 
     public Long getTournament_id() {

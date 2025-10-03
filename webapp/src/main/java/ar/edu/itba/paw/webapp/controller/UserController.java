@@ -41,7 +41,7 @@ public class UserController {
     @RequestMapping("/")
     public ModelAndView index(@ModelAttribute("tournamentForm") TournamentForm tournamentForm, TournamentFilter tournamentFilter, Principal principal) {
         final ModelAndView mav = new ModelAndView("index");
-        List<Game> allGames = gs.findAll();
+        List<Game> allGames = gs.findAllPaged(0L);
 
         User user = null;
         if (principal != null) {
@@ -96,9 +96,9 @@ public class UserController {
     }
 
     @RequestMapping("/gamesPage")
-    public ModelAndView gamesPage(Principal principal) {
+    public ModelAndView gamesPage(Principal principal, @RequestParam(defaultValue = "0") Long page) {
         final ModelAndView mav = new ModelAndView("gamesPage");
-        List<Game> allGames = gs.findAll();
+        List<Game> allGames = gs.findAllPaged(page);
         User user = null;
         if (principal != null) {
             Optional<User> userOpt = us.findByUsername(principal.getName());
@@ -106,12 +106,14 @@ public class UserController {
         }
         mav.addObject("user", user);
         mav.addObject("games", allGames);
+        mav.addObject("totalPages", gs.getPageAmount());
+        mav.addObject("currentPage", page);
 
         return mav;
     }
 
     @RequestMapping(value = "/tournamentsPage", method = RequestMethod.GET)
-    public ModelAndView tournamentsPage(Principal principal, @ModelAttribute("filterForm") FilterForm filterForm, TournamentFilter tf,  @RequestParam(defaultValue = "0") Long page) {
+        public ModelAndView tournamentsPage(Principal principal, @ModelAttribute("filterForm") FilterForm filterForm, TournamentFilter tf,  @RequestParam(defaultValue = "0") Long page) {
         final ModelAndView mav = new ModelAndView("tournamentsPage");
         List<Game> allGames = gs.findAll();
         User user = null;
@@ -127,6 +129,7 @@ public class UserController {
         mav.addObject("elos", Arrays.stream(Elo.values()).toList());
         mav.addObject("genres", Arrays.stream(Genre.values()).toList());
         mav.addObject("teamSizes", List.of(1,2,3,4,5));
+        mav.addObject("currentPage", page);
 
         tf.setGame_id(filterForm.getGame_id());
         tf.setRegion(filterForm.getRegion());
@@ -182,6 +185,7 @@ public class UserController {
             return index(new TournamentForm(), new TournamentFilter(), principal);
         }
         User profile = profileOpt.get();
+        mav.addObject("isMyProfile", profile.getId() == user.getId());
         mav.addObject("profile", profile);
         mav.addObject("favouriteGames", gs.getFavourites(profile.getId()));
         mav.addObject("lastTournaments", ts.findUserActiveTournaments(profile.getId()));

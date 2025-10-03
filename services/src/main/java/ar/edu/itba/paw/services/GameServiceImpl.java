@@ -72,4 +72,14 @@ public class GameServiceImpl implements GameService {
     public List<Game> getFavourites(Long user_id) {
         return gameDao.getFavourites(user_id);
     }
+
+    @Override
+    public List<Game> findAllPaged(Long page){
+        return gameDao.findAllPaged(page);
+    }
+
+    @Override
+    public Long getPageAmount(){
+        return gameDao.getPageAmount();
+    }
 }

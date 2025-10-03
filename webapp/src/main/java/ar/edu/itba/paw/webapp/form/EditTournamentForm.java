@@ -11,7 +11,8 @@ import java.time.LocalDate;
 @DatesConstraint
 @MaxParticipantsNotBelowCurrent
 public class EditTournamentForm implements HasDates{
-    @NotNull private Long tournamentId;
+    @NotNull
+    private Long tournamentId;
     @NotBlank(message = "{home.createTournament.notNull}")
     @Size(max = 100)
     private String name;

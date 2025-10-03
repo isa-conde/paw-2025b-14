@@ -4,15 +4,12 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
-
-<paw:layout user="${user}">
+<paw:layout user="${user}" pageTitle="${profile.username}">
 
     <c:set var="isMyProfile" value="${user.id == profile.id}"/>
     <c:url value="/images/pencil.png" var="pencilUrl"/>
     <c:set var="icon" value="${isMyProfile ? pencilUrl : null }"/>
-    <paw:banner cornerIcon="${icon}" cornerOnClick="openModal('editProfileModal')" image="${pageContext.request.contextPath}/banner/${profile.banner_id}"/>
-
-    <div class="profile-container">
+    <paw:banner cornerIcon="${icon}" cornerOnClick="openModal('editProfileModal')" image="${pageContext.request.contextPath}/banner/${profile.banner_id}">
         <div class="profile-sidebar">
             <div class="profile-picture">
                 <img src="${pageContext.request.contextPath}/pfp/${profile.profile_picture_id}" alt="${profile.username}">
@@ -22,20 +19,23 @@
                 <paw:text size="m"><c:out value="${profile.bio}"/></paw:text>
             </div>
         </div>
+    </paw:banner>
 
-        <!-- Sección central: carruseles -->
-        <div class="profile-main">
-            <div class="carrousel-title">
-                <paw:text size="xl"><spring:message code="profile.favouriteGames.title"/></paw:text>
-            </div>
-            <paw:carrousel id="games" elements="${favouriteGames}" isGame="true"/>
+        <div class="content-container">
+            <!-- Sección central: carruseles -->
+            <div class="profile-main">
+                <div class="carrousel-title">
+                    <paw:text size="xl"><spring:message code="profile.favouriteGames.title"/></paw:text>
+                </div>
+                <paw:carrousel id="games" elements="${favouriteGames}" isGame="true"/>
 
-            <div class="carrousel-title">
-                <paw:text size="xl"><spring:message code="profile.lastTournaments.title"/></paw:text>
+                <div class="carrousel-title">
+                    <paw:text size="xl"><spring:message code="profile.lastTournaments.title"/></paw:text>
+                </div>
+                <paw:carrousel id="tourneys" elements="${lastTournaments}"/>
             </div>
-            <paw:carrousel id="tourneys" elements="${lastTournaments}"/>
         </div>
-    </div>
+
 
 
 </paw:layout>

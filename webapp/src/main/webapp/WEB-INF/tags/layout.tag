@@ -16,7 +16,12 @@
     <head>
         <link rel="stylesheet" href="<c:url value='/css/components.css'/>">
         <link rel="icon" type="image/x-icon" href="<c:url value="/public/favicon.ico"/>">
-        <title><c:out value="${pageTitle != null ? pageTitle : 'RankUp'}"/></title>
+        <title>
+            <c:choose>
+                <c:when test="${not empty pageTitle}">RankUp - <c:out value="${pageTitle}"/></c:when>
+                <c:otherwise>RankUp</c:otherwise>
+            </c:choose>
+        </title>
     </head>
     <c:choose>
         <c:when test="${function != null}">
@@ -32,14 +37,10 @@
                 <paw:searchBar/>
                 <c:choose>
                     <c:when test="${isLoggedIn}">
-                        <paw:profileButton text="${user.username}" onclick="openModal('logoutModal')" isNotSafe="true"/>
-                        <paw:modal id="logoutModal" title="layout.logout">
-                            <div class="row center">
-                                <form:form method="post" action="${logoutUrl}">
-                                    <paw:input path="" label="layout.logout" inputType="submit"/>
-                                </form:form>
-                            </div>
-                        </paw:modal>
+                        <div class="header-buttons">
+                            <paw:profileButton text="${user.username}" onclick="window.location.href='/profile/${user.id}'" isNotSafe="true"/>
+                            <paw:logoutButton/>
+                        </div>
                     </c:when>
                     <c:otherwise>
                         <div>

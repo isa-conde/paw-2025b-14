@@ -7,12 +7,12 @@
 <c:choose>
     <c:when test="${participants.size() <= '0'}">
         <spring:message code="usersGrid.noParticipants" var="noParticipants"/>
-        <div class="no-cards-container"><paw:text size="l">${noParticipants}</paw:text></div>
+        <div class="no-cards-container participants"><paw:text size="l">${noParticipants}</paw:text></div>
     </c:when>
     <c:otherwise>
         <div class="grid users">
             <c:forEach var="p" items="${participants}">
-                <paw:profileButton text="${p.username}" onclick="" isNotSafe="true" size="l" fill="false"/>
+                <paw:profileButton text="${p.username}" onclick="window.location.href='/profile/${p.user_id}'" isNotSafe="true" size="l" fill="false"/>
             </c:forEach>
         </div>
     </c:otherwise>

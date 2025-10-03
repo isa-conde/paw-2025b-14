@@ -3,6 +3,7 @@
 <%@ attribute name="isEditing" required="false" rtexprvalue="true" %>
 <%@ attribute name="formId" required="false" rtexprvalue="true" %>
 <%@ attribute name="size" required="false" rtexprvalue="true" description="Board size: l or [xl]" %>
+<%@ attribute name="groupNumber" required="false" rtexprvalue="true" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 
@@ -16,24 +17,26 @@
     
     <div class="board-body">
         <c:forEach var="participant" items="${participants}">
-            <div class="board-row">
-                <div class="board-cell participant-cell">
-                    <c:if test="${isEditing}">
-                        <input type="checkbox"
-                               class="edit-check"
-                               name="selected"
-                               value="${participant.user_id}"
-                               form="${formId}"
-                               data-kind="groups"
-                               data-group="${participant.groupNumber}"
-                               data-user="${participant.user_id}"/>
-                    </c:if>
-                    <paw:text weight="thin"><c:out value="${participant.username}"/></paw:text>
+            <c:if test="${groupNumber == null || groupNumber == participant.groupNumber}">
+                <div class="board-row">
+                    <div class="board-cell participant-cell">
+                        <c:if test="${isEditing}">
+                            <input type="checkbox"
+                                   class="edit-check"
+                                   name="selected"
+                                   value="${participant.user_id}"
+                                   form="${formId}"
+                                   data-kind="groups"
+                                   data-group="${participant.groupNumber}"
+                                   data-user="${participant.user_id}"/>
+                        </c:if>
+                        <paw:text weight="thin"><c:out value="${participant.username}"/></paw:text>
+                    </div>
+                    <div class="board-cell">
+                        <paw:text weight="semi-bold"><c:out value="${participant.points}"/></paw:text>
+                    </div>
                 </div>
-                <div class="board-cell">
-                    <paw:text weight="semi-bold"><c:out value="${participant.points}"/></paw:text>
-                </div>
-            </div>
+            </c:if>
         </c:forEach>
     </div>
 </div>

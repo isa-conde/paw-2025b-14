@@ -9,9 +9,10 @@ public class Match {
     private final Integer visitorScore;
     private final Integer winner;
     private final Integer stage;
+    private final Boolean isGroupStage;
 
     public Match(Long id, Long tournamentId, Long localId, Long visitorId,
-                            Integer localScore, Integer visitorScore, Integer winner, Integer stage) {
+                            Integer localScore, Integer visitorScore, Integer winner, Integer stage, Boolean isGroupStage) {
         this.id = id;
         this.tournamentId = tournamentId;
         this.localId = localId;
@@ -20,6 +21,7 @@ public class Match {
         this.visitorScore = visitorScore;
         this.winner = winner;
         this.stage = stage;
+        this.isGroupStage = isGroupStage;
     }
 
     public Long getId() {
@@ -52,6 +54,10 @@ public class Match {
 
     public Integer getStage() {
         return stage;
+    }
+
+    public Boolean getIsGroupStage() {
+        return isGroupStage;
     }
 }
 
