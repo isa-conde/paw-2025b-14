@@ -3,10 +3,12 @@ package ar.edu.itba.paw.services;
 import ar.edu.itba.paw.interfaces.exception.*;
 import ar.edu.itba.paw.interfaces.persistence.ImageDao;
 import ar.edu.itba.paw.interfaces.persistence.TokenDao;
+import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.interfaces.persistence.UserDao;
 import ar.edu.itba.paw.interfaces.services.MailService;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.Token;
+import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.User;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -31,15 +33,17 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final MailService ms;
     private final ImageDao imageDao;
+    private final TournamentDao tournamentDao;
 
     private final static int RESET_PASSWORD_DAYS_DURATION = 1;
     private final static int VERIFICATION_DAYS_DURATION = 2;
 
 
-    public UserServiceImpl(final UserDao userDao, final TokenDao tokenDao, final PasswordEncoder passwordEncoder, final MailService ms, final ImageDao imageDao) {
+    public UserServiceImpl(final UserDao userDao, final TokenDao tokenDao, final PasswordEncoder passwordEncoder, final TournamentDao tournamentDao, final MailService ms, final ImageDao imageDao) {
         this.userDao = userDao;
         this.tokenDao = tokenDao;
         this.passwordEncoder = passwordEncoder;
+        this.tournamentDao = tournamentDao;
         this.ms = ms;
         this.imageDao = imageDao;
     }
@@ -208,4 +212,21 @@ public class UserServiceImpl implements UserService {
         }
         userDao.updateProfileInfo(userId, username, bio, pfpId, bannerId);
     }
+
+    @Override
+    public void sendTournamentJoinedEmail(String username, Long tournamentId, String tournamentLink, String recipient) {
+        Optional<Tournament> tournamentOpt = tournamentDao.findById(tournamentId);
+        if(tournamentOpt.isEmpty()) {
+            throw new TournamentNotFoundException();
+        }
+        Tournament tournament = tournamentOpt.get();
+        User creator = findById(tournament.getCreator_id()).get();
+        ms.sendTournamentJoinedEmail(username, tournament.getName(), tournamentLink, recipient, creator.getEmail());
+    }
+
+    @Override
+    public void sendTournamentCreatedEmail(String username, String tournamentName, String tournamentLink, String recipient) {
+        ms.sendTournamentCreatedEmail(username, tournamentName, tournamentLink, recipient);
+    }
+
 }

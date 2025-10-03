@@ -1,4 +1,4 @@
-package ar.edu.itba.paw.webapp.controller;
+package ar.edu.itba.paw.webapp.controller.advice;
 
 import ar.edu.itba.paw.webapp.auth.PawUserDetails;
 import org.springframework.security.core.Authentication;

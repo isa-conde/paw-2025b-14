@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.services;
 
+import ar.edu.itba.paw.interfaces.exception.TournamentNotFoundException;
 import ar.edu.itba.paw.interfaces.exception.UserNotFoundException;
 import ar.edu.itba.paw.interfaces.persistence.GameDao;
 import ar.edu.itba.paw.interfaces.persistence.ImageDao;
@@ -155,11 +156,15 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Override
     public void closeInscriptions(Long tournament_id){
+        if(findById(tournament_id).isEmpty()) {
+            throw new TournamentNotFoundException();
+        }
         tournamentDao.closeInscriptions(tournament_id, participantDao.getTournamentParticipantUsers(tournament_id));
     }
 
     @Override
     public void setMatchWinner(Long matchId, Long tournamentId, Integer winner) {
+
         tournamentDao.setMatchWinner(matchId, tournamentId, winner);
     }
 
@@ -180,6 +185,9 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Override
     public void startTournament(Long tournament_id){
+        if(findById(tournament_id).isEmpty()) {
+            throw new TournamentNotFoundException();
+        }
         tournamentDao.startTournament(tournament_id, participantDao.getTournamentParticipantUsers(tournament_id));
     }
 
