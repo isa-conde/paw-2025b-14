@@ -52,3 +52,11 @@ create table if not exists game_format(
     players_per_team integer not null ,
     game_id integer not null
 );
+
+create table if not exists tokens(
+    id integer identity primary key not null,
+    user_id integer not null,
+    token bigint not null,
+    expiry_date varchar(10) not null,
+    used BOOLEAN DEFAULT false NOT NULL
+);
