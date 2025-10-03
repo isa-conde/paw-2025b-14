@@ -17,7 +17,7 @@
     
     <div class="board-body">
         <c:forEach var="participant" items="${participants}">
-            <c:if test="${groupNumber == null || groupNumber == participant.group_number}">
+            <c:if test="${groupNumber == null || groupNumber == participant.groupNumber}">
                 <div class="board-row">
                     <div class="board-cell participant-cell">
                         <c:if test="${isEditing}">

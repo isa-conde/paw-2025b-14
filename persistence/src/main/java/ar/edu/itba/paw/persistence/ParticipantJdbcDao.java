@@ -31,11 +31,12 @@ public class ParticipantJdbcDao implements ParticipantDao {
                 .withTableName("participant_user");
     }
 
-    private static final RowMapper<ParticipantUser> ROW_MAPPER = (rs, rowNum) -> {
-        ParticipantUser participant = new ParticipantUser(rs.getLong("user_id"), rs.getLong("tournament_id"), rs.getInt("points"));
-        participant.setPoints(rs.getInt("points"));
-        return participant;
-    };
+    private static final RowMapper<ParticipantUser> ROW_MAPPER = (rs, rowNum) -> new ParticipantUser(
+            rs.getLong("user_id"),
+            rs.getLong("tournament_id"),
+            rs.getInt("points"),
+            rs.getInt("group_number")
+    );
 
     private static final RowMapper<ParticipantUserInfo> ROW_MAPPER_INFO = (rs, rowNum) -> new ParticipantUserInfo(rs.getLong("user_id"), rs.getString("username"), rs.getString("email"), rs.getInt("points"), rs.getInt("group_number"));
 
@@ -128,8 +129,12 @@ public class ParticipantJdbcDao implements ParticipantDao {
     }
 
     @Override
-    public Integer getGroupNumber(Long tournament_id, Long user_id){
-        return jdbcTemplate.queryForObject("SELECT group_number FROM participant_user WHERE tournament_id = ? AND user_id = ?", Integer.class, tournament_id, user_id);
+    public Integer getGroupNumber(Long tournamentId, Long userId) {
+        final String sql =
+                "SELECT COALESCE((" +
+                        "  SELECT group_number FROM participant_user WHERE tournament_id = ? AND user_id = ? LIMIT 1" +
+                        "), 0)";
+        return jdbcTemplate.queryForObject(sql, Integer.class, tournamentId, userId);
     }
 
     @Override

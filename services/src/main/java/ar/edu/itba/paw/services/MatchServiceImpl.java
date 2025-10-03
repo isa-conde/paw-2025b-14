@@ -69,7 +69,7 @@ public class MatchServiceImpl implements MatchService {
                 continue;
             }
             Integer group = participantDao.getGroupNumber(tournamentId, m.getLocalId());
-            result.computeIfAbsent(group != null? group : 0, g -> new TreeMap<>())
+            result.computeIfAbsent(group, g -> new TreeMap<>())
                     .computeIfAbsent(stage, s -> new ArrayList<>())
                     .add(m);
         }

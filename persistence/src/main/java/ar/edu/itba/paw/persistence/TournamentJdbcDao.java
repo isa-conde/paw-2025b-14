@@ -80,8 +80,10 @@ public class TournamentJdbcDao implements TournamentDao {
     }
 
     @Override
-    public Boolean isTournamentStarted(Long tournament_id){
-        return jdbcTemplate.queryForObject("SELECT tournament_started FROM tournament WHERE id = ?", Boolean.class, tournament_id);
+    public Boolean isTournamentStarted(Long tournamentId) {
+        final String sql =
+                "SELECT COALESCE((SELECT tournament_started FROM tournament WHERE id = ?), FALSE)";
+        return jdbcTemplate.queryForObject(sql, Boolean.class, tournamentId);
     }
 
     @Override
@@ -115,7 +117,7 @@ public class TournamentJdbcDao implements TournamentDao {
 
     @Override
     public void setTournamentWinner(Long tournament_id, Long user_id){
-        jdbcTemplate.update("UPDATE tournament SET winner_id = ? WHERE id = ?", user_id, tournament_id);
+        jdbcTemplate.update("UPDATE tournament SET tournament_winner = ? WHERE id = ?", user_id, tournament_id);
     }
 
     @Override

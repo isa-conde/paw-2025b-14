@@ -54,6 +54,11 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
+    public Integer getTournamentGroups(Long tournamentId){
+        return participantDao.getTournamentGroups(tournamentId);
+    }
+
+    @Override
     public Boolean hasJoined(Long userId, Long tournamentId) {
         return participantDao.hasJoined(userId, tournamentId);
     }

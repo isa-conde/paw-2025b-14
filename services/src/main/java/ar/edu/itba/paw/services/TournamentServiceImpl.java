@@ -142,7 +142,7 @@ public class TournamentServiceImpl implements TournamentService {
     	return tournamentDao.tournamentParticipantsCount(tournamentId);
     }
 
-    public void createMatches(Long tournamentId, List<ParticipantUser> participants) {
+    private void createMatches(Long tournamentId, List<ParticipantUser> participants) {
         Tournament t = findById(tournamentId).orElse(null);
 
         if (t != null && !participants.isEmpty()) {
@@ -179,7 +179,7 @@ public class TournamentServiceImpl implements TournamentService {
                 ParticipantUser away = rotated.get(n - 1 - i);
 
                 if (home != null && away != null) {
-                    matchDao.insertMatch(matchId++, t.getId(), home.getUser_id(), away.getUser_id(), null, null, null, round);
+                    matchDao.insertMatch(matchId++, t.getId(), home.getUser_id(), away.getUser_id(), round,null, null, null);
                 }
             }
             ParticipantUser first = rotated.remove(1);
@@ -204,8 +204,10 @@ public class TournamentServiceImpl implements TournamentService {
         for (int i = 0; i < extras; i++) {
             ParticipantUser home = participants.get(i * 2);
             ParticipantUser away = participants.get(i * 2 + 1);
+            Long homeId = (home != null) ? home.getUser_id() : null;
+            Long awayId = (away != null) ? away.getUser_id() : null;
 
-            matchDao.insertMatch(matchId++, t.getId(), home.getUser_id(), away.getUser_id(), null, null, null, stage);
+            matchDao.insertMatch(matchId++, t.getId(), homeId, awayId, stage, null,null, null);
             nextRound.add(null);
         }
 
@@ -222,7 +224,9 @@ public class TournamentServiceImpl implements TournamentService {
             for (int i = 0; i < currentRound.size(); i += 2) {
                 ParticipantUser home = currentRound.get(i);
                 ParticipantUser away = (i + 1 < currentRound.size()) ? currentRound.get(i + 1) : null;
-                matchDao.insertMatch(matchId++, t.getId(), home.getUser_id(), away.getUser_id(), null, null, null, stage);
+                Long homeId = (home != null) ? home.getUser_id() : null;
+                Long awayId = (away != null) ? away.getUser_id() : null;
+                matchDao.insertMatch(matchId++, t.getId(), homeId, awayId, stage,null, null, null);
                 nextRound.add(null);
             }
 
@@ -280,7 +284,8 @@ public class TournamentServiceImpl implements TournamentService {
         Integer groups = participantDao.getTournamentGroups(tournamentId);
         List<ParticipantUser> classified = new ArrayList<>(groups * 2);
         for(int i = 1; i <= groups; i++){
-            Map<Integer, List<ParticipantUser>> topPositions = getGroupTopPositions(tournamentId, null);
+            Map<Integer, List<ParticipantUser>> topPositions = getGroupTopPositions(tournamentId, i);
+            System.out.println("Top positions for group " + i + ": " + topPositions);
             if(topPositions.get(1).size() > 1){
                 //TODO - more matches
                 return;
@@ -288,6 +293,7 @@ public class TournamentServiceImpl implements TournamentService {
                 //TODO - more matches second place
                 return;
             }
+            System.out.println("LLEGUE " + i);
             ParticipantUser local   = topPositions.get(1).getFirst();
             ParticipantUser visitor = topPositions.get(2).getFirst();
             classified.add(local);
@@ -311,8 +317,8 @@ public class TournamentServiceImpl implements TournamentService {
         if(groupedParticipants != null){
             long nextId = 1L;
             for(List<ParticipantUser> participants : groupedParticipants.values()){
-                nextId += ((long) participants.size() * (participants.size() - 1)) / 2;
                 createMatchesLeague(t, participants, nextId);
+                nextId += ((long) participants.size() * (participants.size() - 1)) / 2;
             }
         }
     }

@@ -118,8 +118,8 @@
                         </c:if>
                     </c:when>
                     <c:when test="${tournament.structure == ELIMINATION || (tournament.structure == HYBRID && !tournament.is_group_stage)}">
-                        <c:if test="${tournament.tournamentStarted}">
-                            <c:set var="edit" value="tournament.edit.matches" />
+                        <c:if test="${!tournament.openInscriptions}">
+                            <c:set var="edit" value="tournament.edit.matches"/>
                             <paw:text type="title" size="l">
                                 <spring:message code="tournament.standings"/>
                             </paw:text>
@@ -164,7 +164,7 @@
                                             <input type="hidden" name="tournamentId" value="${tournament.id}"/>
                                             <input type="hidden" name="section" value="${param.section != null ? param.section : 'overview'}"/>
                                             <input type="hidden" name="edit" value="true"/>
-                                            <button type="submit" class="btn">
+                                            <button type="submit" class="btn secondary">
                                                 <paw:text size="l"><spring:message code="${edit}"/></paw:text>
                                             </button>
                                         </form>
@@ -198,12 +198,14 @@
                                     </c:otherwise>
                                 </c:choose>
                             </c:if>
-                            <form method="post" action="${pageContext.request.contextPath}/tournament/startTournament">
-                                <input type="hidden" name="tournamentId" value="${tournament.id}"/>
-                                <button type="submit" class="btn">
-                                    <paw:text size="l"><spring:message code="tournament.startTournament"/></paw:text>
-                                </button>
-                            </form>
+                            <c:if test="${!editMode}">
+                                <form method="post" action="${pageContext.request.contextPath}/tournament/startTournament">
+                                    <input type="hidden" name="tournamentId" value="${tournament.id}"/>
+                                    <button type="submit" class="btn">
+                                        <paw:text size="l"><spring:message code="tournament.startTournament"/></paw:text>
+                                    </button>
+                                </form>
+                            </c:if>
                         </div>
                     </c:when>
                 </c:choose>
@@ -229,12 +231,8 @@
                                         </c:forEach>
                                     </c:when>
                                     <c:otherwise>
-                                        <c:set var="subActiveGroup" value="${param.group != null ? param.group : groupSections[0]}"/>
-
-                                        <paw:navbar sections="${groupSections}"
-                                                    labels="${groupLabels}"
-                                                    activeSection="${subActiveGroup}"
-                                                    paramName="group"/>
+                                        <c:set var="subActiveGroup" value="${param.group != null ? param.group : 1}"/>
+                                        <paw:groups-navbar groups="${groups}" activeGroup="${subActiveGroup}" paramName="group"/>
 
                                         <c:forEach var="groupEntry" items="${matchesByGroup}">
                                             <c:if test="${subActiveGroup == groupEntry.key}">
@@ -297,15 +295,27 @@
             <div class="row">
                 <paw:input path="name" label="home.createTournament.name" hasConstraint="true"/>
             </div>
-            <c:if test="${!tournament.finished}">
-                <div class="row">
-                    <c:if test="${!tournament.tournamentStarted}">
-                        <paw:input path="start_date" label="home.createTournament.startDate" inputType="date" hasConstraint="true"/>
-                    </c:if>
-                    <paw:input path="end_date" label="home.createTournament.endDate" inputType="date" hasConstraint="true"/>
-                </div>
-                <paw:input path="max_participants" label="home.createTournament.maxParticipants" inputType="number" hasConstraint="true"/>
-            </c:if>
+            <c:choose>
+                <c:when test="${!tournament.finished}">
+                    <div class="row">
+                        <c:choose>
+                            <c:when test="${!tournament.tournamentStarted}">
+                                <paw:input path="start_date" label="home.createTournament.startDate" inputType="date" hasConstraint="true"/>
+                            </c:when>
+                            <c:otherwise>
+                                <input type="hidden" name="start_date" value="${tournament.start_date}"/>
+                            </c:otherwise>
+                        </c:choose>
+                        <paw:input path="end_date" label="home.createTournament.endDate" inputType="date" hasConstraint="true"/>
+                    </div>
+                    <paw:input path="max_participants" label="home.createTournament.maxParticipants" inputType="number" hasConstraint="true"/>
+                </c:when>
+                <c:otherwise>
+                    <input type="hidden" name="start_date" value="${tournament.start_date}"/>
+                    <input type="hidden" name="end_date" value="${tournament.end_date}"/>
+                    <input type="hidden" name="max_participants" value="${tournament.max_participants}"/>
+                </c:otherwise>
+            </c:choose>
             <paw:input path="image" label="home.createTournament.image" inputType="file"/>
             <div class="row center">
                 <paw:input path="" label="tournament.edit.saveChanges" containerType="half" inputType="submit"/>

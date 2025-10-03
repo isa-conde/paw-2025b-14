@@ -51,6 +51,11 @@ public class TournamentController {
         this.ps = ps;
     }
 
+    @ModelAttribute("tournamentForm")
+    public TournamentForm getTournamentForm(){
+        return new TournamentForm();
+    }
+
     // TODO: delete this!!!
     @RequestMapping(value = "/game/create", method = {RequestMethod.GET})
     public ModelAndView createGameForm(@ModelAttribute("gameForm") final GameForm form){
@@ -154,8 +159,6 @@ public class TournamentController {
         return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
     }
 
-    @Autowired
-    private MessageSource messageSource;
     @RequestMapping(value = "/tournament", method = RequestMethod.GET)
     public ModelAndView tournamentPage(Principal principal, @RequestParam("tournamentId") final long tournamentId, @ModelAttribute("editTournamentForm") final EditTournamentForm form) {
         final ModelAndView mav = new ModelAndView("tournament");
@@ -170,11 +173,7 @@ public class TournamentController {
 
         Map<Integer, Map<Integer, List<MatchInfo>>> matchesByGroup = ms.getTournamentMatchesByGroup(tournamentId);
 
-        List<Integer> groupSections = new ArrayList<>(matchesByGroup.keySet());
-        Locale locale = LocaleContextHolder.getLocale();
-        List<String> groupLabels = groupSections.stream()
-                .map(key -> messageSource.getMessage("tournament.group", new Object[]{key}, locale))
-                .collect(Collectors.toList());
+        Integer groups = ps.getTournamentGroups(tournamentId);
 
         List<ParticipantUserInfo> participants = ps.getTournamentParticipantUsersInfo(tournamentId);
         int participantCount = participants.size();
@@ -197,8 +196,7 @@ public class TournamentController {
             mav.addObject("game", optionalGame.get());
             mav.addObject("creator", optionalUser.get());
             mav.addObject("matchesByGroup", matchesByGroup);
-            mav.addObject("groupSections", groupSections);
-            mav.addObject("groupLabels", groupLabels);
+            mav.addObject("groups", groups);
             mav.addObject("LEAGUE", Structure.LEAGUE);
             mav.addObject("ELIMINATION", Structure.ELIMINATION);
             mav.addObject("HYBRID", Structure.HYBRID);

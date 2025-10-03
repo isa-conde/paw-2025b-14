@@ -165,7 +165,7 @@ public class MatchJdbcDao implements MatchDao {
     @Override
     public List<Long> getStageMatchIds(Integer stage, Long tournamentId) {
         return jdbcTemplate.queryForList(
-                "SELECT id FROM match WHERE tournament_id = ? AND stage = ?",
+                "SELECT id FROM match WHERE tournament_id = ? AND stage = ? ORDER BY id",
                 Long.class, tournamentId, stage
         );
     }
