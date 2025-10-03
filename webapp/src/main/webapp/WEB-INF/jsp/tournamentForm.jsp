@@ -6,12 +6,12 @@
 
 
 <paw:layout user="${user}">
-    <div class="tournamentForm-page">
-        <div class="tournamentForm-page__image">
+    <div class="Form-page">
+        <div class="Form-page__image">
             <img src="${pageContext.request.contextPath}/images/tournament.jpeg" alt="Tournament Image" />
         </div>
 
-        <div class="tournamentForm-page__form">
+        <div class="Form-page__form">
             <c:choose>
                 <c:when test="${step == 1}">
                     <form:form cssClass="form center" modelAttribute="tournamentForm" action="${pageContext.request.contextPath}/tournaments/new/step1" method="post" enctype="multipart/form-data">
