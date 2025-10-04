@@ -287,7 +287,7 @@
                                 <paw:input path="start_date" label="home.createTournament.startDate" inputType="date" hasConstraint="true"/>
                             </c:when>
                             <c:otherwise>
-                                <input type="hidden" name="start_date" value="${tournament.start_date}"/>
+                                <input type="hidden" name="start_date" value=""/>
                             </c:otherwise>
                         </c:choose>
                         <paw:input path="end_date" label="home.createTournament.endDate" inputType="date" hasConstraint="true"/>
@@ -295,8 +295,8 @@
                     <paw:input path="max_participants" label="home.createTournament.maxParticipants" inputType="number" hasConstraint="true"/>
                 </c:when>
                 <c:otherwise>
-                    <input type="hidden" name="start_date" value="${tournament.start_date}"/>
-                    <input type="hidden" name="end_date" value="${tournament.end_date}"/>
+                    <input type="hidden" name="start_date" value=""/>
+                    <input type="hidden" name="end_date" value=""/>
                     <input type="hidden" name="max_participants" value="${tournament.max_participants}"/>
                 </c:otherwise>
             </c:choose>
@@ -308,4 +308,5 @@
     </paw:modal>
 </paw:layout>
 
+<div id="page-flags" data-open-edit-modal="${openEditModal}"></div>
 <script src="${pageContext.request.contextPath}/js/swap.js"></script>

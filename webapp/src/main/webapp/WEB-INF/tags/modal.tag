@@ -7,10 +7,11 @@
 
 <dialog id="${id}" class="modal">
     <div class="header">
-        <paw:text type="title" ><spring:message code="${title}"/></paw:text>
-        <paw:iconButton icon="${pageContext.request.contextPath}/images/close.png" onclick="closeModal('${id}')"/>
+        <paw:text type="title"><spring:message code="${title}"/></paw:text>
+        <paw:iconButton icon="${pageContext.request.contextPath}/images/close.png"
+                        onclick="closeModal('${id}')"/>
     </div>
     <jsp:doBody/>
 </dialog>
 
-<script src="${pageContext.request.contextPath}/js/modal.js"></script>
+<script src="<c:url value='/js/modal.js'/>"></script>
