@@ -60,7 +60,7 @@ public class TeamJdbcDao implements TeamDao {
         String sql = """
         SELECT t.id
         FROM tournament t
-        INNER JOIN participant_user p ON p.tournament_id = t.id
+        INNER JOIN participant p ON p.tournament_id = t.id
         WHERE p.team_id = ? AND t.is_finished = ?
     """;
         return jdbcTemplate.queryForList(sql, Long.class, teamId, isFinished);

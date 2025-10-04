@@ -33,35 +33,4 @@
     </button>
 </div>
 
-<script>
-    window.carrouselState = window.carrouselState || {};
-
-    if (!carrouselState['${id}']) {
-        carrouselState['${id}'] = {
-            currentIndex: 0,
-            itemsPerView: 3,
-            totalItems: ${elements.size()}
-        };
-    }
-
-    function moveCarrousel(id, direction) {
-        const state = carrouselState[id];
-        const maxIndex = state.totalItems;
-
-        state.currentIndex += (direction * state.itemsPerView);
-        state.currentIndex = (maxIndex + state.currentIndex) % maxIndex;
-        while(state.currentIndex % state.itemsPerView !== 0){
-            state.currentIndex -= direction;
-        }
-
-        const carrousel = document.getElementById(id);
-        const track = carrousel.querySelector('.carrousel-track');
-
-        const itemWidth = 380;
-        const gapWidth = 20;
-
-        track.style.transition = 'transform 0.3s ease';
-        const translateX = -(state.currentIndex * (itemWidth + gapWidth));
-        track.style.transform = 'translateX(' + translateX + 'px)';
-    }
-</script>
+<script src="${pageContext.request.contextPath}/js/carrousel.js"></script>

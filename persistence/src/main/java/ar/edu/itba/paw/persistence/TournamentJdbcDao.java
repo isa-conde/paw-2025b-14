@@ -138,7 +138,7 @@ public class TournamentJdbcDao implements TournamentDao {
     private List<Tournament> findUserTournaments(Long userId, Boolean isFinished) {
         String sql = "SELECT t.* " +
                 "FROM tournament t " +
-                "INNER JOIN participant_user p ON p.tournament_id = t.id " +
+                "INNER JOIN participant p ON p.tournament_id = t.id " +
                 "WHERE p.user_id = ? AND t.is_finished = ?; ";
         return jdbcTemplate.query(sql, ROW_MAPPER, userId, isFinished);
     }
@@ -309,7 +309,7 @@ public class TournamentJdbcDao implements TournamentDao {
     @Override
     public int tournamentParticipantsCount(Long tournamentId){
         return jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM participant_user WHERE tournament_id = ?",
+                "SELECT COUNT(*) FROM participant WHERE tournament_id = ?",
                 Integer.class, tournamentId
         );
     }
@@ -319,6 +319,32 @@ public class TournamentJdbcDao implements TournamentDao {
         return jdbcTemplate.queryForObject(
                 "SELECT is_group_stage FROM tournament WHERE id = ?",
                 Boolean.class, tournamentId
+        );
+    }
+
+    @Override
+    public void updateAllStartDates(LocalDate today) {
+        jdbcTemplate.update(
+                """
+                UPDATE tournament
+                   SET start_date = ?
+                 WHERE start_date < ?
+                   AND COALESCE(is_started, false) = false
+                """,
+                today, today
+        );
+    }
+
+    @Override
+    public void updateAllEndDates(LocalDate today) {
+        jdbcTemplate.update(
+                """
+                UPDATE tournament
+                   SET end_date = ?
+                 WHERE end_date < ?
+                   AND COALESCE(is_finished, false) = false
+                """,
+                today, today
         );
     }
 }

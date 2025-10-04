@@ -100,7 +100,7 @@ public class MatchJdbcDao implements MatchDao {
                         "FROM match m " +
                         "LEFT JOIN users local_user   ON m.local_id   = local_user.id " +
                         "LEFT JOIN users visitor_user ON m.visitor_id = visitor_user.id " +
-                        "LEFT JOIN participant_user pu ON pu.tournament_id = m.tournament_id AND pu.user_id = m.local_id " +
+                        "LEFT JOIN participant pu ON pu.tournament_id = m.tournament_id AND pu.user_id = m.local_id " +
                         "WHERE m.tournament_id = ? " +
                         "ORDER BY m.stage, m.id";
 
@@ -186,7 +186,7 @@ public class MatchJdbcDao implements MatchDao {
         return jdbcTemplate.queryForObject(
                 "SELECT MAX(m.stage) " +
                         "FROM match m " +
-                        "JOIN participant_user pu " +
+                        "JOIN participant pu " +
                         "  ON pu.tournament_id = m.tournament_id " +
                         " AND pu.user_id = m.visitor_id " +
                         "WHERE m.tournament_id = ? " +
