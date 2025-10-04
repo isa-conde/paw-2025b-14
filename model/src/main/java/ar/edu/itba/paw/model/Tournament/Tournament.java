@@ -15,7 +15,7 @@ public class Tournament {
     private final Elo elo;
     private final LocalDate start_date;
     private final LocalDate end_date;
-    private final String format;
+    private String format;
     private final Structure structure;
     private final Integer max_participants;
     private final Long image_id;
@@ -24,9 +24,11 @@ public class Tournament {
     private final Long tournament_winner;
     private final Boolean is_group_stage;
     private final Boolean tournament_started;
+    private final Long format_id;
 
 
-    public Tournament(Long id, Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Long imageId, Boolean openInscriptions, Boolean isFinished, Long tournamentWinner, Boolean isGroupStage, Boolean tournamentStarted) {
+
+    public Tournament(Long id, Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Long imageId, Boolean openInscriptions, Boolean isFinished, Long tournamentWinner, Boolean isGroupStage, Boolean tournamentStarted, Long format_id) {
         this.id = id;
         this.creator_id = creator_id;
         this.name = name;
@@ -44,6 +46,7 @@ public class Tournament {
         this.tournament_winner = tournamentWinner;
         this.is_group_stage = isGroupStage;
         this.tournament_started = tournamentStarted;
+        this.format_id = format_id;
     }
 
     public Long getId() {
@@ -81,6 +84,9 @@ public class Tournament {
     public String getFormat() {
         return format;
     }
+    public void setFormat(String format) {
+        this.format = format;
+    }
 
     public Structure getStructure() {
         return structure;
@@ -113,4 +119,9 @@ public class Tournament {
     public Boolean getTournamentStarted() {
         return tournament_started;
     }
+
+    public Long getFormat_id(){
+        return format_id;
+    }
+
 }

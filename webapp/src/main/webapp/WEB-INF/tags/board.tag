@@ -6,12 +6,13 @@
 <%@ attribute name="groupNumber" required="false" rtexprvalue="true" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
 <c:set var="headerSize" value="${not empty size? size : 'xl'}" />
 
 <div class="board">
     <div class="board-header">
-        <div class="board-header-cell ${headerSize} participant-cell"><paw:text size="${headerSize}">Participants</paw:text></div>
+        <div class="board-header-cell ${headerSize} participant-cell"><paw:text size="${headerSize}"><spring:message code="tournament.participants.title"/></paw:text></div>
         <div class="board-header-cell ${headerSize}"><paw:text size="${headerSize}">Points</paw:text></div>
     </div>
     
@@ -24,13 +25,13 @@
                             <input type="checkbox"
                                    class="edit-check"
                                    name="selected"
-                                   value="${participant.user_id}"
+                                   value="${participant.id}"
                                    form="${formId}"
                                    data-kind="groups"
                                    data-group="${participant.groupNumber}"
-                                   data-user="${participant.user_id}"/>
+                                   data-user="${participant.id}"/>
                         </c:if>
-                        <paw:text weight="thin"><c:out value="${participant.username}"/></paw:text>
+                        <paw:text weight="thin"><c:out value="${participant.name}"/></paw:text>
                     </div>
                     <div class="board-cell">
                         <paw:text weight="semi-bold"><c:out value="${participant.points}"/></paw:text>

@@ -1,8 +1,18 @@
 <%@ tag language="java" pageEncoding="UTF-8" %>
 <%@ attribute name="participants" required="true" type="java.util.List" %>
+<%@ attribute name="isIndividualTournament" required="true" type="java.lang.Boolean" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+
+<c:choose>
+    <c:when test="${isIndividualTournament}">
+        <c:set value="/profile/${p.id}" var="url"/>
+    </c:when>
+    <c:otherwise>
+        <c:set value="/team/profile/${p.id}" var="url"/>
+    </c:otherwise>
+</c:choose>
 
 <c:choose>
     <c:when test="${participants.size() <= '0'}">
@@ -12,7 +22,7 @@
     <c:otherwise>
         <div class="grid users">
             <c:forEach var="p" items="${participants}">
-                <paw:profileButton text="${p.username}" onclick="window.location.href='/profile/${p.user_id}'" isNotSafe="true" size="l" fill="false"/>
+                <paw:profileButton text="${p.name}" onclick="window.location.href='${url}'" isNotSafe="true" size="l" fill="false"/>
             </c:forEach>
         </div>
     </c:otherwise>

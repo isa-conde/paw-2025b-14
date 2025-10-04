@@ -1,7 +1,7 @@
 package ar.edu.itba.paw.interfaces.services;
 
 import ar.edu.itba.paw.model.ParticipantUser;
-import ar.edu.itba.paw.model.ParticipantUserInfo;
+import ar.edu.itba.paw.model.ParticipantInfo;
 
 import java.util.List;
 
@@ -19,7 +19,7 @@ public interface ParticipantService {
 
     void swapGroups(Long tournament_id, Long user1, Long user2);
 
-    List<ParticipantUserInfo> getTournamentParticipantUsersInfo(Long tournamentId);
+    List<ParticipantInfo> getTournamentParticipantInfo(Long tournamentId, Integer teamSize);
 
     Integer getTournamentGroups(Long tournamentId);
 }

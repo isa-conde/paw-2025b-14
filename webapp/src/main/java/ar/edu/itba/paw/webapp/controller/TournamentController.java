@@ -3,6 +3,7 @@ package ar.edu.itba.paw.webapp.controller;
 import ar.edu.itba.paw.interfaces.services.*;
 import ar.edu.itba.paw.model.*;
 import ar.edu.itba.paw.model.Game.Game;
+import ar.edu.itba.paw.model.Game.GameFormat;
 import ar.edu.itba.paw.model.MatchInfo;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.enums.Elo;
@@ -13,9 +14,6 @@ import ar.edu.itba.paw.webapp.form.EditTournamentForm;
 import ar.edu.itba.paw.webapp.form.GameForm;
 import ar.edu.itba.paw.webapp.form.SetWinnerForm;
 import ar.edu.itba.paw.webapp.form.TournamentForm;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -32,7 +30,6 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Controller
 @SessionAttributes("tournamentForm")
@@ -43,13 +40,15 @@ public class TournamentController {
     private final TournamentService ts;
     private final MatchService ms;
     private final ParticipantService ps;
+    private final TeamService tms;
 
-    public TournamentController(final UserService us, final GameService gs, final TournamentService ts, final MatchService ms, final ParticipantService ps) {
+    public TournamentController(final UserService us, final GameService gs, final TournamentService ts, final MatchService ms, final ParticipantService ps, final TeamService tms) {
         this.us = us;
         this.gs = gs;
         this.ts = ts;
         this.ms = ms;
         this.ps = ps;
+        this.tms = tms;
     }
 
     @ModelAttribute("tournamentForm")
@@ -172,24 +171,39 @@ public class TournamentController {
 
         Optional<Tournament> optionalTournament = ts.findById(tournamentId);
 
+
         Map<Integer, List<MatchInfo>> matches = ms.getTournamentMatchesByStage(tournamentId);
         long maxStage = matches != null ? matches.keySet().stream().max(Integer::compareTo).orElse(0) : 0L;
 
         Integer groups = ps.getTournamentGroups(tournamentId);
-        List<ParticipantUserInfo> participants = ps.getTournamentParticipantUsersInfo(tournamentId);
-        int participantCount = participants.size();
-        Long userId = (user != null ? user.getId() : null);
-        boolean isParticipant = (userId != null) && participants.stream().anyMatch(p -> Objects.equals(p.getUser_id(), userId));
+
 
         if(optionalTournament.isPresent()) {
             Tournament t = optionalTournament.get();
+
+            Optional<GameFormat> optionalGameFormat = gs.getFormatById(t.getFormat_id());
+            if (optionalGameFormat.isPresent()){
+                GameFormat gf = optionalGameFormat.get();
+                mav.addObject("format", gf);
+                t.setFormat(gf.getName());
+            }
+
+            List<ParticipantInfo> participants = ps.getTournamentParticipantInfo(tournamentId, optionalGameFormat.isPresent() ? optionalGameFormat.get().getPlayers_per_team() : 1);
+            int participantCount = participants.size();
+
             form.setName(t.getName());
             form.setStart_date(t.getStart_date());
             form.setEnd_date(t.getEnd_date());
             form.setMax_participants(t.getMax_participants());
             Optional<Game> optionalGame = gs.findById(t.getGame_id());
             Optional<User> optionalUser = us.findById(t.getCreator_id());
-            mav.addObject("hasJoined", ps.hasJoined(user.getId(), tournamentId));
+            Boolean isIndividualTournament = optionalGameFormat.isEmpty() || optionalGameFormat.get().getPlayers_per_team() == 1;
+            Boolean isParticipant = user != null && ps.hasJoined(user.getId(), tournamentId);
+            if (user != null && !isIndividualTournament && !isParticipant){
+                mav.addObject("userTeams", tms.getUserTeams(user.getId()));
+            }
+            mav.addObject("isIndividualTournament", isIndividualTournament);
+            mav.addObject("isParticipant", isParticipant);
             mav.addObject("participants", participants);
             mav.addObject("user", user);
             mav.addObject("tournament", t);
@@ -202,7 +216,6 @@ public class TournamentController {
             mav.addObject("HYBRID", Structure.HYBRID);
             mav.addObject("tournamentWinner", t.getTournament_winner());
             mav.addObject("participantCount", participantCount);
-            mav.addObject("isParticipant", isParticipant);
             mav.addObject("maxStage", maxStage);
         } else {
             return new ModelAndView("index");
@@ -365,7 +378,7 @@ public class TournamentController {
 
         final Tournament t = ts.create(user.getId(), form.getName(), optionalGame.get().getId(),
                 form.getRegion(), form.getElo(), form.getStart_date(), form.getEnd_date(),
-                form.getFormat(), form.getStructure(), form.getMax_participants(), imageBytes, true, false);
+                null, form.getStructure(), form.getMax_participants(), imageBytes, true, false, form.getFormat_id());
         status.setComplete();
         return new ModelAndView("redirect:/tournament?tournamentId=" + t.getId());
     }

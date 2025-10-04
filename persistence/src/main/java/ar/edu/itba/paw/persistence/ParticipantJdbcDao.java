@@ -2,13 +2,11 @@ package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.interfaces.persistence.ParticipantDao;
 import ar.edu.itba.paw.model.ParticipantUser;
-import ar.edu.itba.paw.model.ParticipantUserInfo;
-import ar.edu.itba.paw.model.Tournament.Tournament;
+import ar.edu.itba.paw.model.ParticipantInfo;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
 import java.sql.Array;
@@ -16,8 +14,6 @@ import java.sql.PreparedStatement;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Repository
 public class ParticipantJdbcDao implements ParticipantDao {
@@ -25,7 +21,7 @@ public class ParticipantJdbcDao implements ParticipantDao {
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
 
-    public ParticipantJdbcDao (final DataSource ds){
+    public ParticipantJdbcDao(final DataSource ds) {
         this.jdbcTemplate = new JdbcTemplate(ds);
         this.jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("participant")
@@ -39,13 +35,22 @@ public class ParticipantJdbcDao implements ParticipantDao {
             rs.getInt("group_number")
     );
 
-    private static final RowMapper<ParticipantUserInfo> ROW_MAPPER_INFO = (rs, rowNum) -> new ParticipantUserInfo(rs.getLong("user_id"), rs.getString("username"), rs.getString("email"), rs.getInt("points"), rs.getInt("group_number"));
+    private static final RowMapper<ParticipantInfo> ROW_MAPPER_USER_INFO = (rs, rowNum) -> new ParticipantInfo(rs.getLong("user_id"), rs.getString("username"), rs.getInt("points"), rs.getInt("group_number"));
+
+    private static final RowMapper<ParticipantInfo> ROW_MAPPER_TEAM_INFO = (rs, rowNum) -> new ParticipantInfo(rs.getLong("team_id"), rs.getString("name"), rs.getInt("points"), rs.getInt("group_number"));
 
     @Override
-    public List<ParticipantUserInfo> getTournamentsParticipantUsersInfo(Long tournament_id) {
+    public List<ParticipantInfo> getTournamentsParticipantUsersInfo(Long tournament_id) {
         return jdbcTemplate.query("SELECT * FROM participant " +
                                       "INNER JOIN users ON participant.user_id = users.id " +
-                                      "WHERE tournament_id = ?", ROW_MAPPER_INFO, tournament_id);
+                                      "WHERE tournament_id = ?", ROW_MAPPER_USER_INFO, tournament_id);
+    }
+
+    @Override
+    public List<ParticipantInfo> getTournamentsParticipantTeamsInfo(Long tournament_id) {
+        return jdbcTemplate.query("SELECT * FROM participant " +
+                "INNER JOIN team ON participant.team_id = team.id " +
+                "WHERE tournament_id = ?", ROW_MAPPER_TEAM_INFO, tournament_id);
     }
 
     @Override
