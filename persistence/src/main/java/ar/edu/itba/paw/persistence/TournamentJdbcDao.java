@@ -321,4 +321,30 @@ public class TournamentJdbcDao implements TournamentDao {
                 Boolean.class, tournamentId
         );
     }
+
+    @Override
+    public void updateAllStartDates(LocalDate today) {
+        jdbcTemplate.update(
+                """
+                UPDATE tournament
+                   SET start_date = ?
+                 WHERE start_date < ?
+                   AND COALESCE(is_started, false) = false
+                """,
+                today, today
+        );
+    }
+
+    @Override
+    public void updateAllEndDates(LocalDate today) {
+        jdbcTemplate.update(
+                """
+                UPDATE tournament
+                   SET end_date = ?
+                 WHERE end_date < ?
+                   AND COALESCE(is_finished, false) = false
+                """,
+                today, today
+        );
+    }
 }
