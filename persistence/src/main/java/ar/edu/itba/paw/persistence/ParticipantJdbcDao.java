@@ -28,7 +28,8 @@ public class ParticipantJdbcDao implements ParticipantDao {
     public ParticipantJdbcDao (final DataSource ds){
         this.jdbcTemplate = new JdbcTemplate(ds);
         this.jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
-                .withTableName("participant_user");
+                .withTableName("participant")
+                .usingGeneratedKeyColumns("id");
     }
 
     private static final RowMapper<ParticipantUser> ROW_MAPPER = (rs, rowNum) -> new ParticipantUser(
@@ -42,8 +43,8 @@ public class ParticipantJdbcDao implements ParticipantDao {
 
     @Override
     public List<ParticipantUserInfo> getTournamentsParticipantUsersInfo(Long tournament_id) {
-        return jdbcTemplate.query("SELECT * FROM participant_user " +
-                                      "INNER JOIN users ON participant_user.user_id = users.id " +
+        return jdbcTemplate.query("SELECT * FROM participant " +
+                                      "INNER JOIN users ON participant.user_id = users.id " +
                                       "WHERE tournament_id = ?", ROW_MAPPER_INFO, tournament_id);
     }
 
@@ -60,25 +61,25 @@ public class ParticipantJdbcDao implements ParticipantDao {
 
     @Override
     public List<ParticipantUser> getTournamentParticipantUsers(Long tournament_id) {
-        return jdbcTemplate.query("SELECT * FROM participant_user WHERE tournament_id = ?", ROW_MAPPER, tournament_id);
+        return jdbcTemplate.query("SELECT * FROM participant WHERE tournament_id = ?", ROW_MAPPER, tournament_id);
     }
 
     @Override
     public ParticipantUser getTournamentParticipantByUserId(Long tournament_id, Long user_id) {
-        return jdbcTemplate.query("SELECT * FROM participant_user " +
+        return jdbcTemplate.query("SELECT * FROM participant " +
                                       "WHERE tournament_id = ? AND user_id = ?",
                                        ROW_MAPPER, tournament_id, user_id).stream().findFirst().orElse(null);
     }
 
     @Override
     public Boolean hasJoined(Long userId, Long tournamentId) {
-        String sql = "SELECT EXISTS (SELECT 1 FROM participant_user WHERE user_id = ? AND tournament_id = ?)";
+        String sql = "SELECT EXISTS (SELECT 1 FROM participant WHERE user_id = ? AND tournament_id = ?)";
         return jdbcTemplate.queryForObject(sql, Boolean.class, userId, tournamentId);
     }
 
     @Override
     public void leaveTournamentUser(Long user_id, Long tournament_id) {
-        jdbcTemplate.update("DELETE FROM participant_user WHERE user_id = ? AND tournament_id = ?", user_id, tournament_id);
+        jdbcTemplate.update("DELETE FROM participant WHERE user_id = ? AND tournament_id = ?", user_id, tournament_id);
     }
 
     @Override
@@ -86,7 +87,7 @@ public class ParticipantJdbcDao implements ParticipantDao {
         jdbcTemplate.update(con -> {
             Array arr = con.createArrayOf("bigint", userIds.toArray(new Long[0]));
             PreparedStatement ps = con.prepareStatement(
-                    "UPDATE participant_user " +
+                    "UPDATE participant " +
                             "SET group_number = ? " +
                             "WHERE tournament_id = ? AND user_id = ANY(?)"
             );
@@ -100,7 +101,7 @@ public class ParticipantJdbcDao implements ParticipantDao {
     @Override
     public void swapGroups(Long tournament_id, Long user1, Long user2, Integer group1, Integer group2){
         jdbcTemplate.update(
-                "UPDATE participant_user " +
+                "UPDATE participant " +
                         "SET group_number = CASE " +
                         "  WHEN user_id = ? THEN ? " +
                         "  WHEN user_id = ? THEN ? " +
@@ -115,7 +116,7 @@ public class ParticipantJdbcDao implements ParticipantDao {
     @Override
     public Integer getTournamentMaxPoints(Long tournamentId){
         return jdbcTemplate.queryForObject(
-                "SELECT MAX(points) FROM participant_user WHERE tournament_id = ?",
+                "SELECT MAX(points) FROM participant WHERE tournament_id = ?",
                 Integer.class, tournamentId
         );
     }
@@ -123,7 +124,7 @@ public class ParticipantJdbcDao implements ParticipantDao {
     @Override
     public Integer getTournamentSecondMaxPoints(Long tournamentId) {
         return jdbcTemplate.queryForObject(
-                "SELECT MAX(points) FROM participant_user WHERE tournament_id = ? AND points < ?",
+                "SELECT MAX(points) FROM participant WHERE tournament_id = ? AND points < ?",
                 Integer.class, tournamentId, getTournamentMaxPoints(tournamentId)
         );
     }
@@ -132,7 +133,7 @@ public class ParticipantJdbcDao implements ParticipantDao {
     public Integer getGroupNumber(Long tournamentId, Long userId) {
         final String sql =
                 "SELECT COALESCE((" +
-                        "  SELECT group_number FROM participant_user WHERE tournament_id = ? AND user_id = ? LIMIT 1" +
+                        "  SELECT group_number FROM participant WHERE tournament_id = ? AND user_id = ? LIMIT 1" +
                         "), 0)";
         return jdbcTemplate.queryForObject(sql, Integer.class, tournamentId, userId);
     }
@@ -143,12 +144,12 @@ public class ParticipantJdbcDao implements ParticipantDao {
 
         if (groupNumber == null) {
             return jdbcTemplate.query(
-                    "SELECT * FROM participant_user WHERE tournament_id = ? AND points = ?",
+                    "SELECT * FROM participant WHERE tournament_id = ? AND points = ?",
                     ROW_MAPPER, tournamentId, points
             );
         } else {
             return jdbcTemplate.query(
-                    "SELECT * FROM participant_user WHERE tournament_id = ? AND points = ? AND group_number = ?",
+                    "SELECT * FROM participant WHERE tournament_id = ? AND points = ? AND group_number = ?",
                     ROW_MAPPER, tournamentId, points, groupNumber
             );
         }
@@ -157,13 +158,13 @@ public class ParticipantJdbcDao implements ParticipantDao {
     @Override
     public Integer getTournamentGroups(Long tournamentId){
         return jdbcTemplate.queryForObject(
-                "SELECT COUNT(DISTINCT group_number) FROM participant_user WHERE tournament_id = ?",
+                "SELECT COUNT(DISTINCT group_number) FROM participant WHERE tournament_id = ?",
                 Integer.class, tournamentId
         );
     }
 
     @Override
     public void sumPoints(Long tournamentId, Long userId, Integer points){
-        jdbcTemplate.update("UPDATE participant_user SET points = points + ? WHERE user_id = ?", points, userId);
+        jdbcTemplate.update("UPDATE participant SET points = points + ? WHERE user_id = ?", points, userId);
     }
 }
