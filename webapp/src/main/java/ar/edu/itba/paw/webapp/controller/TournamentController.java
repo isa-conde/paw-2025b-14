@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.webapp.controller;
 
+import ar.edu.itba.paw.interfaces.exception.TournamentNotFoundException;
 import ar.edu.itba.paw.interfaces.services.*;
 import ar.edu.itba.paw.model.*;
 import ar.edu.itba.paw.model.Game.Game;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -154,7 +156,7 @@ public class TournamentController {
             form.setMax_participants(t.getMax_participants());
             Optional<Game> optionalGame = gs.findById(t.getGame_id());
             Optional<User> optionalUser = us.findById(t.getCreator_id());
-            mav.addObject("hasJoined", ps.hasJoined(user.getId(), tournamentId));
+            mav.addObject("hasJoined", user != null ? ps.hasJoined(user.getId(), tournamentId) : false);
             mav.addObject("participants", participants);
             mav.addObject("user", user);
             mav.addObject("tournament", t);
@@ -171,8 +173,6 @@ public class TournamentController {
             mav.addObject("participantCount", participantCount);
             mav.addObject("isParticipant", isParticipant);
             mav.addObject("maxStage", maxStage);
-        } else {
-            return new ModelAndView("index");
         }
         return mav;
     }

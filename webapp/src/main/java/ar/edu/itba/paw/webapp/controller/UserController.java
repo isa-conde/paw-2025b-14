@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.webapp.controller;
 
+import ar.edu.itba.paw.interfaces.exception.UserNotFoundException;
 import ar.edu.itba.paw.interfaces.services.GameService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.interfaces.services.UserService;
@@ -44,7 +45,7 @@ public class UserController {
         final ModelAndView mav = new ModelAndView("index");
         List<Game> allGames = gs.findAllPaged(0L);
 
-        mav.addObject("user", currentUser.orElse(null));
+        mav.addObject("user", currentUser.isPresent() ? currentUser.get().getPawUser() : null);
         mav.addObject("games", allGames);
         mav.addObject("regions", Arrays.stream(Region.values()).toList());
         mav.addObject("elos", Arrays.stream(Elo.values()).toList());
@@ -63,10 +64,10 @@ public class UserController {
     }
 
     @RequestMapping("/myTournaments")
-    public ModelAndView myTournaments(@ModelAttribute("user") Optional<PawUserDetails> currentUser) {
+    public ModelAndView myTournaments(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam(value = "section", required = false) String section) {
         final ModelAndView mav = new ModelAndView("myTournaments");
 
-        User user = currentUser.orElse(null).getPawUser();
+        User user = currentUser.get().getPawUser();
 
         List<Tournament> onGoingTournaments = ts.getCreatedAndOngoingTournaments(user.getId());
         List<Tournament> finishedTournaments = ts.getCreatedAndFinishedTournaments(user.getId());
@@ -147,8 +148,7 @@ public class UserController {
 
         Optional<User> profileOpt = us.findById(id);
         if (profileOpt.isEmpty()){
-            // TODO: REDIRIGIR A 404
-            return index(currentUser, new TournamentForm());
+            throw new UserNotFoundException();
         }
 
         mav.addObject("user", currentUser.orElse(null));

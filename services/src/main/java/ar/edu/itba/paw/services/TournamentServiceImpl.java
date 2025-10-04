@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.services;
 
+import ar.edu.itba.paw.interfaces.exception.GameNotFoundException;
 import ar.edu.itba.paw.interfaces.exception.TournamentNotFoundException;
 import ar.edu.itba.paw.interfaces.exception.UserNotFoundException;
 import ar.edu.itba.paw.interfaces.persistence.GameDao;
@@ -43,14 +44,18 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Override
     public Optional<Tournament> findById(Long id) {
-        if (id != null){
-            return tournamentDao.findById(id);
+        Optional<Tournament> toReturn = tournamentDao.findById(id);
+        if(toReturn.isEmpty()) {
+            throw new TournamentNotFoundException();
         }
-        return Optional.empty();
+        return toReturn;
     }
 
     @Override
     public List<Tournament> findTournaments(TournamentFilter tournamentFilter, Long page) {
+        if(gameDao.findById(tournamentFilter.getGame_id()).isEmpty()) {
+            throw new GameNotFoundException();
+        }
         return tournamentDao.findTournaments(tournamentFilter, page);
     }
 
@@ -143,9 +148,6 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Override
     public List<Tournament> findByCreator(Long creator_id) {
-        if(findById(creator_id).isEmpty()){
-            throw new UserNotFoundException();
-        }
         return tournamentDao.findByCreator(creator_id);
     }
 
