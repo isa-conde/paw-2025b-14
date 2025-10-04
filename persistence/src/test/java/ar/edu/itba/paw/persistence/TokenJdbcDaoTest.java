@@ -32,7 +32,7 @@ import java.util.Optional;
 @Rollback
 public class TokenJdbcDaoTest {
     private List<Long> USED_IDS;
-    private static final RowMapper<Token> ROW_MAPPER_TOKEN = (rs, rowNum) -> new Token(rs.getLong("id"), rs.getLong("user_id"), rs.getLong("token"), LocalDate.parse(rs.getString("expiry_date"),DateTimeFormatter.ISO_LOCAL_DATE) );
+    private static final RowMapper<Token> ROW_MAPPER_TOKEN = (rs, rowNum) -> new Token(rs.getLong("id"), rs.getLong("user_id"), rs.getLong("token"), rs.getDate("expiry_date").toLocalDate() );
 
     @Autowired
     private DataSource ds;
@@ -51,12 +51,12 @@ public class TokenJdbcDaoTest {
         USED_IDS = new ArrayList<>();
         USED_IDS.add(jdbcInsert.executeAndReturnKey(Map.of("user_id",1L,
                 "token",1L,
-                "expiry_date", LocalDate.now().minusDays(1).toString(),
+                "expiry_date", LocalDate.now().minusDays(1),
                 "used",false))
                 .longValue());
         USED_IDS.add(jdbcInsert.executeAndReturnKey(Map.of("user_id",2L,
                 "token",2L,
-                "expiry_date", LocalDate.now().plusDays(1).toString(),
+                "expiry_date", LocalDate.now().plusDays(1),
                 "used",true))
                 .longValue());
     }

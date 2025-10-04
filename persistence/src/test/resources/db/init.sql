@@ -32,11 +32,14 @@ CREATE TABLE IF NOT EXISTS tournament(
     start_date date ,
     end_date date ,
     format varchar(100) NOT NULL ,
-    max_participants INTEGER NOT NULL ,
     structure varchar(20) ,
+    max_participants INTEGER NOT NULL ,
     image_id INTEGER ,
     open_inscriptions BOOLEAN ,
     is_finished BOOLEAN ,
+    tournament_winner integer,
+    is_group_stage boolean,
+    tournament_started boolean,
     CONSTRAINT tournament_dates_check
         CHECK  ((start_date IS NULL) OR (end_date IS NULL) OR (start_date < end_date))
 );
@@ -57,6 +60,39 @@ create table if not exists tokens(
     id integer identity primary key not null,
     user_id integer not null,
     token bigint not null,
-    expiry_date varchar(10) not null,
+    expiry_date date not null,
     used BOOLEAN DEFAULT false NOT NULL
+);
+
+create table if not exists team_member(
+    team_id integer not null,
+    user_id integer not null,
+    primary key (user_id,team_id)
+);
+
+create table if not exists team(
+    id integer identity primary key not null ,
+    name varchar(16) not null ,
+    profile_picture_id integer,
+    banner_id integer,
+    owner_id integer not null
+);
+
+create table if not exists participant_user(
+    user_id integer not null ,
+    tournament_id integer not null ,
+    points integer default 0 not null ,
+    group_number integer,
+    primary key (user_id,tournament_id)
+);
+
+create table if not exists match(
+    id integer identity primary key not null,
+    tournament_id integer not null ,
+    local_id integer,
+    visitor_id integer,
+    winner integer,
+    stage integer,
+    group_number integer,
+    is_group_stage boolean
 );
