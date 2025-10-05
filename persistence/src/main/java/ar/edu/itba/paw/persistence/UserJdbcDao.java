@@ -9,6 +9,8 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -78,7 +80,28 @@ public class UserJdbcDao implements UserDao {
 
     @Override
     public void updateProfileInfo(Long userId, String username, String bio, Long pfp, Long banner){
-        jdbcTemplate.update("UPDATE users SET username = ?, bio = ?, profile_picture_id = ?, banner_id = ? WHERE id = ?", username, bio, pfp, banner, userId);
-    }
+        StringBuilder sql = new StringBuilder("UPDATE users SET ");
+        List<Object> params = new ArrayList<>();
+
+        sql.append("username = ?");
+        params.add(username);
+
+        sql.append(", bio = ?");
+        params.add(bio);
+
+        if (pfp != null) {
+            sql.append(", profile_picture_id = ?");
+            params.add(pfp);
+        }
+
+        if (banner != null) {
+            sql.append(", banner_id = ?");
+            params.add(banner);
+        }
+
+        sql.append(" WHERE id = ?");
+        params.add(userId);
+
+        jdbcTemplate.update(sql.toString(), params.toArray());    }
 
 }

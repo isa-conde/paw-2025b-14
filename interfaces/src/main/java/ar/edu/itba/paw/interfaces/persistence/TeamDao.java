@@ -18,4 +18,6 @@ public interface TeamDao {
 
     List<Team> getUserTeams(Long user_id);
 
+    void updateTeam(Long teamId, String name, Long pfpId, Long bannerId);
+
     }

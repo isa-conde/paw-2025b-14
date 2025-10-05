@@ -166,13 +166,9 @@ public class UserServiceImpl implements UserService {
         Long pfpId = null;
         if (pfp != null){
             pfpId = imageDao.insertImage(pfp);
-        }else {
-            pfpId = user.get().getProfile_picture_id();
         }
         if (banner != null){
             bannerId = imageDao.insertImage(pfp);
-        }else {
-            bannerId = user.get().getBanner_id();
         }
         userDao.updateProfileInfo(userId, username, bio, pfpId, bannerId);
     }

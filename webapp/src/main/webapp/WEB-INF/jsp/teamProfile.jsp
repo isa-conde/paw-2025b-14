@@ -57,7 +57,44 @@
         </div>
 
     </div>
-
-
-
 </paw:layout>
+
+
+<paw:modal title="team.profile.edit.title" id="editProfileModal">
+    <form:form method="post" modelAttribute="teamForm"
+               action="${pageContext.request.contextPath}/team/update"
+               enctype="multipart/form-data" cssClass="form">
+        <input type="hidden" name="teamId" value="${team.id}"/>
+        <div class="row">
+            <paw:input path="name" label="team.profile.edit.name" hasConstraint="true"/>
+        </div>
+        <div class="row">
+            <paw:input path="profilePicture" label="team.create.teamImage" inputType="file" hasConstraint="true"/>
+        </div>
+        <div class="row">
+            <paw:input path="bannerPicture" label="team.create.teamBanner" inputType="file"/>
+        </div>
+        <div class="input-container">
+            <label for="memberInput" class="input-label"><spring:message code="team.create.members"/></label>
+            <div class="row center member-input-container">
+                <input type="text" id="memberInput" placeholder="<spring:message code="team.create.addMember.placeholder"/>" class="input" />
+                <button type="button" id="addMemberBtn" class="btn submit"><spring:message code="team.create.add"/></button>
+            </div>
+            <form:errors path="members" cssClass="form-error" element="h1"/>
+            <div id="chipContainer" class="chip-container">
+                <c:forEach var="member" items="${teamForm.members}">
+                    <div class="chip">
+                        <c:out value="${member}"/>
+                        <span class="chip-close">X</span>
+                        <input type="hidden" name="members" value="${member}"/>
+                    </div>
+                </c:forEach>
+            </div>
+        </div>
+        <div class="row center">
+            <paw:input path="" label="tournament.edit.saveChanges" containerType="half" inputType="submit"/>
+        </div>
+    </form:form>
+</paw:modal>
+
+<script src="${pageContext.request.contextPath}/js/teamMembers.js"></script>

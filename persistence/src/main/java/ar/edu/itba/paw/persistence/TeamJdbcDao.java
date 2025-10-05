@@ -9,10 +9,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 public class TeamJdbcDao implements TeamDao {
@@ -54,6 +51,30 @@ public class TeamJdbcDao implements TeamDao {
     @Override
     public List<Team> getUserTeams(Long user_id) {
         return jdbcTemplate.query("SELECT DISTINCT t.* FROM team_member tm JOIN team t ON tm.team_id = t.id WHERE tm.user_id = ?", ROW_MAPPER, user_id);
+    }
+
+    @Override
+    public void updateTeam(Long teamId, String name, Long pfpId, Long bannerId) {
+        StringBuilder sql = new StringBuilder("UPDATE team SET ");
+        List<Object> params = new ArrayList<>();
+
+        sql.append("name = ?");
+        params.add(name);
+
+        if (pfpId != null) {
+            sql.append(", profile_picture_id = ?");
+            params.add(pfpId);
+        }
+
+        if (bannerId != null) {
+            sql.append(", banner_id = ?");
+            params.add(bannerId);
+        }
+
+        sql.append(" WHERE id = ?");
+        params.add(teamId);
+
+        jdbcTemplate.update(sql.toString(), params.toArray());
     }
 
     @Override

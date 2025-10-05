@@ -45,6 +45,8 @@ public class TeamServiceImpl implements TeamService {
         for (String s : members){
             teamMemberDao.AddMember(team.getId(), userDao.findByUsername(s).get().getId());
         }
+        teamMemberDao.AddMember(team.getId(), owner_id);
+
 
         return team;
     }
@@ -68,6 +70,25 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public List<Team> getUserTeams(Long user_id) {
         return teamDao.getUserTeams(user_id);
+    }
+
+    @Override
+    public void updateTeam(Long teamId, String name, byte[] pfp, byte[] banner, List<String> members) {
+        Optional<Team> optionalTeam = teamDao.getById(teamId);
+        Long pfp_id = null;
+        Long banner_id = null;
+        if (pfp != null){
+            pfp_id = imageDao.insertImage(pfp);
+        }
+        if (banner != null){
+            banner_id = imageDao.insertImage(banner);
+        }
+
+        for (String s : members){
+            teamMemberDao.AddMember(teamId, userDao.findByUsername(s).get().getId());
+        }
+
+        teamDao.updateTeam(teamId, name, pfp_id, banner_id);
     }
 
     private List<Tournament> getTournamentsFromIds(List<Long> tournamentIds) {

@@ -18,4 +18,6 @@ public interface TeamService {
 
     List<Team> getUserTeams(Long user_id);
 
+    void updateTeam(Long teamId, String name, byte[] pfp, byte[] banner, List<String> members);
+
 }

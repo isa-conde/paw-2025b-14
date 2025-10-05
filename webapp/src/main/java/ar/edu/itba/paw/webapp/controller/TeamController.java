@@ -6,14 +6,13 @@ import ar.edu.itba.paw.model.Team;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
 import ar.edu.itba.paw.webapp.form.CreateTeamForm;
+import ar.edu.itba.paw.webapp.form.EditProfileForm;
+import ar.edu.itba.paw.webapp.form.EditTeamForm;
 import ar.edu.itba.paw.webapp.form.TournamentForm;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
@@ -71,14 +70,12 @@ public class TeamController {
             isValid = false;
             result.rejectValue("banner", "error.tournamentForm.invalidImage");
         }
-        if (isValid){
-            ts.create(form.getName(), pfpBytes, bannerBytes, user.getId(), form.getMembers());
-        }
-        return new ModelAndView("redirect:/");
+        Team team = ts.create(form.getName(), pfpBytes, bannerBytes, user.getId(), form.getMembers());
+        return new ModelAndView("redirect:/profile/team/" + team.getId());
     }
 
     @RequestMapping("/team/profile/{id}")
-    public ModelAndView teamProfile(Principal principal, @PathVariable Long id){
+    public ModelAndView teamProfile(Principal principal, @PathVariable Long id, @ModelAttribute("teamForm") EditTeamForm editTeamForm){
         final ModelAndView mav = new ModelAndView("teamProfile");
 
         User user = us.findByUsername(principal.getName()).orElse(null);
@@ -95,7 +92,49 @@ public class TeamController {
         mav.addObject("owner", us.findById(team.getOwner_id()).get());
         mav.addObject("pastTournaments", ts.getPastTournaments(team.getId()));
         mav.addObject("activeTournaments", ts.getActiveTournaments(team.getId()));
+        editTeamForm.setName(team.getName());
         return mav;
+    }
+
+    @RequestMapping(value = "/team/update", method = { RequestMethod.POST })
+    public ModelAndView updateProfile(Principal principal, @RequestParam("teamId") final long teamId, @Valid @ModelAttribute("EditTeamForm") final EditTeamForm form, final BindingResult result){
+        User user = null;
+        if (principal != null) {
+            Optional<User> userOpt = us.findByUsername(principal.getName());
+            user = userOpt.orElse(null);
+        }
+        if (user == null) {
+            return new ModelAndView("redirect:/");
+        }
+
+        if (result.hasErrors()) {
+            return new ModelAndView("redirect:/team/profile/" + teamId   );
+        }
+
+        Boolean isValid = true;
+
+        byte[] pfpBytes = null;
+        try {
+            if (form.getProfilePicture() != null && !form.getProfilePicture().isEmpty()) {
+                pfpBytes = form.getProfilePicture().getBytes();
+            }
+        } catch (IOException e) {
+            isValid = false;
+            result.rejectValue("profilePicture", "error.tournamentForm.invalidImage");
+        }
+        byte[] bannerBytes = null;
+        try {
+            if (form.getBannerPicture() != null && !form.getBannerPicture().isEmpty()) {
+                bannerBytes = form.getBannerPicture().getBytes();
+            }
+        } catch (IOException e) {
+            isValid = false;
+            result.rejectValue("bannerPicture", "error.tournamentForm.invalidImage");
+        }
+        if (isValid){
+            ts.updateTeam(form.getTeamId(), form.getName(), pfpBytes, bannerBytes, form.getMembers());
+        }
+        return new ModelAndView("redirect:/team/profile/" + form.getTeamId() );
     }
 
 }
