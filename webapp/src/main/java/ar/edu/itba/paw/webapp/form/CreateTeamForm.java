@@ -1,13 +1,10 @@
 package ar.edu.itba.paw.webapp.form;
 
 
-import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.webapp.constraints.ExistingUsersContraint;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.constraints.Max;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 

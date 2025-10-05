@@ -926,7 +926,7 @@ dialog:not([open]) {
 }
 
 .row.center {
-    margin: 30px 20px 20px;
+    margin: 20px 20px 20px;
 }
 
 /* ------- ICON BUTTON ------- */
@@ -1006,11 +1006,7 @@ dialog:not([open]) {
     flex-direction: column;
     flex: 1;
     min-width: 150px;
-    margin-right: 20px;
-}
-
-.inline-input-container:last-child {
-    margin-right: 0;
+    gap: 20px;
 }
 
 .inline-input-container.submit-container {
@@ -1563,4 +1559,32 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .logout-button:hover {
     background-color: var(--secondary-details-hover)
+}
+
+/* ------- LIST ------- */
+
+.teams-list-container {
+    background-color: var(--background-secondary);
+    border-radius: 15px;
+}
+
+.teams-list {
+    width: 100%;
+    max-width: 100%;
+    padding: 30px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+}
+
+.teams-list .btn {
+    width: 100%;
+    max-width: 100%;
+}
+
+.teams-list .btn:disabled {
+    opacity: 1;
 }
