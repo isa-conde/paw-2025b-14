@@ -88,7 +88,7 @@ public class UserController {
         final ModelAndView mav = new ModelAndView("gamesPage");
         List<Game> allGames = gs.findAllPaged(page);
 
-        mav.addObject("user", currentUser.orElse(null));
+        mav.addObject("user", currentUser.isPresent() ? currentUser.get().getPawUser() : null);
         mav.addObject("games", allGames);
         mav.addObject("totalPages", gs.getPageAmount());
         mav.addObject("currentPage", page);
@@ -101,7 +101,7 @@ public class UserController {
         final ModelAndView mav = new ModelAndView("tournamentsPage");
         List<Game> allGames = gs.findAll();
 
-        mav.addObject("user", currentUser.orElse(null));
+        mav.addObject("user", currentUser.isPresent() ? currentUser.get().getPawUser() : null);
         mav.addObject("games", allGames);
         mav.addObject("structures", Arrays.stream(Structure.values()).toList());
         mav.addObject("regions", Arrays.stream(Region.values()).toList());
@@ -135,7 +135,7 @@ public class UserController {
     public ModelAndView search(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam("q") final String q){
         final ModelAndView mav = new ModelAndView("searchResults");
 
-        mav.addObject("user", currentUser.orElse(null));
+        mav.addObject("user", currentUser.isPresent() ? currentUser.get().getPawUser() : null);
         mav.addObject("games", gs.searchByName(q));
         mav.addObject("tournaments", ts.searchByName(q));
 
@@ -151,7 +151,7 @@ public class UserController {
             throw new UserNotFoundException();
         }
 
-        mav.addObject("user", currentUser.orElse(null));
+        mav.addObject("user", currentUser.isPresent() ? currentUser.get().getPawUser() : null);
         mav.addObject("isMyProfile", profileOpt.get().getId() == currentUser.get().getPawUser().getId());
         mav.addObject("profile", profileOpt.get());
         mav.addObject("favouriteGames", gs.getFavourites(id));

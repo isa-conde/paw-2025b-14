@@ -1,14 +1,13 @@
 package ar.edu.itba.paw.webapp.controller.advice;
 
-import ar.edu.itba.paw.interfaces.exception.GameNotFoundException;
-import ar.edu.itba.paw.interfaces.exception.TournamentNotFoundException;
-import ar.edu.itba.paw.interfaces.exception.UserNotFoundException;
+import ar.edu.itba.paw.interfaces.exception.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -62,11 +61,48 @@ public class CustomExceptionHandler {
         return mav;
     }
 
+    @ExceptionHandler(UserAlreadyJoinedException.class)
+    public ModelAndView handleUserAlreadyJoinedException() {
+        ModelAndView mav = new ModelAndView("error/exception");
+        mav.addObject("message", "errorExceptionPage.userAlreadyJoined.description");
+        mav.addObject("title", "errorExceptionPage.userAlreadyJoined.title");
+        return mav;
+    }
+
     @ExceptionHandler(NoHandlerFoundException.class)
     public ModelAndView handleNotFoundException() {
         ModelAndView mav = new ModelAndView("error/exception");
         mav.addObject("message", "error404Page.description");
         mav.addObject("title", "error404Page.title");
+        return mav;
+    }
+
+    @ExceptionHandler(TournamentAlreadyClosedException.class)
+    public ModelAndView handleTournamentAlreadyJoined() {
+        ModelAndView mav = new ModelAndView("error/exception");
+        mav.addObject("message", "errorExceptionPage.tournamentAlreadyClosed.description");
+        mav.addObject("title", "errorExceptionPage.tournamentAlreadyClosed.title");
+        return mav;
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ModelAndView handle405Error() {
+        return new ModelAndView("error/405");
+    }
+
+    @ExceptionHandler(MatchWinnerAlreadySetException.class)
+    public ModelAndView handleMatchWinnerAlreadySet() {
+        ModelAndView mav = new ModelAndView("error/exception");
+        mav.addObject("message", "errorExceptionPage.matchWinnerAlreadySet.description");
+        mav.addObject("title", "errorExceptionPage.matchWinnerAlreadySet.title");
+        return mav;
+    }
+
+    @ExceptionHandler(TournamentAlreadyStartedException.class)
+    public ModelAndView handleTournamentAlreadyStartedException() {
+        ModelAndView mav = new ModelAndView("error/exception");
+        mav.addObject("message", "errorExceptionPage.tournamentAlreadyStarted.description");
+        mav.addObject("title", "errorExceptionPage.tournamentAlreadyStarted.title");
         return mav;
     }
 

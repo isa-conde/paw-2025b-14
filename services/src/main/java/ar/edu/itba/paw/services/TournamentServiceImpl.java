@@ -1,8 +1,6 @@
 package ar.edu.itba.paw.services;
 
-import ar.edu.itba.paw.interfaces.exception.GameNotFoundException;
-import ar.edu.itba.paw.interfaces.exception.TournamentNotFoundException;
-import ar.edu.itba.paw.interfaces.exception.UserNotFoundException;
+import ar.edu.itba.paw.interfaces.exception.*;
 import ar.edu.itba.paw.interfaces.persistence.GameDao;
 import ar.edu.itba.paw.interfaces.persistence.ImageDao;
 import ar.edu.itba.paw.interfaces.persistence.ImageDao;
@@ -161,12 +159,17 @@ public class TournamentServiceImpl implements TournamentService {
         if(findById(tournament_id).isEmpty()) {
             throw new TournamentNotFoundException();
         }
+        if(tournamentDao.isClosed(tournament_id)) {
+            throw new TournamentAlreadyClosedException();
+        }
         tournamentDao.closeInscriptions(tournament_id, participantDao.getTournamentParticipantUsers(tournament_id));
     }
 
     @Override
     public void setMatchWinner(Long matchId, Long tournamentId, Integer winner) {
-
+        if(tournamentDao.hasWinner(matchId, tournamentId)) {
+            throw new MatchWinnerAlreadySetException();
+        }
         tournamentDao.setMatchWinner(matchId, tournamentId, winner);
     }
 
@@ -187,8 +190,12 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Override
     public void startTournament(Long tournament_id){
-        if(findById(tournament_id).isEmpty()) {
+        Optional<Tournament> optTournament = findById(tournament_id);
+        if(optTournament.isEmpty()) {
             throw new TournamentNotFoundException();
+        }
+        if(optTournament.get().getTournamentStarted()) {
+            throw new TournamentAlreadyStartedException();
         }
         tournamentDao.startTournament(tournament_id, participantDao.getTournamentParticipantUsers(tournament_id));
     }

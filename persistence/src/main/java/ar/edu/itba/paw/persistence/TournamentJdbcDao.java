@@ -892,4 +892,20 @@ public class TournamentJdbcDao implements TournamentDao {
                 Integer.class, tournamentId
         );
     }
+
+    @Override
+    public boolean isClosed(Long tournamentId) {
+        Boolean open = jdbcTemplate.queryForObject(
+                "SELECT open_inscriptions FROM tournament WHERE id = ?",
+                Boolean.class, tournamentId
+        );
+        return !open;
+    }
+
+    @Override
+    public boolean hasWinner(Long matchId, Long tournamentId) {
+        Match match = getMatch(matchId, tournamentId);
+        return match.getWinner() != null;
+    }
+
 }

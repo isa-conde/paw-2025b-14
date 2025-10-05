@@ -63,4 +63,8 @@ public interface TournamentDao {
     void updateTournamentInfo(Long tournament_id, String name, LocalDate start_date, LocalDate end_date, Integer max_participants);
 
     int tournamentParticipantsCount(Long tournamentId);
+
+    boolean isClosed(Long tournamentId);
+
+    boolean hasWinner(Long matchId, Long tournamentId);
 }
