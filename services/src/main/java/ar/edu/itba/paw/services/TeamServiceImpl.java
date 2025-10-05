@@ -6,11 +6,13 @@ import ar.edu.itba.paw.model.Team;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Transactional(readOnly = true)
 @Service
 public class TeamServiceImpl implements TeamService {
 
@@ -28,7 +30,7 @@ public class TeamServiceImpl implements TeamService {
         this.tournamentDao = tournamentDao;
     }
 
-
+    @Transactional
     @Override
     public Team create(String name, byte[] pfp, byte[] banner, Long owner_id, List<String> members) {
         Long pfp_id = null;

@@ -46,7 +46,7 @@ public class MailServiceImpl implements MailService {
 
     @Async
     @Override
-    public void sendTournamentJoinedEmail(String userName, String tournamentName, String tournamentLink, String creatorMail, String recipient) {
+    public void sendTournamentJoinedEmail(String userName, String tournamentName, String tournamentLink, String recipient, String creatorMail) {
         Context ctx = new Context();
         ctx.setVariable("userName", userName);
         ctx.setVariable("tournamentName", tournamentName);

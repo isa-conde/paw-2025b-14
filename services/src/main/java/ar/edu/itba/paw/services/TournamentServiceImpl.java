@@ -5,19 +5,20 @@ import ar.edu.itba.paw.interfaces.persistence.*;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.ParticipantUser;
-import ar.edu.itba.paw.model.*;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.*;
 
+@Transactional(readOnly = true)
 @Service
 public class TournamentServiceImpl implements TournamentService {
 
@@ -57,6 +58,7 @@ public class TournamentServiceImpl implements TournamentService {
         return tournamentDao.findGameTournaments(game_id);
     }
 
+    @Transactional
     @Override
     public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, byte[] image, Boolean openInscriptions, Boolean isFinished, Long format_id) {
         Long image_id = imageDao.insertImage(image);
@@ -68,6 +70,7 @@ public class TournamentServiceImpl implements TournamentService {
         return tournamentDao.findByCreator(creator_id);
     }
 
+    @Transactional
     @Override
     public void setFinished(Long tournament_id, Long lastMatchId) {
         Tournament t = findById(tournament_id).orElse(null);
@@ -94,6 +97,7 @@ public class TournamentServiceImpl implements TournamentService {
         return participantDao.getTournamentParticipantsByPoints(tournamentId, null, maxPoints);
     }
 
+    @Transactional
     @Override
     public void closeInscriptions(Long tournament_id){
         if(findById(tournament_id).isEmpty()) {
@@ -102,6 +106,7 @@ public class TournamentServiceImpl implements TournamentService {
         if(tournamentDao.isClosed(tournament_id)) {
             throw new TournamentAlreadyClosedException();
         }
+        createMatches(tournament_id, participantDao.getTournamentParticipantUsers(tournament_id));
         tournamentDao.closeInscriptions(tournament_id);
     }
 
@@ -120,6 +125,7 @@ public class TournamentServiceImpl implements TournamentService {
         return tournamentDao.searchByName(name);
     }
 
+    @Transactional
     @Override
     public void startTournament(Long tournament_id){
         Optional<Tournament> optTournament = findById(tournament_id);
@@ -151,6 +157,7 @@ public class TournamentServiceImpl implements TournamentService {
         return tournamentDao.getPageAmount(pageSize, tf);
     }
 
+    @Transactional
     @Override
     public void updateTournamentInfo(Long tournament_id, String name, LocalDate start_date, LocalDate end_date, Integer max_participants, byte[] image){
         Tournament t = findById(tournament_id).orElse(null);
@@ -163,8 +170,8 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public int tournamentParticipantsCount(Long tournamentId) {
-    	return tournamentDao.tournamentParticipantsCount(tournamentId);
+    public int getTournamentParticipantsCount(Long tournamentId) {
+    	return tournamentDao.getTournamentParticipantsCount(tournamentId);
     }
 
     private void createMatches(Long tournamentId, List<ParticipantUser> participants) {
@@ -181,11 +188,11 @@ public class TournamentServiceImpl implements TournamentService {
         }
     }
 
-    public void createMatchesLeague(Tournament t, List<ParticipantUser> participants) {
+    private void createMatchesLeague(Tournament t, List<ParticipantUser> participants) {
         createMatchesLeague(t, participants, 1L, 1, null);
     }
 
-    public void createMatchesLeague(Tournament t, List<ParticipantUser> participants, Long firstMatchId, Integer firstStage, Boolean isGroupStage) {
+    private void createMatchesLeague(Tournament t, List<ParticipantUser> participants, Long firstMatchId, Integer firstStage, Boolean isGroupStage) {
         int n = participants.size();
 
         // Odd # of participants -> add fictional participant
@@ -304,6 +311,7 @@ public class TournamentServiceImpl implements TournamentService {
         return distribution;
     }
 
+    @Transactional
     @Override
     public void createBracketFromGroups(Long tournamentId) {
         Integer groups = participantDao.getTournamentGroups(tournamentId);

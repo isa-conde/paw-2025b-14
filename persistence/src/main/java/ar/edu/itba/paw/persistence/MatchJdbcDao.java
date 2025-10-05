@@ -174,9 +174,9 @@ public class MatchJdbcDao implements MatchDao {
     }
 
     @Override
-    public Integer getTournamentMaxStage(Long tournamentId){
+    public Integer getTournamentMaxStage(Long tournamentId) {
         return jdbcTemplate.queryForObject(
-                "SELECT MAX(stage) FROM match WHERE tournament_id = ?",
+                "SELECT COALESCE(MAX(stage), 0) FROM match WHERE tournament_id = ?",
                 Integer.class, tournamentId
         );
     }

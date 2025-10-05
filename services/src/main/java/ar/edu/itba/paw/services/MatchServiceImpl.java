@@ -12,9 +12,11 @@ import ar.edu.itba.paw.model.ParticipantUser;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.enums.Structure;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+@Transactional(readOnly = true)
 @Service
 public class MatchServiceImpl implements MatchService {
 
@@ -30,6 +32,7 @@ public class MatchServiceImpl implements MatchService {
         this.ts = tournamentService;
     }
 
+    @Transactional
     @Override
     public void swapMatchesMembers(Long tournament_id, Long match1, Long match2, Long user1, Long user2){
         Match m1 = matchDao.getMatch(tournament_id, match1);
@@ -97,6 +100,7 @@ public class MatchServiceImpl implements MatchService {
         return result;
     }
 
+    @Transactional
     @Override
     public void setMatchWinner(Long matchId, Long tournamentId, Integer winner) {
         if (winner == null || (winner != 1 && winner != 2)) {

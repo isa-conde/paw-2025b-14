@@ -6,10 +6,12 @@ import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.Game.GameFormat;
 import ar.edu.itba.paw.model.enums.Genre;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
+@Transactional(readOnly = true)
 @Service
 public class GameServiceImpl implements GameService {
 
@@ -44,11 +46,13 @@ public class GameServiceImpl implements GameService {
         return gameDao.findAll();
     }
 
+    @Transactional
     @Override
     public Game create(String name, Genre genre, Integer image_id) {
         return gameDao.create(name, genre, image_id);
     }
 
+    @Transactional
     @Override
     public Game createWithFormats(String name, Genre genre, List<GameFormat> formats, byte[] image) {
         return gameDao.createWithFormats(name, genre, formats, image);
@@ -59,6 +63,7 @@ public class GameServiceImpl implements GameService {
         return gameDao.getFormats(gameId);
     }
 
+    @Transactional
     @Override
     public void addFavourite(Long user_id, Long game_id) {
         gameDao.addFavourite(user_id, game_id);

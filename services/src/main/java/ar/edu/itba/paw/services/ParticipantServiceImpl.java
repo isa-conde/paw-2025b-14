@@ -9,11 +9,13 @@ import ar.edu.itba.paw.model.ParticipantUser;
 import ar.edu.itba.paw.model.ParticipantInfo;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Transactional(readOnly = true)
 @Service
 public class ParticipantServiceImpl implements ParticipantService {
 
@@ -27,6 +29,7 @@ public class ParticipantServiceImpl implements ParticipantService {
         this.ts = ts;
     }
 
+    @Transactional
     @Override
     public void joinTournamentUser(Long user_id, Long tournament_id) {
         if(hasJoined(user_id, tournament_id)) {
@@ -74,11 +77,13 @@ public class ParticipantServiceImpl implements ParticipantService {
         return participantDao.hasJoined(userId, tournamentId);
     }
 
+    @Transactional
     @Override
     public void leaveTournamentUser(Long user_id, Long tournament_id) {
         participantDao.leaveTournamentUser(user_id, tournament_id);
     }
 
+    @Transactional
     @Override
     public void swapGroups(Long tournament_id, Long user1, Long user2){
         if (tournamentDao.isTournamentStarted(tournament_id)) {

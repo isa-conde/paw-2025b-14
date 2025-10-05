@@ -320,7 +320,7 @@ public class TournamentJdbcDao implements TournamentDao {
     }
 
     @Override
-    public int tournamentParticipantsCount(Long tournamentId){
+    public int getTournamentParticipantsCount(Long tournamentId){
         return jdbcTemplate.queryForObject(
                 "SELECT COUNT(*) FROM participant WHERE tournament_id = ?",
                 Integer.class, tournamentId

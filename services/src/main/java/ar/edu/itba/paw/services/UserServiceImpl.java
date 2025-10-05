@@ -17,6 +17,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.InvalidAlgorithmParameterException;
 import java.security.SecureRandom;
@@ -48,12 +49,13 @@ public class UserServiceImpl implements UserService {
         this.imageDao = imageDao;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Optional<User> findById(long id) {
         return userDao.findById(id);
     }
 
-
+    @Transactional
     @Override
     public User create(String username, String email, String password) throws BusinessException {
         if (userDao.checkUsernameExists(username)){
@@ -65,16 +67,19 @@ public class UserServiceImpl implements UserService {
         return userDao.create(username, email, passwordEncoder.encode(password));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Optional<User> findByUsername(String username) {
         return userDao.findByUsername(username);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Optional<User> findByEmail(String email) {
         return userDao.findByEmail(email);
     }
 
+    @Transactional
     @Override
     public void requestPasswordReset(String email, String baseUrl) {
         Optional<User> user = findByEmail(email);
@@ -83,11 +88,11 @@ public class UserServiceImpl implements UserService {
             return;
         }
         long userId = user.get().getId();
-        String username = user.get().getUsername();
         Token token = generateToken(userId, RESET_PASSWORD_DAYS_DURATION);
         ms.sendResetPasswordEmail(userId, token.getToken(), email, baseUrl);
     }
 
+    @Transactional
     @Override
     public void sendVerificationEmail(String email, String baseUrl) {
         Optional<User> user = findByEmail(email);
@@ -101,6 +106,7 @@ public class UserServiceImpl implements UserService {
         ms.sendVerificationEmail(userId, username, token.getToken(), email, baseUrl);
     }
 
+    @Transactional
     @Override
     public Optional<Token> resetPassword(Long token, Long userId, String newPassword) {
         Optional<Token> optToken = checkTokenValidity(token, userId);
@@ -110,23 +116,27 @@ public class UserServiceImpl implements UserService {
         return optToken;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public boolean sameAsOldPassword(String newPassword, Long userId) {
-        String oldPassword = userDao.findById(userId).get().getPassword();
+        String oldPassword = findById(userId).get().getPassword();
         if(oldPassword == null) return false;
         return passwordEncoder.matches(newPassword, oldPassword);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public boolean usernameIsTaken(String username) {
-        return userDao.findByUsername(username).isPresent();
+        return findByUsername(username).isPresent();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public boolean emailIsTaken(String email) {
-        return userDao.findByEmail(email).isPresent();
+        return findByEmail(email).isPresent();
     }
 
+    @Transactional
     @Override
     public Optional<Token> verifyEmail(Long token, Long userId) {
         Optional<Token> optToken = checkTokenValidity(token, userId);
@@ -142,6 +152,7 @@ public class UserServiceImpl implements UserService {
         return optToken;
     }
 
+    @Transactional(readOnly = true)
     @Override
     public void authenticateVerifiedUser(Long userId) {
         Optional<User> optUser = findById(userId);
@@ -159,6 +170,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Transactional
     @Override
     public Optional<Token> checkTokenValidity(Long token, Long userId) {
         Optional<Token> optToken = tokenDao.findByToken(token);
@@ -195,6 +207,7 @@ public class UserServiceImpl implements UserService {
         return tokenDao.create(userId, tokenValue, expiryDate);
     }
 
+    @Transactional
     @Override
     public void updateProfileInfo(Long userId, String username, String bio, byte[] pfp, byte[] banner){
         Optional<User> user = userDao.findById(userId);
@@ -213,6 +226,7 @@ public class UserServiceImpl implements UserService {
         userDao.updateProfileInfo(userId, username, bio, pfpId, bannerId);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public void sendTournamentJoinedEmail(String username, Long tournamentId, String tournamentLink, String recipient) {
         Optional<Tournament> tournamentOpt = tournamentDao.findById(tournamentId);

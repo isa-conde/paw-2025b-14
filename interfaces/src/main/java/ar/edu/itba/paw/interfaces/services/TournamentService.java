@@ -42,7 +42,7 @@ public interface TournamentService {
 
     void updateTournamentInfo(Long tournament_id, String name, LocalDate start_date, LocalDate end_date, Integer max_participants, byte[] image);
 
-    int tournamentParticipantsCount(Long tournamentId);
+    int getTournamentParticipantsCount(Long tournamentId);
 
     void createBracketFromGroups(Long tournamentId);
 
