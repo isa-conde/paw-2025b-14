@@ -1,16 +1,19 @@
 package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.interfaces.persistence.ParticipantDao;
-import ar.edu.itba.paw.model.ParticipantUser;
-import ar.edu.itba.paw.model.ParticipantInfo;
+import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
+import ar.edu.itba.paw.model.Participant;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.sql.Array;
 import java.sql.PreparedStatement;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,37 +23,45 @@ public class ParticipantJdbcDao implements ParticipantDao {
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
+    private final NamedParameterJdbcTemplate namedJdbcTemplate;
 
     public ParticipantJdbcDao(final DataSource ds) {
         this.jdbcTemplate = new JdbcTemplate(ds);
+        this.namedJdbcTemplate = new NamedParameterJdbcTemplate(ds);
         this.jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("participant")
                 .usingGeneratedKeyColumns("id");
     }
 
-    private static final RowMapper<ParticipantUser> ROW_MAPPER = (rs, rowNum) -> new ParticipantUser(
+    private static final RowMapper<Participant> ROW_MAPPER_USER = (rs, rowNum) -> new Participant(
             rs.getLong("user_id"),
-            rs.getLong("tournament_id"),
+            rs.getString("username"),
             rs.getInt("points"),
             rs.getInt("group_number")
     );
 
-    private static final RowMapper<ParticipantInfo> ROW_MAPPER_USER_INFO = (rs, rowNum) -> new ParticipantInfo(rs.getLong("user_id"), rs.getString("username"), rs.getInt("points"), rs.getInt("group_number"));
+    private static final RowMapper<Participant> ROW_MAPPER_TEAM = (rs, rowNum) -> new Participant(
+            rs.getLong("team_id"),
+            rs.getString("name"),
+            rs.getInt("points"),
+            rs.getInt("group_number")
+    );
 
-    private static final RowMapper<ParticipantInfo> ROW_MAPPER_TEAM_INFO = (rs, rowNum) -> new ParticipantInfo(rs.getLong("team_id"), rs.getString("name"), rs.getInt("points"), rs.getInt("group_number"));
+
 
     @Override
-    public List<ParticipantInfo> getTournamentsParticipantUsersInfo(Long tournament_id) {
+    public List<Participant> getTournamentsParticipantUsers(Long tournament_id) {
+
         return jdbcTemplate.query("SELECT * FROM participant " +
                                       "INNER JOIN users ON participant.user_id = users.id " +
-                                      "WHERE tournament_id = ?", ROW_MAPPER_USER_INFO, tournament_id);
+                                      "WHERE tournament_id = ?", ROW_MAPPER_USER, tournament_id);
     }
 
     @Override
-    public List<ParticipantInfo> getTournamentsParticipantTeamsInfo(Long tournament_id) {
+    public List<Participant> getTournamentsParticipantTeams(Long tournament_id) {
         return jdbcTemplate.query("SELECT * FROM participant " +
                 "INNER JOIN team ON participant.team_id = team.id " +
-                "WHERE tournament_id = ?", ROW_MAPPER_TEAM_INFO, tournament_id);
+                "WHERE tournament_id = ?", ROW_MAPPER_TEAM, tournament_id);
     }
 
     @Override
@@ -65,15 +76,11 @@ public class ParticipantJdbcDao implements ParticipantDao {
     }
 
     @Override
-    public List<ParticipantUser> getTournamentParticipantUsers(Long tournament_id) {
-        return jdbcTemplate.query("SELECT * FROM participant WHERE tournament_id = ?", ROW_MAPPER, tournament_id);
-    }
-
-    @Override
-    public ParticipantUser getTournamentParticipantByUserId(Long tournament_id, Long user_id) {
+    public Participant getTournamentParticipantByUserId(Long tournament_id, Long user_id) {
         return jdbcTemplate.query("SELECT * FROM participant " +
-                                      "WHERE tournament_id = ? AND user_id = ?",
-                                       ROW_MAPPER, tournament_id, user_id).stream().findFirst().orElse(null);
+                        "INNER JOIN users ON participant.user_id = users.id " +
+                        "WHERE tournament_id = ? AND user_id = ?",
+                                       ROW_MAPPER_USER, tournament_id, user_id).stream().findFirst().orElse(null);
     }
 
     @Override
@@ -88,23 +95,23 @@ public class ParticipantJdbcDao implements ParticipantDao {
     }
 
     @Override
-    public void updateGroupNumberForUsers(long tournamentId, int groupNumber, List<Long> userIds) {
-        jdbcTemplate.update(con -> {
-            Array arr = con.createArrayOf("bigint", userIds.toArray(new Long[0]));
-            PreparedStatement ps = con.prepareStatement(
-                    "UPDATE participant " +
-                            "SET group_number = ? " +
-                            "WHERE tournament_id = ? AND user_id = ANY(?)"
-            );
-            ps.setInt(1, groupNumber);
-            ps.setLong(2, tournamentId);
-            ps.setArray(3, arr);
-            return ps;
-        });
+    public void updateGroupNumberForUsers(long tournamentId, int groupNumber, List<Long> userIds, Integer teamSize) {
+        String idColumn = (teamSize != null && teamSize > 1) ? "team_id" : "user_id";
+
+        String sql = "UPDATE participant " +
+                "SET group_number = :groupNumber " +
+                "WHERE tournament_id = :tournamentId AND " + idColumn + " IN (:ids)";
+
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("tournamentId", tournamentId)
+                .addValue("groupNumber", groupNumber)
+                .addValue("ids", userIds);
+
+        namedJdbcTemplate.update(sql, params);
     }
 
     @Override
-    public void swapGroups(Long tournament_id, Long user1, Long user2, Integer group1, Integer group2){
+    public void swapGroups(Long tournament_id, Long user1, Long user2, Integer group1, Integer group2, Integer teamSize){
         jdbcTemplate.update(
                 "UPDATE participant " +
                         "SET group_number = CASE " +
@@ -135,29 +142,70 @@ public class ParticipantJdbcDao implements ParticipantDao {
     }
 
     @Override
-    public Integer getGroupNumber(Long tournamentId, Long userId) {
-        final String sql =
-                "SELECT COALESCE((" +
-                        "  SELECT group_number FROM participant WHERE tournament_id = ? AND user_id = ? LIMIT 1" +
-                        "), 0)";
-        return jdbcTemplate.queryForObject(sql, Integer.class, tournamentId, userId);
+    public Integer getGroupNumber(Long tournamentId, Long userId, Integer teamSize) {
+        String sql = "SELECT COALESCE((" +
+                "  SELECT group_number FROM participant " +
+                "  WHERE tournament_id = :tournamentId AND " +
+                (teamSize != null && teamSize > 1 ? "team_id = :id " : "user_id = :id ") +
+                "  LIMIT 1" +
+                "), 0)";
+
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("tournamentId", tournamentId)
+                .addValue("id", userId);
+
+        return namedJdbcTemplate.queryForObject(sql, params, Integer.class);
     }
 
     @Override
-    public List<ParticipantUser> getTournamentParticipantsByPoints(
-            Long tournamentId, Integer groupNumber, Integer points) {
+    public List<Participant> getTournamentParticipantsByPoints(
+            Long tournamentId, Integer groupNumber, Integer points, Integer teamSize) {
 
-        if (groupNumber == null) {
-            return jdbcTemplate.query(
-                    "SELECT * FROM participant WHERE tournament_id = ? AND points = ?",
-                    ROW_MAPPER, tournamentId, points
-            );
+        if (teamSize > 1) {
+            return getTournamentParticipantsByPointsTeam(tournamentId, groupNumber, points);
         } else {
-            return jdbcTemplate.query(
-                    "SELECT * FROM participant WHERE tournament_id = ? AND points = ? AND group_number = ?",
-                    ROW_MAPPER, tournamentId, points, groupNumber
-            );
+            return getTournamentParticipantsByPointsUser(tournamentId, groupNumber, points);
         }
+    }
+
+
+    private List<Participant> getTournamentParticipantsByPointsUser(Long tournamentId, Integer groupNumber, Integer points) {
+
+        StringBuilder sql = new StringBuilder(
+                "SELECT p.* FROM participant p " +
+                        "INNER JOIN users u ON p.user_id = u.id " +
+                        "WHERE p.tournament_id = :tournamentId AND p.points = :points"
+        );
+
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("tournamentId", tournamentId)
+                .addValue("points", points);
+
+        if (groupNumber != null) {
+            sql.append(" AND p.group_number = :groupNumber");
+            params.addValue("groupNumber", groupNumber);
+        }
+
+        return namedJdbcTemplate.query(sql.toString(), params, ROW_MAPPER_USER);
+    }
+
+    private List<Participant> getTournamentParticipantsByPointsTeam(Long tournamentId, Integer groupNumber, Integer points) {
+        StringBuilder sql = new StringBuilder(
+                "SELECT p.* FROM participant p " +
+                        "INNER JOIN team t ON p.team_id = t.id " +
+                        "WHERE p.tournament_id = :tournamentId AND p.points = :points"
+        );
+
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("tournamentId", tournamentId)
+                .addValue("points", points);
+
+        if (groupNumber != null) {
+            sql.append(" AND p.group_number = :groupNumber");
+            params.addValue("groupNumber", groupNumber);
+        }
+
+        return namedJdbcTemplate.query(sql.toString(), params, ROW_MAPPER_TEAM);
     }
 
     @Override

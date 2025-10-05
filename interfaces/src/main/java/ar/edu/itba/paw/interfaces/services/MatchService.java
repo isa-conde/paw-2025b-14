@@ -1,8 +1,6 @@
 package ar.edu.itba.paw.interfaces.services;
 
 import ar.edu.itba.paw.model.MatchInfo;
-import ar.edu.itba.paw.model.ParticipantUser;
-import ar.edu.itba.paw.model.Tournament.Tournament;
 
 import java.util.*;
 

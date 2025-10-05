@@ -202,7 +202,7 @@ public class TournamentController {
                 mav.addObject("format", gf);
                 t.setFormat(gf.getName());
             }
-            List<ParticipantInfo> participants = ps.getTournamentParticipantInfo(tournamentId, optionalGameFormat.isPresent() ? optionalGameFormat.get().getPlayers_per_team() : 1);
+            List<Participant> participants = ps.getTournamentParticipants(tournamentId, optionalGameFormat.isPresent() ? optionalGameFormat.get().getPlayers_per_team() : 1);
             int participantCount = participants.size();
             Optional<Game> optionalGame = gs.findById(t.getGame_id());
             Optional<User> optionalUser = us.findById(t.getCreator_id());
