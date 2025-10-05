@@ -106,16 +106,31 @@
 
                             </c:when>
                         </c:choose>
-                        <paw:button-card
-                                title="${title}"
-                                text="${text}"
-                                butText="${butText}"
-                                secondary="${secondary}"
-                                icon="${pageContext.request.contextPath}/images/${icon}"
-                                method="post"
-                                onclick="${joinUrl}"
-                                tournamentId="${tournament.id}"
-                                texture="true"/>
+                        <c:choose>
+                            <c:when test="${!isParticipant && isIndividualTournament}">
+                                <paw:button-card
+                                        title="${title}"
+                                        text="${text}"
+                                        butText="${butText}"
+                                        secondary="${secondary}"
+                                        icon="${pageContext.request.contextPath}/images/${icon}"
+                                        method="post"
+                                        onclick="${joinUrl}"
+                                        tournamentId="${tournament.id}"
+                                        texture="true"/>
+                            </c:when>
+                            <c:otherwise>
+                                <paw:button-card
+                                        title="${title}"
+                                        text="${text}"
+                                        butText="${butText}"
+                                        secondary="${secondary}"
+                                        icon="${pageContext.request.contextPath}/images/${icon}"
+                                        onclick="openModal('chooseTeamModal')"
+                                        tournamentId="${tournament.id}"
+                                        texture="true"/>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                 </c:if>
                 <c:choose>
@@ -317,20 +332,21 @@
 </paw:layout>
 
 <paw:modal title="tournament.join.chooseTeam" id="chooseTeamModal">
-    <c:forEach items="${userTeams}" >
+    <c:forEach items="${userTeams}" var="t">
         <div class="team-selection-row">
-            <div class="team-info">
-                <img src="${pageContext.request.contextPath}/pfp/${team.profile_picture_id}"
-                     alt="${team.name}"
-                     class="team-pfp"/>
-                <paw:text><c:out value="${team.name}"/></paw:text>
+            <div class="row center">
+                <div class="team-pfp">
+                    <img src="${pageContext.request.contextPath}/pfp/${t.pfp_id}"
+                         alt="${t.name}"/>
+                </div>
+                <paw:text><c:out value="${t.name}"/></paw:text>
+                <button
+                        type="button"
+                        class="btn join-btn"
+                        onclick="window.location.href='${pageContext.request.contextPath}/tournament/team/join?teamId=${t.id}'">
+                    <spring:message code="tournament.join.button"/>
+                </button>
             </div>
-            <button
-                    type="button"
-                    class="btn join-btn"
-                    onclick="window.location.href='${pageContext.request.contextPath}/tournament/team/join?teamId=${team.id}'">
-                <spring:message code="tournament.join.button"/>
-            </button>
         </div>
     </c:forEach>
 </paw:modal>
