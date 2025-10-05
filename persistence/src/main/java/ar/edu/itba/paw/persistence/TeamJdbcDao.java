@@ -52,6 +52,11 @@ public class TeamJdbcDao implements TeamDao {
     }
 
     @Override
+    public List<Team> getUserTeams(Long user_id) {
+        return jdbcTemplate.query("SELECT DISTINCT t.* FROM team_member tm JOIN team t ON tm.team_id = t.id WHERE tm.user_id = ?", ROW_MAPPER, user_id);
+    }
+
+    @Override
     public List<Long> getPastTournaments(Long teamId) {
         return findTeamTournamentIds(teamId, true);
     }
@@ -60,7 +65,7 @@ public class TeamJdbcDao implements TeamDao {
         String sql = """
         SELECT t.id
         FROM tournament t
-        INNER JOIN participant_user p ON p.tournament_id = t.id
+        INNER JOIN participant p ON p.tournament_id = t.id
         WHERE p.team_id = ? AND t.is_finished = ?
     """;
         return jdbcTemplate.queryForList(sql, Long.class, teamId, isFinished);

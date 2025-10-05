@@ -44,7 +44,7 @@
                             <paw:text type="title" size="xl"><spring:message code="createTournament.Step2"/></paw:text>
                             <div class="row">
                                 <paw:input path="max_participants" label="home.createTournament.maxParticipants" inputType="number" hasConstraint="true" />
-                                <paw:input path="format" label="home.createTournament.format" hasConstraint="true" inputType="select" items="${formats}" itemLabel="name" itemValue="name"/>
+                                <paw:input path="format_id" label="home.createTournament.format" hasConstraint="true" inputType="select" items="${formats}" itemLabel="name" itemValue="id"/>
                             </div>
                             <div class="row center">
                                 <paw:input path="elo" label="home.createTournament.skillLevel" inputType="select" items="${elos}" hasConstraint="true" emptyOption="${emptyOption}"/>

@@ -5,10 +5,11 @@ import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.interfaces.services.ParticipantService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.ParticipantUser;
-import ar.edu.itba.paw.model.ParticipantUserInfo;
+import ar.edu.itba.paw.model.ParticipantInfo;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,8 +43,13 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
-    public List<ParticipantUserInfo> getTournamentParticipantUsersInfo(Long tournamentId) {
-        List<ParticipantUserInfo> participants = participantDao.getTournamentsParticipantUsersInfo(tournamentId);
+    public List<ParticipantInfo> getTournamentParticipantInfo(Long tournamentId, Integer teamSize) {
+        List<ParticipantInfo> participants = new ArrayList<>();
+        if (teamSize > 1){
+            participants = participantDao.getTournamentsParticipantTeamsInfo(tournamentId);
+        }else {
+            participants = participantDao.getTournamentsParticipantUsersInfo(tournamentId);
+        }
         participants.sort((a, b) -> b.getPoints().compareTo(a.getPoints()));
         return participants;
     }

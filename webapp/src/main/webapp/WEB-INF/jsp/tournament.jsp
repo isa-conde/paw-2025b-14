@@ -62,7 +62,7 @@
                         <c:forEach var="p" items="${participants}">
                             <c:if test="${p.user_id == tournamentWinner}">
                                 <div class="cards-container">
-                                    <paw:winner-card winnerName="${p.username}"/>
+                                    <paw:winner-card winnerName="${p.name}"/>
                                 </div>
                             </c:if>
                         </c:forEach>
@@ -95,7 +95,15 @@
                                 </c:choose>
                                 <c:set var="butText" value="tournament.joinCard.butText"/>
                                 <c:set var="secondary" value="false"/>
-                                <c:set var="url" value="${joinUrl}"/>
+                                <c:choose>
+                                    <c:when test="${!isParticipant && isIndividualTournament}">
+                                        <c:set var="url" value="${joinUrl}"/>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <c:set value="openModal('chooseTeamModal')" var="joinUrl"/>
+                                    </c:otherwise>
+                                </c:choose>
+
                             </c:when>
                         </c:choose>
                         <paw:button-card
@@ -105,7 +113,7 @@
                                 secondary="${secondary}"
                                 icon="${pageContext.request.contextPath}/images/${icon}"
                                 method="post"
-                                onclick="${url}"
+                                onclick="${joinUrl}"
                                 tournamentId="${tournament.id}"
                                 texture="true"/>
                     </div>
@@ -259,10 +267,10 @@
                         </div>
                     </c:if>
                 </div>
-                <paw:users-grid participants="${participantsList}"/>
+                <paw:users-grid participants="${participants}" isIndividualTournament="${isIndividualTournament}"/>
                 <c:if test="${!isParticipant && tournament.openInscriptions}">
                     <div class="cards-container">
-                        <form:form method="post" action="${joinUrl}" onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
+                        <form:form method="post" action="${url}" onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
                             <input type="hidden" name="tournamentId" value="${tournament.id}"/>
                             <paw:input path="" inputType="submit" label="tournament.joinCard.butText"/>
                         </form:form>
@@ -307,6 +315,25 @@
         </form:form>
     </paw:modal>
 </paw:layout>
+
+<paw:modal title="tournament.join.chooseTeam" id="chooseTeamModal">
+    <c:forEach items="${userTeams}" >
+        <div class="team-selection-row">
+            <div class="team-info">
+                <img src="${pageContext.request.contextPath}/pfp/${team.profile_picture_id}"
+                     alt="${team.name}"
+                     class="team-pfp"/>
+                <paw:text><c:out value="${team.name}"/></paw:text>
+            </div>
+            <button
+                    type="button"
+                    class="btn join-btn"
+                    onclick="window.location.href='${pageContext.request.contextPath}/tournament/team/join?teamId=${team.id}'">
+                <spring:message code="tournament.join.button"/>
+            </button>
+        </div>
+    </c:forEach>
+</paw:modal>
 
 <div id="page-flags" data-open-edit-modal="${openEditModal}"></div>
 <script src="${pageContext.request.contextPath}/js/swap.js"></script>

@@ -42,7 +42,7 @@ public class TournamentJdbcDao implements TournamentDao {
             rs.getLong("creator_id"), rs.getString("name"), rs.getLong("game_id"), Region.valueOf(rs.getString("region")),
             Elo.valueOf(rs.getString("elo")), rs.getDate("start_date").toLocalDate(), rs.getDate("end_date").toLocalDate(),
             rs.getString("format"), Structure.valueOf(rs.getString("structure")), rs.getInt("max_participants"), rs.getLong("image_id"),
-            rs.getBoolean("open_inscriptions"), rs.getBoolean("is_finished"), rs.getLong("tournament_winner"), rs.getBoolean("is_group_stage"), rs.getBoolean("tournament_started"));
+            rs.getBoolean("open_inscriptions"), rs.getBoolean("is_finished"), rs.getLong("tournament_winner"), rs.getBoolean("is_group_stage"), rs.getBoolean("tournament_started"), rs.getLong("format_id"));
 
     private static final RowMapper<User> ROW_MAPPER_USER = (rs, rowNum) -> new User(rs.getLong("id"), rs.getString("username"), rs.getString("email"), rs.getString("password"), rs.getBoolean("verified"), rs.getString("bio"), rs.getLong("profile_picture_id"), rs.getLong("banner_id"));
 
@@ -57,7 +57,7 @@ public class TournamentJdbcDao implements TournamentDao {
     }
 
     @Override
-    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Long image_id, Boolean open_inscriptions, Boolean is_finished) {
+    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Long image_id, Boolean open_inscriptions, Boolean is_finished, Long format_id) {
 
         SqlParameterSource values = new MapSqlParameterSource()
                 .addValue("creator_id", creator_id)
@@ -73,10 +73,11 @@ public class TournamentJdbcDao implements TournamentDao {
                 .addValue("image_id", image_id)
                 .addValue("open_inscriptions", open_inscriptions)
                 .addValue("is_finished", is_finished)
-                .addValue("tournament_started", false);
+                .addValue("tournament_started", false)
+                .addValue("format_id", format_id);
 
         Number key = jdbcInsert.executeAndReturnKey(values);
-        return new Tournament(key.longValue(), creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, null, null, false);
+        return new Tournament(key.longValue(), creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, null, null, false, format_id);
     }
 
     @Override
@@ -138,7 +139,7 @@ public class TournamentJdbcDao implements TournamentDao {
     private List<Tournament> findUserTournaments(Long userId, Boolean isFinished) {
         String sql = "SELECT t.* " +
                 "FROM tournament t " +
-                "INNER JOIN participant_user p ON p.tournament_id = t.id " +
+                "INNER JOIN participant p ON p.tournament_id = t.id " +
                 "WHERE p.user_id = ? AND t.is_finished = ?; ";
         return jdbcTemplate.query(sql, ROW_MAPPER, userId, isFinished);
     }
@@ -309,7 +310,7 @@ public class TournamentJdbcDao implements TournamentDao {
     @Override
     public int tournamentParticipantsCount(Long tournamentId){
         return jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM participant_user WHERE tournament_id = ?",
+                "SELECT COUNT(*) FROM participant WHERE tournament_id = ?",
                 Integer.class, tournamentId
         );
     }
