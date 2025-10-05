@@ -3,15 +3,16 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <spring:message code="createTournament.emptyOption" var="emptyOption"/>
+<spring:message code="createTournament.pageTitle" var="pageTitle"/>
 
 
-<paw:layout user="${user}">
-    <div class="tournamentForm-page">
-        <div class="tournamentForm-page__image">
+<paw:layout user="${user}" pageTitle="${pageTitle}">
+    <div class="Form-page">
+        <div class="Form-page__image">
             <img src="${pageContext.request.contextPath}/images/tournament.jpeg" alt="Tournament Image" />
         </div>
 
-        <div class="tournamentForm-page__form">
+        <div class="Form-page__form">
             <c:choose>
                 <c:when test="${step == 1}">
                     <form:form cssClass="form center" modelAttribute="tournamentForm" action="${pageContext.request.contextPath}/tournaments/new/step1" method="post" enctype="multipart/form-data">
@@ -43,7 +44,7 @@
                             <paw:text type="title" size="xl"><spring:message code="createTournament.Step2"/></paw:text>
                             <div class="row">
                                 <paw:input path="max_participants" label="home.createTournament.maxParticipants" inputType="number" hasConstraint="true" />
-                                <paw:input path="format" label="home.createTournament.format" hasConstraint="true" inputType="select" items="${formats}" itemLabel="name" itemValue="name"/>
+                                <paw:input path="format_id" label="home.createTournament.format" hasConstraint="true" inputType="select" items="${formats}" itemLabel="name" itemValue="id"/>
                             </div>
                             <div class="row center">
                                 <paw:input path="elo" label="home.createTournament.skillLevel" inputType="select" items="${elos}" hasConstraint="true" emptyOption="${emptyOption}"/>

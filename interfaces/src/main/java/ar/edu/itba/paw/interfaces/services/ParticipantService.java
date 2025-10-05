@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.interfaces.services;
 
 import ar.edu.itba.paw.model.ParticipantUser;
+import ar.edu.itba.paw.model.ParticipantInfo;
 
 import java.util.List;
 
@@ -15,4 +16,10 @@ public interface ParticipantService {
     Boolean hasJoined(Long userId, Long tournamentId);
 
     public void leaveTournamentUser(Long user_id, Long tournament_id);
+
+    void swapGroups(Long tournament_id, Long user1, Long user2);
+
+    List<ParticipantInfo> getTournamentParticipantInfo(Long tournamentId, Integer teamSize);
+
+    Integer getTournamentGroups(Long tournamentId);
 }

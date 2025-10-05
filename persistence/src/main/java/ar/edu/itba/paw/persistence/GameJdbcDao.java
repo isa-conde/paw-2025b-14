@@ -134,4 +134,9 @@ public class GameJdbcDao implements GameDao {
         return (long) Math.ceil( gameAmount / 9L);
     }
 
+    @Override
+    public Optional<GameFormat> getFormatById(Long id) {
+        return jdbcTemplate.query("SELECT * FROM game_format WHERE id = ?", ROW_MAPPER_FORMAT, id).stream().findFirst();
+    }
+
 }

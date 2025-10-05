@@ -4,7 +4,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
-<paw:layout user="${user}">
+<paw:layout user="${user}" pageTitle="${profile.username}">
 
     <c:set var="isMyProfile" value="${user.id == profile.id}"/>
     <c:url value="/images/pencil.png" var="pencilUrl"/>
@@ -33,9 +33,6 @@
                     <paw:text size="xl"><spring:message code="profile.lastTournaments.title"/></paw:text>
                 </div>
                 <paw:carrousel id="tourneys" elements="${lastTournaments}"/>
-            </div>
-            <div class="cards-container">
-                <paw:button text="profile.logout" size="m" onclick="window.location.href='${logoutUrl}'"/>
             </div>
         </div>
 

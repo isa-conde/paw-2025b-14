@@ -5,9 +5,10 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <c:url var="registerUrl" value="/register"/>
 <c:url var="loginUrl" value="/login"/>
+<spring:message code="register.page.header" var="title"/>
 
-<paw:form-layout title="register.page.title">
-    <paw:text type="title"><spring:message code="register.page.header"/></paw:text>
+<paw:form-layout pageTitle="${title}">
+    <paw:text type="title">${title}</paw:text>
     <form:form cssClass="form-container" modelAttribute="registerForm" action="${registerUrl}" method="post">
         <div>
             <paw:input path="username" label="register.username" hasConstraint="true"/>

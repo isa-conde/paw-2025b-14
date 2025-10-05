@@ -1,18 +1,40 @@
-function openModal(id) {
-    const modal = findModal(id);
-    modal.showModal();
-}
-
-function closeModal(id) {
-    const modal = findModal(id)
-    modal.close();
-}
-
-function findModal(id) {
-    const modal = document.getElementById(id);
-    if (!modal) {
-        console.error(`Modal with id "${id}" not found.`);
-        return;
+(function () {
+    function findModal(id) {
+        const m = document.getElementById(id);
+        if (!m) console.error('Modal not found:', id);
+        return m;
     }
-    return modal;
-}
+
+    window.openModal = function (id) {
+        const m = findModal(id);
+        if (!m) return;
+        try {
+            if (m.open) m.close();
+            m.showModal();
+        } catch {
+            m.setAttribute('open', '');
+        }
+    };
+
+    window.closeModal = function (id, redirectUrl) {
+        const m = findModal(id);
+        if (!m) return;
+
+        const url = redirectUrl || m.dataset.redirectOnClose;
+
+        if (url) {
+            const handler = () => { window.location.href = url; };
+            m.addEventListener('close', handler, { once: true });
+        }
+
+        if (m.open) m.close();
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const f = document.getElementById('page-flags');
+        if (f?.dataset.openEditModal === 'true') {
+            openModal('editTournamentModal');
+        }
+    });
+
+})();

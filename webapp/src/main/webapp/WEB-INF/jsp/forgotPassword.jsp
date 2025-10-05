@@ -4,9 +4,11 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
 <c:url var="forgotPasswordUrl" value="/forgotPassword"/>
+<spring:message code="forgotPassword.title" var="title"/>
+<spring:message code="login.title" var="pageTitle"/>
 
-<paw:form-layout title="forgotPassword.title">
-    <paw:text type="title"><spring:message code="forgotPassword.title"/></paw:text>
+<paw:form-layout pageTitle="${pageTitle}">
+    <paw:text type="title">${title}</paw:text>
     <paw:text><spring:message code="forgotPassword.text"/></paw:text>
     <form:form cssClass="form-container" modelAttribute="emailForm" action="${forgotPasswordUrl}" method="post">
         <div>

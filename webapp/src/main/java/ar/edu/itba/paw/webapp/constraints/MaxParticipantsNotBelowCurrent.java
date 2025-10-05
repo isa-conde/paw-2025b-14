@@ -4,12 +4,12 @@ import javax.validation.Constraint;
 import javax.validation.Payload;
 import java.lang.annotation.*;
 
-@Documented
-@Target(ElementType.TYPE)
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = MaxParticipantsValidator.class)
 public @interface MaxParticipantsNotBelowCurrent {
-    String message() default "{tournament.maxParticipants.tooSmall}";
+    String message() default "{tournament.maxParticipants.belowCurrent}";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
+

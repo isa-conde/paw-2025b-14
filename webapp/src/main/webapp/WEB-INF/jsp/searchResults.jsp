@@ -1,9 +1,9 @@
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<spring:message code="searchPage.pageTitle" var="pageTitle"/>
 
-
-<paw:layout user="${user}">
+<paw:layout user="${user}" pageTitle="${pageTitle}">
     <div class="content-container">
         <c:choose>
             <c:when test="${games.size() == 0  && tournaments.size() == 0}">

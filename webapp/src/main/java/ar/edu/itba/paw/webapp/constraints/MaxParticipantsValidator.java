@@ -1,7 +1,9 @@
 package ar.edu.itba.paw.webapp.constraints;
 
 import ar.edu.itba.paw.interfaces.services.TournamentService;
+import ar.edu.itba.paw.webapp.constraints.MaxParticipantsNotBelowCurrent;
 import ar.edu.itba.paw.webapp.form.EditTournamentForm;
+import org.hibernate.validator.constraintvalidation.HibernateConstraintValidatorContext;
 import org.springframework.stereotype.Component;
 
 import javax.validation.ConstraintValidator;
@@ -16,16 +18,19 @@ public class MaxParticipantsValidator implements ConstraintValidator<MaxParticip
     @Override
     public boolean isValid(EditTournamentForm form, ConstraintValidatorContext ctx) {
         if (form == null || form.getTournamentId() == null || form.getMax_participants() == null) return true;
+
         int current = ts.tournamentParticipantsCount(form.getTournamentId());
         if (form.getMax_participants() < current) {
             ctx.disableDefaultConstraintViolation();
-            ctx.buildConstraintViolationWithTemplate(
-                            "Max participants cannot be less than current participants (" + current + ").")
+
+            HibernateConstraintValidatorContext hctx = ctx.unwrap(HibernateConstraintValidatorContext.class);
+            hctx.addMessageParameter("current", current)
+                    .buildConstraintViolationWithTemplate("{tournament.maxParticipants.belowCurrent}")
                     .addPropertyNode("max_participants")
                     .addConstraintViolation();
+
             return false;
         }
         return true;
     }
 }
-

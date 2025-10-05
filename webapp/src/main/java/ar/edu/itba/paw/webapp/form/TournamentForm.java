@@ -32,8 +32,6 @@ public class TournamentForm implements HasDates{
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @NotNull(message = "{home.createTournament.notNull}", groups = StepOne.class)
     private LocalDate end_date;
-    @NotNull(message = "{home.createTournament.notNull}", groups = StepTwo.class)
-    private String format;
     @NotNull(message = "{home.createTournament.notNull}", groups = StepOne.class)
     private Structure structure;
     @NotNull(message = "{home.createTournament.notNull}", groups = StepTwo.class)
@@ -43,6 +41,8 @@ public class TournamentForm implements HasDates{
     @ImageConstraint(groups = StepTwo.class)
     @NotNull(message = "{home.createTournament.notNull}", groups = StepTwo.class)
     private MultipartFile image;
+    @NotNull(message = "{home.createTournament.notNull}", groups = StepTwo.class)
+    private Long format_id;
 
     public String getName() {
         return name;
@@ -86,13 +86,6 @@ public class TournamentForm implements HasDates{
         this.end_date = end_date;
     }
 
-    public String getFormat() {
-        return format;
-    }
-    public void setFormat(String format) {
-        this.format = format;
-    }
-
     public Structure getStructure() {
         return structure;
     }
@@ -112,6 +105,13 @@ public class TournamentForm implements HasDates{
     }
     public void setImage(MultipartFile image) {
         this.image = image;
+    }
+
+    public Long getFormat_id() {
+        return format_id;
+    }
+    public void setFormat_id(Long format_id) {
+        this.format_id = format_id;
     }
 }
 

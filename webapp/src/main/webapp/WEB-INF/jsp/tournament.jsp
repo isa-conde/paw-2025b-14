@@ -12,7 +12,7 @@
 <c:url value="/images/pencil.png" var="pencilUrl"/>
 <c:set var="cornerIcon" value="${isCreator ? pencilUrl : null}"/>
 
-<paw:layout user="${user}">
+<paw:layout user="${user}" pageTitle="${tournament.name}">
     <paw:banner
             image="${pageContext.request.contextPath}/image/${tournament.image_id}"
             cornerIcon="${cornerIcon}"
@@ -27,17 +27,17 @@
         <br/>
         <div class="organizer-container">
             <paw:text size="s"><spring:message code="tournament.organizedBy"/></paw:text>
-            <paw:profileButton text="${creator.username}" onclick="" size="xs" isNotSafe="true"/>
+            <paw:profileButton text="${creator.username}" onclick="window.location.href='/profile/${creator.id}'" size="xs" isNotSafe="true"/>
         </div>
     </paw:banner>
     <spring:message code="tournament.overview" var="overview"/>
-    <spring:message code="tournament.matches" var="matches"/>
+    <spring:message code="tournament.matches" var="matchesTab"/>
     <spring:message code="tournament.participants.title" var="participantsTab"/>
     <c:set var="showMatches" value="${tournament.tournamentStarted}"/>
     <c:choose>
         <c:when test="${showMatches}">
-            <c:set var="sections" value="${['overview','matches', 'participantsTab']}"/>
-            <c:set var="labels"   value="${[overview, matches, participantsTab]}"/>
+            <c:set var="sections" value="${['overview','matchesTab', 'participantsTab']}"/>
+            <c:set var="labels"   value="${[overview, matchesTab, participantsTab]}"/>
         </c:when>
         <c:otherwise>
             <c:set var="sections" value="${['overview', 'participantsTab']}"/>
@@ -58,21 +58,15 @@
                     <paw:icon-card icon="${pageContext.request.contextPath}/images/level.png" text="${tournament.elo}"/>
                     <paw:icon-card icon="${pageContext.request.contextPath}/images/members.png" text="${teams}"/>
                 </div>
-                <c:choose>
-                    <c:when test="${tournamentWinner != null && tournamentWinner > 0}">
-                        <c:forEach var="g" items="${participants}">
-                            <c:if test="${g.key == 0}">
-                                <c:forEach var="p" items="${g.value}">
-                                    <c:if test="${p.user_id == tournamentWinner}">
-                                        <div class="cards-container">
-                                            <paw:winner-card winnerName="${p.username}"/>
-                                        </div>
-                                    </c:if>
-                                </c:forEach>
+                <c:if test="${tournamentWinner != null && tournamentWinner > 0}">
+                        <c:forEach var="p" items="${participants}">
+                            <c:if test="${p.user_id == tournamentWinner}">
+                                <div class="cards-container">
+                                    <paw:winner-card winnerName="${p.name}"/>
+                                </div>
                             </c:if>
                         </c:forEach>
-                    </c:when>
-                </c:choose>
+                </c:if>
                 <c:if test="${isParticipant && !tournament.tournamentStarted || !isParticipant && tournament.openInscriptions}">
                     <div class="cards-container">
                         <c:set var="icon" value="${tournament.structure == LEAGUE ? 'grid.png' : 'bracket.png'}"/>
@@ -101,7 +95,15 @@
                                 </c:choose>
                                 <c:set var="butText" value="tournament.joinCard.butText"/>
                                 <c:set var="secondary" value="false"/>
-                                <c:set var="url" value="${joinUrl}"/>
+                                <c:choose>
+                                    <c:when test="${!isParticipant && isIndividualTournament}">
+                                        <c:set var="url" value="${joinUrl}"/>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <c:set value="openModal('chooseTeamModal')" var="joinUrl"/>
+                                    </c:otherwise>
+                                </c:choose>
+
                             </c:when>
                         </c:choose>
                         <paw:button-card
@@ -111,7 +113,7 @@
                                 secondary="${secondary}"
                                 icon="${pageContext.request.contextPath}/images/${icon}"
                                 method="post"
-                                onclick="${url}"
+                                onclick="${joinUrl}"
                                 tournamentId="${tournament.id}"
                                 texture="true"/>
                     </div>
@@ -120,31 +122,27 @@
                     <c:when test="${tournament.structure == LEAGUE}">
                         <c:if test="${not empty participants}">
                             <paw:text type="title" size="l"><spring:message code="tournament.standings"/></paw:text>
-                            <paw:board participants="${participantsList}"/>
+                            <paw:board participants="${participants}"/>
                         </c:if>
                     </c:when>
                     <c:when test="${tournament.structure == ELIMINATION || (tournament.structure == HYBRID && !tournament.is_group_stage)}">
-                        <c:if test="${tournament.tournamentStarted}">
-                            <c:set var="edit" value="tournament.edit.matches" />
+                        <c:if test="${!tournament.openInscriptions}">
+                            <c:set var="edit" value="tournament.edit.matches"/>
                             <paw:text type="title" size="l">
                                 <spring:message code="tournament.standings"/>
                             </paw:text>
-                            <c:forEach var="groupEntry" items="${matchesByGroup}">
-                                <c:if test="${groupEntry.key == 0}">
-                                    <paw:bracket matchesByStage="${groupEntry.value}" tournamentId="${tournament.id}" isCreator="${isCreator}" isEditing="${editMode}" formId="swapMembersForm"/>
-                                </c:if>
-                            </c:forEach>
+                            <paw:bracket matchesByStage="${matches}" tournamentId="${tournament.id}" isCreator="${isCreator}" isEditing="${editMode}" formId="swapMembersForm"/>
                         </c:if>
                     </c:when>
                     <c:when test="${tournament.structure == HYBRID && tournament.is_group_stage}">
                         <c:set var="edit" value="tournament.edit.groups" />
                         <c:if test="${not empty participants}">
-                            <c:forEach var="g" items="${participants}">
+                            <c:forEach var="g" begin="1" end="${groups}" step="1">
                                 <div class="board-container">
                                     <paw:text type="title" size="m">
-                                        <spring:message code="tournament.groupStandings" arguments="${g.key}"/>
+                                        <spring:message code="tournament.groupStandings" arguments="${g}"/>
                                     </paw:text>
-                                    <paw:board participants="${g.value}" isEditing="${editMode}" size="l" formId="swapGroupsForm"/>
+                                    <paw:board participants="${participants}" isEditing="${editMode}" size="l" formId="swapGroupsForm" groupNumber="${g}"/>
                                 </div>
                             </c:forEach>
                         </c:if>
@@ -163,14 +161,14 @@
                     </c:when>
                     <c:when test="${user.id == tournament.creator_id && !tournament.tournamentStarted}">
                         <div class="cards-container">
-                            <c:if test="${tournament.structure eq 'ELIMINATION' or tournament.structure eq 'HYBRID'}">
+                            <c:if test="${tournament.structure eq ELIMINATION or tournament.structure eq HYBRID}">
                                 <c:choose>
                                     <c:when test="${not editMode}">
                                         <form method="get" action="">
                                             <input type="hidden" name="tournamentId" value="${tournament.id}"/>
                                             <input type="hidden" name="section" value="${param.section != null ? param.section : 'overview'}"/>
                                             <input type="hidden" name="edit" value="true"/>
-                                            <button type="submit" class="btn">
+                                            <button type="submit" class="btn secondary">
                                                 <paw:text size="l"><spring:message code="${edit}"/></paw:text>
                                             </button>
                                         </form>
@@ -204,68 +202,54 @@
                                     </c:otherwise>
                                 </c:choose>
                             </c:if>
-                            <form method="post" action="${pageContext.request.contextPath}/tournament/startTournament" style="display:inline;">
-                                <input type="hidden" name="tournamentId" value="${tournament.id}"/>
-                                <button type="submit" class="btn">
-                                    <paw:text size="l"><spring:message code="tournament.startTournament"/></paw:text>
-                                </button>
-                            </form>
+                            <c:if test="${!editMode}">
+                                <form method="post" action="${pageContext.request.contextPath}/tournament/startTournament">
+                                    <input type="hidden" name="tournamentId" value="${tournament.id}"/>
+                                    <button type="submit" class="btn">
+                                        <paw:text size="l"><spring:message code="tournament.startTournament"/></paw:text>
+                                    </button>
+                                </form>
+                            </c:if>
                         </div>
                     </c:when>
                 </c:choose>
             </c:when>
-            <c:when test="${activeSection == 'matches'}">
+            <c:when test="${activeSection == 'matchesTab'}">
                 <c:choose>
-                    <c:when test="${empty matchesByGroup}">
+                    <c:when test="${empty matches}">
                         <div class="no-cards-container">
                             <paw:text size="l" weight="thin"><spring:message code="tournament.noMatches"/></paw:text>
                         </div>
                     </c:when>
                     <c:otherwise>
                         <c:choose>
-                            <c:when test="${tournament.structure == 'HYBRID'}">
+                            <c:when test="${tournament.structure == HYBRID}">
                                 <c:choose>
                                     <c:when test="${!tournament.is_group_stage}">
-                                        <c:forEach var="groupEntry" items="${matchesByGroup}">
-                                            <c:if test="${groupEntry.key == 0}">
-                                                <c:forEach var="stageEntry" items="${groupEntry.value}">
-                                                    <paw:date-matches dateNumber="${stageEntry.key}" matches="${stageEntry.value}" tournamentId="${tournament.id}" isCreator="${isCreator}" tournamentStructure="${tournament.structure}" groupNumber="0" totalMatches="${stageEntry.value.size()}" maxStage="${maxStage}"/>
-                                                </c:forEach>
-                                            </c:if>
+                                        <c:forEach var="stageEntry" items="${matches}">
+                                            <paw:date-matches dateNumber="${stageEntry.key}" matches="${stageEntry.value}" tournamentId="${tournament.id}" isCreator="${isCreator}" tournamentStructure="${tournament.structure}" totalMatches="${stageEntry.value.size()}" maxStage="${maxStage}"/>
                                         </c:forEach>
                                     </c:when>
                                     <c:otherwise>
-                                        <c:set var="subActiveGroup" value="${param.group != null ? param.group : groupSections[0]}"/>
-
-                                        <paw:navbar sections="${groupSections}"
-                                                    labels="${groupLabels}"
-                                                    activeSection="${subActiveGroup}"
-                                                    paramName="group"/>
-
-                                        <c:forEach var="groupEntry" items="${matchesByGroup}">
-                                            <c:if test="${subActiveGroup == groupEntry.key}">
-                                                <c:forEach var="stageEntry" items="${groupEntry.value}">
-                                                    <paw:date-matches
-                                                            dateNumber="${stageEntry.key}"
-                                                            matches="${stageEntry.value}"
-                                                            tournamentId="${tournament.id}"
-                                                            isCreator="${isCreator}"
-                                                            tournamentStructure="${tournament.structure}"
-                                                            groupNumber="${groupEntry.key}"
-                                                            totalMatches="${stageEntry.value.size()}"/>
-                                                </c:forEach>
-                                            </c:if>
+                                        <c:set var="subActiveGroup" value="${param.group != null ? param.group : 1}"/>
+                                        <paw:groups-navbar groups="${groups}" activeGroup="${subActiveGroup}" paramName="group"/>
+                                        <c:forEach var="stageEntry" items="${matches}">
+                                                <paw:date-matches
+                                                        dateNumber="${stageEntry.key}"
+                                                        matches="${stageEntry.value}"
+                                                        tournamentId="${tournament.id}"
+                                                        isCreator="${isCreator}"
+                                                        tournamentStructure="${tournament.structure}"
+                                                        groupStage="true"
+                                                        groupNumber="${subActiveGroup}"
+                                                        totalMatches="${stageEntry.value.size()}"/>
                                         </c:forEach>
                                     </c:otherwise>
                                 </c:choose>
                             </c:when>
                             <c:otherwise>
-                                <c:forEach var="groupEntry" items="${matchesByGroup}">
-                                    <c:if test="${groupEntry.key == 0}">
-                                        <c:forEach var="stageEntry" items="${groupEntry.value}">
-                                             <paw:date-matches dateNumber="${stageEntry.key}" matches="${stageEntry.value}" tournamentId="${tournament.id}" isCreator="${isCreator}" tournamentStructure="${tournament.structure}" groupNumber="${groupEntry.key}" totalMatches="${stageEntry.value.size()}" maxStage="${maxStage}"/>
-                                        </c:forEach>
-                                    </c:if>
+                                <c:forEach var="stageEntry" items="${matches}">
+                                     <paw:date-matches dateNumber="${stageEntry.key}" matches="${stageEntry.value}" tournamentId="${tournament.id}" isCreator="${isCreator}" tournamentStructure="${tournament.structure}" totalMatches="${stageEntry.value.size()}" maxStage="${maxStage}"/>
                                 </c:forEach>
                             </c:otherwise>
                         </c:choose>
@@ -283,10 +267,10 @@
                         </div>
                     </c:if>
                 </div>
-                <paw:users-grid participants="${participantsList}"/>
+                <paw:users-grid participants="${participants}" isIndividualTournament="${isIndividualTournament}"/>
                 <c:if test="${!isParticipant && tournament.openInscriptions}">
                     <div class="cards-container">
-                        <form:form method="post" action="${joinUrl}" onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
+                        <form:form method="post" action="${url}" onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
                             <input type="hidden" name="tournamentId" value="${tournament.id}"/>
                             <paw:input path="" inputType="submit" label="tournament.joinCard.butText"/>
                         </form:form>
@@ -295,7 +279,16 @@
             </c:when>
         </c:choose>
     </div>
-    <paw:modal title="tournament.edit.modal.title" id="editTournamentModal">
+    <c:url var="tournamentUrl" value="/tournament">
+        <c:param name="tournamentId" value="${tournament.id}"/>
+        <c:if test="${not empty param.section}">
+            <c:param name="section" value="${param.section}"/>
+        </c:if>
+        <c:if test="${not empty param.group}">
+            <c:param name="group" value="${param.group}"/>
+        </c:if>
+    </c:url>
+    <paw:modal title="tournament.edit.modal.title" id="editTournamentModal" returnUrl="${tournamentUrl}">
         <form:form method="post" modelAttribute="editTournamentForm"
                    action="${pageContext.request.contextPath}/tournament/update"
                    enctype="multipart/form-data" cssClass="form">
@@ -310,7 +303,9 @@
                     </c:if>
                     <paw:input path="end_date" label="home.createTournament.endDate" inputType="date" hasConstraint="true"/>
                 </div>
-                <paw:input path="max_participants" label="home.createTournament.maxParticipants" inputType="number" hasConstraint="true"/>
+                <c:if test="${tournament.openInscriptions}">
+                    <paw:input path="max_participants" label="home.createTournament.maxParticipants" inputType="number" hasConstraint="true"/>
+                </c:if>
             </c:if>
             <paw:input path="image" label="home.createTournament.image" inputType="file"/>
             <div class="row center">
@@ -320,23 +315,24 @@
     </paw:modal>
 </paw:layout>
 
-<script>
-        (function initEditChecks(){
-            document.addEventListener('change', function(e){
-                if (!e.target.classList.contains('edit-check')) return;
-                const checked = [...document.querySelectorAll('.edit-check:checked')];
-                if (checked.length > 2) {
-                    e.target.checked = false;
-                }
-                updateSwapButton();
-            });
-            document.addEventListener('DOMContentLoaded', updateSwapButton);
-        })();
-            function updateSwapButton(){
-            const btn = document.getElementById('swapBtn');
-            if (!btn) return;
-            const selected = [...document.querySelectorAll('.edit-check:checked')];
+<paw:modal title="tournament.join.chooseTeam" id="chooseTeamModal">
+    <c:forEach items="${userTeams}" >
+        <div class="team-selection-row">
+            <div class="team-info">
+                <img src="${pageContext.request.contextPath}/pfp/${team.profile_picture_id}"
+                     alt="${team.name}"
+                     class="team-pfp"/>
+                <paw:text><c:out value="${team.name}"/></paw:text>
+            </div>
+            <button
+                    type="button"
+                    class="btn join-btn"
+                    onclick="window.location.href='${pageContext.request.contextPath}/tournament/team/join?teamId=${team.id}'">
+                <spring:message code="tournament.join.button"/>
+            </button>
+        </div>
+    </c:forEach>
+</paw:modal>
 
-            btn.disabled = !(selected.length === 2);
-        }
-</script>
+<div id="page-flags" data-open-edit-modal="${openEditModal}"/>
+<script src="${pageContext.request.contextPath}/js/swap.js"></script>

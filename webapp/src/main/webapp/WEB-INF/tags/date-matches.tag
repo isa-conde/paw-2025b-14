@@ -5,16 +5,19 @@
 <%@ attribute name="tournamentId" required="true" rtexprvalue="true" %>
 <%@ attribute name="isCreator" required="false" rtexprvalue="true" %>
 <%@ attribute name="tournamentStructure" required="false" rtexprvalue="true" %>
+<%@ attribute name="groupStage" required="false" rtexprvalue="true" %>
 <%@ attribute name="groupNumber" required="false" rtexprvalue="true" %>
 <%@ attribute name="totalMatches" required="false" rtexprvalue="true" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
+<c:set var="isGroupStage" value="${not empty groupStage? groupStage : 'false'}"/>
+
 <div class="date-section">
     <div class="date-header">
         <c:choose>
-            <c:when test="${tournamentStructure == 'ELIMINATION' || (tournamentStructure == 'HYBRID' && groupNumber == 0)}">
+            <c:when test="${tournamentStructure == 'ELIMINATION' || (tournamentStructure == 'HYBRID' && !groupStage)}">
                 <c:set var="diff" value="${maxStage - dateNumber}"/>
                 <c:set var="participantsInRound" value="${totalMatches * 2}"/>
 
@@ -58,15 +61,18 @@
 
     <div class="matches-grid">
         <c:forEach var="match" items="${matches}">
-            <paw:match-card 
-                matchId="${match.id}"
-                tournamentId="${tournamentId}"
-                localPlayer="${match.localPlayerName}"
-                visitorPlayer="${match.visitorPlayerName}"
-                localPlayerId="${match.localId}"
-                visitorPlayerId="${match.visitorId}"
-                winner="${match.winner}"
-                isCreator="${isCreator}"/>
+            <c:if test="${empty groupNumber or match.groupNumber eq groupNumber}">
+                <paw:match-card
+                    matchId="${match.id}"
+                    tournamentId="${tournamentId}"
+                    localPlayer="${match.localPlayerName}"
+                    visitorPlayer="${match.visitorPlayerName}"
+                    localPlayerId="${match.localId}"
+                    visitorPlayerId="${match.visitorId}"
+                    winner="${match.winner}"
+                    groupNumber="${groupNumber}"
+                    isCreator="${isCreator}"/>
+            </c:if>
         </c:forEach>
     </div>
 </div>

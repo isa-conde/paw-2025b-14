@@ -5,19 +5,22 @@
 
 <c:url value="/" var="homeUrl"/>
 <c:url value="/verify?userId=${userId}" var="resendVerificationUrl"/>
+<spring:message code="login.title" var="pageTitle"/>
+<spring:message code="verification.successful.title" var="successTitle"/>
+<spring:message code="verification.failed.title" var="failedTitle"/>
 
 <c:choose>
   <c:when test="${validToken}">
-    <paw:form-layout title="verification.successful.title">
-      <paw:text type="title"><spring:message code="verification.successful.title"/></paw:text>
+    <paw:form-layout pageTitle="${pageTitle}">
+      <paw:text type="title">${successTitle}</paw:text>
       <paw:text size="l"><spring:message code="verification.successful.text"/></paw:text>
       <br>
       <paw:button onclick="window.location.href='${homeUrl}'" text="verification.goToHome"/>
     </paw:form-layout>
   </c:when>
   <c:otherwise>
-    <paw:form-layout title="verification.failed.title">
-      <paw:text type="title"><spring:message code="verification.failed.title"/></paw:text>
+    <paw:form-layout pageTitle="${pageTitle}">
+      <paw:text type="title">${failedTitle}</paw:text>
       <paw:text size="l"><spring:message code="verification.failed.text"/></paw:text>
       <br>
       <form:form method="post" action="${resendVerificationUrl}">
