@@ -1,5 +1,5 @@
 <%@ tag language="java" pageEncoding="UTF-8" %>
-<%@ attribute name="teams" required="true" type="java.util.List" %>
+<%@ attribute name="members" required="true" type="java.util.List" %>
 <%@ attribute name="formId" required="false" rtexprvalue="true" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
@@ -7,9 +7,9 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
 <div class="teams-list">
-    <c:forEach var="t" items="${teams}">
+    <c:forEach var="t" items="${members}">
         <label class="team-option">
-            <form:radiobutton path="teamId" value="${t.id}"/>
+            <form:checkbox path="teamId" value="${t.id}"/>
             <paw:profileButton text="${t.name}" onclick="" isNotSafe="true" size="l" fill="false" disabled="true"/>
         </label>
     </c:forEach>

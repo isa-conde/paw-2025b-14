@@ -1566,6 +1566,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .teams-list-container {
     background-color: var(--background-secondary);
     border-radius: 15px;
+    padding: 10px;
 }
 
 .teams-list {
@@ -1587,4 +1588,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .teams-list .btn:disabled {
     opacity: 1;
+}
+
+.team-option,
+.member-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }

@@ -215,7 +215,6 @@ public class TournamentController {
                     editTournamentForm.setEnd_date(t.getEnd_date());
                 }
             }
-            joinTournamentTeamForm.setTournamentId(tournamentId);
             Optional<GameFormat> optionalGameFormat = gs.getFormatById(t.getFormat_id());
             if (optionalGameFormat.isPresent()){
                 GameFormat gf = optionalGameFormat.get();
@@ -265,6 +264,7 @@ public class TournamentController {
             mav.addObject("openModal", "'chooseTeamModal'");
         }else{
             mav.addObject("openModal", "'chooseTeamMembersModal'");
+            mav.addObject("teamMembers", tms.getUserTeams(1L));
         }
         return mav;
     }

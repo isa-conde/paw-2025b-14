@@ -316,35 +316,37 @@
     </paw:modal>
 </paw:layout>
 
-<paw:modal title="tournament.join.chooseTeam" id="chooseTeamModal">
+<paw:modal title="tournament.join.chooseTeam" id="chooseTeamModal" returnUrl="${tournamentUrl}">
     <form:form method="post"
                modelAttribute="joinTeamForm"
                action="${pageContext.request.contextPath}/tournament/join/step1"
                cssClass="form">
 
         <form:hidden path="tournamentId" value="${tournament.id}"/>
-
-        <div class="teams-list">
-            <c:forEach var="t" items="${userTeams}">
-                <label class="team-option" style="display:flex;align-items:center;gap:8px;">
-                    <form:radiobutton path="teamId" value="${t.id}"/>
-                    <paw:profileButton text="${t.name}" isNotSafe="true" size="l" fill="false" disabled="true" onclick=""/>
-                </label>
-            </c:forEach>
+        <div class="teams-list-container">
+            <paw:team-list teams="${userTeams}"/>
+            <div class="row center">
+                <paw:button onclick="window.location.href='${pageContext.request.contextPath}/team/create'; return false;" text="team.create.pageTitle" secondary="true" size="m"/>
+            </div>
         </div>
-
         <form:errors path="teamId" cssClass="form-error"/>
-
-        <div class="row center" style="margin-top:20px;">
+        <div class="row center">
             <paw:input path="" label="tournament.chooseTeam" containerType="half" inputType="submit"/>
         </div>
+    </form:form>
+</paw:modal>
+<paw:modal title="tournament.join.chooseMembers" id="chooseTeamMembersModal" returnUrl="${tournamentUrl}">
+    <form:form method="post"
+               modelAttribute="joinTeamForm"
+               action="${pageContext.request.contextPath}/tournament/join/step2"
+               cssClass="form">
 
+        <div class="teams-list-container">
+            <paw:member-list members="${teamMembers}"/>
+        </div>
+        <form:errors path="teamId" cssClass="form-error"/>
         <div class="row center">
-            <paw:button
-                    onclick="window.location.href='${pageContext.request.contextPath}/team/create'; return false;"
-                    text="team.create.pageTitle"
-                    secondary="true"
-                    size="m"/>
+            <paw:input path="" label="tournament.joinCard.butText" containerType="half" inputType="submit"/>
         </div>
     </form:form>
 </paw:modal>
