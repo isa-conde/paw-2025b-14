@@ -54,13 +54,15 @@ public class ParticipantJdbcDaoTest {
                 .usingGeneratedKeyColumns("id");
         jdbcInsert.execute(Map.of("user_id",ID,"tournament_id",ID,"points",21,"group_number",1));
         jdbcInsert.execute(Map.of("user_id",ID+1,"tournament_id",ID,"points",2,"group_number",2));
+        jdbcInsert.execute(Map.of("team_id",ID,"tournament_id",ID+1,"points",21,"group_number",1));
+        jdbcInsert.execute(Map.of("team_id",ID+1,"tournament_id",ID+1,"points",2,"group_number",2));
     }
 
     @Test
     public void testJoinUser(){
         participantJdbcDao.joinTournamentUser(ID+2,ID);
 
-        Assert.assertEquals(3, JdbcTestUtils.countRowsInTable(jdbcTemplate,"participant"));
+        Assert.assertEquals(5, JdbcTestUtils.countRowsInTable(jdbcTemplate,"participant"));
         Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant","tournament_id = " + ID + " and user_id = " + (ID+2)));
     }
 
@@ -87,6 +89,32 @@ public class ParticipantJdbcDaoTest {
     @Test
     public void testGetNoOnesInfo(){
         List<ParticipantInfo> ans = participantJdbcDao.getTournamentsParticipantUsersInfo((long) -1);
+
+        Assert.assertNotNull(ans);
+        Assert.assertTrue(ans.isEmpty());
+    }
+
+    @Test
+    public void testGetTeamsInfo(){
+        SimpleJdbcInsert teamJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("team");
+        teamJdbcInsert.execute(Map.of("id",ID,"name",USERNAME, "owner_id",ID));
+        teamJdbcInsert.execute(Map.of("id",ID+1,"name",USERNAME+"a", "owner_id",ID+1));
+        List<ParticipantInfo> ans = participantJdbcDao.getTournamentsParticipantTeamsInfo(ID+1);
+
+        Assert.assertNotNull(ans);
+        Assert.assertFalse(ans.isEmpty());
+        Assert.assertEquals(2,ans.size());
+        for (int i = 0; i < 2; i++) {
+            Assert.assertEquals(ID+i,ans.get(i).getId().longValue());
+            Assert.assertEquals(ID+i,ans.get(i).getGroupNumber().longValue());
+            Assert.assertEquals((i==0)?21:2,ans.get(i).getPoints().intValue());
+            Assert.assertEquals(USERNAME + ((i==0)?"":"a"),ans.get(i).getName());
+        }
+    }
+
+    @Test
+    public void testGetNoTeamsInfo(){
+        List<ParticipantInfo> ans = participantJdbcDao.getTournamentsParticipantTeamsInfo((long) -1);
 
         Assert.assertNotNull(ans);
         Assert.assertTrue(ans.isEmpty());
@@ -151,7 +179,7 @@ public class ParticipantJdbcDaoTest {
     public void testLeaveUser(){
         participantJdbcDao.leaveTournamentUser(ID,ID);
 
-        Assert.assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate,"participant"));
+        Assert.assertEquals(3,JdbcTestUtils.countRowsInTable(jdbcTemplate,"participant"));
         Assert.assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
                 "tournament_id = user_id and user_id = ID"));
     }
@@ -160,7 +188,7 @@ public class ParticipantJdbcDaoTest {
     public void testLeaveNoOne(){
         participantJdbcDao.leaveTournamentUser(ID+2,ID);
 
-        Assert.assertEquals(2,JdbcTestUtils.countRowsInTable(jdbcTemplate,"participant"));
+        Assert.assertEquals(4,JdbcTestUtils.countRowsInTable(jdbcTemplate,"participant"));
     }
 
     @Test
@@ -168,9 +196,9 @@ public class ParticipantJdbcDaoTest {
         participantJdbcDao.updateGroupNumberForUsers(ID,3,List.of(ID,ID+1));
 
         Assert.assertEquals(2,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
-                "group_number = 3"));
+                "group_number = 3 and user_id is not null"));
         Assert.assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
-                "group_number <> 3"));
+                "group_number <> 3 and user_id is not null"));
     }
 
     @Test
