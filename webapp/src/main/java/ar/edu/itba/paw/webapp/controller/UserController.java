@@ -169,7 +169,7 @@ public class UserController {
     }
 
     @RequestMapping("/profile/{id}")
-    public ModelAndView profile(Principal principal, @PathVariable Long id, @ModelAttribute("EditProfileForm") EditProfileForm editProfileForm){
+    public ModelAndView profile(Principal principal, @PathVariable Long id, @ModelAttribute("editProfileForm") EditProfileForm form){
         final ModelAndView mav = new ModelAndView("profile");
 
         User user = null;
@@ -189,10 +189,15 @@ public class UserController {
         mav.addObject("profile", profile);
         mav.addObject("favouriteGames", gs.getFavourites(profile.getId()));
         mav.addObject("lastTournaments", ts.findUserActiveTournaments(profile.getId()));
-        mav.addObject("EditProfileForm", editProfileForm);
+        mav.addObject("EditProfileForm", form);
 
-        editProfileForm.setUsername(profile.getUsername());
-        editProfileForm.setBio(profile.getBio());
+        boolean hasFormErrors = mav.getModel().containsKey(
+                BindingResult.MODEL_KEY_PREFIX + "editProfileForm"
+        );
+        if (!hasFormErrors) {
+            form.setUsername(profile.getUsername());
+            form.setBio(profile.getBio());
+        }
 
         return mav;
     }
