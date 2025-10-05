@@ -5,11 +5,11 @@
 <spring:message code="team.create.pageTitle" var="pageTitle"/>
 
 <paw:layout user="${user}" pageTitle="${pageTitle}">
-    <div class="Form-page">
-        <div class="Form-page__image">
+    <div class="tournament-form-page">
+        <div class="tournament-form-page__image">
             <img src="${pageContext.request.contextPath}/images/teamCreationImage.jpg" alt="Team Image" />
         </div>
-        <div class="Form-page__form">
+        <div class="tournament-form-page__form">
             <form:form cssClass="form center" modelAttribute="teamForm" action="${pageContext.request.contextPath}/team/create" method="post" enctype="multipart/form-data" id="teamForm">
                 <div>
                     <paw:text type="title" size="xl"><spring:message code="team.create.title"/></paw:text>

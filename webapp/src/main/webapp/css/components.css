@@ -1460,20 +1460,20 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 /* ------- Tournament Form ------- */
 
-.Form-page {
+.tournament-form-page {
     display: flex;
     min-height: 100vh;
     flex-direction: row;
 }
 
-.Form-page__image {
+.tournament-form-page__image {
     flex: 1;             /* ocupa mitad exacta */
     max-width: 50vw;     /* nunca más de la mitad */
     height: 100vh;
     overflow: hidden;
 }
 
-.Form-page__image img {
+.tournament-form-page__image img {
     width: 100%;
     height: 100%;
     object-fit: cover;   /* rellena toda la caja */
@@ -1481,7 +1481,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     display: block;
 }
 
-.Form-page__form {
+.tournament-form-page__form {
     flex: 1;
     max-width: 50vw;
     padding: 40px;

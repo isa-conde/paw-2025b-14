@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.services;
 
+import ar.edu.itba.paw.interfaces.exception.MatchWinnerAlreadySetException;
 import ar.edu.itba.paw.interfaces.persistence.MatchDao;
 import ar.edu.itba.paw.interfaces.persistence.ParticipantDao;
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
@@ -101,6 +102,9 @@ public class MatchServiceImpl implements MatchService {
         if (winner == null || (winner != 1 && winner != 2)) {
             throw new IllegalArgumentException("winner must be 1 (local) or 2 (visitor)");
         }
+        if(hasWinner(matchId, tournamentId)) {
+            throw new MatchWinnerAlreadySetException();
+        }
         matchDao.setMatchWinner(matchId, tournamentId, winner);
         Match match = matchDao.getMatch(tournamentId, matchId);
 
@@ -150,5 +154,10 @@ public class MatchServiceImpl implements MatchService {
         } else {
             matchDao.updateMatchVisitor(tournamentId, parentMatchId, winnerId);
         }
+    }
+
+    private boolean hasWinner(Long matchId, Long tournamentId) {
+        Match match = matchDao.getMatch(tournamentId, matchId);
+        return match.getWinner() != null;
     }
 }
