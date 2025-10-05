@@ -12,7 +12,7 @@
 <c:url value="/images/pencil.png" var="pencilUrl"/>
 <c:set var="cornerIcon" value="${isCreator ? pencilUrl : null}"/>
 
-<paw:layout user="${user}" pageTitle="${tournament.name}">
+<paw:layout user="${user}" pageTitle="${tournament.name}" function="${openModal}">
     <paw:banner
             image="${pageContext.request.contextPath}/image/${tournament.image_id}"
             cornerIcon="${cornerIcon}"
@@ -317,21 +317,36 @@
 </paw:layout>
 
 <paw:modal title="tournament.join.chooseTeam" id="chooseTeamModal">
-    <div class="teams-list-container">
-        <paw:team-list teams="${userTeams}"/>
+    <form:form method="post"
+               modelAttribute="joinTeamForm"
+               action="${pageContext.request.contextPath}/tournament/join/step1"
+               cssClass="form">
+
+        <form:hidden path="tournamentId" value="${tournament.id}"/>
+
+        <div class="teams-list">
+            <c:forEach var="t" items="${userTeams}">
+                <label class="team-option" style="display:flex;align-items:center;gap:8px;">
+                    <form:radiobutton path="teamId" value="${t.id}"/>
+                    <paw:profileButton text="${t.name}" isNotSafe="true" size="l" fill="false" disabled="true" onclick=""/>
+                </label>
+            </c:forEach>
+        </div>
+
+        <form:errors path="teamId" cssClass="form-error"/>
+
+        <div class="row center" style="margin-top:20px;">
+            <paw:input path="" label="tournament.chooseTeam" containerType="half" inputType="submit"/>
+        </div>
+
         <div class="row center">
             <paw:button
                     onclick="window.location.href='${pageContext.request.contextPath}/team/create'; return false;"
                     text="team.create.pageTitle"
                     secondary="true"
-                    size="m"
-            />
+                    size="m"/>
         </div>
-    </div>
-    <div class="row center">
-        <paw:input path="" label="tournament.chooseTeam" containerType="half" inputType="submit"/>
-    </div>
+    </form:form>
 </paw:modal>
 
-<div id="page-flags" data-open-edit-modal="${openEditModal}"/>
 <script src="${pageContext.request.contextPath}/js/swap.js"></script>
