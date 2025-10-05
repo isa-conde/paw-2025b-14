@@ -77,6 +77,7 @@
                                 <c:set var="butText" value="${tournament.openInscriptions ? 'tournament.leave.butText' : ''}"/>
                                 <c:set var="secondary" value="true"/>
                                 <c:set var="url" value="${leaveUrl}"/>
+                                <c:set var="method" value="post"/>
                             </c:when>
                             <c:when test="${!isParticipant && tournament.openInscriptions}">
                                 <c:choose>
@@ -96,41 +97,26 @@
                                 <c:set var="butText" value="tournament.joinCard.butText"/>
                                 <c:set var="secondary" value="false"/>
                                 <c:choose>
-                                    <c:when test="${!isParticipant && isIndividualTournament}">
+                                    <c:when test="${isIndividualTournament}">
                                         <c:set var="url" value="${joinUrl}"/>
+                                        <c:set var="method" value="post"/>
                                     </c:when>
                                     <c:otherwise>
-                                        <c:set value="openModal('chooseTeamModal')" var="joinUrl"/>
+                                        <c:set var="url" value="openModal('chooseTeamModal')"/>
                                     </c:otherwise>
                                 </c:choose>
-
                             </c:when>
                         </c:choose>
-                        <c:choose>
-                            <c:when test="${!isParticipant && isIndividualTournament}">
-                                <paw:button-card
-                                        title="${title}"
-                                        text="${text}"
-                                        butText="${butText}"
-                                        secondary="${secondary}"
-                                        icon="${pageContext.request.contextPath}/images/${icon}"
-                                        method="post"
-                                        onclick="${joinUrl}"
-                                        tournamentId="${tournament.id}"
-                                        texture="true"/>
-                            </c:when>
-                            <c:otherwise>
-                                <paw:button-card
-                                        title="${title}"
-                                        text="${text}"
-                                        butText="${butText}"
-                                        secondary="${secondary}"
-                                        icon="${pageContext.request.contextPath}/images/${icon}"
-                                        onclick="openModal('chooseTeamModal')"
-                                        tournamentId="${tournament.id}"
-                                        texture="true"/>
-                            </c:otherwise>
-                        </c:choose>
+                        <paw:button-card
+                                title="${title}"
+                                text="${text}"
+                                butText="${butText}"
+                                secondary="${secondary}"
+                                icon="${pageContext.request.contextPath}/images/${icon}"
+                                method="${method}"
+                                onclick="${url}"
+                                tournamentId="${tournament.id}"
+                                texture="true"/>
                     </div>
                 </c:if>
                 <c:choose>
@@ -332,23 +318,20 @@
 </paw:layout>
 
 <paw:modal title="tournament.join.chooseTeam" id="chooseTeamModal">
-    <c:forEach items="${userTeams}" var="t">
-        <div class="team-selection-row">
-            <div class="row center">
-                <div class="team-pfp">
-                    <img src="${pageContext.request.contextPath}/pfp/${t.pfp_id}"
-                         alt="${t.name}"/>
-                </div>
-                <paw:text><c:out value="${t.name}"/></paw:text>
-                <button
-                        type="button"
-                        class="btn join-btn"
-                        onclick="window.location.href='${pageContext.request.contextPath}/tournament/team/join?teamId=${t.id}'">
-                    <spring:message code="tournament.join.button"/>
-                </button>
-            </div>
+    <div class="teams-list-container">
+        <paw:team-list teams="${userTeams}"/>
+        <div class="row center">
+            <paw:button
+                    onclick="window.location.href='${pageContext.request.contextPath}/team/create'; return false;"
+                    text="team.create.pageTitle"
+                    secondary="true"
+                    size="m"
+            />
         </div>
-    </c:forEach>
+    </div>
+    <div class="row center">
+        <paw:input path="" label="tournament.chooseTeam" containerType="half" inputType="submit"/>
+    </div>
 </paw:modal>
 
 <script src="${pageContext.request.contextPath}/js/swap.js"></script>
