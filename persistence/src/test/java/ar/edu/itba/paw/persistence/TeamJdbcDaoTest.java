@@ -177,4 +177,21 @@ public class TeamJdbcDaoTest {
         Assert.assertEquals(1,past.size());
         Assert.assertEquals(pastTournament,past.get(0));
     }
+
+    @Test
+    public void testGetUsersTeams(){
+        SimpleJdbcInsert teamMemberInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("team_member");
+        teamMemberInsert.execute(Map.of("team_id",used_id,"user_id",ID));
+        List<Team> ans = teamJdbcDao.getUserTeams(ID);
+
+        Assert.assertNotNull(ans);
+        Assert.assertFalse(ans.isEmpty());
+        Assert.assertEquals(1,ans.size());
+        Team present = ans.get(0);
+        Assert.assertEquals(OTHER_TEAM,present.getName());
+        Assert.assertEquals(OTHER_ID,present.getOwner_id());
+        Assert.assertEquals(OTHER_ID,present.getBanner_id());
+        Assert.assertEquals(OTHER_ID,present.getPfp_id());
+        Assert.assertEquals(used_id,present.getId());
+    }
 }
