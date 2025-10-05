@@ -1,5 +1,6 @@
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <c:url value="/logout" var="logoutUrl"/>
 
@@ -7,7 +8,6 @@
     <img src="${pageContext.request.contextPath}/images/logoutButton.png" alt="Logout">
 </button>
 
-<!-- Modal de confirmación -->
 <paw:modal title="logout.modal.title" id="logoutConfirmModal">
     <div class="row center">
         <paw:button text="logout.confirm" onclick="window.location.href='${logoutUrl}'"/>
