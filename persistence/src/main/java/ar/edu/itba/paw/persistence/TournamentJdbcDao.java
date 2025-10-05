@@ -131,9 +131,8 @@ public class TournamentJdbcDao implements TournamentDao {
                                     WHEN end_date IS NOT NULL AND end_date < CURRENT_DATE
                                       THEN CURRENT_DATE
                                     ELSE end_date
-                                  END
-                       start_date = CURRENT_DATE,
-                 WHERE id = ?
+                                  END,
+                       start_date = CURRENT_DATE WHERE id = ?
                 """,
                 tournament_id
         );
@@ -343,7 +342,7 @@ public class TournamentJdbcDao implements TournamentDao {
                 UPDATE tournament
                    SET start_date = CURRENT_DATE
                  WHERE start_date < CURRENT_DATE
-                   AND COALESCE(is_started, false) = false
+                   AND COALESCE(tournament_started, false) = false
                 """
         );
     }

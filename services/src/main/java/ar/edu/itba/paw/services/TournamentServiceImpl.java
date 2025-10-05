@@ -1,10 +1,7 @@
 package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.exception.*;
-import ar.edu.itba.paw.interfaces.persistence.ImageDao;
-import ar.edu.itba.paw.interfaces.persistence.MatchDao;
-import ar.edu.itba.paw.interfaces.persistence.ParticipantDao;
-import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
+import ar.edu.itba.paw.interfaces.persistence.*;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.ParticipantUser;
@@ -28,12 +25,14 @@ public class TournamentServiceImpl implements TournamentService {
     private final ImageDao imageDao;
     private final ParticipantDao participantDao;
     private final MatchDao matchDao;
+    private final GameDao gameDao;
 
-    public TournamentServiceImpl(TournamentDao tournamentDao, ImageDao imageDao, ParticipantDao participantDao, MatchDao matchDao) {
+    public TournamentServiceImpl(TournamentDao tournamentDao, ImageDao imageDao, ParticipantDao participantDao, MatchDao matchDao, GameDao gameDao) {
         this.tournamentDao = tournamentDao;
         this.imageDao = imageDao;
         this.participantDao = participantDao;
         this.matchDao = matchDao;
+        this.gameDao = gameDao;
     }
 
     @Override
@@ -103,7 +102,7 @@ public class TournamentServiceImpl implements TournamentService {
         if(tournamentDao.isClosed(tournament_id)) {
             throw new TournamentAlreadyClosedException();
         }
-        tournamentDao.closeInscriptions(tournament_id, participantDao.getTournamentParticipantUsers(tournament_id));
+        tournamentDao.closeInscriptions(tournament_id);
     }
 
     @Override

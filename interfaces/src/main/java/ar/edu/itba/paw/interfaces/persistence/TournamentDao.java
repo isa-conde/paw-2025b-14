@@ -61,6 +61,4 @@ public interface TournamentDao {
     void updateAllEndDates();
 
     boolean isClosed(Long tournamentId);
-
-    boolean hasWinner(Long matchId, Long tournamentId);
 }
