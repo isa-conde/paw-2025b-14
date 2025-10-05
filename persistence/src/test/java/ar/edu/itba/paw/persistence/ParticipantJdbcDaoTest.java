@@ -1,7 +1,7 @@
 package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.model.ParticipantUser;
-import ar.edu.itba.paw.model.ParticipantUserInfo;
+import ar.edu.itba.paw.model.ParticipantInfo;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -71,23 +71,22 @@ public class ParticipantJdbcDaoTest {
                 "password",PASSWORD,"verified",true));
         userJdbcInsert.execute(Map.of("id",ID+1,"email",EMAIL+"a","username",USERNAME+"a",
                 "password",PASSWORD,"verified",true));
-        List<ParticipantUserInfo> ans = participantJdbcDao.getTournamentsParticipantUsersInfo(ID);
+        List<ParticipantInfo> ans = participantJdbcDao.getTournamentsParticipantUsersInfo(ID);
 
         Assert.assertNotNull(ans);
         Assert.assertFalse(ans.isEmpty());
         Assert.assertEquals(2,ans.size());
         for (int i = 0; i < 2; i++) {
-            Assert.assertEquals(ID+i,ans.get(i).getUser_id().longValue());
+            Assert.assertEquals(ID+i,ans.get(i).getId().longValue());
             Assert.assertEquals(ID+i,ans.get(i).getGroupNumber().longValue());
             Assert.assertEquals((i==0)?21:2,ans.get(i).getPoints().intValue());
-            Assert.assertEquals(USERNAME + ((i==0)?"":"a"),ans.get(i).getUsername());
-            Assert.assertEquals(EMAIL + ((i==0)?"":"a"),ans.get(i).getEmail());
+            Assert.assertEquals(USERNAME + ((i==0)?"":"a"),ans.get(i).getName());
         }
     }
 
     @Test
     public void testGetNoOnesInfo(){
-        List<ParticipantUserInfo> ans = participantJdbcDao.getTournamentsParticipantUsersInfo((long) -1);
+        List<ParticipantInfo> ans = participantJdbcDao.getTournamentsParticipantUsersInfo((long) -1);
 
         Assert.assertNotNull(ans);
         Assert.assertTrue(ans.isEmpty());
