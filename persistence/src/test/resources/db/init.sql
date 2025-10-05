@@ -78,12 +78,18 @@ create table if not exists team(
     owner_id integer not null
 );
 
-create table if not exists participant_user(
-    user_id integer not null ,
+create table if not exists participant(
+    id integer identity primary key not null ,
+    user_id integer,
+    team_id integer,
     tournament_id integer not null ,
     points integer default 0 not null ,
     group_number integer,
-    primary key (user_id,tournament_id)
+    constraint participant_user_or_team_chk check (
+        (user_id is null and team_id is not null)
+        or
+        (user_id is not null and team_id is null)
+        )
 );
 
 create table if not exists match(
