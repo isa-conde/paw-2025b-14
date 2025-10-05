@@ -4,7 +4,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
-<paw:layout user="${user}" pageTitle="${profile.username}">
+<paw:layout user="${user}" pageTitle="${profile.username}" function="${openModal}">
 
     <c:set var="isMyProfile" value="${user.id == profile.id}"/>
     <c:url value="/images/pencil.png" var="pencilUrl"/>

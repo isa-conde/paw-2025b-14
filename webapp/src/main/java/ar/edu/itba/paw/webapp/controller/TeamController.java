@@ -90,14 +90,16 @@ public class TeamController {
         Team team = optionalTeam.get();
         mav.addObject("team", team);
         mav.addObject("owner", us.findById(team.getOwner_id()).get());
-        mav.addObject("pastTournaments", ts.getPastTournaments(team.getId()));
-        mav.addObject("activeTournaments", ts.getActiveTournaments(team.getId()));
+        mav.addObject("pastTournaments", ts.getPastTournaments(id));
+        mav.addObject("activeTournaments", ts.getActiveTournaments(id));
+        mav.addObject("teamForm", editTeamForm);
+        mav.addObject("members", ts.getTeamMembers(id));
         editTeamForm.setName(team.getName());
         return mav;
     }
 
     @RequestMapping(value = "/team/update", method = { RequestMethod.POST })
-    public ModelAndView updateProfile(Principal principal, @RequestParam("teamId") final long teamId, @Valid @ModelAttribute("EditTeamForm") final EditTeamForm form, final BindingResult result){
+    public ModelAndView updateProfile(Principal principal, @RequestParam("teamId") final long teamId, @Valid @ModelAttribute("teamForm") final EditTeamForm form, final BindingResult result){
         User user = null;
         if (principal != null) {
             Optional<User> userOpt = us.findByUsername(principal.getName());
@@ -108,7 +110,9 @@ public class TeamController {
         }
 
         if (result.hasErrors()) {
-            return new ModelAndView("redirect:/team/profile/" + teamId   );
+            ModelAndView mav = teamProfile(principal, teamId, form);
+            mav.addObject("openModal", "'editProfileModal'");
+            return mav;
         }
 
         Boolean isValid = true;

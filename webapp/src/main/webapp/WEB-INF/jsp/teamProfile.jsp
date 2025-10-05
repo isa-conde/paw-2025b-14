@@ -4,7 +4,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
-<paw:layout user="${user}">
+<paw:layout user="${user}" function="${openModal}">
 
     <c:set var="isMyTeam" value="${user.id == team.owner_id}"/>
     <c:url value="/images/pencil.png" var="pencilUrl"/>
@@ -24,37 +24,56 @@
         </div>
     </paw:banner>
 
-    <div class="content-container">
-        <!-- Sección central: carruseles -->
-        <div class="profile-main">
-            <div class="carrousel-title">
-                <paw:text size="xl"><spring:message code="team.profile.activeTournaments"/></paw:text>
-            </div>
-            <c:choose>
-                <c:when test="${activeTournaments.size() == 0}">
-                    <div class="no-cards-container">
-                        <paw:text><spring:message code="team.profile.noActiveTournaments" arguments="${team.name}"/></paw:text>
-                    </div>
-                </c:when>
-                <c:otherwise>
-                    <paw:carrousel id="activetourneys" elements="${activeTournaments}"/>
-                </c:otherwise>
-            </c:choose>
-            <div class="carrousel-title">
-                <paw:text size="xl"><spring:message code="team.profile.pastTournaments"/></paw:text>
-            </div>
-            <c:choose>
-                <c:when test="${pastTournaments.size() == 0}">
-                    <div class="no-cards-container">
-                        <paw:text><spring:message code="team.profile.noPastTournaments" arguments="${team.name}"/></paw:text>
-                    </div>
-                </c:when>
-                <c:otherwise>
-                    <paw:carrousel id="pasttourneys" elements="${pastTournaments}"/>
-                </c:otherwise>
-            </c:choose>
 
-        </div>
+    <spring:message code="team.profile.overview" var="overview"/>
+    <spring:message code="team.profile.members" var="membersTab"/>
+    <c:set var="sections" value="${['overview', 'membersTab']}"/>
+    <c:set var="labels"   value="${[overview, membersTab]}"/>
+    <c:set var="activeSection" value="${param.section}"/>
+
+    <paw:navbar sections="${sections}" labels="${labels}" activeSection="${activeSection}"/>
+
+    <div class="content-container">
+        <c:choose>
+            <c:when test="${activeSection == 'membersTab'}">
+                <div class="users-grid-title">
+                    <spring:message code="team.profile.members" var="ptitle"/>
+                    <paw:text type="title" size="l">${ptitle}</paw:text>
+                </div>
+                <paw:members members="${members}"/>
+            </c:when>
+            <c:otherwise>
+                <div class="profile-main">
+                    <div class="carrousel-title">
+                        <paw:text size="xl"><spring:message code="team.profile.activeTournaments"/></paw:text>
+                    </div>
+                    <c:choose>
+                        <c:when test="${activeTournaments.size() == 0}">
+                            <div class="no-cards-container">
+                                <paw:text><spring:message code="team.profile.noActiveTournaments" arguments="${team.name}"/></paw:text>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <paw:carrousel id="activetourneys" elements="${activeTournaments}"/>
+                        </c:otherwise>
+                    </c:choose>
+                    <div class="carrousel-title">
+                        <paw:text size="xl"><spring:message code="team.profile.pastTournaments"/></paw:text>
+                    </div>
+                    <c:choose>
+                        <c:when test="${pastTournaments.size() == 0}">
+                            <div class="no-cards-container">
+                                <paw:text><spring:message code="team.profile.noPastTournaments" arguments="${team.name}"/></paw:text>
+                            </div>
+                        </c:when>
+                        <c:otherwise>
+                            <paw:carrousel id="pasttourneys" elements="${pastTournaments}"/>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
+            </c:otherwise>
+        </c:choose>
+
 
     </div>
 </paw:layout>

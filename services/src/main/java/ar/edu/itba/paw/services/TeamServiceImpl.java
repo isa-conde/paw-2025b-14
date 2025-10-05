@@ -85,10 +85,27 @@ public class TeamServiceImpl implements TeamService {
         }
 
         for (String s : members){
-            teamMemberDao.AddMember(teamId, userDao.findByUsername(s).get().getId());
+            if (!teamMemberDao.isMember(teamId, userDao.findByUsername(s).get().getId())){
+                teamMemberDao.AddMember(teamId, userDao.findByUsername(s).get().getId());
+            }
         }
 
         teamDao.updateTeam(teamId, name, pfp_id, banner_id);
+    }
+
+    @Override
+    public Boolean isMember(Long team_id, Long user_id) {
+        return teamMemberDao.isMember(team_id, user_id);
+    }
+
+    @Override
+    public List<User> getTeamMembers(Long team_id) {
+        List<Long> user_ids = teamMemberDao.getTeamMembers(team_id);
+        List<User> toReturn = new ArrayList<>();
+        for (Long l : user_ids){
+            toReturn.add(userDao.findById(l).get());
+        }
+        return toReturn;
     }
 
     private List<Tournament> getTournamentsFromIds(List<Long> tournamentIds) {

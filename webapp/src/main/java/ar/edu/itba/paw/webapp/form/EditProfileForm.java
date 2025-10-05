@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.webapp.form;
 
+import ar.edu.itba.paw.webapp.validation.UsernameIsTaken;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.*;
@@ -7,10 +8,12 @@ import java.time.LocalDate;
 
 public class EditProfileForm {
 
+
     @NotNull
     private Long userId;
     @NotBlank(message = "{home.createTournament.notNull}")
     @Size(max = 100)
+    @UsernameIsTaken(message = "{error.registerForm.usernameUsed}")
     private String username;
     @Size(max = 255)
     private String bio;

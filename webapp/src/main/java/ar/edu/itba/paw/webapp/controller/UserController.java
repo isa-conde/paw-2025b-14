@@ -189,6 +189,7 @@ public class UserController {
         mav.addObject("profile", profile);
         mav.addObject("favouriteGames", gs.getFavourites(profile.getId()));
         mav.addObject("lastTournaments", ts.findUserActiveTournaments(profile.getId()));
+        mav.addObject("EditProfileForm", editProfileForm);
 
         editProfileForm.setUsername(profile.getUsername());
         editProfileForm.setBio(profile.getBio());
@@ -208,7 +209,9 @@ public class UserController {
         }
 
         if (result.hasErrors()) {
-            return new ModelAndView("redirect:/profile/" + userId   );
+            ModelAndView mav = profile(principal, userId, form);
+            mav.addObject("openModal", "'editProfileModal'");
+            return mav;
         }
 
         Boolean isValid = true;
