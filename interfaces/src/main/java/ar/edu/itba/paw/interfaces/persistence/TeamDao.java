@@ -16,4 +16,6 @@ public interface TeamDao {
 
     List<Long> getActiveTournaments(Long teamId);
 
+    List<Team> getUserTeams(Long user_id);
+
     }

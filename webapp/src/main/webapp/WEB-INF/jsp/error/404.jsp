@@ -5,7 +5,7 @@
 
 <c:url value="/" var="homeUrl"/>
 
-<paw:form-layout title="error404Page.title">
+<paw:form-layout pageTitle="404">
   <paw:text type="title"><spring:message code="error404Page.title"/></paw:text>
   <paw:text size="l"><spring:message code="error404Page.description"/></paw:text>
   <br>

@@ -65,6 +65,11 @@ public class TeamServiceImpl implements TeamService {
         return getTournamentsFromIds(teamDao.getPastTournaments(team_id));
     }
 
+    @Override
+    public List<Team> getUserTeams(Long user_id) {
+        return teamDao.getUserTeams(user_id);
+    }
+
     private List<Tournament> getTournamentsFromIds(List<Long> tournamentIds) {
         List<Tournament> tournaments = new ArrayList<>();
         for (Long id : tournamentIds) {

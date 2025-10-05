@@ -82,4 +82,12 @@ public class GameServiceImpl implements GameService {
     public Long getPageAmount(){
         return gameDao.getPageAmount();
     }
+
+    @Override
+    public Optional<GameFormat> getFormatById(Long id) {
+        if (id == null){
+            return Optional.empty();
+        }
+        return gameDao.getFormatById(id);
+    }
 }

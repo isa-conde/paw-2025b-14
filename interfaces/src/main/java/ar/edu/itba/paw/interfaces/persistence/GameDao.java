@@ -34,4 +34,6 @@ public interface GameDao {
     List<Game> findAllPaged(Long page);
 
     Long getPageAmount();
+
+    Optional<GameFormat> getFormatById(Long id);
 }

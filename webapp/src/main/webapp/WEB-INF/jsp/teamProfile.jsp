@@ -30,11 +30,30 @@
             <div class="carrousel-title">
                 <paw:text size="xl"><spring:message code="team.profile.activeTournaments"/></paw:text>
             </div>
-            <paw:carrousel id="tourneys" elements="${activeTournaments}"/>
+            <c:choose>
+                <c:when test="${activeTournaments.size() == 0}">
+                    <div class="no-cards-container">
+                        <paw:text><spring:message code="team.profile.noActiveTournaments" arguments="${team.name}"/></paw:text>
+                    </div>
+                </c:when>
+                <c:otherwise>
+                    <paw:carrousel id="activetourneys" elements="${activeTournaments}"/>
+                </c:otherwise>
+            </c:choose>
             <div class="carrousel-title">
                 <paw:text size="xl"><spring:message code="team.profile.pastTournaments"/></paw:text>
             </div>
-            <paw:carrousel id="tourneys" elements="${pastTournaments}"/>
+            <c:choose>
+                <c:when test="${pastTournaments.size() == 0}">
+                    <div class="no-cards-container">
+                        <paw:text><spring:message code="team.profile.noPastTournaments" arguments="${team.name}"/></paw:text>
+                    </div>
+                </c:when>
+                <c:otherwise>
+                    <paw:carrousel id="pasttourneys" elements="${pastTournaments}"/>
+                </c:otherwise>
+            </c:choose>
+
         </div>
 
     </div>
