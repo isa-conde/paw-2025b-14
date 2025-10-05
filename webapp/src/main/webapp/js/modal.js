@@ -16,9 +16,18 @@
         }
     };
 
-    window.closeModal = function (id) {
+    window.closeModal = function (id, redirectUrl) {
         const m = findModal(id);
-        if (m?.open) m.close();
+        if (!m) return;
+
+        const url = redirectUrl || m.dataset.redirectOnClose;
+
+        if (url) {
+            const handler = () => { window.location.href = url; };
+            m.addEventListener('close', handler, { once: true });
+        }
+
+        if (m.open) m.close();
     };
 
     document.addEventListener('DOMContentLoaded', () => {

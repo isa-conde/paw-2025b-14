@@ -133,8 +133,7 @@ public class TournamentController {
             Principal principal,
             @RequestParam("tournamentId") final long tournamentId,
             @Valid @ModelAttribute("editTournamentForm") final EditTournamentForm form,
-            final BindingResult result,
-            RedirectAttributes ra)
+            final BindingResult result)
     {
         User user = null;
         if (principal != null) {
