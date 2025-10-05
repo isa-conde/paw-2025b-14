@@ -56,7 +56,7 @@ public interface TournamentDao {
 
     Boolean isTournamentStarted(Long tournament_id);
 
-    void updateAllStartDates(LocalDate startDate);
+    void updateAllStartDates();
 
-    void updateAllEndDates(LocalDate endDate);
+    void updateAllEndDates();
 }

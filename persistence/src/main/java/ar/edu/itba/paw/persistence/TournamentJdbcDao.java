@@ -123,7 +123,20 @@ public class TournamentJdbcDao implements TournamentDao {
 
     @Override
     public void startTournament(Long tournament_id) {
-        jdbcTemplate.update("UPDATE tournament SET tournament_started = true, start_date = CURRENT_DATE WHERE id = ?", tournament_id);
+        jdbcTemplate.update(
+                """
+                UPDATE tournament
+                   SET tournament_started = true,
+                       end_date = CASE
+                                    WHEN end_date IS NOT NULL AND end_date < CURRENT_DATE
+                                      THEN CURRENT_DATE
+                                    ELSE end_date
+                                  END
+                       start_date = CURRENT_DATE,
+                 WHERE id = ?
+                """,
+                tournament_id
+        );
     }
 
     @Override
@@ -324,28 +337,26 @@ public class TournamentJdbcDao implements TournamentDao {
     }
 
     @Override
-    public void updateAllStartDates(LocalDate today) {
+    public void updateAllStartDates() {
         jdbcTemplate.update(
                 """
                 UPDATE tournament
-                   SET start_date = ?
-                 WHERE start_date < ?
+                   SET start_date = CURRENT_DATE
+                 WHERE start_date < CURRENT_DATE
                    AND COALESCE(is_started, false) = false
-                """,
-                today, today
+                """
         );
     }
 
     @Override
-    public void updateAllEndDates(LocalDate today) {
+    public void updateAllEndDates() {
         jdbcTemplate.update(
                 """
                 UPDATE tournament
-                   SET end_date = ?
-                 WHERE end_date < ?
+                   SET end_date = CURRENT_DATE
+                 WHERE end_date < CURRENT_DATE
                    AND COALESCE(is_finished, false) = false
-                """,
-                today, today
+                """
         );
     }
 }

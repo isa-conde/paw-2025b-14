@@ -1,7 +1,9 @@
 package ar.edu.itba.paw.webapp.form;
 
 import ar.edu.itba.paw.webapp.constraints.DatesConstraint;
+import ar.edu.itba.paw.webapp.constraints.DatesNullabilityConstraint;
 import ar.edu.itba.paw.webapp.constraints.MaxParticipantsNotBelowCurrent;
+import ar.edu.itba.paw.webapp.constraints.MaxParticipantsNullabilityConstraint;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -9,7 +11,9 @@ import javax.validation.constraints.*;
 import java.time.LocalDate;
 
 @DatesConstraint
+@DatesNullabilityConstraint
 @MaxParticipantsNotBelowCurrent
+@MaxParticipantsNullabilityConstraint
 public class EditTournamentForm implements HasDates{
     @NotNull
     private Long tournamentId;
@@ -17,10 +21,8 @@ public class EditTournamentForm implements HasDates{
     @Size(max = 100)
     private String name;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @NotNull(message = "{home.createTournament.notNull}")
     private LocalDate start_date;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @NotNull(message = "{home.createTournament.notNull}")
     private LocalDate end_date;
     @Min(value = 4, message = "{home.createTournament.minParticipants}")
     @Max(value = 32, message = "{home.createTournament.maxParticipantsError}")
