@@ -73,8 +73,8 @@ public class ParticipantJdbcDao implements ParticipantDao {
 
     @Override
     public Boolean hasJoined(Long userId, Long tournamentId) {
-        String sql = "SELECT EXISTS (SELECT 1 FROM participant WHERE user_id = ? AND tournament_id = ?)";
-        return jdbcTemplate.queryForObject(sql, Boolean.class, userId, tournamentId);
+        String sql = "SELECT 1 FROM participant WHERE user_id = ? AND tournament_id = ? LIMIT 1";
+        return !jdbcTemplate.query(sql, (rs, rowNum) -> 1, userId, tournamentId).isEmpty();
     }
 
     @Override
@@ -84,18 +84,22 @@ public class ParticipantJdbcDao implements ParticipantDao {
 
     @Override
     public void updateGroupNumberForUsers(long tournamentId, int groupNumber, List<Long> userIds) {
-        jdbcTemplate.update(con -> {
-            Array arr = con.createArrayOf("bigint", userIds.toArray(new Long[0]));
-            PreparedStatement ps = con.prepareStatement(
-                    "UPDATE participant " +
-                            "SET group_number = ? " +
-                            "WHERE tournament_id = ? AND user_id = ANY(?)"
-            );
-            ps.setInt(1, groupNumber);
-            ps.setLong(2, tournamentId);
-            ps.setArray(3, arr);
-            return ps;
-        });
+        String inClause = userIds.stream()
+                .map(ignore -> "?")
+                .collect(Collectors.joining(", "));
+
+        String sql = "UPDATE participant " +
+                "SET group_number = ? " +
+                "WHERE tournament_id = ? AND user_id IN (" + inClause + ")";
+
+        Object[] params = new Object[userIds.size() + 2];
+        params[0] = groupNumber;
+        params[1] = tournamentId;
+        for (int i = 0; i < userIds.size(); i++) {
+            params[i + 2] = userIds.get(i);
+        }
+
+        jdbcTemplate.update(sql, params);
     }
 
     @Override
@@ -131,11 +135,10 @@ public class ParticipantJdbcDao implements ParticipantDao {
 
     @Override
     public Integer getGroupNumber(Long tournamentId, Long userId) {
-        final String sql =
-                "SELECT COALESCE((" +
-                        "  SELECT group_number FROM participant WHERE tournament_id = ? AND user_id = ? LIMIT 1" +
-                        "), 0)";
-        return jdbcTemplate.queryForObject(sql, Integer.class, tournamentId, userId);
+        final String sql = "SELECT group_number FROM participant " +
+                "WHERE tournament_id = ? AND user_id = ? LIMIT 1";
+        List<Integer> results = jdbcTemplate.query(sql, (rs, rowNum) -> rs.getInt("group_number"), tournamentId, userId);
+        return results.isEmpty() ? 0 : results.get(0);
     }
 
     @Override

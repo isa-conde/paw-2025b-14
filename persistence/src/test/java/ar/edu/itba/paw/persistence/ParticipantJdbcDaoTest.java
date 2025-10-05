@@ -1,18 +1,25 @@
 package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.model.ParticipantUser;
+import ar.edu.itba.paw.model.ParticipantUserInfo;
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.jdbc.JdbcTestUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
+import java.util.List;
+import java.util.Map;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = TestConfig.class)
@@ -20,6 +27,10 @@ import javax.sql.DataSource;
 @Transactional
 @Rollback
 public class ParticipantJdbcDaoTest {
+    private static final Long ID = 1L;
+    private static final String USERNAME = "johndoe";
+    private static final String EMAIL = "some@mail.com";
+    private static final String PASSWORD = "1234567890";
     private static final RowMapper<ParticipantUser> ROW_MAPPER = (rs, rowNum) -> new ParticipantUser(
             rs.getLong("user_id"),
             rs.getLong("tournament_id"),
@@ -38,5 +49,216 @@ public class ParticipantJdbcDaoTest {
     @Before
     public void setUp(){
         jdbcTemplate = new JdbcTemplate(ds);
+        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("participant")
+                .usingGeneratedKeyColumns("id");
+        jdbcInsert.execute(Map.of("user_id",ID,"tournament_id",ID,"points",21,"group_number",1));
+        jdbcInsert.execute(Map.of("user_id",ID+1,"tournament_id",ID,"points",2,"group_number",2));
+    }
+
+    @Test
+    public void testJoinUser(){
+        participantJdbcDao.joinTournamentUser(ID+2,ID);
+
+        Assert.assertEquals(3, JdbcTestUtils.countRowsInTable(jdbcTemplate,"participant"));
+        Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant","tournament_id = " + ID + " and user_id = " + (ID+2)));
+    }
+
+    @Test
+    public void testGetUsersInfo(){
+        SimpleJdbcInsert userJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("users");
+        userJdbcInsert.execute(Map.of("id",ID,"email",EMAIL,"username",USERNAME,
+                "password",PASSWORD,"verified",true));
+        userJdbcInsert.execute(Map.of("id",ID+1,"email",EMAIL+"a","username",USERNAME+"a",
+                "password",PASSWORD,"verified",true));
+        List<ParticipantUserInfo> ans = participantJdbcDao.getTournamentsParticipantUsersInfo(ID);
+
+        Assert.assertNotNull(ans);
+        Assert.assertFalse(ans.isEmpty());
+        Assert.assertEquals(2,ans.size());
+        for (int i = 0; i < 2; i++) {
+            Assert.assertEquals(ID+i,ans.get(i).getUser_id().longValue());
+            Assert.assertEquals(ID+i,ans.get(i).getGroupNumber().longValue());
+            Assert.assertEquals((i==0)?21:2,ans.get(i).getPoints().intValue());
+            Assert.assertEquals(USERNAME + ((i==0)?"":"a"),ans.get(i).getUsername());
+            Assert.assertEquals(EMAIL + ((i==0)?"":"a"),ans.get(i).getEmail());
+        }
+    }
+
+    @Test
+    public void testGetNoOnesInfo(){
+        List<ParticipantUserInfo> ans = participantJdbcDao.getTournamentsParticipantUsersInfo((long) -1);
+
+        Assert.assertNotNull(ans);
+        Assert.assertTrue(ans.isEmpty());
+    }
+
+    @Test
+    public void testGetUsers(){
+        List<ParticipantUser> ans = participantJdbcDao.getTournamentParticipantUsers(ID);
+
+        Assert.assertNotNull(ans);
+        Assert.assertFalse(ans.isEmpty());
+        Assert.assertEquals(2,ans.size());
+        for (int i = 0; i < 2; i++) {
+            Assert.assertEquals(ID+i,ans.get(i).getUser_id().longValue());
+            Assert.assertEquals(ID+i,ans.get(i).getGroupNumber().longValue());
+            Assert.assertEquals((i==0)?21:2,ans.get(i).getPoints().intValue());
+            Assert.assertEquals(ID,ans.get(i).getTournament_id());
+        }
+    }
+
+    @Test
+    public void testGetNoOne(){
+        List<ParticipantUser> empty = participantJdbcDao.getTournamentParticipantUsers((long) -1);
+
+        Assert.assertNotNull(empty);
+        Assert.assertTrue(empty.isEmpty());
+    }
+
+    @Test
+    public void testGetUserById(){
+        ParticipantUser ans = participantJdbcDao.getTournamentParticipantByUserId(ID,ID);
+
+        Assert.assertNotNull(ans);
+        Assert.assertEquals(ID,ans.getTournament_id());
+        Assert.assertEquals(ID,ans.getUser_id());
+        Assert.assertEquals(Integer.valueOf(1),ans.getGroupNumber());
+        Assert.assertEquals(Integer.valueOf(21),ans.getPoints());
+    }
+
+    @Test
+    public void testGetByIdNoOne(){
+        ParticipantUser ans = participantJdbcDao.getTournamentParticipantByUserId((long)0, (long)-1);
+
+        Assert.assertNull(ans);
+    }
+
+    @Test
+    public void testHasJoined(){
+        boolean ans = participantJdbcDao.hasJoined(ID,ID);
+
+        Assert.assertTrue(ans);
+    }
+
+    @Test
+    public void testHasNotJoined(){
+        boolean ans = participantJdbcDao.hasJoined(ID+2,ID);
+
+        Assert.assertFalse(ans);
+    }
+
+    @Test
+    public void testLeaveUser(){
+        participantJdbcDao.leaveTournamentUser(ID,ID);
+
+        Assert.assertEquals(1,JdbcTestUtils.countRowsInTable(jdbcTemplate,"participant"));
+        Assert.assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
+                "tournament_id = user_id and user_id = ID"));
+    }
+
+    @Test
+    public void testLeaveNoOne(){
+        participantJdbcDao.leaveTournamentUser(ID+2,ID);
+
+        Assert.assertEquals(2,JdbcTestUtils.countRowsInTable(jdbcTemplate,"participant"));
+    }
+
+    @Test
+    public void testUpdateGroupNumberUsers(){
+        participantJdbcDao.updateGroupNumberForUsers(ID,3,List.of(ID,ID+1));
+
+        Assert.assertEquals(2,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
+                "group_number = 3"));
+        Assert.assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
+                "group_number <> 3"));
+    }
+
+    @Test
+    public void testSwapGroups(){
+        participantJdbcDao.swapGroups(ID,ID,ID+1,1,2);
+
+        Assert.assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
+                "group_number = user_id"));
+        Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
+                "group_number = 1 and user_id = 2"));
+        Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
+                "group_number = 2 and user_id = 1"));
+    }
+
+    @Test
+    public void testGetMaxPoints(){
+        int ans = participantJdbcDao.getTournamentMaxPoints(ID);
+
+        Assert.assertEquals(21,ans);
+    }
+
+    @Test
+    public void testGetSecondMaxPoints(){
+        int ans = participantJdbcDao.getTournamentSecondMaxPoints(ID);
+
+        Assert.assertEquals(2,ans);
+    }
+
+    @Test
+    public void testGetGroupNumber(){
+        int ans = participantJdbcDao.getGroupNumber(ID,ID);
+
+        Assert.assertEquals(1,ans);
+    }
+
+    @Test
+    public void testGetNoGroupNumber(){
+        jdbcTemplate.update("update participant set group_number = null");
+        int ans = participantJdbcDao.getGroupNumber(ID,ID);
+
+        Assert.assertEquals(0,ans);
+    }
+
+    @Test
+    public void testGetUserByPoints(){
+        List<ParticipantUser> ans = participantJdbcDao.getTournamentParticipantsByPoints(ID,null,21);
+
+        Assert.assertNotNull(ans);
+        Assert.assertFalse(ans.isEmpty());
+        Assert.assertEquals(1,ans.size());
+        Assert.assertEquals(ID,ans.get(0).getUser_id());
+        Assert.assertEquals(21,ans.get(0).getPoints().intValue());
+        Assert.assertEquals(1,ans.get(0).getGroupNumber().intValue());
+    }
+
+    @Test
+    public void testGetUserByPointsInGroup(){
+        jdbcTemplate.update("update participant set points = 21 where group_number = 2");
+        List<ParticipantUser> ans = participantJdbcDao.getTournamentParticipantsByPoints(ID,1,21);
+
+        Assert.assertNotNull(ans);
+        Assert.assertFalse(ans.isEmpty());
+        Assert.assertEquals(1,ans.size());
+        Assert.assertEquals(ID,ans.get(0).getUser_id());
+        Assert.assertEquals(21,ans.get(0).getPoints().intValue());
+        Assert.assertEquals(1,ans.get(0).getGroupNumber().intValue());
+    }
+
+    @Test
+    public void testGetGroups(){
+        int ans = participantJdbcDao.getTournamentGroups(ID);
+
+        Assert.assertEquals(2,ans);
+    }
+
+    @Test
+    public void testGetNoGroups(){
+        int ans = participantJdbcDao.getTournamentGroups(ID+2);
+
+        Assert.assertEquals(0,ans);
+    }
+
+    @Test
+    public void testAddPoints(){
+        participantJdbcDao.sumPoints(ID,ID+1,3);
+        int ans = jdbcTemplate.queryForObject("select points from participant where tournament_id = ? and user_id = ?", Integer.class,ID,ID+1);
+
+        Assert.assertEquals(5,ans);
     }
 }
