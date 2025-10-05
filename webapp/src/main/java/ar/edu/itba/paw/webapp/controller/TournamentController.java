@@ -145,8 +145,11 @@ public class TournamentController {
         }
 
         if (result.hasErrors()) {
-            return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
+            ModelAndView mav = tournamentPage(principal, tournamentId, form);
+            mav.addObject("openEditModal", Boolean.TRUE);
+            return mav;
         }
+
         byte[] imageBytes = null;
         try {
             if (form.getImage() != null && !form.getImage().isEmpty()) {
@@ -180,21 +183,27 @@ public class TournamentController {
 
         if(optionalTournament.isPresent()) {
             Tournament t = optionalTournament.get();
-
+            boolean hasFormErrors = mav.getModel().containsKey(
+                    BindingResult.MODEL_KEY_PREFIX + "editTournamentForm"
+            );
+            if (!hasFormErrors) {
+                form.setName(t.getName());
+                if(!t.getTournamentStarted()){
+                    form.setStart_date(t.getStart_date());
+                    form.setMax_participants(t.getMax_participants());
+                }
+                if(!t.getFinished()) {
+                    form.setEnd_date(t.getEnd_date());
+                }
+            }
             Optional<GameFormat> optionalGameFormat = gs.getFormatById(t.getFormat_id());
             if (optionalGameFormat.isPresent()){
                 GameFormat gf = optionalGameFormat.get();
                 mav.addObject("format", gf);
                 t.setFormat(gf.getName());
             }
-
             List<ParticipantInfo> participants = ps.getTournamentParticipantInfo(tournamentId, optionalGameFormat.isPresent() ? optionalGameFormat.get().getPlayers_per_team() : 1);
             int participantCount = participants.size();
-
-            form.setName(t.getName());
-            form.setStart_date(t.getStart_date());
-            form.setEnd_date(t.getEnd_date());
-            form.setMax_participants(t.getMax_participants());
             Optional<Game> optionalGame = gs.findById(t.getGame_id());
             Optional<User> optionalUser = us.findById(t.getCreator_id());
             Boolean isIndividualTournament = optionalGameFormat.isEmpty() || optionalGameFormat.get().getPlayers_per_team() == 1;

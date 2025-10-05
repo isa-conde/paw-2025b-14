@@ -5,9 +5,6 @@ import ar.edu.itba.paw.interfaces.services.UpdateDatesService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-
 @Service
 public class UpdateDatesServiceImpl implements UpdateDatesService {
 
@@ -21,8 +18,7 @@ public class UpdateDatesServiceImpl implements UpdateDatesService {
     @Override
     @Scheduled(cron = "0 10 3 * * *", zone = TZ)
     public void updateDates() {
-        LocalDate today = LocalDate.now(ZoneId.of(TZ));
-        tournamentDao.updateAllStartDates(today);
-        tournamentDao.updateAllEndDates(today);
+        tournamentDao.updateAllStartDates();
+        tournamentDao.updateAllEndDates();
     }
 }
