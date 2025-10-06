@@ -21,7 +21,7 @@ public class UserForm {
 	@UsernameIsTaken(message = "{error.registerForm.usernameUsed}")
 	@NotBlank(message = "{form.requiredField}")
 	@Size(max = 31)
-	@Pattern( regexp = "|[a-zA-Z][-a-zA-Z0-9_]+" , message = "{home.login.usernameFormat}")
+	@Pattern( regexp = "|[a-zA-Z][-a-zA-Z0-9_]+" , message = "home.login.usernameFormat")
 	private String username;
 	
 	@PasswordValidation
