@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.webapp.form;
 
 import ar.edu.itba.paw.webapp.constraints.ExistingUsersContraint;
+import ar.edu.itba.paw.webapp.constraints.TeamNameNotTakenConstraint;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
@@ -8,6 +9,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
+@UniqueTeamNameOnEdit
 public class EditTeamForm {
 
     @NotNull

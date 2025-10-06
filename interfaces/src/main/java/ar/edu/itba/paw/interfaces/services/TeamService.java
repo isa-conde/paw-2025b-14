@@ -24,4 +24,7 @@ public interface TeamService {
     Boolean isMember(Long team_id, Long user_id);
 
     List<User> getTeamMembers(Long team_id);
+
+    Boolean teamNameTaken(String name);
+
 }

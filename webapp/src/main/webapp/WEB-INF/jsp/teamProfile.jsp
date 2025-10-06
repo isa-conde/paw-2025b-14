@@ -79,7 +79,7 @@
 </paw:layout>
 
 
-<paw:modal title="team.profile.edit.title" id="editProfileModal">
+<paw:modal title="team.profile.edit.title" id="editProfileModal" returnUrl="/team/profile/${team.id}">
     <form:form method="post" modelAttribute="teamForm"
                action="${pageContext.request.contextPath}/team/update"
                enctype="multipart/form-data" cssClass="form">

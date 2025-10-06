@@ -52,7 +52,7 @@
             <c:when test="${activeSection == 'overview'}">
                 <div class="icon-card-container">
                     <c:set var="teamsText" value="${tournament.openInscriptions ? tournament.max_participants : participantCount}"/>
-                    <spring:message code="tournament.teams" var="teams" arguments="${teamsText}"/>
+                    <spring:message code="tournament.participants" var="teams" arguments="${teamsText}"/>
                     <paw:icon-card icon="${pageContext.request.contextPath}/images/map.png" text="${tournament.region}"/>
                     <paw:icon-card icon="${pageContext.request.contextPath}/images/team.png" text="${tournament.format}"/>
                     <paw:icon-card icon="${pageContext.request.contextPath}/images/level.png" text="${tournament.elo}"/>

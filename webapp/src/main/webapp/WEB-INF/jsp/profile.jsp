@@ -40,8 +40,8 @@
 
 </paw:layout>
 
-<paw:modal title="profile.edit.modal.title" id="editProfileModal">
-    <form:form method="post" modelAttribute="EditProfileForm"
+<paw:modal title="profile.edit.modal.title" id="editProfileModal" returnUrl="/profile/${profile.id}">
+    <form:form method="post" modelAttribute="editProfileForm"
                action="${pageContext.request.contextPath}/profile/update"
                enctype="multipart/form-data" cssClass="form">
         <input type="hidden" name="userId" value="${profile.id}"/>

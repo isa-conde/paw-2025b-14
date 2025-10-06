@@ -1,7 +1,6 @@
 package ar.edu.itba.paw.interfaces.persistence;
 
-import ar.edu.itba.paw.model.ParticipantUser;
-import ar.edu.itba.paw.model.ParticipantInfo;
+import ar.edu.itba.paw.model.Participant;
 
 import java.util.List;
 
@@ -9,19 +8,17 @@ public interface ParticipantDao {
 
     void joinTournamentUser(Long user_id, Long tournament_id);
 
-    List<ParticipantUser> getTournamentParticipantUsers(Long tournament_id);
-
-    ParticipantUser getTournamentParticipantByUserId(Long tournament_id, Long user_id);
+    Participant getTournamentParticipantByUserId(Long tournament_id, Long user_id);
 
     Boolean hasJoined(Long userId, Long tournamentId);
 
     void leaveTournamentUser(Long user_id, Long tournament_id);
 
-    void updateGroupNumberForUsers(long tournamentId, int groupNumber, List<Long> userIds);
+    void updateGroupNumberForUsers(long tournamentId, int groupNumber, List<Long> userIds, Integer teamSize);
 
-    void swapGroups(Long tournament_id, Long user1, Long user2, Integer group1, Integer group2);
+    void swapGroups(Long tournament_id, Long user1, Long user2, Integer group1, Integer group2, Integer teamSize);
 
-    List<ParticipantUser> getTournamentParticipantsByPoints(Long tournamentId, Integer group_number, Integer points);
+    List<Participant> getTournamentParticipantsByPoints(Long tournamentId, Integer group_number, Integer points, Integer teamSize);
 
     Integer getTournamentMaxPoints(Long tournamentId);
 
@@ -29,11 +26,11 @@ public interface ParticipantDao {
 
     Integer getTournamentGroups(Long tournamentId);
 
-    List<ParticipantInfo> getTournamentsParticipantUsersInfo(Long tournament_id);
+    List<Participant> getTournamentsParticipantUsers(Long tournament_id);
 
-    Integer getGroupNumber(Long tournament_id, Long user_id);
+    Integer getGroupNumber(Long tournament_id, Long user_id, Integer teamSize);
 
     void sumPoints(Long tournamentId, Long userId, Integer points);
 
-    public List<ParticipantInfo> getTournamentsParticipantTeamsInfo(Long tournament_id);
+    List<Participant> getTournamentsParticipantTeams(Long tournament_id);
 }

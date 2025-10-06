@@ -31,16 +31,16 @@
           <paw:elements-grid elements="${tournaments}" id="tournamets-grid" headerElements="${games}"/>
       </c:if>
 
-  <c:if test="${!isFiltered}">
-    <c:forEach var="game" items="${games}" varStatus="status">
-        <c:if test="${not empty gameTournaments[game.id]}">
-            <div class="carrousel-title">
-                <paw:text type="title" size="s"><c:out value="${game.name}"/></paw:text>
-            </div>
-            <paw:carrousel id="game-${game.id}-tournaments" elements="${gameTournaments[game.id]}"/>
-        </c:if>
-    </c:forEach>
-  </c:if>
+      <c:if test="${!isFiltered}">
+        <c:forEach var="game" items="${games}" varStatus="status">
+            <c:if test="${not empty gameTournaments[game.id]}">
+                <div class="carrousel-title">
+                    <paw:text type="title" size="s"><c:out value="${game.name}"/></paw:text>
+                </div>
+                <paw:carrousel id="game-${game.id}-tournaments" elements="${gameTournaments[game.id]}"/>
+            </c:if>
+        </c:forEach>
+      </c:if>
         <div class="pagination-container">
             <c:if test="${totalPages > 1}">
                 <div class="pagination">
@@ -70,6 +70,21 @@
                     </c:if>
                 </div>
             </c:if>
+        </div>
+
+        <div class="cards-container">
+            <c:set var="createTournamentFunction" value="window.location.href='${pageContext.request.contextPath}/tournaments/new/step1'"/>
+            <c:set var="createTeamFunction" value="window.location.href='${pageContext.request.contextPath}/team/create'"/>
+            <paw:button-card
+                    title="tournaments.create.title"
+                    butText="home.createTournament.butText"
+                    onclick="${createTournamentFunction}"
+                    texture="true"/>
+            <paw:button-card
+                    title="tournaments.team.title"
+                    butText="tournaments.team.butText"
+                    onclick="${createTeamFunction}"
+                    texture="true"/>
         </div>
 
     </div>

@@ -2,7 +2,6 @@ package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.persistence.*;
 import ar.edu.itba.paw.interfaces.services.TeamService;
-import ar.edu.itba.paw.model.ParticipantUser;
 import ar.edu.itba.paw.model.Team;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.User;
@@ -45,8 +44,10 @@ public class TeamServiceImpl implements TeamService {
 
         Team team = teamDao.create(name, pfp_id, banner_id, owner_id);
 
-        for (String s : members){
-            teamMemberDao.AddMember(team.getId(), userDao.findByUsername(s).get().getId());
+        if (members != null){
+            for (String s : members){
+                teamMemberDao.AddMember(team.getId(), userDao.findByUsername(s).get().getId());
+            }
         }
         teamMemberDao.AddMember(team.getId(), owner_id);
 
@@ -87,9 +88,12 @@ public class TeamServiceImpl implements TeamService {
             banner_id = imageDao.insertImage(banner);
         }
 
-        for (String s : members){
-            if (!teamMemberDao.isMember(teamId, userDao.findByUsername(s).get().getId())){
-                teamMemberDao.AddMember(teamId, userDao.findByUsername(s).get().getId());
+        if (members != null){
+            for (String s : members){
+                Long userid =  userDao.findByUsername(s).get().getId();
+                if (!teamMemberDao.isMember(teamId,userid)){
+                    teamMemberDao.AddMember(teamId, userid);
+                }
             }
         }
 
@@ -109,6 +113,11 @@ public class TeamServiceImpl implements TeamService {
             toReturn.add(userDao.findById(l).get());
         }
         return toReturn;
+    }
+
+    @Override
+    public Boolean teamNameTaken(String name) {
+        return teamDao.teamNameTaken(name);
     }
 
     private List<Tournament> getTournamentsFromIds(List<Long> tournamentIds) {
