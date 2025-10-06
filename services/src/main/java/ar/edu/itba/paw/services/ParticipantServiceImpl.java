@@ -32,25 +32,24 @@ public class ParticipantServiceImpl implements ParticipantService {
     public void joinTournamentUser(Long user_id, Long tournament_id) {
         participantDao.joinTournamentUser(user_id, tournament_id);
 
-        List<Participant> participants = getTournamentParticipants(tournament_id);
+        List<Participant> participants = getTournamentParticipantUsers(tournament_id);
         Optional<Tournament> tournament = tournamentDao.findById(tournament_id);
         if (tournament.isPresent() && participants.size() == tournament.get().getMax_participants()) {
             ts.closeInscriptions(tournament_id);
         }
     }
 
-    @Override
-    public List<Participant> getTournamentParticipants(Long tournament_id) {
-        return participantDao.getTournamentsParticipantUsers(tournament_id);
+    private List<Participant> getTournamentParticipantUsers(Long tournament_id) {
+        return participantDao.getTournamentParticipantUsers(tournament_id);
     }
 
     @Override
     public List<Participant> getTournamentParticipants(Long tournamentId, Integer teamSize) {
-        List<Participant> participants = new ArrayList<>();
+        List<Participant> participants;
         if (teamSize > 1){
-            participants = participantDao.getTournamentsParticipantTeams(tournamentId);
+            participants = participantDao.getTournamentParticipantTeams(tournamentId);
         }else {
-            participants = participantDao.getTournamentsParticipantUsers(tournamentId);
+            participants = participantDao.getTournamentParticipantUsers(tournamentId);
         }
         participants.sort((a, b) -> b.getPoints().compareTo(a.getPoints()));
         return participants;
@@ -92,5 +91,13 @@ public class ParticipantServiceImpl implements ParticipantService {
         }
 
         participantDao.swapGroups(tournament_id, user1, user2, g1, g2, teamSize);
+    }
+
+    @Override
+    public void joinTournamentTeam(Long tournamentId, Long teamId, List<Long> participants){
+        for(Long p : participants){
+            participantDao.joinTournamentUserWithTeam(p, tournamentId, teamId);
+        }
+        participantDao.joinTournamentTeam(teamId, tournamentId);
     }
 }

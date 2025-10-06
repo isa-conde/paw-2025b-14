@@ -285,7 +285,7 @@ public class TournamentController {
             mav.addObject("selectedTeamId", form.getTeamId());
             return mav;
         }
-
+        ps.joinTournamentTeam(form.getTournamentId(), form.getTeamId(), form.getMembers());
         return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
     }
 

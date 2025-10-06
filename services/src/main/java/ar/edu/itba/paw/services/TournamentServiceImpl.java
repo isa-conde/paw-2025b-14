@@ -92,7 +92,7 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public void closeInscriptions(Long tournament_id){
         tournamentDao.closeInscriptions(tournament_id);
-        createMatches(tournament_id, participantDao.getTournamentsParticipantUsers(tournament_id));
+        createMatches(tournament_id, participantDao.getTournamentParticipantUsers(tournament_id));
     }
 
     @Override
@@ -320,7 +320,7 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     private void createGroupStageMatches(Tournament t){
-        Map<Integer, List<Participant>> groupedParticipants = getGroupedParticipants(participantDao.getTournamentsParticipantUsers(t.getId()));
+        Map<Integer, List<Participant>> groupedParticipants = getGroupedParticipants(participantDao.getTournamentParticipantUsers(t.getId()));
         if(groupedParticipants != null){
             long nextId = 1L;
             for(List<Participant> participants : groupedParticipants.values()){

@@ -50,7 +50,7 @@ public class ParticipantJdbcDao implements ParticipantDao {
 
 
     @Override
-    public List<Participant> getTournamentsParticipantUsers(Long tournament_id) {
+    public List<Participant> getTournamentParticipantUsers(Long tournament_id) {
 
         return jdbcTemplate.query("SELECT * FROM participant " +
                                       "INNER JOIN users ON participant.user_id = users.id " +
@@ -58,7 +58,7 @@ public class ParticipantJdbcDao implements ParticipantDao {
     }
 
     @Override
-    public List<Participant> getTournamentsParticipantTeams(Long tournament_id) {
+    public List<Participant> getTournamentParticipantTeams(Long tournament_id) {
         return jdbcTemplate.query("SELECT * FROM participant " +
                 "INNER JOIN team ON participant.team_id = team.id " +
                 "WHERE tournament_id = ?", ROW_MAPPER_TEAM, tournament_id);
@@ -72,6 +72,24 @@ public class ParticipantJdbcDao implements ParticipantDao {
         values.put("tournament_id", tournament_id);
         values.put("points", 0);
 
+        jdbcInsert.execute(values);
+    }
+
+    @Override
+    public void joinTournamentUserWithTeam(Long user_id, Long tournament_id, Long team_id) {
+        Map<String, Object> values = new HashMap<>();
+        values.put("user_id", user_id);
+        values.put("tournament_id", tournament_id);
+        values.put("team_id", team_id);
+        jdbcInsert.execute(values);
+    }
+
+    @Override
+    public void joinTournamentTeam(Long tournamentId, Long teamId) {
+        Map<String, Object> values = new HashMap<>();
+        values.put("team_id", teamId);
+        values.put("tournament_id", tournamentId);
+        values.put("points", 0);
         jdbcInsert.execute(values);
     }
 

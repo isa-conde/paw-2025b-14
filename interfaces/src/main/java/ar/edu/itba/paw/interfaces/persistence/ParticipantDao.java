@@ -8,6 +8,10 @@ public interface ParticipantDao {
 
     void joinTournamentUser(Long user_id, Long tournament_id);
 
+    void joinTournamentUserWithTeam(Long user_id, Long tournament_id, Long team_id);
+
+    void joinTournamentTeam(Long tournamentId, Long teamId);
+
     Participant getTournamentParticipantByUserId(Long tournament_id, Long user_id);
 
     Boolean hasJoined(Long userId, Long tournamentId);
@@ -26,11 +30,11 @@ public interface ParticipantDao {
 
     Integer getTournamentGroups(Long tournamentId);
 
-    List<Participant> getTournamentsParticipantUsers(Long tournament_id);
+    List<Participant> getTournamentParticipantUsers(Long tournament_id);
 
     Integer getGroupNumber(Long tournament_id, Long user_id, Integer teamSize);
 
     void sumPoints(Long tournamentId, Long userId, Integer points);
 
-    List<Participant> getTournamentsParticipantTeams(Long tournament_id);
+    List<Participant> getTournamentParticipantTeams(Long tournament_id);
 }

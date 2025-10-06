@@ -8,8 +8,6 @@ public interface ParticipantService {
 
     public void joinTournamentUser(Long user_id, Long tournament_id);
 
-    public List<Participant> getTournamentParticipants(Long tournament_id);
-
     public Participant getTournamentParticipantByUserId(Long tournament_id, Long user_id);
 
     Boolean hasJoined(Long userId, Long tournamentId);
@@ -21,4 +19,6 @@ public interface ParticipantService {
     List<Participant> getTournamentParticipants(Long tournamentId, Integer teamSize);
 
     Integer getTournamentGroups(Long tournamentId);
+
+    void joinTournamentTeam(Long tournamentId, Long teamId, List<Long> participants);
 }
