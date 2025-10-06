@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.SecureRandom;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -215,15 +216,16 @@ public class UserServiceImpl implements UserService {
         Long pfpId = null;
         if (pfp != null){
             pfpId = imageDao.insertImage(pfp);
-        }else {
-            pfpId = user.get().getProfile_picture_id();
         }
         if (banner != null){
             bannerId = imageDao.insertImage(pfp);
-        }else {
-            bannerId = user.get().getBanner_id();
         }
         userDao.updateProfileInfo(userId, username, bio, pfpId, bannerId);
+    }
+
+    @Override
+    public List<User> searchByName(String name) {
+        return userDao.searchByName(name);
     }
 
     @Transactional(readOnly = true)

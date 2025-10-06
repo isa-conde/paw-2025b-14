@@ -9,10 +9,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 public class TeamJdbcDao implements TeamDao {
@@ -57,6 +54,41 @@ public class TeamJdbcDao implements TeamDao {
     }
 
     @Override
+    public void updateTeam(Long teamId, String name, Long pfpId, Long bannerId) {
+        StringBuilder sql = new StringBuilder("UPDATE team SET ");
+        List<Object> params = new ArrayList<>();
+
+        sql.append("name = ?");
+        params.add(name);
+
+        if (pfpId != null) {
+            sql.append(", profile_picture_id = ?");
+            params.add(pfpId);
+        }
+
+        if (bannerId != null) {
+            sql.append(", banner_id = ?");
+            params.add(bannerId);
+        }
+
+        sql.append(" WHERE id = ?");
+        params.add(teamId);
+
+        jdbcTemplate.update(sql.toString(), params.toArray());
+    }
+
+    @Override
+    public Boolean teamNameTaken(String name) {
+        final String sql = "SELECT EXISTS(SELECT 1 FROM team WHERE name = ?)";
+        return jdbcTemplate.queryForObject(sql, Boolean.class, name);
+    }
+
+    @Override
+    public List<Team> searchByName(String name) {
+        return jdbcTemplate.query("SELECT * FROM team WHERE LOWER(name) LIKE '%' || LOWER(?) || '%'", ROW_MAPPER, name);
+    }
+
+    @Override
     public List<Long> getPastTournaments(Long teamId) {
         return findTeamTournamentIds(teamId, true);
     }
@@ -69,5 +101,26 @@ public class TeamJdbcDao implements TeamDao {
         WHERE p.team_id = ? AND t.is_finished = ?
     """;
         return jdbcTemplate.queryForList(sql, Long.class, teamId, isFinished);
+    }
+
+    @Override
+    public List<Team> getUserTeamsBySize(Long userId, Integer minSize) {
+        String sql = """
+        SELECT t.*
+        FROM team t
+        WHERE EXISTS (
+            SELECT 1
+            FROM team_member tm
+            WHERE tm.team_id = t.id
+              AND tm.user_id = ?
+        )
+        AND (
+            SELECT COUNT(*)
+            FROM team_member tm2
+            WHERE tm2.team_id = t.id
+        ) >= ?
+        ORDER BY t.id
+    """;
+        return jdbcTemplate.query(sql, ROW_MAPPER, userId, minSize);
     }
 }

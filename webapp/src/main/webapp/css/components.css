@@ -345,6 +345,7 @@ button:disabled {
 .main-text {
     font-weight: 700;
     margin: 5px 0;
+    color: var(--primary-text);
 }
 
 .main-text.xl {
@@ -926,7 +927,7 @@ dialog:not([open]) {
 }
 
 .row.center {
-    margin: 30px 20px 20px;
+    margin: 20px 20px 20px;
 }
 
 /* ------- ICON BUTTON ------- */
@@ -1006,11 +1007,7 @@ dialog:not([open]) {
     flex-direction: column;
     flex: 1;
     min-width: 150px;
-    margin-right: 20px;
-}
-
-.inline-input-container:last-child {
-    margin-right: 0;
+    gap: 20px;
 }
 
 .inline-input-container.submit-container {
@@ -1563,4 +1560,107 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .logout-button:hover {
     background-color: var(--secondary-details-hover)
+}
+
+/* ------- LIST ------- */
+
+.teams-list-container {
+    background-color: var(--background-secondary);
+    border-radius: 15px;
+    padding: 10px;
+}
+
+.teams-list {
+    width: 100%;
+    max-width: 100%;
+    padding: 30px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: stretch;
+    justify-content: center;
+}
+
+.team-option input[type="radio"] {
+    flex: 0 0 auto;
+}
+
+.teams-list .btn {
+    max-width: 100%;
+}
+
+.teams-list .btn:disabled {
+    opacity: 1;
+}
+
+.team-option,
+.member-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.team-option .btn,
+.member-option .btn {
+    flex: 1 1 auto;
+    width: auto;
+    max-width: 100%;
+    justify-content: flex-start;
+}
+
+.team-option .btn:disabled,
+.member-option .btn:disabled {
+    pointer-events: none;
+}
+
+.join-team-error {
+    padding: 10px;
+}
+
+
+
+.profile-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    background-color: var(--background-secondary);
+    border-radius: 15px;
+    padding: 20px;
+    width: 120px;
+    min-height: 160px;
+    margin: 10px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.profile-card:hover {
+    transform: scale(1.05);
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 10px;
+    border: 2px solid var(--primary-button);
+    object-fit: cover;
+}
+
+.profile-avatar img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--primary-button);
+}
+
+
+.profile-name {
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    word-wrap: break-word;
 }

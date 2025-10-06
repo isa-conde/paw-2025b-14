@@ -50,4 +50,5 @@ public interface TournamentService {
 
     List<Tournament> getCreatedAndOngoingTournaments(Long userId);
 
+    Integer getPlayersPerTeam(Long tournamentId);
 }

@@ -64,7 +64,7 @@ public class AuthController {
 
     @RequestMapping("/logout")
     public ModelAndView logout() {
-        return new ModelAndView("redirect:/login");
+        return new ModelAndView("redirect:/logout");
     }
 
     @RequestMapping(value = "/verify", method = RequestMethod.POST)

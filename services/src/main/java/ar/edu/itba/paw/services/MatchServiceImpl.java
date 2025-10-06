@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.exception.MatchWinnerAlreadySetException;
+import ar.edu.itba.paw.interfaces.persistence.GameDao;
 import ar.edu.itba.paw.interfaces.persistence.MatchDao;
 import ar.edu.itba.paw.interfaces.persistence.ParticipantDao;
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
@@ -8,7 +9,6 @@ import ar.edu.itba.paw.interfaces.services.MatchService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.Match;
 import ar.edu.itba.paw.model.MatchInfo;
-import ar.edu.itba.paw.model.ParticipantUser;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.enums.Structure;
 import org.springframework.stereotype.Service;
@@ -23,13 +23,15 @@ public class MatchServiceImpl implements MatchService {
     private final MatchDao matchDao;
     private final ParticipantDao participantDao;
     private final TournamentDao tournamentDao;
+    private final GameDao gameDao;
     private final TournamentService ts;
 
-    public MatchServiceImpl(MatchDao matchDao, ParticipantDao participantDao, TournamentDao tournamentDao, TournamentService tournamentService) {
+    public MatchServiceImpl(MatchDao matchDao, ParticipantDao participantDao, TournamentDao tournamentDao, TournamentService tournamentService, GameDao gameDao) {
         this.matchDao = matchDao;
         this.participantDao = participantDao;
         this.tournamentDao = tournamentDao;
         this.ts = tournamentService;
+        this.gameDao = gameDao;
     }
 
     @Transactional
@@ -74,7 +76,9 @@ public class MatchServiceImpl implements MatchService {
             if (stage == null) {
                 continue;
             }
-            Integer group = participantDao.getGroupNumber(tournamentId, m.getLocalId());
+            Optional<Tournament> t = tournamentDao.findById(tournamentId);
+            Integer teamSize = gameDao.getFormatById(t.get().getFormat_id()).get().getPlayers_per_team();
+            Integer group = participantDao.getGroupNumber(tournamentId, m.getLocalId(), teamSize);
             result.computeIfAbsent(group, g -> new TreeMap<>())
                     .computeIfAbsent(stage, s -> new ArrayList<>())
                     .add(m);
