@@ -59,15 +59,6 @@ public class TournamentJdbcDao implements TournamentDao {
             rs.getBoolean("tournament_started"),
             rs.getLong("format_id"));
 
-    private static final RowMapper<User> ROW_MAPPER_USER = (rs, rowNum) -> new User(rs.getLong("id"),
-            rs.getString("username"),
-            rs.getString("email"),
-            rs.getString("password"),
-            rs.getBoolean("verified"),
-            rs.getString("bio"),
-            rs.getLong("profile_picture_id"),
-            rs.getLong("banner_id"));
-
     @Override
     public Optional<Tournament> findById(Long id) {
         return jdbcTemplate.query("SELECT * FROM tournament WHERE id = ?", ROW_MAPPER, id).stream().findFirst();
@@ -185,7 +176,7 @@ public class TournamentJdbcDao implements TournamentDao {
     @Override
     public List<Tournament> findTournaments(TournamentFilter filter, Long page) {
         MapSqlParameterSource params = new MapSqlParameterSource();
-        StringBuilder sql = new StringBuilder("SELECT DISTINCT ON (t.id) t.* FROM tournament t");
+        StringBuilder sql = new StringBuilder("SELECT * FROM tournament t");
 
         sql.append(buildTournamentFilterSql(filter, params));
 
@@ -207,13 +198,13 @@ public class TournamentJdbcDao implements TournamentDao {
             sql.append(" JOIN game g ON t.game_id = g.id");
         }
         if (needsFormatJoin) {
-            sql.append(" LEFT JOIN game_format gf ON t.game_id = gf.game_id");
+            sql.append(" LEFT JOIN game_format gf ON t.game_id = gf.game_id AND t.format_id = gf.id");
         }
 
         sql.append(" WHERE open_inscriptions = true");
 
         if (filter.getName() != null) {
-            sql.append(" AND t.name LIKE :name");
+            sql.append(" AND LOWER(t.name) LIKE LOWER(:name)");
             params.addValue("name", filter.getName());
         }
         if (filter.getGame_id() != null) {
@@ -222,11 +213,11 @@ public class TournamentJdbcDao implements TournamentDao {
         }
         if (filter.getElo() != null) {
             sql.append(" AND t.elo = :elo");
-            params.addValue("elo", filter.getElo(), Types.OTHER);
+            params.addValue("elo", filter.getElo().name(), Types.OTHER);
         }
         if (filter.getRegion() != null) {
             sql.append(" AND t.region = :region");
-            params.addValue("region", filter.getRegion(), Types.OTHER);
+            params.addValue("region", filter.getRegion().name(), Types.OTHER);
         }
         if (filter.getFormat() != null) {
             sql.append(" AND t.format = :format");
@@ -234,14 +225,14 @@ public class TournamentJdbcDao implements TournamentDao {
         }
         if (filter.getStructure() != null) {
             sql.append(" AND t.structure = :structure");
-            params.addValue("structure", filter.getStructure(), Types.OTHER);
+            params.addValue("structure", filter.getStructure().name(), Types.OTHER);
         }
         if (filter.getStart_date() != null) {
-            sql.append(" AND t.start_date < :start_date");
+            sql.append(" AND t.start_date <= :start_date");
             params.addValue("start_date", filter.getStart_date());
         }
         if (filter.getEnd_date() != null) {
-            sql.append(" AND t.end_date < :end_date");
+            sql.append(" AND t.end_date <= :end_date");
             params.addValue("end_date", filter.getEnd_date());
         }
         if (filter.getPlayersPerTeam() != null) {
@@ -250,7 +241,7 @@ public class TournamentJdbcDao implements TournamentDao {
         }
         if (filter.getGenre() != null) {
             sql.append(" AND g.genre = :genre");
-            params.addValue("genre", filter.getGenre(), Types.OTHER);
+            params.addValue("genre", filter.getGenre().name(), Types.OTHER);
         }
         return sql.toString();
     }
