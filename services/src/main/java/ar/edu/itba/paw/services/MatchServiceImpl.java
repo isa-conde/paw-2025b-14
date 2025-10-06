@@ -80,6 +80,9 @@ public class MatchServiceImpl implements MatchService {
             return Collections.emptyMap();
         }
         Integer teamSize = ts.getPlayersPerTeam(tournamentId);
+        if(teamSize == null){
+            teamSize = 1;
+        }
         Map<Integer, List<MatchInfo>> result = new TreeMap<>();
         Boolean isGroupStage = tournamentDao.getIsGroupStage(tournamentId);
         for (MatchInfo m : matches) {

@@ -88,7 +88,7 @@ public class MatchJdbcDao implements MatchDao {
 
     @Override
     public List<MatchInfo> getTournamentMatches(Long tournamentId, Integer teamSize) {
-        final String joinCondition = (teamSize > 1)
+        final String joinCondition = (teamSize != null && teamSize > 1)
                 ? "AND p.team_id = m.local_id AND p.user_id IS NULL"
                 : "AND p.user_id = m.local_id";
 

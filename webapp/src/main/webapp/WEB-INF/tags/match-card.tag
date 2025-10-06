@@ -1,8 +1,8 @@
 <%@ tag language="java" pageEncoding="UTF-8" %>
 <%@ attribute name="matchId" required="true" rtexprvalue="true" %>
 <%@ attribute name="tournamentId" required="true" rtexprvalue="true" %>
-<%@ attribute name="localPlayer" required="true" rtexprvalue="true" %>
-<%@ attribute name="visitorPlayer" required="true" rtexprvalue="true" %>
+<%@ attribute name="localPlayer" required="true" rtexprvalue="true" type="ar.edu.itba.paw.model.Participant" %>
+<%@ attribute name="visitorPlayer" required="true" rtexprvalue="true" type="ar.edu.itba.paw.model.Participant" %>
 <%@ attribute name="localPlayerId" required="true" rtexprvalue="true" %>
 <%@ attribute name="visitorPlayerId" required="true" rtexprvalue="true" %>
 <%@ attribute name="winner" required="false" rtexprvalue="true" %>
@@ -13,11 +13,18 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
 
+<c:set var="localName" value="${localPlayer == null ? 'TBD' : localPlayer.name}"/>
+<c:set var="visitorName" value="${visitorPlayer == null ? 'TBD' : visitorPlayer.name}"/>
+
+<c:set var="contextPath" value="${pageContext.request.contextPath}"/>
+<c:set var="localPfp" value="${localPlayer == null ? contextPath.concat('/images/empty_user.png') : contextPath.concat('/pfp/').concat(localPlayer.pfp_id)}"/>
+<c:set var="visitorPfp" value="${visitorPlayer == null ? contextPath.concat('/images/empty_user.png') : contextPath.concat('/pfp/').concat(visitorPlayer.pfp_id)}"/>
+
 <div class="match-card">
     <div class="match-players">
         <div class="player local-player ${winner == 1 ? 'winner' : ''}">
-            <img src="${pageContext.request.contextPath}/images/empty_user.png" alt="Player" class="player-avatar"/>
-            <paw:text size="s" weight="semi-bold"><c:out value="${localPlayer.name}"/></paw:text>
+            <img src="${localPfp}" alt="Local Player" class="player-avatar"/>
+            <paw:text size="s" weight="semi-bold"><c:out value="${localName}"/></paw:text>
         </div>
         
         <div class="vs-container">
@@ -25,8 +32,8 @@
         </div>
         
         <div class="player visitor-player ${winner == 2 ? 'winner' : ''}">
-            <img src="${pageContext.request.contextPath}/images/empty_user.png" alt="Player" class="player-avatar"/>
-            <paw:text size="s" weight="semi-bold"><c:out value="${visitorPlayer.name}"/></paw:text>
+            <img src="${visitorPfp}" alt="Visitor Player" class="player-avatar"/>
+            <paw:text size="s" weight="semi-bold"><c:out value="${visitorName}"/></paw:text>
         </div>
     </div>
     <spring:message code="tournament.wins" var="wins"/>
