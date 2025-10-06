@@ -39,14 +39,16 @@ public class ParticipantJdbcDao implements ParticipantDao {
             rs.getLong("user_id"),
             rs.getString("username"),
             rs.getInt("points"),
-            rs.getInt("group_number")
+            rs.getInt("group_number"),
+            rs.getLong("profile_picture_id")
     );
 
     private static final RowMapper<Participant> ROW_MAPPER_TEAM = (rs, rowNum) -> new Participant(
             rs.getLong("team_id"),
             rs.getString("name"),
             rs.getInt("points"),
-            rs.getInt("group_number")
+            rs.getInt("group_number"),
+            rs.getLong("profile_picture_id")
     );
 
 

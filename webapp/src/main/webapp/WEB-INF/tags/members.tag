@@ -9,6 +9,6 @@
 <div class="grid users">
     <c:forEach var="p" items="${members}">
         <c:set value="/profile/${p.id}" var="url"/>
-        <paw:profileButton text="${p.username}" onclick="window.location.href='${url}'" isNotSafe="true" size="l" fill="false"/>
+        <paw:profileButton text="${p.username}" onclick="window.location.href='${url}'" isNotSafe="true" size="l" fill="false" imageId="${p.pfp_id}"/>
     </c:forEach>
 </div>

@@ -19,7 +19,7 @@
             </div>
             <div class="organizer-container">
                 <paw:text size="s"><spring:message code="team.profile.createdBy"/></paw:text>
-                <paw:profileButton text="${owner.username}" onclick="window.location.href='/profile/${owner.id}'" size="xs" isNotSafe="true"/>
+                <paw:profileButton imageId="${owner.pfp_id}" text="${owner.username}" onclick="window.location.href='/profile/${owner.id}'" size="xs" isNotSafe="true"/>
             </div>
         </div>
     </paw:banner>

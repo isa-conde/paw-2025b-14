@@ -130,6 +130,7 @@ public class UserController {
         }
 
         mav.addObject("isFiltered", isFiltered);
+
         return mav;
     }
 
@@ -147,7 +148,7 @@ public class UserController {
     }
 
     @RequestMapping("/profile/{id}")
-    public ModelAndView profile(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @PathVariable Long id, @ModelAttribute("EditProfileForm") EditProfileForm editProfileForm){
+    public ModelAndView profile(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @PathVariable Long id, @ModelAttribute("editProfileForm") EditProfileForm editProfileForm){
         final ModelAndView mav = new ModelAndView("profile");
 
         Optional<User> profileOpt = us.findById(id);
