@@ -129,9 +129,28 @@ public class ParticipantServiceImpl implements ParticipantService {
     @Transactional
     @Override
     public void joinTournamentTeam(Long tournamentId, Long teamId, List<Long> participants){
+        Optional<Tournament> tournament = tournamentDao.findById(tournamentId);
+        if(tournament.isEmpty()){
+            return;
+        }
+        Tournament t = tournament.get();
+        User creator = userDao.findById(t.getCreator_id()).get();
+
         for(Long p : participants){
+            if(hasJoined(p, tournamentId)) {
+                LOGGER.warn("User with ID {} has already joined tournament with ID {}", p, tournamentId);
+                throw new UserAlreadyJoinedException();
+            }
             participantDao.joinTournamentUserWithTeam(p, tournamentId, teamId);
+            User user = userDao.findById(p).get();
+            ms.sendTournamentJoinedEmail(tournamentId, user.getUsername(), t.getName(), user.getEmail(), creator.getEmail());
+            LOGGER.info("Tournament joined email correctly sent to the address {}", user.getEmail());
         }
         participantDao.joinTournamentTeam(tournamentId, teamId);
+        List<Participant> currentParticipants = getTournamentParticipants(tournamentId, ts.getPlayersPerTeam(tournamentId));
+        if (currentParticipants.size() == t.getMax_participants()) {
+            ts.closeInscriptions(tournamentId);
+            LOGGER.info("Max participant count has been reached. The inscriptions for tournament with ID {} have been closed", tournamentId);
+        }
     }
 }

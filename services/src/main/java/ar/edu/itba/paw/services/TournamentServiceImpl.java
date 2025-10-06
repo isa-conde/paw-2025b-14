@@ -369,13 +369,10 @@ public class TournamentServiceImpl implements TournamentService {
                 createMatchesLeague(t, topPositions.get(1), lastMatchId + 1, matchDao.getTournamentGroupMaxStage(tournamentId, i) + 1, true);
                 return;
             }else if(topPositions.get(2).size() > 1){
-                participantDao.sumPoints(tournamentId, topPositions.get(1).getFirst().getId(), 3 * (topPositions.get(2).size() / 2));
+                participantDao.sumPoints(tournamentId, topPositions.get(1).getFirst().getId(), 3 * (topPositions.get(2).size() / 2), getPlayersPerTeam(tournamentId));
                 createMatchesLeague(t, topPositions.get(2), lastMatchId + 1, matchDao.getTournamentGroupMaxStage(tournamentId, i) + 1, true);
                 return;
             }
-            System.out.println("Error in bracket creation group " + i);
-            System.out.println("topPositions.get(1) " + topPositions.get(1));
-            System.out.println("topPositions.get(2) " + topPositions.get(2));
             if(topPositions.get(1).isEmpty() || topPositions.get(2).isEmpty()){
                 return;
             }

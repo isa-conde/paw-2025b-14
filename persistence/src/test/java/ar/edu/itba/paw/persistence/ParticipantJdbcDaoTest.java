@@ -357,7 +357,7 @@ public class ParticipantJdbcDaoTest {
 
     @Test
     public void testAddPoints(){
-        participantJdbcDao.sumPoints(ID,ID+1,3);
+        participantJdbcDao.sumPoints(ID,ID+1,3, 1);
         int ans = jdbcTemplate.queryForObject("select points from participant where tournament_id = ? and user_id = ?", Integer.class,ID,ID+1);
 
         Assert.assertEquals(5,ans);

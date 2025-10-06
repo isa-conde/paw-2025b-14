@@ -15,6 +15,8 @@
 
 <c:set var="localName" value="${localPlayer == null ? 'TBD' : localPlayer.name}"/>
 <c:set var="visitorName" value="${visitorPlayer == null ? 'TBD' : visitorPlayer.name}"/>
+<c:set var="localPfpDir" value="${localPlayer == null ? '/images/empty_user.png' : 'pfp/${localPlayer.pfp_id}'}"/>
+<c:set var="visitorPfpDir" value="${visitorPlayer == null ? '/images/empty_user.png' : 'pfp/${visitorPlayer.pfp_id}'}"/>
 
 <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
 <c:set var="localPfp" value="${localPlayer == null ? contextPath.concat('/images/empty_user.png') : contextPath.concat('/pfp/').concat(localPlayer.pfp_id)}"/>
@@ -44,7 +46,8 @@
                 <input type="hidden" name="tournamentId" value="${tournamentId}"/>
                 <input type="hidden" name="winner" value="1"/>
                 <button type="submit" class="action-button local-win">
-                    <paw:text size="xs"><c:out value="${localPlayer} ${wins}"/></paw:text>
+                    <spring:message code="tournament.wins" arguments="${localName}" var="winsMessage"/>
+                    <paw:text size="xs"><c:out value="${winsMessage}"/></paw:text>
                 </button>
             </form>
             <form method="post" action="${pageContext.request.contextPath}/tournament/setWinner" style="display: inline;">
@@ -53,7 +56,8 @@
                 <input type="hidden" name="group" value="${groupNumber}"/>
                 <input type="hidden" name="winner" value="2"/>
                 <button type="submit" class="action-button visitor-win">
-                    <paw:text size="xs"><c:out value="${visitorPlayer} ${wins}"/></paw:text>
+                    <spring:message code="tournament.wins" arguments="${visitorName}" var="winsMessage"/>
+                    <paw:text size="xs"><c:out value="${winsMessage}"/></paw:text>
                 </button>
             </form>
         </div>

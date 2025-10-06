@@ -286,7 +286,17 @@ public class ParticipantJdbcDao implements ParticipantDao {
     }
 
     @Override
-    public void sumPoints(Long tournamentId, Long userId, Integer points){
-        jdbcTemplate.update("UPDATE participant SET points = points + ? WHERE user_id = ?", points, userId);
+    public void sumPoints(Long tournamentId, Long userId, Integer points, Integer teamSize) {
+        if (teamSize != null && teamSize > 1) {
+            jdbcTemplate.update(
+                    "UPDATE participant SET points = points + ? WHERE team_id = ? AND tournament_id = ? AND user_id IS NULL",
+                    points, userId, tournamentId
+            );
+        } else {
+            jdbcTemplate.update(
+                    "UPDATE participant SET points = points + ? WHERE user_id = ? AND tournament_id = ?",
+                    points, userId, tournamentId
+            );
+        }
     }
 }

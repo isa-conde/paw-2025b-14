@@ -129,7 +129,7 @@ public class MatchServiceImpl implements MatchService {
         if(!isFinished && (structure.equals(Structure.ELIMINATION) || ( structure.equals(Structure.HYBRID) && !isGroupStage))) {
             setNextMatchInfo(matchId, tournamentId, winnerId);
         }else if(structure.equals(Structure.LEAGUE) || ( structure.equals(Structure.HYBRID) && isGroupStage)){
-            participantDao.sumPoints(tournamentId, winnerId, 3);
+            participantDao.sumPoints(tournamentId, winnerId, 3, ts.getPlayersPerTeam(tournamentId));
         }
         if (structure.equals(Structure.HYBRID) && isGroupStage && isFinished) {
             ts.createBracketFromGroups(tournamentId, matchId);

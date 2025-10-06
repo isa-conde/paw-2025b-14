@@ -36,7 +36,7 @@ public interface ParticipantDao {
 
     Integer getGroupNumber(Long tournament_id, Long user_id, Integer teamSize);
 
-    void sumPoints(Long tournamentId, Long userId, Integer points);
+    void sumPoints(Long tournamentId, Long userId, Integer points, Integer teamSize);
 
     List<Participant> getTournamentParticipantTeams(Long tournament_id);
 }
