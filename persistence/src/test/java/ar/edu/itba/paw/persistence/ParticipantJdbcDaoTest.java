@@ -109,60 +109,6 @@ public class ParticipantJdbcDaoTest {
                 " and user_id = " + ID));
     }
 
-//    @Test
-//    public void testGetUsersInfo(){
-//        SimpleJdbcInsert userJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("users");
-//        userJdbcInsert.execute(Map.of("id",ID,"email",EMAIL,"username",USERNAME,
-//                "password",PASSWORD,"verified",true));
-//        userJdbcInsert.execute(Map.of("id",ID+1,"email",EMAIL+"a","username",USERNAME+"a",
-//                "password",PASSWORD,"verified",true));
-//        List<ParticipantInfo> ans = participantJdbcDao.getTournamentsParticipantUsersInfo(ID);
-//
-//        Assert.assertNotNull(ans);
-//        Assert.assertFalse(ans.isEmpty());
-//        Assert.assertEquals(2,ans.size());
-//        for (int i = 0; i < 2; i++) {
-//            Assert.assertEquals(ID+i,ans.get(i).getId().longValue());
-//            Assert.assertEquals(ID+i,ans.get(i).getGroupNumber().longValue());
-//            Assert.assertEquals((i==0)?21:2,ans.get(i).getPoints().intValue());
-//            Assert.assertEquals(USERNAME + ((i==0)?"":"a"),ans.get(i).getName());
-//        }
-//    }
-
-//    @Test
-//    public void testGetNoOnesInfo(){
-//        List<ParticipantInfo> ans = participantJdbcDao.getTournamentsParticipantUsersInfo((long) -1);
-//
-//        Assert.assertNotNull(ans);
-//        Assert.assertTrue(ans.isEmpty());
-//    }
-
-//    @Test
-//    public void testGetTeamsInfo(){
-//        SimpleJdbcInsert teamJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("team");
-//        teamJdbcInsert.execute(Map.of("id",ID,"name",USERNAME, "owner_id",ID));
-//        teamJdbcInsert.execute(Map.of("id",ID+1,"name",USERNAME+"a", "owner_id",ID+1));
-//        List<ParticipantInfo> ans = participantJdbcDao.getTournamentsParticipantTeamsInfo(ID+1);
-//
-//        Assert.assertNotNull(ans);
-//        Assert.assertFalse(ans.isEmpty());
-//        Assert.assertEquals(2,ans.size());
-//        for (int i = 0; i < 2; i++) {
-//            Assert.assertEquals(ID+i,ans.get(i).getId().longValue());
-//            Assert.assertEquals(ID+i,ans.get(i).getGroupNumber().longValue());
-//            Assert.assertEquals((i==0)?21:2,ans.get(i).getPoints().intValue());
-//            Assert.assertEquals(USERNAME + ((i==0)?"":"a"),ans.get(i).getName());
-//        }
-//    }
-
-//    @Test
-//    public void testGetNoTeamsInfo(){
-//        List<ParticipantInfo> ans = participantJdbcDao.getTournamentsParticipantTeamsInfo((long) -1);
-//
-//        Assert.assertNotNull(ans);
-//        Assert.assertTrue(ans.isEmpty());
-//    }
-
     @Test
     public void testGetUsers(){
         List<Participant> ans = participantJdbcDao.getTournamentParticipantUsers(ID);
@@ -302,9 +248,13 @@ public class ParticipantJdbcDaoTest {
 
     @Test
     public void testGetSecondMaxPoints(){
+        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("participant")
+                .usingGeneratedKeyColumns("id");
+        jdbcInsert.execute(Map.of("user_id",ID+2,"tournament_id",ID,"points",14,"group_number",1));
         int ans = participantJdbcDao.getTournamentSecondMaxPointsGroup(ID, 1);
 
-        Assert.assertEquals(2,ans);
+        Assert.assertEquals(14,ans);
     }
 
     @Test
