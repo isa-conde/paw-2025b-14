@@ -122,7 +122,7 @@ public class UserJdbcDaoTest {
         Assert.assertFalse(user.isVerified());
         Assert.assertNull(inserted.get(0).getBio());
         Assert.assertNull(user.getBio());
-        Assert.assertNull(user.getProfile_picture_id());
+        Assert.assertNull(user.getPfp_id());
         Assert.assertNull(user.getBanner_id());
         Assert.assertEquals(rows + 1, JdbcTestUtils.countRowsInTable(jdbcTemplate,"users"));
     }
@@ -270,6 +270,6 @@ public class UserJdbcDaoTest {
         Assert.assertEquals(USED_USERNAME+"a",row.getUsername());
         Assert.assertEquals(USERNAME,row.getBio());
         Assert.assertEquals(usedId,row.getBanner_id().longValue());
-        Assert.assertEquals(usedId,row.getProfile_picture_id().longValue());
+        Assert.assertEquals(usedId,row.getPfp_id().longValue());
     }
 }

@@ -38,7 +38,7 @@
                 <c:choose>
                     <c:when test="${isLoggedIn}">
                         <div class="header-buttons">
-                            <paw:profileButton text="${user.username}" onclick="window.location.href='/profile/${user.id}'" isNotSafe="true"/>
+                            <paw:profileButton text="${user.username}" imageId="${user.pfp_id}" onclick="window.location.href='/profile/${user.id}'" isNotSafe="true" size="m"/>
                             <paw:logoutButton/>
                         </div>
                     </c:when>

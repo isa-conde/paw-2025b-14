@@ -10,7 +10,7 @@
     <c:forEach var="t" items="${teams}">
         <label class="team-option">
             <form:radiobutton path="teamId" value="${t.id}"/>
-            <paw:profileButton text="${t.name}" onclick="" isNotSafe="true" size="l" fill="false" disabled="true"/>
+            <paw:profileButton text="${t.name}" imageId="${t.pfp_id}" onclick="" isNotSafe="true" size="l" fill="false" disabled="true"/>
         </label>
     </c:forEach>
 </div>

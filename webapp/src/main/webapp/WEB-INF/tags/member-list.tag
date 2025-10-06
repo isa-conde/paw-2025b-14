@@ -15,7 +15,7 @@
             <c:forEach var="m" items="${members}">
                 <input type="hidden" name="members" value="${m.id}"/>
                 <label class="team-option">
-                    <paw:profileButton text="${m.username}" isNotSafe="true" size="l" fill="false" disabled="true" onclick=""/>
+                    <paw:profileButton imageId="${m.pfp_id}" text="${m.username}" isNotSafe="true" size="l" fill="false" disabled="true" onclick=""/>
                 </label>
             </c:forEach>
         </c:when>
@@ -24,7 +24,7 @@
             <c:forEach var="m" items="${members}">
                 <label class="team-option">
                     <form:checkbox path="members" value="${m.id}"/>
-                    <paw:profileButton text="${m.username}" isNotSafe="true" size="l" fill="false" disabled="true" onclick=""/>
+                    <paw:profileButton imageId="${m.pfp_id}" text="${m.username}" isNotSafe="true" size="l" fill="false" disabled="true" onclick=""/>
                 </label>
             </c:forEach>
         </c:otherwise>

@@ -12,7 +12,7 @@
     <paw:banner cornerIcon="${icon}" cornerOnClick="openModal('editProfileModal')" image="${pageContext.request.contextPath}/banner/${profile.banner_id}">
         <div class="profile-sidebar">
             <div class="profile-picture">
-                <img src="${pageContext.request.contextPath}/pfp/${profile.profile_picture_id}" alt="${profile.username}">
+                <img src="${pageContext.request.contextPath}/pfp/${profile.pfp_id}" alt="${profile.username}">
             </div>
             <div class="profile-info">
                 <paw:text size="xl"><c:out value="${profile.username}"/></paw:text>

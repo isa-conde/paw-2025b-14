@@ -6,12 +6,14 @@ public class Participant {
     private Integer points;
     private final String name;
     private final Integer group_number;
+    private final Long pfp_id;
 
-    public Participant(final Long id, final String name, Integer points, Integer group_number) {
+    public Participant(final Long id, final String name, Integer points, Integer group_number, Long pfp_id) {
         this.id = id;
         this.name = name;
         this.points = points;
         this.group_number = group_number;
+        this.pfp_id = pfp_id;
     }
 
     public String getName() {
@@ -34,5 +36,7 @@ public class Participant {
         return group_number;
     }
 
-
+    public Long getPfp_id() {
+        return pfp_id;
+    }
 }

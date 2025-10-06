@@ -168,6 +168,7 @@ public class TournamentController {
     public ModelAndView tournamentPage(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam("tournamentId") final long tournamentId,
                                        @ModelAttribute("editTournamentForm") final EditTournamentForm editTournamentForm,
                                        @ModelAttribute("joinTeamForm") JoinTournamentTeamForm joinTournamentTeamForm) {
+
         final ModelAndView mav = new ModelAndView("tournament");
         User user = null;
         if (currentUser.isPresent()) {

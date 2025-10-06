@@ -3,6 +3,7 @@ package ar.edu.itba.paw.interfaces.persistence;
 import ar.edu.itba.paw.model.User;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 public interface UserDao {
@@ -26,4 +27,7 @@ public interface UserDao {
     void updateProfileInfo(Long userId, String username, String bio, Long pfp, Long banner);
 
     List<User> searchByName(String name);
+
+    void updateUserLocale(String locale, Long userId);
+
 }
