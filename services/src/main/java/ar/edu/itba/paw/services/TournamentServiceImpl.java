@@ -92,7 +92,7 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public void setFinished(Long tournament_id, Long lastMatchId) { // TODO: check for possible error handling
         Tournament t = findById(tournament_id).orElse(null);
-        Long winner;
+        Long winner = null;
         if (t != null) {
             if (t.getStructure() == Structure.LEAGUE) {
                 List<Participant> tops = getLeagueTournamentTopPositions(tournament_id);
@@ -111,6 +111,15 @@ public class TournamentServiceImpl implements TournamentService {
             LOGGER.info("User with ID {} has won the tournament with ID {}", winner, tournament_id);
             tournamentDao.setFinished(tournament_id);
             LOGGER.info("Tournament with ID {} has successfully ended", tournament_id);
+        }
+        List<Participant> participants = participantDao.getTournamentParticipantUsers(tournament_id);
+        for(Participant p : participants){
+            User user = userDao.findById(p.getId()).get();
+            if(p.getId().equals(winner)) {
+                ms.sendTournamentWinnerEmail(tournament_id, user.getUsername(), t.getName(), user.getEmail());
+            } else {
+                ms.sendTournamentEndedEmail(tournament_id, user.getUsername(), t.getName(), user.getEmail());
+            }
         }
     }
 

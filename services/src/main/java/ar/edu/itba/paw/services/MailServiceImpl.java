@@ -137,6 +137,45 @@ public class MailServiceImpl implements MailService {
         sendEmail(recipient, subject, body);
     }
 
+    @Async
+    @Override
+    public void sendTournamentEndedEmail(Long tournamentId, String username, String tournamentName, String recipient) {
+        Locale locale = Locale.getDefault();
+        Context ctx = new Context(locale);
+        ctx.setVariable("userName", username);
+        ctx.setVariable("tournamentName", tournamentName);
+        String tournamentLink = baseUrl + "/tournament?tournamentId=" + tournamentId;
+        ctx.setVariable("tournamentLink", tournamentLink);
+
+        String body = templateEngine.process("tournament-ended-notification", ctx);
+
+        String subject = messageSource.getMessage(
+                "email.tournamentEndedNotification.subject",
+                new Object[]{tournamentName},
+                locale);
+
+        sendEmail(recipient, subject, body);
+    }
+
+    @Async
+    @Override
+    public void sendTournamentWinnerEmail(Long tournamentId, String username, String tournamentName, String recipient) {
+        Locale locale = Locale.getDefault();
+        Context ctx = new Context(locale);
+        ctx.setVariable("userName", username);
+        ctx.setVariable("tournamentName", tournamentName);
+        String tournamentLink = baseUrl + "/tournament?tournamentId=" + tournamentId;
+        ctx.setVariable("tournamentLink", tournamentLink);
+
+        String body = templateEngine.process("tournament-winner-notification", ctx);
+
+        String subject = messageSource.getMessage(
+                "email.tournamentWinnerNotification.subject",
+                new Object[]{tournamentName},
+                locale);
+
+        sendEmail(recipient, subject, body);
+    }
 
     private void sendEmail(String recipient, String subject, String body) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
