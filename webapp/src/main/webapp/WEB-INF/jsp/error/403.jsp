@@ -4,8 +4,10 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
 <c:url value="/verify?userId=${user.id}" var="resendVerificationUrl"/>
+<c:url value="/" var="homeUrl"/>
 
-<paw:form-layout title="error403Page.pageTitle">
+
+<paw:form-layout pageTitle="error403Page.pageTitle">
     <paw:text type="title"><spring:message code="error403Page.pageTitle"/></paw:text>
     <c:choose>
         <c:when test="${!user.verified}">
@@ -17,6 +19,8 @@
         </c:when>
         <c:otherwise>
             <paw:text size="l"><spring:message code="error403Page.generalAccessDenied"/></paw:text>
+            <br>
+            <paw:button text="error404Page.goToHome" onclick="window.location.href='${homeUrl}'"/>
         </c:otherwise>
     </c:choose>
 </paw:form-layout>
