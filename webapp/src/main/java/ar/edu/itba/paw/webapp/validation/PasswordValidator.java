@@ -19,25 +19,25 @@ public class PasswordValidator implements ConstraintValidator<PasswordValidation
         context.disableDefaultConstraintViolation();
 
         if (password.length() < 8 || password.length() > 20) {
-            context.buildConstraintViolationWithTemplate("Password must be between 8 and 20 characters long")
+            context.buildConstraintViolationWithTemplate("{error.registerForm.invalidPasswordLength}")
                    .addConstraintViolation();
             return false;
         }
 
         if (!password.matches(".*[a-z].*")) {
-            context.buildConstraintViolationWithTemplate("Password must contain at least one lowercase letter")
+            context.buildConstraintViolationWithTemplate("{error.registerForm.invalidPasswordLowercase}")
                    .addConstraintViolation();
             return false;
         }
 
         if (!password.matches(".*[A-Z].*")) {
-            context.buildConstraintViolationWithTemplate("Password must contain at least one uppercase letter")
+            context.buildConstraintViolationWithTemplate("{error.registerForm.invalidPasswordUppercase}")
                    .addConstraintViolation();
             return false;
         }
 
         if (!password.matches(".*[0-9].*")) {
-            context.buildConstraintViolationWithTemplate("Password must contain at least one digit")
+            context.buildConstraintViolationWithTemplate("{error.registerForm.invalidPasswordDigit}")
                    .addConstraintViolation();
             return false;
         }

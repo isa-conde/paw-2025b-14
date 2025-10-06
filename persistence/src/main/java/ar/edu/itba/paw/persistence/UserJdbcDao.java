@@ -38,7 +38,7 @@ public class UserJdbcDao implements UserDao {
 
     @Override
     public User create(String username, String email, String password) {
-        final Map<String, Object> values = Map.of("username", username, "email", email, "password", password, "verified", false);
+        final Map<String, Object> values = Map.of("username", username, "email", email, "password", password, "verified", false, "locale", "es");
         final Number key = jdbcInsert.executeAndReturnKey(values);
 
         return new User(key.longValue(), username, email, password, false, null, null, null, "es");

@@ -1,6 +1,8 @@
 package ar.edu.itba.paw.services;
 
+import ar.edu.itba.paw.interfaces.persistence.UserDao;
 import ar.edu.itba.paw.interfaces.services.MailService;
+import ar.edu.itba.paw.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,10 +40,14 @@ public class MailServiceImpl implements MailService {
     @Value("${app.baseUrl}")
     private String baseUrl;
 
+    @Autowired
+    private UserDao userDao;
+
     @Async
     @Override
     public void sendTournamentCreatedEmail(Long tournamentId, String userName, String tournamentName, String recipient) {
-        Locale locale = Locale.getDefault();
+        User user = userDao.findByUsername(userName).get();
+        Locale locale = toLocale(user.getLocale());
         Context ctx = new Context(locale);
         ctx.setVariable("userName", userName);
         ctx.setVariable("tournamentName", tournamentName);
@@ -61,7 +67,8 @@ public class MailServiceImpl implements MailService {
     @Async
     @Override
     public void sendTournamentJoinedEmail(Long tournamentId, String userName, String tournamentName, String recipient, String creatorMail) {
-        Locale locale = Locale.getDefault();
+        User user = userDao.findByUsername(userName).get();
+        Locale locale = toLocale(user.getLocale());
         Context ctx = new Context(locale);
         ctx.setVariable("userName", userName);
         ctx.setVariable("tournamentName", tournamentName);
@@ -82,7 +89,8 @@ public class MailServiceImpl implements MailService {
     @Async
     @Override
     public void sendVerificationEmail(Long userId, String userName, Long token, String recipient) {
-        Locale locale = Locale.getDefault();
+        User user = userDao.findByUsername(userName).get();
+        Locale locale = toLocale(user.getLocale());
         Context ctx = new Context(locale);
         ctx.setVariable("userName", userName);
         String verificationUrl = baseUrl + "/verify/confirm?token=" + token.toString() + "&userId=" + userId.toString();
@@ -101,7 +109,8 @@ public class MailServiceImpl implements MailService {
     @Async
     @Override
     public void sendResetPasswordEmail(Long userId, Long token, String recipient) {
-        Locale locale = Locale.getDefault();
+        User user = userDao.findById(userId).get();
+        Locale locale = toLocale(user.getLocale());
         Context ctx = new Context(locale);
         String resetPasswordUrl = baseUrl + "/forgotPassword/reset?token=" + token.toString() + "&userId=" + userId;
         ctx.setVariable("resetPasswordUrl", resetPasswordUrl);
@@ -119,7 +128,8 @@ public class MailServiceImpl implements MailService {
     @Async
     @Override
     public void sendTournamentStartedEmail(Long tournamentId, String username, String tournamentName, String creatorMail, String recipient) {
-        Locale locale = Locale.getDefault();
+        User user = userDao.findByUsername(username).get();
+        Locale locale = toLocale(user.getLocale());
         Context ctx = new Context(locale);
         ctx.setVariable("userName", username);
         ctx.setVariable("tournamentName", tournamentName);
@@ -140,7 +150,8 @@ public class MailServiceImpl implements MailService {
     @Async
     @Override
     public void sendTournamentEndedEmail(Long tournamentId, String username, String tournamentName, String recipient) {
-        Locale locale = Locale.getDefault();
+        User user = userDao.findByUsername(username).get();
+        Locale locale = toLocale(user.getLocale());
         Context ctx = new Context(locale);
         ctx.setVariable("userName", username);
         ctx.setVariable("tournamentName", tournamentName);
@@ -160,7 +171,8 @@ public class MailServiceImpl implements MailService {
     @Async
     @Override
     public void sendTournamentWinnerEmail(Long tournamentId, String username, String tournamentName, String recipient) {
-        Locale locale = Locale.getDefault();
+        User user = userDao.findByUsername(username).get();
+        Locale locale = toLocale(user.getLocale());
         Context ctx = new Context(locale);
         ctx.setVariable("userName", username);
         ctx.setVariable("tournamentName", tournamentName);
@@ -190,6 +202,11 @@ public class MailServiceImpl implements MailService {
         } catch (MailException e) {
             throw e;
         }
+    }
+
+    private Locale toLocale(String code) {
+        Locale loc = Locale.forLanguageTag(code.replace('_', '-'));
+        return loc.getLanguage().isEmpty() ? Locale.getDefault() : loc;
     }
 
 }

@@ -30,7 +30,7 @@ public class ResetPasswordMatcher implements ConstraintValidator<ResetPasswordMa
         if (!passwordsMatch) {
             context.disableDefaultConstraintViolation();
 
-            context.buildConstraintViolationWithTemplate("Passwords don't match")
+            context.buildConstraintViolationWithTemplate("{error.passwordsDontMatch}")
                    .addPropertyNode("confirmNewPassword")
                    .addConstraintViolation();
         }
