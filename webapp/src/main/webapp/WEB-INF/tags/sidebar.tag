@@ -29,8 +29,8 @@
                 <paw:sidebar-button
                         icon="${pageContext.request.contextPath}/images/badge.png"
                         text="sidebar.myTourneys"
-                        href="${pageContext.request.contextPath}/myTournaments"
-                        active="${pageContext.request.requestURI.contains('/myTournaments') ? 'true' : 'false'}"/>
+                        href="${pageContext.request.contextPath}/profile/${user.id}/tournaments"
+                        active="${pageContext.request.requestURI.contains('/profile/'.concat(user.id).concat('/tournaments')) ? 'true' : 'false'}"/>
             </c:when>
         </c:choose>
 

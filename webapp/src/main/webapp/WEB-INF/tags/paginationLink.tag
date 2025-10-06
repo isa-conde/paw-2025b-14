@@ -1,10 +1,14 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ attribute name="page" required="true" %>
 <%@ attribute name="url" required="true" %>
+<%@attribute name="pageNumber" required="false" type="java.lang.String" %>
+<c:if test="${empty pageNumber}">
+    <c:set var="pageNumber" value="" scope="page"/>
+</c:if>
 <c:url var="completeUrl" value="${url}">
-    <c:param name="page" value="${page}" />
+    <c:param name="page${pageNumber}" value="${page}" />
     <c:forEach var="entry" items="${pageContext.request.parameterMap}">
-        <c:if test="${entry.key ne 'page'}">
+        <c:if test="${entry.key ne page}">
             <c:forEach var="value" items="${entry.value}">
                 <c:param name="${entry.key}" value="${value}" />
             </c:forEach>

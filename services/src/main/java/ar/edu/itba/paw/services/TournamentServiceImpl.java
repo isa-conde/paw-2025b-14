@@ -84,8 +84,8 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public List<Tournament> findByCreator(Long creator_id) {
-        return tournamentDao.findByCreator(creator_id);
+    public List<Tournament> findByCreator(Long creator_id, Long page) {
+        return tournamentDao.findByCreator(creator_id, page);
     }
 
     @Transactional
@@ -150,13 +150,13 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public List<Tournament> findUserActiveTournaments(Long userId) {
-        return tournamentDao.findUserActiveTournaments(userId);
+    public List<Tournament> findUserActiveTournaments(Long userId, Long page) {
+        return tournamentDao.findUserActiveTournaments(userId, page);
     }
 
     @Override
-    public List<Tournament> findUserPastTournaments(Long userId) {
-        return tournamentDao.findUserPastTournaments(userId);
+    public List<Tournament> findUserPastTournaments(Long userId, Long page) {
+        return tournamentDao.findUserPastTournaments(userId, page);
     }
 
     @Override
@@ -436,14 +436,29 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public List<Tournament> getCreatedAndFinishedTournaments(Long userId) {
-        List<Tournament> allCreatedTournaments = findByCreator(userId);
+    public Integer getPagesBySection(Long userId, String section) {
+        if (Objects.equals(section, "active")){
+            return tournamentDao.getUserActiveTournamentsPages(userId);
+        }if (Objects.equals(section, "finished")){
+            return tournamentDao.getUserPastTournamentsPages(userId);
+        }if (Objects.equals(section, "ownedFinished")){
+            return tournamentDao.getCreatedAndFinishedTournamentsPages(userId);
+        }if (Objects.equals(section, "ownedOngoing")){
+            return tournamentDao.getCreatedAndOngoingTournamentsPages(userId);
+        }
+        return 1;
+    }
+
+
+    @Override
+    public List<Tournament> getCreatedAndFinishedTournaments(Long userId, Long page) {
+        List<Tournament> allCreatedTournaments = findByCreator(userId, page);
         return allCreatedTournaments.stream().filter(t -> t.getFinished()).toList();
     }
 
     @Override
-    public List<Tournament> getCreatedAndOngoingTournaments(Long userId) {
-        List<Tournament> allCreatedTournaments = findByCreator(userId);
+    public List<Tournament> getCreatedAndOngoingTournaments(Long userId, Long page) {
+        List<Tournament> allCreatedTournaments = findByCreator(userId, page);
         return allCreatedTournaments.stream().filter(t -> !t.getFinished()).toList();
     }
 
