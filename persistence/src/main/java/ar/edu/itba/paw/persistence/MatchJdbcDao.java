@@ -50,8 +50,6 @@ public class MatchJdbcDao implements MatchDao {
             rs.getLong("tournament_id"),
             rs.getObject("local_id") != null ? rs.getLong("local_id") : null,
             rs.getObject("visitor_id") != null ? rs.getLong("visitor_id") : null,
-            rs.getString("local_player_name"),
-            rs.getString("visitor_player_name"),
             rs.getObject("local_score") != null ? rs.getInt("local_score") : null,
             rs.getObject("visitor_score") != null? rs.getInt("visitor_score") : null,
             rs.getObject("winner") != null ? rs.getInt("winner") : null,
@@ -90,42 +88,24 @@ public class MatchJdbcDao implements MatchDao {
 
     @Override
     public List<MatchInfo> getTournamentMatches(Long tournamentId, Integer teamSize) {
-        final String sql = (teamSize > 1)
-                ? """
-               SELECT m.id, m.tournament_id, m.local_id, m.visitor_id,
-                       COALESCE(lteam.name, 'TBD')   AS local_player_name,
-                       COALESCE(vteam.name, 'TBD')   AS visitor_player_name,
-                       m.local_score, m.visitor_score, m.winner, m.stage, m.is_group_stage,
-                       COALESCE(p.group_number, 0)   AS group_number
-                  FROM match m
-             LEFT JOIN team lteam ON lteam.id = m.local_id
-             LEFT JOIN team vteam ON vteam.id = m.visitor_id
-             LEFT JOIN participant p
-                    ON p.tournament_id = m.tournament_id
-                   AND p.team_id       = m.local_id
-                   AND p.user_id       IS NULL
-                 WHERE m.tournament_id = ?
-              ORDER BY m.stage, m.id
-              """
-                : """
+        final String joinCondition = (teamSize != null && teamSize > 1)
+                ? "AND p.team_id = m.local_id AND p.user_id IS NULL"
+                : "AND p.user_id = m.local_id";
+
+        final String sql = """
            SELECT m.id, m.tournament_id, m.local_id, m.visitor_id,
-                  COALESCE(local_user.username,   'TBD') AS local_player_name,
-                  COALESCE(visitor_user.username, 'TBD') AS visitor_player_name,
                   m.local_score, m.visitor_score, m.winner, m.stage, m.is_group_stage,
-                  COALESCE(pu.group_number, 0)           AS group_number
+                  COALESCE(p.group_number, 0) AS group_number
              FROM match m
-            LEFT JOIN users local_user   ON m.local_id   = local_user.id
-            LEFT JOIN users visitor_user ON m.visitor_id = visitor_user.id
-            LEFT JOIN participant pu
-                   ON pu.tournament_id = m.tournament_id
-                  AND pu.user_id       = m.local_id
-                WHERE m.tournament_id = ?
-             ORDER BY m.stage, m.id
-              """;
+        LEFT JOIN participant p
+               ON p.tournament_id = m.tournament_id
+                  %s
+            WHERE m.tournament_id = ?
+         ORDER BY m.stage, m.id
+        """.formatted(joinCondition);
 
         return jdbcTemplate.query(sql, ROW_MAPPER_MATCH_INFO, tournamentId);
     }
-
 
     @Override
     public Long getMaxMatchId(Long tournamentId){

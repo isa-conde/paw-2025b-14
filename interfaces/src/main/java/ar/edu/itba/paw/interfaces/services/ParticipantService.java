@@ -8,8 +8,6 @@ public interface ParticipantService {
 
     public void joinTournamentUser(Long user_id, Long tournament_id);
 
-    public Participant getTournamentParticipantByUserId(Long tournament_id, Long user_id);
-
     Boolean hasJoined(Long userId, Long tournamentId);
 
     public void leaveTournament(Long user_id, Long tournament_id);

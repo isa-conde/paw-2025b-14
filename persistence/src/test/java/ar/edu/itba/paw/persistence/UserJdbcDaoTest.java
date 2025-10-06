@@ -273,4 +273,13 @@ public class UserJdbcDaoTest {
         Assert.assertEquals(usedId,row.getBanner_id().longValue());
         Assert.assertEquals(usedId,row.getPfp_id().longValue());
     }
+
+    @Test
+    public void testUpdateLocale(){
+        userJdbcDao.updateUserLocale("locale",usedId);
+        final String ans = jdbcTemplate.queryForObject("select locale from users where id = ?",String.class,usedId);
+
+        Assert.assertNotNull(ans);
+        Assert.assertEquals("locale",ans);
+    }
 }
