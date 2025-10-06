@@ -7,10 +7,10 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
 <div class="teams-list">
-    <c:forEach var="t" items="${members}">
+    <c:forEach var="m" items="${members}">
         <label class="team-option">
-            <form:checkbox path="teamId" value="${t.id}"/>
-            <paw:profileButton text="${t.name}" onclick="" isNotSafe="true" size="l" fill="false" disabled="true"/>
+            <form:checkbox path="members" value="${m.id}"/>
+            <paw:profileButton text="${m.username}" onclick="" isNotSafe="true" size="l" fill="false" disabled="true"/>
         </label>
     </c:forEach>
 </div>

@@ -345,6 +345,7 @@ button:disabled {
 .main-text {
     font-weight: 700;
     margin: 5px 0;
+    color: var(--primary-text);
 }
 
 .main-text.xl {
@@ -1577,12 +1578,15 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    align-items: center;
+    align-items: stretch;
     justify-content: center;
 }
 
+.team-option input[type="radio"] {
+    flex: 0 0 auto;
+}
+
 .teams-list .btn {
-    width: 100%;
     max-width: 100%;
 }
 
@@ -1595,4 +1599,21 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     display: flex;
     align-items: center;
     gap: 10px;
+}
+
+.team-option .btn,
+.member-option .btn {
+    flex: 1 1 auto;
+    width: auto;
+    max-width: 100%;
+    justify-content: flex-start;
+}
+
+.team-option .btn:disabled,
+.member-option .btn:disabled {
+    pointer-events: none;
+}
+
+.join-team-error {
+    padding: 10px;
 }

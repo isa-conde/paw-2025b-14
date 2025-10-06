@@ -251,7 +251,7 @@ public class TournamentController {
         return mav;
     }
 
-    @PostMapping("/tournament/join/step1")
+    @RequestMapping(value = "/tournament/join/step1", method = { RequestMethod.POST })
     public ModelAndView handleStep1(
             @Validated(JoinTournamentTeamForm.StepOne.class)
             @ModelAttribute("joinTeamForm") JoinTournamentTeamForm form,
@@ -264,14 +264,15 @@ public class TournamentController {
             mav.addObject("openModal", "'chooseTeamModal'");
         }else{
             mav.addObject("openModal", "'chooseTeamMembersModal'");
-            mav.addObject("teamMembers", tms.getUserTeams(1L));
+            mav.addObject("teamMembers", tms.getTeamMembers(form.getTeamId()));
+            mav.addObject("selectedTeamId", form.getTeamId());
         }
         return mav;
     }
 
-    @PostMapping("/tournament/join/step2")
+    @RequestMapping(value = "/tournament/join/step2", method = { RequestMethod.POST })
     public ModelAndView handleStep2(
-            @Validated(JoinTournamentTeamForm.StepOne.class)
+            @Validated(JoinTournamentTeamForm.StepTwo.class)
             @ModelAttribute("joinTeamForm") JoinTournamentTeamForm form,
             BindingResult br,
             @RequestParam long tournamentId,
@@ -280,8 +281,11 @@ public class TournamentController {
         if (br.hasErrors()) {
             ModelAndView mav = tournamentPage(principal, tournamentId, new EditTournamentForm(), form);
             mav.addObject("openModal", "'chooseTeamMembersModal'");
+            mav.addObject("teamMembers", tms.getTeamMembers(form.getTeamId()));
+            mav.addObject("selectedTeamId", form.getTeamId());
             return mav;
         }
+
         return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
     }
 

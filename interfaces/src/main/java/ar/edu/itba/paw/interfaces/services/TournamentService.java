@@ -44,4 +44,6 @@ public interface TournamentService {
     int tournamentParticipantsCount(Long tournamentId);
 
     void createBracketFromGroups(Long tournamentId);
+
+    Integer getPlayersPerTeam(Long tournamentId);
 }

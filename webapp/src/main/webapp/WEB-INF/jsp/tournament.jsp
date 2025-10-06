@@ -317,34 +317,42 @@
 </paw:layout>
 
 <paw:modal title="tournament.join.chooseTeam" id="chooseTeamModal" returnUrl="${tournamentUrl}">
-    <form:form method="post"
-               modelAttribute="joinTeamForm"
-               action="${pageContext.request.contextPath}/tournament/join/step1"
-               cssClass="form">
-
+    <form:form method="post" modelAttribute="joinTeamForm" action="${pageContext.request.contextPath}/tournament/join/step1" cssClass="form">
         <form:hidden path="tournamentId" value="${tournament.id}"/>
-        <div class="teams-list-container">
-            <paw:team-list teams="${userTeams}"/>
-            <div class="row center">
-                <paw:button onclick="window.location.href='${pageContext.request.contextPath}/team/create'; return false;" text="team.create.pageTitle" secondary="true" size="m"/>
-            </div>
-        </div>
-        <form:errors path="teamId" cssClass="form-error"/>
-        <div class="row center">
-            <paw:input path="" label="tournament.chooseTeam" containerType="half" inputType="submit"/>
-        </div>
+        <c:choose>
+            <c:when test="${userTeams.size() <= 0}">
+                <div class="row center">
+                    <paw:text size="l"><spring:message code="tournament.join.noTeams" arguments="${format.players_per_team}"/></paw:text>
+                </div>
+                <div class="row center">
+                    <paw:button onclick="window.location.href='${pageContext.request.contextPath}/team/create'; return false;" text="team.create.pageTitle"/>
+                </div>
+            </c:when>
+            <c:otherwise>
+                <div class="teams-list-container">
+                    <paw:team-list teams="${userTeams}"/>
+                </div>
+                <div class="join-team-error">
+                    <form:errors path="teamId" cssClass="form-error" element="h1"/>
+                </div>
+                <div class="row center">
+                    <paw:input path="" label="tournament.chooseTeam" containerType="half" inputType="submit"/>
+                </div>
+            </c:otherwise>
+        </c:choose>
     </form:form>
 </paw:modal>
 <paw:modal title="tournament.join.chooseMembers" id="chooseTeamMembersModal" returnUrl="${tournamentUrl}">
-    <form:form method="post"
-               modelAttribute="joinTeamForm"
-               action="${pageContext.request.contextPath}/tournament/join/step2"
-               cssClass="form">
-
+    <form:form method="post" modelAttribute="joinTeamForm" action="${pageContext.request.contextPath}/tournament/join/step2" cssClass="form" data-required-members="${format.players_per_team}">
+        <form:hidden path="tournamentId" value="${tournament.id}"/>
+        <form:hidden path="teamId" value="${selectedTeamId}"/>
+        <paw:text size="l"><spring:message code="tournament.join.requiredSize" arguments="${format.players_per_team}"/></paw:text>
         <div class="teams-list-container">
             <paw:member-list members="${teamMembers}"/>
         </div>
-        <form:errors path="teamId" cssClass="form-error"/>
+        <div class="join-team-error">
+            <form:errors path="members" cssClass="form-error" element="h1"/>
+        </div>
         <div class="row center">
             <paw:input path="" label="tournament.joinCard.butText" containerType="half" inputType="submit"/>
         </div>

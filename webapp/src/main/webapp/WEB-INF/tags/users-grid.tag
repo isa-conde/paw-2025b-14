@@ -5,26 +5,17 @@
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
+<div class="grid users">
+    <c:forEach var="p" items="${participants}">
+        <c:choose>
+            <c:when test="${isIndividualTournament}">
+                <c:set value="/profile/${p.id}" var="url"/>
+            </c:when>
+            <c:otherwise>
+                <c:set value="/team/profile/${p.id}" var="url"/>
+            </c:otherwise>
+        </c:choose>
+        <paw:profileButton text="${p.name}" onclick="window.location.href='${url}'" isNotSafe="true" size="l" fill="false"/>
+    </c:forEach>
+</div>
 
-
-<c:choose>
-    <c:when test="${participants.size() <= '0'}">
-        <spring:message code="usersGrid.noParticipants" var="noParticipants"/>
-        <div class="no-cards-container participants"><paw:text size="l">${noParticipants}</paw:text></div>
-    </c:when>
-    <c:otherwise>
-        <div class="grid users">
-            <c:forEach var="p" items="${participants}">
-                <c:choose>
-                    <c:when test="${isIndividualTournament}">
-                        <c:set value="/profile/${p.id}" var="url"/>
-                    </c:when>
-                    <c:otherwise>
-                        <c:set value="/team/profile/${p.id}" var="url"/>
-                    </c:otherwise>
-                </c:choose>
-                <paw:profileButton text="${p.name}" onclick="window.location.href='${url}'" isNotSafe="true" size="l" fill="false"/>
-            </c:forEach>
-        </div>
-    </c:otherwise>
-</c:choose>

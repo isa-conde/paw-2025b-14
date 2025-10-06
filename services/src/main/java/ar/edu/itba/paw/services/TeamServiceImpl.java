@@ -2,6 +2,7 @@ package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.persistence.*;
 import ar.edu.itba.paw.interfaces.services.TeamService;
+import ar.edu.itba.paw.model.ParticipantUser;
 import ar.edu.itba.paw.model.Team;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.User;
@@ -19,13 +20,15 @@ public class TeamServiceImpl implements TeamService {
     TeamMemberDao teamMemberDao;
     UserDao userDao;
     TournamentDao tournamentDao;
+    ParticipantDao participantDao;
 
-    public TeamServiceImpl(ImageDao imageDao, TeamDao teamDao, TeamMemberDao teamMemberDao, UserDao userDao, TournamentDao tournamentDao){
+    public TeamServiceImpl(ImageDao imageDao, TeamDao teamDao, TeamMemberDao teamMemberDao, UserDao userDao, TournamentDao tournamentDao, ParticipantDao participantDao){
         this.imageDao = imageDao;
         this.teamDao = teamDao;
         this.teamMemberDao = teamMemberDao;
         this.userDao = userDao;
         this.tournamentDao = tournamentDao;
+        this.participantDao = participantDao;
     }
 
 
@@ -115,6 +118,4 @@ public class TeamServiceImpl implements TeamService {
         }
         return tournaments;
     }
-
-
 }
