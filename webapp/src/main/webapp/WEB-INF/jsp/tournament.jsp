@@ -6,6 +6,7 @@
 
 <c:url value="/tournament/join" var="joinUrl"/>
 <c:url value="/tournament/leave" var="leaveUrl"/>
+<c:url value="/tournament/update?tournamentId=${tournament.id}" var="tournamentUpdateUrl"/>
 
 <c:set var="isCreator" value="${user.id == tournament.creator_id}"/>
 <c:set var="editMode" value="${param.edit eq 'true' && isCreator}"/>
@@ -303,7 +304,7 @@
     </c:url>
     <paw:modal title="tournament.edit.modal.title" id="editTournamentModal" returnUrl="${tournamentUrl}">
         <form:form method="post" modelAttribute="editTournamentForm"
-                   action="${pageContext.request.contextPath}/tournament/update"
+                   action="${tournamentUpdateUrl}"
                    enctype="multipart/form-data" cssClass="form">
             <input type="hidden" name="tournamentId" value="${tournament.id}"/>
             <div class="row">
