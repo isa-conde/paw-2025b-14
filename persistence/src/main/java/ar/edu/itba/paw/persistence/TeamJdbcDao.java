@@ -78,6 +78,12 @@ public class TeamJdbcDao implements TeamDao {
     }
 
     @Override
+    public Boolean teamNameTaken(String name) {
+        final String sql = "SELECT EXISTS(SELECT 1 FROM team WHERE name = ?)";
+        return jdbcTemplate.queryForObject(sql, Boolean.class, name);
+    }
+
+    @Override
     public List<Long> getPastTournaments(Long teamId) {
         return findTeamTournamentIds(teamId, true);
     }

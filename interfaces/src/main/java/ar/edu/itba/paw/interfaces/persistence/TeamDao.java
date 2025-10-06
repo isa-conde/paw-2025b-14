@@ -21,4 +21,6 @@ public interface TeamDao {
 
     void updateTeam(Long teamId, String name, Long pfpId, Long bannerId);
 
+    Boolean teamNameTaken(String name);
+
     }

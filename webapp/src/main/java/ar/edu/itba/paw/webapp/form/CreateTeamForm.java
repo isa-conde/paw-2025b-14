@@ -2,6 +2,7 @@ package ar.edu.itba.paw.webapp.form;
 
 
 import ar.edu.itba.paw.webapp.constraints.ExistingUsersContraint;
+import ar.edu.itba.paw.webapp.constraints.TeamNameNotTakenConstraint;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
@@ -12,6 +13,7 @@ public class CreateTeamForm {
 
     @NotBlank(message = "{home.createTournament.notNull}")
     @Size(max = 100)
+    @TeamNameNotTakenConstraint(message = "{team.create.error.nameTaken}")
     private String name;
     private MultipartFile banner;
     private MultipartFile pfp;
