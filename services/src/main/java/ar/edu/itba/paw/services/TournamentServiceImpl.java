@@ -137,7 +137,14 @@ public class TournamentServiceImpl implements TournamentService {
             LOGGER.warn("The inscriptions for the tournament with ID {} have already been closed", tournament_id);
             throw new TournamentAlreadyClosedException();
         }
-        createMatches(tournament_id, participantDao.getTournamentParticipantUsers(tournament_id));
+        Integer teamSize = getPlayersPerTeam(tournament_id);
+        List<Participant> participants;
+        if (teamSize > 1){
+            participants = participantDao.getTournamentParticipantTeams(tournament_id);
+        }else {
+            participants = participantDao.getTournamentParticipantUsers(tournament_id);
+        }
+        createMatches(tournament_id, participants);
         tournamentDao.closeInscriptions(tournament_id);
         LOGGER.info("The inscriptions for the tournament with ID {} have been successfully closed", tournament_id);
     }
@@ -168,7 +175,7 @@ public class TournamentServiceImpl implements TournamentService {
         tournamentDao.startTournament(tournament_id);
         LOGGER.info("The tournament with ID {} has successfully been started", tournament_id);
         Tournament t = optTournament.get();
-        if(t.getStructure().equals(Structure.HYBRID)){
+        if(t.getStructure().equals(Structure.HYBRID) && t.getIs_group_stage()){
             createGroupStageMatches(t);
         }
         List<Participant> participants = participantDao.getTournamentParticipantUsers(tournament_id);
@@ -316,7 +323,7 @@ public class TournamentServiceImpl implements TournamentService {
                 List<Participant> group = new ArrayList<>(participants.subList(index, index + size));
                 Long[] ids = group.stream().map(Participant::getId).toArray(Long[]::new);
                 int groupNumber = g + 1;
-                participantDao.updateGroupNumberForUsers(t.getId(), groupNumber, Arrays.asList(ids),teamSize);
+                participantDao.updateGroupNumberForUsers(t.getId(), groupNumber, Arrays.asList(ids), teamSize);
                 index += size;
             }
         }else{

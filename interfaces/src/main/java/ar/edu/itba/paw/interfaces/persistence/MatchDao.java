@@ -13,7 +13,7 @@ public interface MatchDao {
 
     void setMatchWinner(Long matchId, Long tournamentId, Integer winner);
 
-    List<MatchInfo> getTournamentMatches(Long tournament_id);
+    List<MatchInfo> getTournamentMatches(Long tournament_id, Integer teamSize);
 
     Match getMatch(long tournamentId, long matchId);
 

@@ -122,7 +122,7 @@ public class MatchJdbcDaoTest {
 
     @Test
     public void testGetTournamentMatches(){
-        List<MatchInfo> ans = matchJdbcDao.getTournamentMatches(OTHER_ID);
+        List<MatchInfo> ans = matchJdbcDao.getTournamentMatches(OTHER_ID, 1);
 
         Assert.assertNotNull(ans);
         Assert.assertFalse(ans.isEmpty());
@@ -144,7 +144,7 @@ public class MatchJdbcDaoTest {
 
     @Test
     public void testGetTournamentMatchesNoGroup(){
-        List<MatchInfo> ans = matchJdbcDao.getTournamentMatches(OTHER_ID+1);
+        List<MatchInfo> ans = matchJdbcDao.getTournamentMatches(OTHER_ID+1, 1);
 
         Assert.assertNotNull(ans);
         Assert.assertFalse(ans.isEmpty());
@@ -166,7 +166,7 @@ public class MatchJdbcDaoTest {
 
     @Test
     public void testGetNoMatches(){
-        List<MatchInfo> ans = matchJdbcDao.getTournamentMatches(ID);
+        List<MatchInfo> ans = matchJdbcDao.getTournamentMatches(ID, 1);
 
         Assert.assertNotNull(ans);
         Assert.assertTrue(ans.isEmpty());

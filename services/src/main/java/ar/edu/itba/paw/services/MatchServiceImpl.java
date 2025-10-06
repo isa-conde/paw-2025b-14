@@ -74,31 +74,8 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
-    public Map<Integer, Map<Integer, List<MatchInfo>>> getTournamentMatchesByGroup(Long tournamentId) {
-        List<MatchInfo> matches = matchDao.getTournamentMatches(tournamentId);
-        if (matches.isEmpty()) {
-            return Collections.emptyMap();
-        }
-        Map<Integer, Map<Integer, List<MatchInfo>>> result = new TreeMap<>();
-
-        for (MatchInfo m : matches) {
-            Integer stage = m.getStage();
-            if (stage == null) {
-                continue;
-            }
-            Optional<Tournament> t = tournamentDao.findById(tournamentId);
-            Integer teamSize = gameDao.getFormatById(t.get().getFormat_id()).get().getPlayers_per_team();
-            Integer group = participantDao.getGroupNumber(tournamentId, m.getLocalId(), teamSize);
-            result.computeIfAbsent(group, g -> new TreeMap<>())
-                    .computeIfAbsent(stage, s -> new ArrayList<>())
-                    .add(m);
-        }
-        return result;
-    }
-
-    @Override
     public Map<Integer, List<MatchInfo>> getTournamentMatchesByStage(Long tournamentId){
-        List<MatchInfo> matches = matchDao.getTournamentMatches(tournamentId);
+        List<MatchInfo> matches = matchDao.getTournamentMatches(tournamentId, ts.getPlayersPerTeam(tournamentId));
         if (matches.isEmpty()) {
             return Collections.emptyMap();
         }

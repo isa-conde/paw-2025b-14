@@ -55,8 +55,6 @@ public class ParticipantJdbcDao implements ParticipantDao {
             rs.getLong("profile_picture_id")
     );
 
-
-
     @Override
     public List<Participant> getTournamentParticipantUsers(Long tournament_id) {
 
