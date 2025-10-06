@@ -295,14 +295,14 @@ public class ParticipantJdbcDaoTest {
 
     @Test
     public void testGetMaxPoints(){
-        int ans = participantJdbcDao.getTournamentMaxPoints(ID);
+        int ans = participantJdbcDao.getTournamentMaxPointsGroup(ID, 1);
 
         Assert.assertEquals(21,ans);
     }
 
     @Test
     public void testGetSecondMaxPoints(){
-        int ans = participantJdbcDao.getTournamentSecondMaxPoints(ID);
+        int ans = participantJdbcDao.getTournamentSecondMaxPointsGroup(ID, 1);
 
         Assert.assertEquals(2,ans);
     }

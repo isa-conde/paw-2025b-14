@@ -212,7 +212,7 @@ public class TournamentController {
             Boolean isIndividualTournament = optionalGameFormat.isEmpty() || optionalGameFormat.get().getPlayers_per_team() == 1;
             Boolean isParticipant = user != null && ps.hasJoined(user.getId(), tournamentId);
             if (user != null && !isIndividualTournament && !isParticipant){
-                mav.addObject("userTeams", tms.getUserTeamsByTournamentSize(user.getId(), tournamentId));
+                mav.addObject("userTeams", tms.getUserTeamsBySizeNotInTournament(user.getId(), tournamentId));
             }
             mav.addObject("isIndividualTournament", isIndividualTournament);
             mav.addObject("isParticipant", isParticipant);

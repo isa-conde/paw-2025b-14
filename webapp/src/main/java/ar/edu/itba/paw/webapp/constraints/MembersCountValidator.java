@@ -1,7 +1,11 @@
 package ar.edu.itba.paw.webapp.constraints;
 
+import ar.edu.itba.paw.interfaces.services.TeamService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
+import ar.edu.itba.paw.model.Team;
+import ar.edu.itba.paw.webapp.form.EditTeamForm;
 import ar.edu.itba.paw.webapp.form.JoinTournamentTeamForm;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
@@ -44,5 +48,40 @@ public class MembersCountValidator implements ConstraintValidator<MembersCountCo
                 .addConstraintViolation();
 
         return false;
+    }
+
+    @Component
+    public static class UniqueTeamNameOnEditValidator implements ConstraintValidator<TeamNameNotTakenConstraint.UniqueTeamNameOnEdit, EditTeamForm> {
+
+        @Autowired
+        private TeamService teamService;
+
+        @Override
+        public boolean isValid(EditTeamForm form, ConstraintValidatorContext context) {
+            if (form == null) return true;
+
+            String newName = form.getName();
+            Long teamId = form.getTeamId();
+
+            if (newName == null || newName.isBlank()) return true;
+
+            Optional<Team> currentTeamOpt = teamService.getById(teamId);
+            if (currentTeamOpt.isEmpty()) return true;
+
+            Team currentTeam = currentTeamOpt.get();
+
+            if (newName.equalsIgnoreCase(currentTeam.getName())) return true;
+
+            boolean taken = teamService.teamNameTaken(newName);
+            if (taken) {
+                context.disableDefaultConstraintViolation();
+                context.buildConstraintViolationWithTemplate("{team.create.error.nameTaken}")
+                        .addPropertyNode("name")
+                        .addConstraintViolation();
+                return false;
+            }
+
+            return true;
+        }
     }
 }

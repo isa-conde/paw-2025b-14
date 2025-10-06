@@ -149,7 +149,7 @@ public class MatchServiceImpl implements MatchService {
             participantDao.sumPoints(tournamentId, winnerId, 3);
         }
         if (structure.equals(Structure.HYBRID) && isGroupStage && isFinished) {
-            ts.createBracketFromGroups(tournamentId);
+            ts.createBracketFromGroups(tournamentId, matchId);
             isFinished = matchDao.allMatchesPlayed(tournamentId);
         }
         if (isFinished) {

@@ -15,4 +15,17 @@ public  @interface TeamNameNotTakenConstraint {
     String message() default "Team name is already taken";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
+
+    @Documented
+    @Constraint(validatedBy = MembersCountValidator.UniqueTeamNameOnEditValidator.class)
+    @Target({ ElementType.TYPE })
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface UniqueTeamNameOnEdit {
+
+        String message() default "Team name is already taken";
+
+        Class<?>[] groups() default {};
+
+        Class<? extends Payload>[] payload() default {};
+    }
 }

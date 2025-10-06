@@ -26,9 +26,9 @@ public interface ParticipantDao {
 
     List<Participant> getTournamentParticipantsByPoints(Long tournamentId, Integer group_number, Integer points, Integer teamSize);
 
-    Integer getTournamentMaxPoints(Long tournamentId);
+    Integer getTournamentMaxPointsGroup(Long tournamentId, Integer group);
 
-    Integer getTournamentSecondMaxPoints(Long tournamentId);
+    Integer getTournamentSecondMaxPointsGroup(Long tournamentId, Integer group);
 
     Integer getTournamentGroups(Long tournamentId);
 

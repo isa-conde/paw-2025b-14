@@ -68,7 +68,7 @@ public class TeamController {
                 result.rejectValue("banner", "error.tournamentForm.invalidImage");
             }
             Team team = ts.create(form.getName(), pfpBytes, bannerBytes, user.getId(), form.getMembers());
-            return new ModelAndView("redirect:/profile/team/" + team.getId());
+            return new ModelAndView("redirect:/team/profile/" + team.getId());
         }
         return null;
     }

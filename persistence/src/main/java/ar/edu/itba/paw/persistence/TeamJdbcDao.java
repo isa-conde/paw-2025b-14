@@ -110,7 +110,8 @@ public class TeamJdbcDao implements TeamDao {
     }
 
     @Override
-    public List<Team> getUserTeamsBySize(Long userId, Integer minSize) {
+    public List<Team> getUserTeamsBySizeNotInTournament(Long userId, Long tournamentId, Integer minSize) {
+        final int required = (minSize == null ? 1 : minSize);
         String sql = """
         SELECT t.*
         FROM team t
@@ -120,13 +121,19 @@ public class TeamJdbcDao implements TeamDao {
             WHERE tm.team_id = t.id
               AND tm.user_id = ?
         )
-        AND (
+          AND (
             SELECT COUNT(*)
             FROM team_member tm2
             WHERE tm2.team_id = t.id
-        ) >= ?
+          ) >= ?
+          AND NOT EXISTS (
+            SELECT 1
+            FROM participant p
+            WHERE p.tournament_id = ?
+              AND p.team_id = t.id
+          )
         ORDER BY t.id
-    """;
-        return jdbcTemplate.query(sql, ROW_MAPPER, userId, minSize);
+        """;
+        return jdbcTemplate.query(sql, ROW_MAPPER, userId, required, tournamentId);
     }
 }
