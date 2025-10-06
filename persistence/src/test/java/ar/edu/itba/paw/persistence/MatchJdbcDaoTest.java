@@ -312,6 +312,14 @@ public class MatchJdbcDaoTest {
     }
 
     @Test
+    public void testGetNoMaxStage(){
+        Integer ans = matchJdbcDao.getTournamentMaxStage(ID);
+
+        Assert.assertNotNull(ans);
+        Assert.assertEquals(0,ans.intValue());
+    }
+
+    @Test
     public void testGetGroupMaxStage(){
         SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("match");
         Map<String,Object> values = new HashMap<>();

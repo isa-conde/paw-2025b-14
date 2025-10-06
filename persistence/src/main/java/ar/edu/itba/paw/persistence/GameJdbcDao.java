@@ -144,4 +144,8 @@ public class GameJdbcDao implements GameDao {
         return jdbcTemplate.query("SELECT * FROM game_format WHERE id = ?", ROW_MAPPER_FORMAT, id).stream().findFirst();
     }
 
+    @Override
+    public Integer getPlayersPerTeam(Long id){
+        return jdbcTemplate.queryForObject("SELECT players_per_team FROM game_format WHERE id = ?", Integer.class, id);
+    }
 }

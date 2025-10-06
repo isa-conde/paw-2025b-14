@@ -257,4 +257,19 @@ public class UserJdbcDaoTest {
         Assert.assertNotNull(ans);
         Assert.assertTrue(ans.isEmpty());
     }
+
+    @Test
+    public void testUpdateProfileInfo(){
+        userJdbcDao.updateProfileInfo(usedId,USED_USERNAME+"a",USERNAME,usedId,usedId);
+        final List<User> updated = jdbcTemplate.query("select * from users where id = ?", ROW_MAPPER, usedId);
+
+        Assert.assertNotNull(updated);
+        Assert.assertFalse(updated.isEmpty());
+        Assert.assertEquals(1,updated.size());
+        User row = updated.get(0);
+        Assert.assertEquals(USED_USERNAME+"a",row.getUsername());
+        Assert.assertEquals(USERNAME,row.getBio());
+        Assert.assertEquals(usedId,row.getBanner_id().longValue());
+        Assert.assertEquals(usedId,row.getProfile_picture_id().longValue());
+    }
 }

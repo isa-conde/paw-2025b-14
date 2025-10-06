@@ -25,9 +25,9 @@ public class ExistingUsersValidator implements ConstraintValidator<ExistingUsers
 
     @Override
     public boolean isValid(List<String> value, ConstraintValidatorContext context) {
-        Boolean isValid = true;
+        boolean isValid = true;
 
-        if (value.isEmpty()){
+        if (value == null || value.isEmpty()){
             return true;
         }
         List<String> invalidUsers = new ArrayList<>();

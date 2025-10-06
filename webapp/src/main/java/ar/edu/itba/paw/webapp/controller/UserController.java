@@ -2,6 +2,7 @@ package ar.edu.itba.paw.webapp.controller;
 
 import ar.edu.itba.paw.interfaces.exception.UserNotFoundException;
 import ar.edu.itba.paw.interfaces.services.GameService;
+import ar.edu.itba.paw.interfaces.services.TeamService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.Game.Game;
@@ -24,7 +25,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.security.Principal;
 import java.util.*;
 
 @Controller
@@ -33,11 +33,13 @@ public class UserController {
     private final GameService gs;
     private final UserService us;
     private final TournamentService ts;
+    private final TeamService tms;
 
-    public UserController(GameService gs, UserService us, TournamentService ts) {
+    public UserController(GameService gs, UserService us, TournamentService ts, TeamService tms) {
         this.gs = gs;
         this.us = us;
         this.ts = ts;
+        this.tms = tms;
     }
 
     @RequestMapping("/")
@@ -138,6 +140,8 @@ public class UserController {
         mav.addObject("user", currentUser.isPresent() ? currentUser.get().getPawUser() : null);
         mav.addObject("games", gs.searchByName(q));
         mav.addObject("tournaments", ts.searchByName(q));
+        mav.addObject("users", us.searchByName(q));
+        mav.addObject("teams", tms.searchByName(q));
 
         return mav;
     }
@@ -150,23 +154,34 @@ public class UserController {
         if (profileOpt.isEmpty()){
             throw new UserNotFoundException();
         }
-
+        User profile = profileOpt.get();
         mav.addObject("user", currentUser.isPresent() ? currentUser.get().getPawUser() : null);
-        mav.addObject("isMyProfile", profileOpt.get().getId() == currentUser.get().getPawUser().getId());
+        mav.addObject("isMyProfile", profile.getId() == currentUser.get().getPawUser().getId());
         mav.addObject("profile", profileOpt.get());
         mav.addObject("favouriteGames", gs.getFavourites(id));
         mav.addObject("lastTournaments", ts.findUserActiveTournaments(id));
+        mav.addObject("EditProfileForm", editProfileForm);
 
         editProfileForm.setUsername(profileOpt.get().getUsername());
         editProfileForm.setBio(profileOpt.get().getBio());
+
+        boolean hasFormErrors = mav.getModel().containsKey(
+                BindingResult.MODEL_KEY_PREFIX + "editProfileForm"
+        );
+        if (!hasFormErrors) {
+            editProfileForm.setUsername(profile.getUsername());
+            editProfileForm.setBio(profile.getBio());
+        }
 
         return mav;
     }
 
     @RequestMapping(value = "/profile/update", method = { RequestMethod.POST })
-    public ModelAndView updateProfile(@RequestParam("userId") final long userId, @Valid @ModelAttribute("editProfileForm") final EditProfileForm form, final BindingResult result){
-        if (result.hasErrors()) {
-            return new ModelAndView("redirect:/profile/" + userId);
+    public ModelAndView updateProfile(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam("userId") final long userId, @Valid @ModelAttribute("editProfileForm") final EditProfileForm form, final BindingResult result){
+        if (currentUser.isPresent() && result.hasErrors()) {
+            ModelAndView mav = profile(currentUser, userId, form);
+            mav.addObject("openModal", "'editProfileModal'");
+            return mav;
         }
 
         ModelAndView mav = new ModelAndView("redirect:/profile/" + userId);

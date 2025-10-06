@@ -1,10 +1,7 @@
 package ar.edu.itba.paw.interfaces.persistence;
 
-import ar.edu.itba.paw.model.ParticipantUser;
-import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
-import ar.edu.itba.paw.model.MatchInfo;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
@@ -46,7 +43,7 @@ public interface TournamentDao {
 
     void updateTournamentInfo(Long tournament_id, String name, LocalDate start_date, LocalDate end_date, Integer max_participants);
 
-    int tournamentParticipantsCount(Long tournamentId);
+    int getTournamentParticipantsCount(Long tournamentId);
 
     void setIsGroupStage(Long tournamentId, Boolean bool);
 

@@ -86,11 +86,8 @@ create table if not exists participant(
     points integer default 0 not null ,
     group_number integer,
     constraint participant_user_or_team_chk check (
-        (user_id is null and team_id is not null)
-        or
-        (user_id is not null and team_id is null)
-        )
-);
+        user_id is not null or team_id is not null
+));
 
 create table if not exists match(
     id integer identity not null,

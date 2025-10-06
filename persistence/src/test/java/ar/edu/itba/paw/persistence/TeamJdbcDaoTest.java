@@ -194,4 +194,90 @@ public class TeamJdbcDaoTest {
         Assert.assertEquals(OTHER_ID,present.getPfp_id());
         Assert.assertEquals(used_id,present.getId());
     }
+
+    @Test
+    public void testUpdateTeam(){
+        teamJdbcDao.updateTeam(used_id,OTHER_TEAM+"a",ID,ID);
+        List<Team> list = jdbcTemplate.query("select * from team where id = ?",ROW_MAPPER,used_id);
+
+        Assert.assertNotNull(list);
+        Assert.assertFalse(list.isEmpty());
+        Assert.assertEquals(1,list.size());
+        Team team = list.get(0);
+        Assert.assertEquals(OTHER_TEAM+"a", team.getName());
+        Assert.assertEquals(ID, team.getBanner_id());
+        Assert.assertEquals(ID, team.getPfp_id());
+    }
+
+    @Test
+    public void testNameTaken(){
+        Boolean isTaken = teamJdbcDao.teamNameTaken(OTHER_TEAM);
+
+        Assert.assertNotNull(isTaken);
+        Assert.assertTrue(isTaken);
+    }
+
+    @Test
+    public void testNameNotTaken(){
+        Boolean isTaken = teamJdbcDao.teamNameTaken(TEAM);
+
+        Assert.assertNotNull(isTaken);
+        Assert.assertFalse(isTaken);
+    }
+
+    @Test
+    public void testSearchByName(){
+        List<Team> foundTeams = teamJdbcDao.searchByName("Grupo");
+
+        Assert.assertNotNull(foundTeams);
+        Assert.assertFalse(foundTeams.isEmpty());
+        Assert.assertEquals(1, foundTeams.size());
+        Team found = foundTeams.get(0);
+        Assert.assertEquals(OTHER_TEAM, found.getName());
+        Assert.assertEquals(OTHER_ID, found.getOwner_id());
+        Assert.assertEquals(OTHER_ID, found.getPfp_id());
+        Assert.assertEquals(OTHER_ID, found.getBanner_id());
+        Assert.assertEquals(used_id, found.getId());
+    }
+
+    @Test
+    public void testSearchByNameNoOne(){
+        List<Team> foundTeams = teamJdbcDao.searchByName("nada");
+
+        Assert.assertNotNull(foundTeams);
+        Assert.assertTrue(foundTeams.isEmpty());
+    }
+
+    @Test
+    public void testGetUserTeamsBySize(){
+        SimpleJdbcInsert teamMemberInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("team_member");
+        teamMemberInsert.execute(Map.of("team_id", used_id, "user_id", ID));
+        teamMemberInsert.execute(Map.of("team_id", used_id, "user_id", OTHER_ID));
+
+        List<Team> teams = teamJdbcDao.getUserTeamsBySize(ID, 2);
+
+        Assert.assertNotNull(teams);
+        Assert.assertFalse(teams.isEmpty());
+        Assert.assertEquals(1, teams.size());
+        Team team = teams.get(0);
+        Assert.assertEquals(OTHER_TEAM, team.getName());
+        Assert.assertEquals(used_id, team.getId());
+        Assert.assertEquals(OTHER_ID, team.getOwner_id());
+        Assert.assertEquals(OTHER_ID, team.getPfp_id());
+        Assert.assertEquals(OTHER_ID, team.getBanner_id());
+        Integer memberCount = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM team_member WHERE team_id = ?",
+                Integer.class,
+                used_id
+        );
+        Assert.assertTrue(memberCount >= 2);
+    }
+
+    @Test
+    public void testGetUserNoTeamsBySize(){
+        List<Team> teams = teamJdbcDao.getUserTeamsBySize(9L, 12);
+
+        Assert.assertNotNull(teams);
+        Assert.assertTrue(teams.isEmpty());
+    }
 }
