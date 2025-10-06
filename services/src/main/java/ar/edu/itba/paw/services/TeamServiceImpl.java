@@ -6,6 +6,8 @@ import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.Team;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,21 +19,22 @@ import java.util.Optional;
 @Service
 public class TeamServiceImpl implements TeamService {
 
-    ImageDao imageDao;
-    TeamDao teamDao;
-    TeamMemberDao teamMemberDao;
-    UserDao userDao;
-    TournamentDao tournamentDao;
-    ParticipantDao participantDao;
-    TournamentService ts;
+    private final static Logger LOGGER = LoggerFactory.getLogger(TeamServiceImpl.class);
 
-    public TeamServiceImpl(ImageDao imageDao, TeamDao teamDao, TeamMemberDao teamMemberDao, UserDao userDao, TournamentDao tournamentDao, ParticipantDao participantDao, TournamentService ts){
+    private final ImageDao imageDao;
+    private final TeamDao teamDao;
+    private final TeamMemberDao teamMemberDao;
+    private final UserDao userDao;
+    private final TournamentDao tournamentDao;
+    private final TournamentService ts;
+
+
+    public TeamServiceImpl(ImageDao imageDao, TeamDao teamDao, TeamMemberDao teamMemberDao, UserDao userDao, TournamentDao tournamentDao, TournamentService ts){
         this.imageDao = imageDao;
         this.teamDao = teamDao;
         this.teamMemberDao = teamMemberDao;
         this.userDao = userDao;
         this.tournamentDao = tournamentDao;
-        this.participantDao = participantDao;
         this.ts = ts;
     }
 
@@ -48,6 +51,7 @@ public class TeamServiceImpl implements TeamService {
         }
 
         Team team = teamDao.create(name, pfp_id, banner_id, owner_id);
+        LOGGER.info("The team {} has been successfully created", name);
 
         if (members != null){
             for (String s : members){

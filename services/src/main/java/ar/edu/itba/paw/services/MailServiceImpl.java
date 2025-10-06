@@ -29,8 +29,6 @@ public class MailServiceImpl implements MailService {
     @Autowired
     private SpringTemplateEngine templateEngine;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MailServiceImpl.class);
-
     @Async
     @Override
     public void sendTournamentCreatedEmail(String userName, String tournamentName, String tournamentLink, String recipient) {

@@ -8,6 +8,8 @@ import ar.edu.itba.paw.interfaces.services.ParticipantService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.Participant;
 import ar.edu.itba.paw.model.Tournament.Tournament;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,10 +21,12 @@ import java.util.Optional;
 @Service
 public class ParticipantServiceImpl implements ParticipantService {
 
-    ParticipantDao participantDao;
-    TournamentDao tournamentDao;
-    GameDao gameDao;
-    TournamentService ts;
+    private final static Logger LOGGER = LoggerFactory.getLogger(ParticipantServiceImpl.class);
+
+    private final ParticipantDao participantDao;
+    private final TournamentDao tournamentDao;
+    private final TournamentService ts;
+    private final GameDao gameDao;
 
     public ParticipantServiceImpl(ParticipantDao participantDao, TournamentDao tournamentDao, TournamentService ts, GameDao gameDao){
         this.participantDao = participantDao;
@@ -35,6 +39,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     @Override
     public void joinTournamentUser(Long user_id, Long tournament_id) {
         if(hasJoined(user_id, tournament_id)) {
+            LOGGER.warn("User with ID {} has already joined tournament with ID {}", user_id, tournament_id);
             throw new UserAlreadyJoinedException();
         }
 
@@ -44,7 +49,9 @@ public class ParticipantServiceImpl implements ParticipantService {
         Optional<Tournament> tournament = tournamentDao.findById(tournament_id);
         if (tournament.isPresent() && participants.size() == tournament.get().getMax_participants()) {
             ts.closeInscriptions(tournament_id);
+            LOGGER.info("Max participant count has been reached. The inscriptions for tournament with ID {} have been closed", tournament_id);
         }
+        LOGGER.info("User with ID {} has joined tournament with ID {}", user_id, tournament_id);
     }
 
     private List<Participant> getTournamentParticipantUsers(Long tournament_id) {
@@ -89,13 +96,14 @@ public class ParticipantServiceImpl implements ParticipantService {
                 participantDao.leaveTournamentUser(user_id, tournament_id);
             }
         }
+        LOGGER.info("User with ID {} has successfully left tournament with ID {}", user_id, tournament_id);
     }
 
     @Transactional
     @Override
     public void swapGroups(Long tournament_id, Long user1, Long user2){
         if (tournamentDao.isTournamentStarted(tournament_id)) {
-            throw new IllegalStateException("Members cannot be swapped after the tournament has started");
+            throw new IllegalStateException("Members cannot be swapped after the tournament has started"); // TODO: custom handling
         }
         Optional<Tournament> t = tournamentDao.findById(tournament_id);
         Integer teamSize = gameDao.getFormatById(t.get().getFormat_id()).get().getPlayers_per_team();
@@ -104,10 +112,12 @@ public class ParticipantServiceImpl implements ParticipantService {
         Integer g2 = participantDao.getGroupNumber(tournament_id, user2, teamSize);
 
         if (g1.equals(g2)) {
+            LOGGER.warn("Cannot swap users within the same group");
             return;
         }
 
         participantDao.swapGroups(tournament_id, user1, user2, g1, g2, teamSize);
+        LOGGER.info("Users with IDs {} and {} have successfully swapped groups", user1, user2);
     }
 
     @Override
