@@ -96,6 +96,9 @@ public class TournamentServiceImpl implements TournamentService {
         if (t != null) {
             if (t.getStructure() == Structure.LEAGUE) {
                 List<Participant> tops = getLeagueTournamentTopPositions(tournament_id);
+                if(tops.isEmpty()) {
+                    LOGGER.debug("Top positions list for league format is empty");
+                }
                 if (tops.size() > 1) {
                     createMatchesLeague(t, tops, lastMatchId + 1, matchDao.getTournamentMaxStage(tournament_id) + 1, null);
                     return;

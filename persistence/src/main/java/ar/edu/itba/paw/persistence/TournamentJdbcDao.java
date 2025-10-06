@@ -59,15 +59,6 @@ public class TournamentJdbcDao implements TournamentDao {
             rs.getBoolean("tournament_started"),
             rs.getLong("format_id"));
 
-    private static final RowMapper<User> ROW_MAPPER_USER = (rs, rowNum) -> new User(rs.getLong("id"),
-            rs.getString("username"),
-            rs.getString("email"),
-            rs.getString("password"),
-            rs.getBoolean("verified"),
-            rs.getString("bio"),
-            rs.getLong("profile_picture_id"),
-            rs.getLong("banner_id"));
-
     @Override
     public Optional<Tournament> findById(Long id) {
         return jdbcTemplate.query("SELECT * FROM tournament WHERE id = ?", ROW_MAPPER, id).stream().findFirst();

@@ -3,6 +3,8 @@ package ar.edu.itba.paw.persistence;
 import ar.edu.itba.paw.interfaces.persistence.ParticipantDao;
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.model.Participant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -22,6 +24,8 @@ import java.util.stream.Collectors;
 
 @Repository
 public class ParticipantJdbcDao implements ParticipantDao {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(ParticipantJdbcDao.class);
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
@@ -164,10 +168,17 @@ public class ParticipantJdbcDao implements ParticipantDao {
 
     @Override
     public Integer getTournamentMaxPointsGroup(Long tournamentId, Integer group){
-        return jdbcTemplate.queryForObject(
-                "SELECT MAX(points) FROM participant WHERE tournament_id = ? AND group_number = ?",
-                Integer.class, tournamentId, group
-        );
+        if (group == null) {
+            return jdbcTemplate.queryForObject(
+                    "SELECT COALESCE(MAX(points), 0) FROM participant WHERE tournament_id = ?",
+                    Integer.class, tournamentId
+            );
+        } else {
+            return jdbcTemplate.queryForObject(
+                    "SELECT COALESCE(MAX(points), 0) FROM participant WHERE tournament_id = ? AND group_number = ?",
+                    Integer.class, tournamentId, group
+            );
+        }
     }
 
     @Override
