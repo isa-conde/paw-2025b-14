@@ -24,10 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.SecureRandom;
 import java.time.LocalDate;
+import java.util.*;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Transactional(readOnly = true)
 @Service
@@ -232,6 +230,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> searchByName(String name) {
         return userDao.searchByName(name);
+    }
+
+    @Override
+    public void updateUserLocale(Locale locale, Long userId) {
+        String language = locale.getLanguage();
+        userDao.updateUserLocale(language, userId);
     }
 
 }

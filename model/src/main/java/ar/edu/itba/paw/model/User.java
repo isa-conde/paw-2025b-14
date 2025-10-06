@@ -10,8 +10,9 @@ public class User {
     private String bio;
     private Long pfp_id;
     private Long banner_id;
+    private String locale;
 
-    public User(final long id, final String username, final String email, String password, boolean verified, String bio, Long pfp_id, Long banner_id) {
+    public User(final long id, final String username, final String email, String password, boolean verified, String bio, Long pfp_id, Long banner_id, String locale) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -20,6 +21,7 @@ public class User {
         this.bio = bio;
         this.pfp_id = pfp_id;
         this.banner_id = banner_id;
+        this.locale = locale;
     }
 
     public long getId() {
@@ -66,5 +68,13 @@ public class User {
 
     public void setBanner_id(Long id){
         this.banner_id=id;
+    }
+
+    public String getLocale() {
+        return locale;
+    }
+
+    public void setLocale(String locale) {
+        this.locale = locale;
     }
 }
