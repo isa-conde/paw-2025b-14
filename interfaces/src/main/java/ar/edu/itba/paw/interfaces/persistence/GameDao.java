@@ -34,4 +34,6 @@ public interface GameDao {
     Long getPageAmount();
 
     Optional<GameFormat> getFormatById(Long id);
+
+    Integer getPlayersPerTeam(Long id);
 }

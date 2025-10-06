@@ -3,6 +3,7 @@ package ar.edu.itba.paw.interfaces.services;
 import ar.edu.itba.paw.model.Token;
 import ar.edu.itba.paw.model.User;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
@@ -36,6 +37,8 @@ public interface UserService {
     void authenticateVerifiedUser(Long userId);
 
     void updateProfileInfo(Long userId, String username, String bio, byte[] pfp, byte[] banner);
+
+    List<User> searchByName(String name);
 
     void sendTournamentCreatedEmail(String username, String tournamentName, String tournamentLink, String recipient);
 }

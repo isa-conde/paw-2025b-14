@@ -2,9 +2,11 @@ package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.exception.*;
 import ar.edu.itba.paw.interfaces.persistence.*;
+import ar.edu.itba.paw.interfaces.persistence.*;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.Game.Game;
-import ar.edu.itba.paw.model.ParticipantUser;
+import ar.edu.itba.paw.model.*;
+import ar.edu.itba.paw.model.Game.GameFormat;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
@@ -86,12 +88,12 @@ public class TournamentServiceImpl implements TournamentService {
         Long winner;
         if (t != null) {
             if (t.getStructure() == Structure.LEAGUE) {
-                List<ParticipantUser> tops = getLeagueTournamentTopPositions(tournament_id);
+                List<Participant> tops = getLeagueTournamentTopPositions(tournament_id);
                 if (tops.size() > 1) {
                     createMatchesLeague(t, tops, lastMatchId + 1, matchDao.getTournamentMaxStage(tournament_id) + 1, null);
                     return;
                 }
-                winner = tops.getFirst().getUser_id();
+                winner = tops.getFirst().getId();
             } else {
                 winner = matchDao.getMatchWinner(tournament_id, lastMatchId);
             }
@@ -102,10 +104,11 @@ public class TournamentServiceImpl implements TournamentService {
         }
     }
 
-    private List<ParticipantUser> getLeagueTournamentTopPositions(Long tournamentId){
+    private List<Participant> getLeagueTournamentTopPositions(Long tournamentId){
+        Optional<Tournament> t = tournamentDao.findById(tournamentId);
         Integer maxPoints = participantDao.getTournamentMaxPoints(tournamentId);
         if (maxPoints == null) return java.util.Collections.emptyList();
-        return participantDao.getTournamentParticipantsByPoints(tournamentId, null, maxPoints);
+        return participantDao.getTournamentParticipantsByPoints(tournamentId, null, maxPoints,  gameDao.getFormatById(t.get().getFormat_id()).get().getPlayers_per_team());
     }
 
     @Transactional
@@ -184,7 +187,7 @@ public class TournamentServiceImpl implements TournamentService {
     	return tournamentDao.getTournamentParticipantsCount(tournamentId);
     }
 
-    private void createMatches(Long tournamentId, List<ParticipantUser> participants) {
+    private void createMatches(Long tournamentId, List<Participant> participants) {
         Tournament t = findById(tournamentId).orElse(null);
         if (t != null && !participants.isEmpty()) { // TODO: no participant error handling
             if(t.getStructure().equals(Structure.ELIMINATION)) {
@@ -198,11 +201,11 @@ public class TournamentServiceImpl implements TournamentService {
         LOGGER.info("Matches for tournament with ID {} of {} format have successfully been created", t.getId(), t.getStructure());
     }
 
-    private void createMatchesLeague(Tournament t, List<ParticipantUser> participants) {
+    public void createMatchesLeague(Tournament t, List<Participant> participants) {
         createMatchesLeague(t, participants, 1L, 1, null);
     }
 
-    private void createMatchesLeague(Tournament t, List<ParticipantUser> participants, Long firstMatchId, Integer firstStage, Boolean isGroupStage) {
+    public void createMatchesLeague(Tournament t, List<Participant> participants, Long firstMatchId, Integer firstStage, Boolean isGroupStage) {
         int n = participants.size();
 
         if (n % 2 != 0) {
@@ -212,23 +215,23 @@ public class TournamentServiceImpl implements TournamentService {
         int totalRounds = n - 1;
         Long matchId = firstMatchId;
 
-        List<ParticipantUser> rotated = new ArrayList<>(participants);
+        List<Participant> rotated = new ArrayList<>(participants);
 
         for (int round = firstStage; round < firstStage + totalRounds; round++) {
             for (int i = 0; i < n / 2; i++) {
-                ParticipantUser home = rotated.get(i);
-                ParticipantUser away = rotated.get(n - 1 - i);
+                Participant home = rotated.get(i);
+                Participant away = rotated.get(n - 1 - i);
 
                 if (home != null && away != null) {
-                    matchDao.insertMatch(matchId++, t.getId(), home.getUser_id(), away.getUser_id(), round,null, null, null, isGroupStage);
+                    matchDao.insertMatch(matchId++, t.getId(), home.getId(), away.getId(), round,null, null, null, isGroupStage);
                 }
             }
-            ParticipantUser first = rotated.remove(1);
+            Participant first = rotated.remove(1);
             rotated.add(first);
         }
     }
 
-    private void createMatchesBracket(Tournament t, List<ParticipantUser> participants, Long firstMatchId, Boolean isGroupStage) {
+    private void createMatchesBracket(Tournament t, List<Participant> participants, Long firstMatchId, Boolean isGroupStage) {
         int n = participants.size();
 
         int floorPowerOfTwo = 1;
@@ -240,13 +243,13 @@ public class TournamentServiceImpl implements TournamentService {
         Long matchId = firstMatchId;
         Integer stage = matchDao.getTournamentMaxStage(t.getId()) + 1;
 
-        List<ParticipantUser> nextRound = new ArrayList<>();
+        List<Participant> nextRound = new ArrayList<>();
 
         for (int i = 0; i < extras; i++) {
-            ParticipantUser home = participants.get(i * 2);
-            ParticipantUser away = participants.get(i * 2 + 1);
-            Long homeId = (home != null) ? home.getUser_id() : null;
-            Long awayId = (away != null) ? away.getUser_id() : null;
+            Participant home = participants.get(i * 2);
+            Participant away = participants.get(i * 2 + 1);
+            Long homeId = (home != null) ? home.getId() : null;
+            Long awayId = (away != null) ? away.getId() : null;
 
             matchDao.insertMatch(matchId++, t.getId(), homeId, awayId, stage, null,null, null, isGroupStage);
             nextRound.add(null);
@@ -259,14 +262,14 @@ public class TournamentServiceImpl implements TournamentService {
         stage++;
 
         while (nextRound.size() > 1) {
-            List<ParticipantUser> currentRound = nextRound;
+            List<Participant> currentRound = nextRound;
             nextRound = new ArrayList<>();
 
             for (int i = 0; i < currentRound.size(); i += 2) {
-                ParticipantUser home = currentRound.get(i);
-                ParticipantUser away = (i + 1 < currentRound.size()) ? currentRound.get(i + 1) : null;
-                Long homeId = (home != null) ? home.getUser_id() : null;
-                Long awayId = (away != null) ? away.getUser_id() : null;
+                Participant home = currentRound.get(i);
+                Participant away = (i + 1 < currentRound.size()) ? currentRound.get(i + 1) : null;
+                Long homeId = (home != null) ? home.getId() : null;
+                Long awayId = (away != null) ? away.getId() : null;
                 matchDao.insertMatch(matchId++, t.getId(), homeId, awayId, stage,null, null, null, isGroupStage);
                 nextRound.add(null);
             }
@@ -275,8 +278,9 @@ public class TournamentServiceImpl implements TournamentService {
         }
     }
 
-    private void createMatchesHybrid(Tournament t, List<ParticipantUser> participants) {
+    private void createMatchesHybrid(Tournament t, List<Participant> participants) {
         int n = participants.size();
+        Integer teamSize = gameDao.getFormatById(t.getFormat_id()).get().getPlayers_per_team();
         if (n > 8){
             tournamentDao.setIsGroupStage(t.getId(), true);
             int groupsCount = calculateGroups(n);
@@ -284,10 +288,10 @@ public class TournamentServiceImpl implements TournamentService {
             int index = 0;
             for (int g = 0; g < groupsCount; g++) {
                 int size = distribution.get(g);
-                List<ParticipantUser> group = new ArrayList<>(participants.subList(index, index + size));
-                Long[] ids = group.stream().map(ParticipantUser::getUser_id).toArray(Long[]::new);
+                List<Participant> group = new ArrayList<>(participants.subList(index, index + size));
+                Long[] ids = group.stream().map(Participant::getId).toArray(Long[]::new);
                 int groupNumber = g + 1;
-                participantDao.updateGroupNumberForUsers(t.getId(), groupNumber, Arrays.asList(ids));
+                participantDao.updateGroupNumberForUsers(t.getId(), groupNumber, Arrays.asList(ids),teamSize);
                 index += size;
             }
         }else{
@@ -325,19 +329,20 @@ public class TournamentServiceImpl implements TournamentService {
     public void createBracketFromGroups(Long tournamentId) { // TODO: error handling here?
         Integer groups = participantDao.getTournamentGroups(tournamentId);
         Tournament t = findById(tournamentId).orElse(null);
-        List<ParticipantUser> classified = new ArrayList<>(groups * 2);
+        List<Participant> classified = new ArrayList<>(groups * 2);
         for(int i = 1; i <= groups; i++){
-            Map<Integer, List<ParticipantUser>> topPositions = getGroupTopPositions(tournamentId, i);
+            Map<Integer, List<Participant>> topPositions = getGroupTopPositions(tournamentId, i);
             if(topPositions.get(1).size() > 1){
                 createMatchesLeague(t, topPositions.get(1), 1L, matchDao.getTournamentGroupMaxStage(tournamentId, i), true);
                 return;
             }else if(topPositions.get(2).size() > 1){
-                participantDao.sumPoints(tournamentId, topPositions.get(1).getFirst().getUser_id(), 3 * (topPositions.get(2).size() / 2));
+                participantDao.sumPoints(tournamentId, topPositions.get(1).getFirst().getId(), 3 * (topPositions.get(2).size() / 2));
+
                 createMatchesLeague(t, topPositions.get(2), 1L, matchDao.getTournamentGroupMaxStage(tournamentId, i), true);
                 return;
             }
-            ParticipantUser local   = topPositions.get(1).getFirst();
-            ParticipantUser visitor = topPositions.get(2).getFirst();
+            Participant local   = topPositions.get(1).getFirst();
+            Participant visitor = topPositions.get(2).getFirst();
             classified.add(local);
             classified.add(visitor);
         }
@@ -346,33 +351,44 @@ public class TournamentServiceImpl implements TournamentService {
         createMatchesBracket(findById(tournamentId).orElse(null), classified, matchDao.getMaxMatchId(tournamentId) + 1, false);
     }
 
-    private Map<Integer, List<ParticipantUser>> getGroupTopPositions(Long tournament_id, Integer group_number){
-        Map<Integer, List<ParticipantUser>> out = new HashMap<>();
-        out.put(1, participantDao.getTournamentParticipantsByPoints(tournament_id, group_number, participantDao.getTournamentMaxPoints(tournament_id)));
-        out.put(2, participantDao.getTournamentParticipantsByPoints(tournament_id, group_number, participantDao.getTournamentSecondMaxPoints(tournament_id)));
+    private Map<Integer, List<Participant>> getGroupTopPositions(Long tournament_id, Integer group_number){
+        Map<Integer, List<Participant>> out = new HashMap<>();
+        Optional<Tournament> t = tournamentDao.findById(tournament_id);
+        Integer teamSize = gameDao.getFormatById(t.get().getFormat_id()).get().getPlayers_per_team();
+        out.put(1, participantDao.getTournamentParticipantsByPoints(tournament_id, group_number, participantDao.getTournamentMaxPoints(tournament_id), teamSize));
+        out.put(2, participantDao.getTournamentParticipantsByPoints(tournament_id, group_number, participantDao.getTournamentSecondMaxPoints(tournament_id), teamSize));
         return out;
     }
 
     private void createGroupStageMatches(Tournament t){
-        Map<Integer, List<ParticipantUser>> groupedParticipants = getGroupedParticipants(participantDao.getTournamentParticipantUsers(t.getId()));
+        Map<Integer, List<Participant>> groupedParticipants = getGroupedParticipants(participantDao.getTournamentParticipantUsers(t.getId()));
         if(groupedParticipants != null){
             long nextId = 1L;
-            for(List<ParticipantUser> participants : groupedParticipants.values()){
+            for(List<Participant> participants : groupedParticipants.values()){
                 createMatchesLeague(t, participants, nextId, 1, true);
                 nextId += ((long) participants.size() * (participants.size() - 1)) / 2;
             }
         }
     }
 
-    private Map<Integer, List<ParticipantUser>> getGroupedParticipants(List<ParticipantUser> participantUsers) {
-        Map<Integer, List<ParticipantUser>> grouped = new TreeMap<>(Integer::compareTo);
-        for (ParticipantUser p : participantUsers) {
+    private Map<Integer, List<Participant>> getGroupedParticipants(List<Participant> participants) {
+        Map<Integer, List<Participant>> grouped = new TreeMap<>(Integer::compareTo);
+        for (Participant p : participants) {
             if (p.getGroupNumber() == null) {
                 return null;
             }
             grouped.computeIfAbsent(p.getGroupNumber(), k -> new ArrayList<>()).add(p);
         }
         return grouped;
+    }
+
+    @Override
+    public Integer getPlayersPerTeam(Long tournamentId){
+        Tournament t = findById(tournamentId).orElse(null);
+        if(t != null && t.getFormat_id() != null){
+            return gameDao.getPlayersPerTeam(t.getFormat_id());
+        }
+        return null;
     }
 
     @Override

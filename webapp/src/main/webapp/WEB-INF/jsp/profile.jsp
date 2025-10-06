@@ -4,7 +4,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
-<paw:layout user="${user}" pageTitle="${profile.username}">
+<paw:layout user="${user}" pageTitle="${profile.username}" function="${openModal}">
 
     <c:set var="isMyProfile" value="${user.id == profile.id}"/>
     <c:url value="/images/pencil.png" var="pencilUrl"/>
@@ -40,8 +40,8 @@
 
 </paw:layout>
 
-<paw:modal title="profile.edit.modal.title" id="editProfileModal">
-    <form:form method="post" modelAttribute="EditProfileForm"
+<paw:modal title="profile.edit.modal.title" id="editProfileModal" returnUrl="/profile/${profile.id}">
+    <form:form method="post" modelAttribute="editProfileForm"
                action="${pageContext.request.contextPath}/profile/update"
                enctype="multipart/form-data" cssClass="form">
         <input type="hidden" name="userId" value="${profile.id}"/>

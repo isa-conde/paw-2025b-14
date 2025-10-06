@@ -1,25 +1,28 @@
 package ar.edu.itba.paw.webapp.form;
 
-
 import ar.edu.itba.paw.webapp.constraints.ExistingUsersContraint;
 import ar.edu.itba.paw.webapp.constraints.TeamNameNotTakenConstraint;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.List;
 
-public class CreateTeamForm {
+@UniqueTeamNameOnEdit
+public class EditTeamForm {
 
+    @NotNull
+    private Long teamId;
     @NotBlank(message = "{home.createTournament.notNull}")
     @Size(max = 100)
-    @TeamNameNotTakenConstraint(message = "{team.create.error.nameTaken}")
     private String name;
-    private MultipartFile banner;
-    private MultipartFile pfp;
-    private Long owner_id;
     @ExistingUsersContraint
-    private List<String> members;
+    List<String> members;
+
+    private MultipartFile profilePicture;
+
+    private MultipartFile bannerPicture;
 
     public String getName() {
         return name;
@@ -28,25 +31,21 @@ public class CreateTeamForm {
         this.name = name;
     }
 
-    public MultipartFile getBanner() {
-        return banner;
+    public MultipartFile getProfilePicture() {
+        return profilePicture;
     }
-    public void setBanner_id(MultipartFile banner) {
-        this.banner = banner;
-    }
-
-    public MultipartFile getPfp() {
-        return pfp;
-    }
-    public void setPfp(MultipartFile pfp) {
-        this.pfp = pfp;
+    public void setProfilePicture(MultipartFile profilePicture) {
+        this.profilePicture = profilePicture;
     }
 
-    public Long getOwner_id() {
-        return owner_id;
+    public Long getTeamId(){ return teamId; }
+    public void setTeamId(Long id){ this.teamId = id; }
+
+    public MultipartFile getBannerPicture() {
+        return bannerPicture;
     }
-    public void setOwner_id(Long owner_id) {
-        this.owner_id = owner_id;
+    public void setBannerPicture(MultipartFile bannerPicture) {
+        this.bannerPicture = bannerPicture;
     }
 
     public List<String> getMembers() {
@@ -55,5 +54,4 @@ public class CreateTeamForm {
     public void setMembers(List<String> members) {
         this.members = members;
     }
-
 }
