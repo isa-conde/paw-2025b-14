@@ -271,10 +271,22 @@
                 <paw:users-grid participants="${participants}" isIndividualTournament="${isIndividualTournament}"/>
                 <c:if test="${!isParticipant && tournament.openInscriptions}">
                     <div class="cards-container">
-                        <form:form method="post" action="${url}" onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
-                            <input type="hidden" name="tournamentId" value="${tournament.id}"/>
-                            <paw:input path="" inputType="submit" label="tournament.joinCard.butText"/>
-                        </form:form>
+                        <c:choose>
+                            <c:when test="${isIndividualTournament}">
+                                <form:form method="post"
+                                           action="${joinUrl}"
+                                           onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
+                                    <input type="hidden" name="tournamentId" value="${tournament.id}"/>
+                                    <paw:input path="" inputType="submit" label="tournament.joinCard.butText"/>
+                                </form:form>
+                            </c:when>
+                            <c:otherwise>
+                                <button type="button" class="btn"
+                                        onclick="openModal('chooseTeamModal')">
+                                    <paw:text size="l"><spring:message code="tournament.joinCard.butText"/></paw:text>
+                                </button>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                 </c:if>
             </c:when>
