@@ -49,8 +49,6 @@ public class ParticipantJdbcDao implements ParticipantDao {
             rs.getInt("group_number")
     );
 
-
-
     @Override
     public List<Participant> getTournamentParticipantUsers(Long tournament_id) {
 
