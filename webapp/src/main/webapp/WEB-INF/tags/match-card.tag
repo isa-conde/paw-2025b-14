@@ -17,7 +17,7 @@
     <div class="match-players">
         <div class="player local-player ${winner == 1 ? 'winner' : ''}">
             <img src="${pageContext.request.contextPath}/images/empty_user.png" alt="Player" class="player-avatar"/>
-            <paw:text size="s" weight="semi-bold"><c:out value="${localPlayer}"/></paw:text>
+            <paw:text size="s" weight="semi-bold"><c:out value="${localPlayer.name}"/></paw:text>
         </div>
         
         <div class="vs-container">
@@ -26,7 +26,7 @@
         
         <div class="player visitor-player ${winner == 2 ? 'winner' : ''}">
             <img src="${pageContext.request.contextPath}/images/empty_user.png" alt="Player" class="player-avatar"/>
-            <paw:text size="s" weight="semi-bold"><c:out value="${visitorPlayer}"/></paw:text>
+            <paw:text size="s" weight="semi-bold"><c:out value="${visitorPlayer.name}"/></paw:text>
         </div>
     </div>
     <spring:message code="tournament.wins" var="wins"/>

@@ -211,7 +211,7 @@ public class ParticipantJdbcDaoTest {
 
     @Test
     public void testGetUserById(){
-        Participant ans = participantJdbcDao.getTournamentParticipantByUserId(ID,ID);
+        Participant ans = participantJdbcDao.getTournamentParticipantById(ID,ID, 1);
 
         Assert.assertNotNull(ans);
         Assert.assertEquals(USERNAME,ans.getName());
@@ -222,7 +222,7 @@ public class ParticipantJdbcDaoTest {
 
     @Test
     public void testGetByIdNoOne(){
-        Participant ans = participantJdbcDao.getTournamentParticipantByUserId((long)0, (long)-1);
+        Participant ans = participantJdbcDao.getTournamentParticipantById((long)0, (long)-1, 1);
 
         Assert.assertNull(ans);
     }

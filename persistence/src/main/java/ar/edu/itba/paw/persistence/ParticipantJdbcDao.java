@@ -97,11 +97,32 @@ public class ParticipantJdbcDao implements ParticipantDao {
     }
 
     @Override
-    public Participant getTournamentParticipantByUserId(Long tournament_id, Long user_id) {
-        return jdbcTemplate.query("SELECT * FROM participant " +
-                        "INNER JOIN users ON participant.user_id = users.id " +
-                        "WHERE tournament_id = ? AND user_id = ?",
-                                       ROW_MAPPER_USER, tournament_id, user_id).stream().findFirst().orElse(null);
+    public Participant getTournamentParticipantById(Long tournament_id, Long participantId, Integer teamSize) {
+        if (teamSize > 1) {
+            final String sql = """
+              SELECT * FROM participant
+               INNER JOIN team ON participant.team_id = team.id
+               WHERE participant.tournament_id = ? 
+                 AND participant.team_id = ?
+              """;
+
+            return jdbcTemplate.query(sql, ROW_MAPPER_TEAM, tournament_id, participantId)
+                    .stream()
+                    .findFirst()
+                    .orElse(null);
+        } else {
+            final String sql = """
+              SELECT * FROM participant
+               INNER JOIN users ON participant.user_id = users.id
+               WHERE participant.tournament_id = ? 
+                 AND participant.user_id = ?
+              """;
+
+            return jdbcTemplate.query(sql, ROW_MAPPER_USER, tournament_id, participantId)
+                    .stream()
+                    .findFirst()
+                    .orElse(null);
+        }
     }
 
     @Override

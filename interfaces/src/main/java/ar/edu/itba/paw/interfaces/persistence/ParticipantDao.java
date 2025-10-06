@@ -12,7 +12,7 @@ public interface ParticipantDao {
 
     void joinTournamentTeam(Long tournamentId, Long teamId);
 
-    Participant getTournamentParticipantByUserId(Long tournament_id, Long user_id);
+    Participant getTournamentParticipantById(Long tournament_id, Long user_id, Integer teamSize);
 
     Boolean hasJoined(Long userId, Long tournamentId);
 

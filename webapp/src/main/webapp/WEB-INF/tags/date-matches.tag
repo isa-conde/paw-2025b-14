@@ -65,8 +65,8 @@
                 <paw:match-card
                     matchId="${match.id}"
                     tournamentId="${tournamentId}"
-                    localPlayer="${match.localPlayerName}"
-                    visitorPlayer="${match.visitorPlayerName}"
+                    localPlayer="${match.local}"
+                    visitorPlayer="${match.visitor}"
                     localPlayerId="${match.localId}"
                     visitorPlayerId="${match.visitorId}"
                     winner="${match.winner}"

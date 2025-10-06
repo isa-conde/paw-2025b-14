@@ -137,8 +137,6 @@ public class MatchJdbcDaoTest {
         Assert.assertEquals(Integer.valueOf(2),match.getWinner());
         Assert.assertEquals(Integer.valueOf(1),match.getStage());
         Assert.assertTrue(match.getIsGroupStage());
-        Assert.assertEquals(USERNAME,match.getLocalPlayerName());
-        Assert.assertEquals(OTHER_USERNAME,match.getVisitorPlayerName());
         Assert.assertEquals(Integer.valueOf(1),match.getGroupNumber());
     }
 
@@ -159,8 +157,6 @@ public class MatchJdbcDaoTest {
         Assert.assertNull(match.getWinner());
         Assert.assertEquals(1,match.getStage().intValue());
         Assert.assertFalse(match.getIsGroupStage());
-        Assert.assertEquals(USERNAME,match.getLocalPlayerName());
-        Assert.assertEquals(OTHER_USERNAME,match.getVisitorPlayerName());
         Assert.assertEquals(Integer.valueOf(0),match.getGroupNumber());
     }
 

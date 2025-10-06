@@ -79,9 +79,12 @@ public class MatchServiceImpl implements MatchService {
         if (matches.isEmpty()) {
             return Collections.emptyMap();
         }
+        Integer teamSize = ts.getPlayersPerTeam(tournamentId);
         Map<Integer, List<MatchInfo>> result = new TreeMap<>();
         Boolean isGroupStage = tournamentDao.getIsGroupStage(tournamentId);
         for (MatchInfo m : matches) {
+            m.setLocal(participantDao.getTournamentParticipantById(tournamentId, m.getLocalId(), teamSize));
+            m.setVisitor(participantDao.getTournamentParticipantById(tournamentId, m.getVisitorId(), teamSize));
             Integer stage = m.getStage();
             if (stage == null || (m.getIsGroupStage() != null && isGroupStage != null && m.getIsGroupStage() != isGroupStage)) {
                 continue;
