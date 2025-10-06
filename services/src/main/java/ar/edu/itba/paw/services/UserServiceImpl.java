@@ -10,6 +10,8 @@ import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.Token;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -28,6 +30,8 @@ import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private final UserDao userDao;
     private final TokenDao tokenDao;
@@ -64,6 +68,7 @@ public class UserServiceImpl implements UserService {
         if (userDao.checkEmailExists(email)){
             throw new EmailAlreadyUsedException(email);
         }
+        LOGGER.info("The user {} has been created with email {}", username, email);
         return userDao.create(username, email, passwordEncoder.encode(password));
     }
 
@@ -83,13 +88,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public void requestPasswordReset(String email, String baseUrl) {
         Optional<User> user = findByEmail(email);
-        if (user.isEmpty()) {
-            // TODO: handle unaffiliated email
-            return;
-        }
         long userId = user.get().getId();
         Token token = generateToken(userId, RESET_PASSWORD_DAYS_DURATION);
         ms.sendResetPasswordEmail(userId, token.getToken(), email, baseUrl);
+        LOGGER.info("Reset Password email correctly sent to the address {}", email);
     }
 
     @Transactional
@@ -97,13 +99,13 @@ public class UserServiceImpl implements UserService {
     public void sendVerificationEmail(String email, String baseUrl) {
         Optional<User> user = findByEmail(email);
         if(user.isEmpty()) {
-            // TODO: handle unaffiliated email
-            return;
+            throw new UserNotFoundException();
         }
         long userId = user.get().getId();
         String username = user.get().getUsername();
         Token token = generateToken(userId, VERIFICATION_DAYS_DURATION);
         ms.sendVerificationEmail(userId, username, token.getToken(), email, baseUrl);
+        LOGGER.info("Verification email correctly sent to the address {}", email);
     }
 
     @Transactional
@@ -112,6 +114,7 @@ public class UserServiceImpl implements UserService {
         Optional<Token> optToken = checkTokenValidity(token, userId);
         if(optToken.isPresent()) {
             userDao.changePassword(userId, passwordEncoder.encode(newPassword));
+            LOGGER.info("User {} has successfully changed their password", findById(userId).get().getUsername());
         }
         return optToken;
     }
@@ -146,6 +149,7 @@ public class UserServiceImpl implements UserService {
                 userDao.verifyUser(userId);
             }
         } else {
+            LOGGER.error("User with ID {} does not exist", userId);
             throw new UserNotFoundException();
         }
 
@@ -166,6 +170,7 @@ public class UserServiceImpl implements UserService {
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } else {
+            LOGGER.error("User with ID {} does not exist", userId);
             throw new UserNotFoundException();
         }
     }
@@ -175,6 +180,7 @@ public class UserServiceImpl implements UserService {
     public Optional<Token> checkTokenValidity(Long token, Long userId) {
         Optional<Token> optToken = tokenDao.findByToken(token);
         if(findById(userId).isEmpty()) {
+            LOGGER.error("User with ID {} does not exist", userId);
             throw new UserNotFoundException();
         }
         if(optToken.isPresent()) {
@@ -183,7 +189,13 @@ public class UserServiceImpl implements UserService {
                 if(foundToken.getExpiry_date().isAfter(LocalDate.now())) {
                     tokenDao.markAsUsed(foundToken.getId());
                     return optToken;
+                } else {
+                    LOGGER.warn("User with ID {} attempted to use an expired token", userId);
+                    // TODO: make new exception for expired token
                 }
+            } else {
+                LOGGER.warn("User with ID {} attempted to use another user's token", userId);
+                // TODO: make new exception for token not belonging to user
             }
         }
         return Optional.empty();
@@ -224,6 +236,7 @@ public class UserServiceImpl implements UserService {
             bannerId = user.get().getBanner_id();
         }
         userDao.updateProfileInfo(userId, username, bio, pfpId, bannerId);
+        LOGGER.info("Profile of user {} has been correctly updated", username);
     }
 
     @Transactional(readOnly = true)
@@ -231,16 +244,19 @@ public class UserServiceImpl implements UserService {
     public void sendTournamentJoinedEmail(String username, Long tournamentId, String tournamentLink, String recipient) {
         Optional<Tournament> tournamentOpt = tournamentDao.findById(tournamentId);
         if(tournamentOpt.isEmpty()) {
+            LOGGER.error("Tournament of ID {} does not exist", tournamentId);
             throw new TournamentNotFoundException();
         }
         Tournament tournament = tournamentOpt.get();
         User creator = findById(tournament.getCreator_id()).get();
         ms.sendTournamentJoinedEmail(username, tournament.getName(), tournamentLink, recipient, creator.getEmail());
+        LOGGER.info("Tournament joined email correctly sent to the address {}", recipient);
     }
 
     @Override
     public void sendTournamentCreatedEmail(String username, String tournamentName, String tournamentLink, String recipient) {
         ms.sendTournamentCreatedEmail(username, tournamentName, tournamentLink, recipient);
+        LOGGER.info("Tournament creation email correctly sent to the address {}", recipient);
     }
 
 }

@@ -4,7 +4,8 @@ import ar.edu.itba.paw.interfaces.persistence.*;
 import ar.edu.itba.paw.interfaces.services.TeamService;
 import ar.edu.itba.paw.model.Team;
 import ar.edu.itba.paw.model.Tournament.Tournament;
-import ar.edu.itba.paw.model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,11 +17,13 @@ import java.util.Optional;
 @Service
 public class TeamServiceImpl implements TeamService {
 
-    ImageDao imageDao;
-    TeamDao teamDao;
-    TeamMemberDao teamMemberDao;
-    UserDao userDao;
-    TournamentDao tournamentDao;
+    private final static Logger LOGGER = LoggerFactory.getLogger(TeamServiceImpl.class);
+
+    private final ImageDao imageDao;
+    private final TeamDao teamDao;
+    private final TeamMemberDao teamMemberDao;
+    private final UserDao userDao;
+    private final TournamentDao tournamentDao;
 
     public TeamServiceImpl(ImageDao imageDao, TeamDao teamDao, TeamMemberDao teamMemberDao, UserDao userDao, TournamentDao tournamentDao){
         this.imageDao = imageDao;
@@ -43,9 +46,11 @@ public class TeamServiceImpl implements TeamService {
         }
 
         Team team = teamDao.create(name, pfp_id, banner_id, owner_id);
+        LOGGER.info("The team {} has been successfully created", name);
 
         for (String s : members){
-            teamMemberDao.AddMember(team.getId(), userDao.findByUsername(s).get().getId());
+            teamMemberDao.addMember(team.getId(), userDao.findByUsername(s).get().getId()); // TODO: check if member is already in team?
+            LOGGER.info("User {} has been successfully added to team {}", s, name);
         }
 
         return team;

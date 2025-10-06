@@ -22,7 +22,7 @@ public class TeamMemberJdbcDao implements TeamMemberDao {
 
 
     @Override
-    public void AddMember(Long team_id, Long user_id) {
+    public void addMember(Long team_id, Long user_id) {
         Map<String, Object> values = Map.of("team_id", team_id, "user_id", user_id);
         jdbcInsert.execute(values);
     }

@@ -6,11 +6,14 @@ import ar.edu.itba.paw.interfaces.persistence.ParticipantDao;
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.interfaces.services.MatchService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
+import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.Match;
 import ar.edu.itba.paw.model.MatchInfo;
 import ar.edu.itba.paw.model.ParticipantUser;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.enums.Structure;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,16 +23,20 @@ import java.util.*;
 @Service
 public class MatchServiceImpl implements MatchService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MatchServiceImpl.class);
+
     private final MatchDao matchDao;
     private final ParticipantDao participantDao;
     private final TournamentDao tournamentDao;
     private final TournamentService ts;
+    private final UserService us;
 
-    public MatchServiceImpl(MatchDao matchDao, ParticipantDao participantDao, TournamentDao tournamentDao, TournamentService tournamentService) {
+    public MatchServiceImpl(MatchDao matchDao, ParticipantDao participantDao, TournamentDao tournamentDao, TournamentService tournamentService, UserService userService) {
         this.matchDao = matchDao;
         this.participantDao = participantDao;
         this.tournamentDao = tournamentDao;
         this.ts = tournamentService;
+        this.us = userService;
     }
 
     @Transactional
@@ -38,7 +45,7 @@ public class MatchServiceImpl implements MatchService {
         Match m1 = matchDao.getMatch(tournament_id, match1);
         Match m2 = matchDao.getMatch(tournament_id, match2);
         if (m1 == null || m2 == null) {
-            throw new IllegalArgumentException("Both matches must exist in the tournament");
+            throw new IllegalArgumentException("Both matches must exist in the tournament"); // TODO: custom handling
         }
 
         boolean u1IsLocalM1 = m1.getLocalId() != null && m1.getLocalId().equals(user1);
@@ -47,7 +54,7 @@ public class MatchServiceImpl implements MatchService {
         boolean u2IsVisitM2 = m2.getVisitorId() != null && m2.getVisitorId().equals(user2);
 
         if ((!u1IsLocalM1 && !u1IsVisitM1) || (!u2IsLocalM2 && !u2IsVisitM2)) {
-            throw new IllegalArgumentException("user1 must be in match1 and user2 must be in match2");
+            throw new IllegalArgumentException("user1 must be in match1 and user2 must be in match2"); // TODO: custom handling
         }
         if (u1IsLocalM1) {
             matchDao.updateMatchLocal(tournament_id, match1, user2);
@@ -59,6 +66,9 @@ public class MatchServiceImpl implements MatchService {
         } else {
             matchDao.updateMatchVisitor(tournament_id, match2, user1);
         }
+        String username1 = us.findById(user1).get().getUsername();
+        String username2 = us.findById(user2).get().getUsername();
+        LOGGER.info("User {} and {} have been successfully swapped matches", username1, username2);
     }
 
     @Override
@@ -104,9 +114,10 @@ public class MatchServiceImpl implements MatchService {
     @Override
     public void setMatchWinner(Long matchId, Long tournamentId, Integer winner) {
         if (winner == null || (winner != 1 && winner != 2)) {
-            throw new IllegalArgumentException("winner must be 1 (local) or 2 (visitor)");
+            throw new IllegalArgumentException("winner must be 1 (local) or 2 (visitor)"); // TODO: custom handling
         }
         if(hasWinner(matchId, tournamentId)) {
+            LOGGER.warn("Match with ID {} already has a winner", matchId);
             throw new MatchWinnerAlreadySetException();
         }
         matchDao.setMatchWinner(matchId, tournamentId, winner);
@@ -115,7 +126,7 @@ public class MatchServiceImpl implements MatchService {
         Long localId = match.getLocalId();
         Long visitorId = match.getVisitorId();
         if (localId == null || visitorId == null) {
-            throw new IllegalStateException("Cannot set winner for TBD matches");
+            throw new IllegalStateException("Cannot set winner for TBD matches"); // TODO: custom handling
         }
         Long winnerId = (winner == 1) ? localId : visitorId;
 
@@ -140,6 +151,7 @@ public class MatchServiceImpl implements MatchService {
         if (isFinished) {
             ts.setFinished(tournamentId, matchId);
         }
+        LOGGER.info("The winner of match with ID {} has been correctly set", matchId);
     }
 
     private void setNextMatchInfo(Long matchId, Long tournamentId, Long winnerId) {
