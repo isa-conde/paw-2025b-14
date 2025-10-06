@@ -8,6 +8,7 @@ import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -38,13 +39,34 @@ public class TournamentJdbcDao implements TournamentDao {
                 .usingGeneratedKeyColumns("id");
     }
 
-    private static final RowMapper<Tournament> ROW_MAPPER = (rs, rowNum) -> new Tournament(rs.getLong("id"),
-            rs.getLong("creator_id"), rs.getString("name"), rs.getLong("game_id"), Region.valueOf(rs.getString("region")),
-            Elo.valueOf(rs.getString("elo")), rs.getDate("start_date").toLocalDate(), rs.getDate("end_date").toLocalDate(),
-            rs.getString("format"), Structure.valueOf(rs.getString("structure")), rs.getInt("max_participants"), rs.getLong("image_id"),
-            rs.getBoolean("open_inscriptions"), rs.getBoolean("is_finished"), rs.getLong("tournament_winner"), rs.getBoolean("is_group_stage"), rs.getBoolean("tournament_started"), rs.getLong("format_id"));
+    private static final RowMapper<Tournament> ROW_MAPPER = (rs, rowNum) -> new Tournament(
+            rs.getLong("id"),
+            rs.getLong("creator_id"),
+            rs.getString("name"),
+            rs.getLong("game_id"),
+            Region.valueOf(rs.getString("region")),
+            Elo.valueOf(rs.getString("elo")),
+            rs.getDate("start_date").toLocalDate(),
+            rs.getDate("end_date").toLocalDate(),
+            rs.getString("format"),
+            Structure.valueOf(rs.getString("structure")),
+            rs.getInt("max_participants"),
+            rs.getLong("image_id"),
+            rs.getBoolean("open_inscriptions"),
+            rs.getBoolean("is_finished"),
+            rs.getLong("tournament_winner"),
+            rs.getBoolean("is_group_stage"),
+            rs.getBoolean("tournament_started"),
+            rs.getLong("format_id"));
 
-    private static final RowMapper<User> ROW_MAPPER_USER = (rs, rowNum) -> new User(rs.getLong("id"), rs.getString("username"), rs.getString("email"), rs.getString("password"), rs.getBoolean("verified"), rs.getString("bio"), rs.getLong("profile_picture_id"), rs.getLong("banner_id"));
+    private static final RowMapper<User> ROW_MAPPER_USER = (rs, rowNum) -> new User(rs.getLong("id"),
+            rs.getString("username"),
+            rs.getString("email"),
+            rs.getString("password"),
+            rs.getBoolean("verified"),
+            rs.getString("bio"),
+            rs.getLong("profile_picture_id"),
+            rs.getLong("banner_id"));
 
     @Override
     public Optional<Tournament> findById(Long id) {
@@ -63,8 +85,8 @@ public class TournamentJdbcDao implements TournamentDao {
                 .addValue("creator_id", creator_id)
                 .addValue("name", name)
                 .addValue("game_id", game_id)
-                .addValue("region", region, Types.OTHER)
-                .addValue("elo", elo, Types.OTHER)
+                .addValue("region", region.name(), Types.OTHER)
+                .addValue("elo", elo.name(), Types.OTHER)
                 .addValue("start_date", start_date)
                 .addValue("end_date", end_date)
                 .addValue("format", format)
@@ -83,8 +105,12 @@ public class TournamentJdbcDao implements TournamentDao {
     @Override
     public Boolean isTournamentStarted(Long tournamentId) {
         final String sql =
-                "SELECT COALESCE((SELECT tournament_started FROM tournament WHERE id = ?), FALSE)";
-        return jdbcTemplate.queryForObject(sql, Boolean.class, tournamentId);
+                "SELECT tournament_started FROM tournament WHERE id = ?";
+        try {
+            return jdbcTemplate.queryForObject(sql, Boolean.class, tournamentId);
+        }catch (DataAccessException e){
+            return false;
+        }
     }
 
     @Override
@@ -155,7 +181,7 @@ public class TournamentJdbcDao implements TournamentDao {
                 "WHERE p.user_id = ? AND t.is_finished = ?; ";
         return jdbcTemplate.query(sql, ROW_MAPPER, userId, isFinished);
     }
-
+// ward
     @Override
     public List<Tournament> findTournaments(TournamentFilter filter, Long page) {
         MapSqlParameterSource params = new MapSqlParameterSource();
@@ -228,7 +254,7 @@ public class TournamentJdbcDao implements TournamentDao {
         }
         return sql.toString();
     }
-
+//end ward
     @Override
     public List<Tournament> searchByName(String name){
         String sql = "SELECT * " +
@@ -241,25 +267,26 @@ public class TournamentJdbcDao implements TournamentDao {
     @Override
     public Map<Long,List<Tournament>> getUnfilteredTournamentPages(Long page) {
         String sql = """
-        WITH top_games AS (
-            SELECT g.id
-            FROM game g
-            JOIN tournament t2 ON g.id = t2.game_id
-            GROUP BY g.id
-            ORDER BY COUNT(t2.id) DESC
-            LIMIT 3 OFFSET ?
-        ),
-        ranked_tournaments AS (
-            SELECT t.*,
-                   ROW_NUMBER() OVER (PARTITION BY t.game_id ORDER BY t.start_date) AS rn
+            WITH top_games AS (
+                SELECT g.id
+                FROM game g
+                JOIN tournament t2 ON g.id = t2.game_id
+                GROUP BY g.id
+                ORDER BY COUNT(t2.id) DESC
+                LIMIT 3 OFFSET ?
+            )
+            SELECT t.*
             FROM tournament t
             WHERE t.game_id IN (SELECT id FROM top_games)
               AND t.open_inscriptions = true
-        )
-        SELECT *
-        FROM ranked_tournaments
-        WHERE rn <= 9
-        ORDER BY game_id, start_date
+              AND (
+                  SELECT COUNT(*)
+                  FROM tournament t2
+                  WHERE t2.game_id = t.game_id
+                    AND t2.start_date <= t.start_date
+                    AND t2.open_inscriptions = true
+              ) <= 9
+            ORDER BY t.game_id, t.start_date
         """;
         List<Tournament> tournaments = jdbcTemplate.query(sql, ROW_MAPPER, page * 3);
 
