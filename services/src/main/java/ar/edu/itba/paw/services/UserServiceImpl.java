@@ -207,7 +207,6 @@ public class UserServiceImpl implements UserService {
         }
 
         LocalDate expiryDate = LocalDate.now().plusDays(validityDays);
-
         return tokenDao.create(userId, tokenValue, expiryDate);
     }
 
