@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
@@ -112,7 +113,7 @@ public class UserJdbcDao implements UserDao {
 
     @Override
     public void updateUserLocale(String locale, Long userId) {
-        jdbcTemplate.update("UPDATE users SET locale = ? WHERE user_id = ?", locale, userId);
+        jdbcTemplate.update("UPDATE users SET locale = ? WHERE id = ?", locale, userId);
     }
 
 }

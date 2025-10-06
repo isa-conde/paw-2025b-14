@@ -15,14 +15,12 @@ import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
 import ar.edu.itba.paw.webapp.auth.PawUserDetails;
 import ar.edu.itba.paw.webapp.form.EditProfileForm;
-import ar.edu.itba.paw.webapp.form.EditTournamentForm;
 import ar.edu.itba.paw.webapp.form.FilterForm;
 import ar.edu.itba.paw.webapp.form.TournamentForm;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.LocaleContextResolver;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
@@ -69,25 +67,6 @@ public class UserController {
         return mav;
     }
 
-    @RequestMapping("/myTournaments")
-    public ModelAndView myTournaments(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam(value = "section", required = false) String section) {
-        final ModelAndView mav = new ModelAndView("myTournaments");
-
-        User user = currentUser.get().getPawUser();
-
-        List<Tournament> onGoingTournaments = ts.getCreatedAndOngoingTournaments(user.getId());
-        List<Tournament> finishedTournaments = ts.getCreatedAndFinishedTournaments(user.getId());
-        List<Tournament> joinedTournaments = ts.findUserActiveTournaments(user.getId());
-        List<Tournament> pastTournaments = ts.findUserPastTournaments(user.getId());
-
-        mav.addObject("user", user);
-        mav.addObject("pastTournaments", pastTournaments);
-        mav.addObject("onGoingTournaments", onGoingTournaments);
-        mav.addObject("finishedTournaments", finishedTournaments);
-        mav.addObject("joinedTournaments", joinedTournaments);
-
-        return mav;
-    }
 
     @RequestMapping("/gamesPage")
     public ModelAndView gamesPage(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam(defaultValue = "0") Long page) {
@@ -164,7 +143,8 @@ public class UserController {
         mav.addObject("isMyProfile", profile.getId() == currentUser.get().getPawUser().getId());
         mav.addObject("profile", profileOpt.get());
         mav.addObject("favouriteGames", gs.getFavourites(id));
-        mav.addObject("lastTournaments", ts.findUserActiveTournaments(id));
+        mav.addObject("lastTournaments", ts.findUserActiveTournaments(id, 1L));
+        mav.addObject("teams", tms.getUserTeams(id));
         mav.addObject("EditProfileForm", editProfileForm);
 
         editProfileForm.setUsername(profileOpt.get().getUsername());
@@ -176,6 +156,41 @@ public class UserController {
         if (!hasFormErrors) {
             editProfileForm.setUsername(profile.getUsername());
             editProfileForm.setBio(profile.getBio());
+        }
+
+        return mav;
+    }
+
+
+    @RequestMapping("/profile/{id}/tournaments")
+    public ModelAndView profileTournaments(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @PathVariable Long id, @RequestParam(value = "section", required = false, defaultValue = "active") String section, @RequestParam(defaultValue = "0") Long page1, @RequestParam(defaultValue = "0") Long page2) {
+        final ModelAndView mav = new ModelAndView("myTournaments");
+
+        Optional<User> profileOpt = us.findById(id);
+        if (profileOpt.isEmpty()){
+            throw new UserNotFoundException();
+        }
+        User profile = profileOpt.get();
+
+        List<Tournament> onGoingTournaments = ts.getCreatedAndOngoingTournaments(profile.getId(), page1);
+        List<Tournament> finishedTournaments = ts.getCreatedAndFinishedTournaments(profile.getId(), page1);
+        List<Tournament> joinedTournaments = ts.findUserActiveTournaments(profile.getId(), page1);
+        List<Tournament> pastTournaments = ts.findUserPastTournaments(profile.getId(), page2);
+
+
+
+        mav.addObject("user", currentUser.isPresent() ? currentUser.get().getPawUser() : null);
+        mav.addObject("profile", profile);
+        mav.addObject("pastTournaments", pastTournaments);
+        mav.addObject("onGoingTournaments", onGoingTournaments);
+        mav.addObject("finishedTournaments", finishedTournaments);
+        mav.addObject("joinedTournaments", joinedTournaments);
+        mav.addObject("currentPage1", page1);
+        mav.addObject("currentPage2", page2);
+        mav.addObject("totalPages1", ts.getPagesBySection(profile.getId(), section));
+        if (section.equals("owned")){
+            mav.addObject("totalPages1", ts.getPagesBySection(profile.getId(), section + "Ongoing"));
+            mav.addObject("totalPages2", ts.getPagesBySection(profile.getId(), section + "Finished"));
         }
 
         return mav;

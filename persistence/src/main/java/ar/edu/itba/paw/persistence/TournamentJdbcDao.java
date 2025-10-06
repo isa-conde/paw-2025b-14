@@ -59,15 +59,6 @@ public class TournamentJdbcDao implements TournamentDao {
             rs.getBoolean("tournament_started"),
             rs.getLong("format_id"));
 
-    private static final RowMapper<User> ROW_MAPPER_USER = (rs, rowNum) -> new User(rs.getLong("id"),
-            rs.getString("username"),
-            rs.getString("email"),
-            rs.getString("password"),
-            rs.getBoolean("verified"),
-            rs.getString("bio"),
-            rs.getLong("profile_picture_id"),
-            rs.getLong("banner_id"));
-
     @Override
     public Optional<Tournament> findById(Long id) {
         return jdbcTemplate.query("SELECT * FROM tournament WHERE id = ?", ROW_MAPPER, id).stream().findFirst();
@@ -128,8 +119,27 @@ public class TournamentJdbcDao implements TournamentDao {
     }
 
     @Override
-    public List<Tournament> findByCreator(Long creator_id) {
-        return jdbcTemplate.query("SELECT * FROM tournament t WHERE creator_id = ?", ROW_MAPPER, creator_id);
+    public Integer getCreatedAndFinishedTournamentsPages(Long userId) {
+        int count = countCreatedTournaments(userId, true);
+        return (int) Math.ceil(count / 9.0);
+    }
+
+    @Override
+    public Integer getCreatedAndOngoingTournamentsPages(Long userId) {
+        int count = countCreatedTournaments(userId, false);
+        return (int) Math.ceil(count / 9.0);
+    }
+
+
+    private int countCreatedTournaments(Long userId, boolean isFinished) {
+        String sql = "SELECT COUNT(*) FROM tournament WHERE creator_id = ? AND is_finished = ?";
+        return jdbcTemplate.queryForObject(sql, Integer.class, userId, isFinished);
+    }
+
+
+    @Override
+    public List<Tournament> findByCreator(Long creator_id, Long page) {
+        return jdbcTemplate.query("SELECT * FROM tournament t WHERE creator_id = ? LIMIT 9 OFFSET ?", ROW_MAPPER, creator_id, 9*page);
     }
 
     @Override
@@ -165,23 +175,45 @@ public class TournamentJdbcDao implements TournamentDao {
     }
 
     @Override
-    public List<Tournament> findUserActiveTournaments(Long userId) {
-        return findUserTournaments(userId, false);
+    public List<Tournament> findUserActiveTournaments(Long userId, Long page) {
+        return findUserTournaments(userId, false, page);
     }
 
     @Override
-    public List<Tournament> findUserPastTournaments(Long userId) {
-        return findUserTournaments(userId, true);
+    public List<Tournament> findUserPastTournaments(Long userId, Long page) {
+        return findUserTournaments(userId, true, page);
     }
 
-    private List<Tournament> findUserTournaments(Long userId, Boolean isFinished) {
+    private List<Tournament> findUserTournaments(Long userId, Boolean isFinished, Long page) {
         String sql = "SELECT t.* " +
                 "FROM tournament t " +
                 "INNER JOIN participant p ON p.tournament_id = t.id " +
-                "WHERE p.user_id = ? AND t.is_finished = ?; ";
-        return jdbcTemplate.query(sql, ROW_MAPPER, userId, isFinished);
+                "WHERE p.user_id = ? AND t.is_finished = ? " +
+                "LIMIT 9 OFFSET ?; ";
+        return jdbcTemplate.query(sql, ROW_MAPPER, userId, isFinished, 9*page);
     }
-// ward
+
+    private int countUserTournaments(Long userId, Boolean isFinished) {
+        String sql = "SELECT COUNT(*) " +
+                "FROM tournament t " +
+                "INNER JOIN participant p ON p.tournament_id = t.id " +
+                "WHERE p.user_id = ? AND t.is_finished = ?";
+        return jdbcTemplate.queryForObject(sql, Integer.class, userId, isFinished);
+    }
+
+    @Override
+    public Integer getUserActiveTournamentsPages(Long userId) {
+        int count = countUserTournaments(userId, false);
+        return (int) Math.ceil(count / 9.0);
+    }
+
+    @Override
+    public Integer getUserPastTournamentsPages(Long userId) {
+        int count = countUserTournaments(userId, true);
+        return (int) Math.ceil(count / 9.0);
+    }
+
+
     @Override
     public List<Tournament> findTournaments(TournamentFilter filter, Long page) {
         MapSqlParameterSource params = new MapSqlParameterSource();

@@ -22,17 +22,48 @@
     </paw:banner>
 
         <div class="content-container">
-            <!-- Sección central: carruseles -->
             <div class="profile-main">
                 <div class="carrousel-title">
                     <paw:text size="xl"><spring:message code="profile.favouriteGames.title"/></paw:text>
                 </div>
-                <paw:carrousel id="games" elements="${favouriteGames}" isGame="true"/>
+                <c:choose>
+                    <c:when test="${favouriteGames.size() > 0}">
+                        <paw:carrousel id="games" elements="${favouriteGames}" isGame="true"/>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="no-cards-container">
+                            <paw:text weight="thin"><spring:message code="profile.favouriteGames.empty" arguments="${profile.username}"/></paw:text>
+                        </div>
+                    </c:otherwise>
+                </c:choose>
 
                 <div class="carrousel-title">
                     <paw:text size="xl"><spring:message code="profile.lastTournaments.title"/></paw:text>
                 </div>
-                <paw:carrousel id="tourneys" elements="${lastTournaments}"/>
+                <c:choose>
+                    <c:when test="${lastTournaments.size() > 0}">
+                        <paw:carrousel id="lastTournaments" elements="${lastTournaments}"/>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="no-cards-container">
+                            <paw:text weight="thin"><spring:message code="profile.lastTournaments.empty" arguments="${profile.username}"/></paw:text>
+                        </div>
+                    </c:otherwise>
+                </c:choose>
+
+                <div class="carrousel-title">
+                    <paw:text type="title" size="s"><spring:message code="profile.teams.title"/></paw:text>
+                </div>
+                <c:choose>
+                    <c:when test="${teams.size() > 0}">
+                        <paw:carrousel id="team-list" elements="${teams}" isTeamProfile="${true}"/>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="no-cards-container">
+                            <paw:text weight="thin"><spring:message code="profile.teams.empty" arguments="${profile.username}"/></paw:text>
+                        </div>
+                    </c:otherwise>
+                </c:choose>
             </div>
         </div>
 

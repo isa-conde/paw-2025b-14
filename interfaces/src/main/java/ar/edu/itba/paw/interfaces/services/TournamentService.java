@@ -22,15 +22,15 @@ public interface TournamentService {
 
     Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, byte[] image_id, Boolean openInscriptions, Boolean isFinished, Long format_id);
 
-    List<Tournament> findByCreator(Long creator_id);
+    List<Tournament> findByCreator(Long creator_id, Long page);
 
     void setFinished(Long tournament_id, Long match_id);
 
     void closeInscriptions(Long tournament_id);
 
-    List<Tournament> findUserActiveTournaments(Long userId);
+    List<Tournament> findUserActiveTournaments(Long userId, Long page);
 
-    List<Tournament> findUserPastTournaments(Long userId);
+    List<Tournament> findUserPastTournaments(Long userId, Long page);
 
     List<Tournament> searchByName(String name);
 
@@ -46,9 +46,13 @@ public interface TournamentService {
 
     void createBracketFromGroups(Long tournamentId, Long lastMatchId);
 
-    List<Tournament> getCreatedAndFinishedTournaments(Long userId);
+    List<Tournament> getCreatedAndFinishedTournaments(Long userId, Long page);
 
-    List<Tournament> getCreatedAndOngoingTournaments(Long userId);
+    List<Tournament> getCreatedAndOngoingTournaments(Long userId, Long page);
 
     Integer getPlayersPerTeam(Long tournamentId);
+
+    Integer getPagesBySection(Long userId, String section);
 }
+
+

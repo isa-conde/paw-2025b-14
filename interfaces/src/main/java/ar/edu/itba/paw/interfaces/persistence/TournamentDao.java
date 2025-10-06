@@ -23,13 +23,13 @@ public interface TournamentDao {
 
     Structure getTournamentStructure(Long tournament_id);
 
-    List<Tournament> findByCreator(Long creator_id);
+    List<Tournament> findByCreator(Long creator_id, Long page);
 
     void setFinished(Long tournament_id);
 
-    List<Tournament> findUserActiveTournaments(Long userId);
+    List<Tournament> findUserActiveTournaments(Long userId, Long page);
 
-    List<Tournament> findUserPastTournaments(Long userId);
+    List<Tournament> findUserPastTournaments(Long userId, Long page);
 
     void closeInscriptions(Long tournament_id);
 
@@ -58,4 +58,14 @@ public interface TournamentDao {
     void updateAllEndDates();
 
     boolean isClosed(Long tournamentId);
-}
+
+    public Integer getUserPastTournamentsPages(Long userId);
+
+    public Integer getUserActiveTournamentsPages(Long userId);
+
+    public Integer getCreatedAndOngoingTournamentsPages(Long userId);
+
+    public Integer getCreatedAndFinishedTournamentsPages(Long userId);
+
+
+    }

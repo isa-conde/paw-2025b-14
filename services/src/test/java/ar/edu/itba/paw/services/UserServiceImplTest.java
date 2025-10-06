@@ -52,7 +52,7 @@ public class UserServiceImplTest{
         Mockito.when(mockUserDao.checkEmailExists(EMAIL))
                 .thenReturn(false);
         Mockito.when(mockUserDao.create(Mockito.eq(USERNAME),Mockito.eq(EMAIL),Mockito.eq(PASSWORD)))
-                .thenReturn(new User(1,USERNAME,EMAIL,PASSWORD, false, null, 1L, 1L));
+                .thenReturn(new User(1,USERNAME,EMAIL,PASSWORD, false, null, 1L, 1L, "PLACEHOLDER"));
 
         User maybeUser = userService.create(USERNAME,EMAIL,PASSWORD);
 
@@ -84,7 +84,7 @@ public class UserServiceImplTest{
     @Test
     public void testSameAsOldPassword(){
         Mockito.when(mockUserDao.findById(1L))
-                .thenReturn(Optional.of(new User(1L,USERNAME,EMAIL,PASSWORD, false, null, 1L, 1L)));
+                .thenReturn(Optional.of(new User(1L,USERNAME,EMAIL,PASSWORD, false, null, 1L, 1L, "PLACEHOLDER")));
         Mockito.when(passwordEncoder.matches(PASSWORD,PASSWORD)).thenReturn(true);
 
         boolean ans = userService.sameAsOldPassword(PASSWORD,1L);
@@ -95,7 +95,7 @@ public class UserServiceImplTest{
     @Test
     public void testSameAsNoPassword(){
         Mockito.when(mockUserDao.findById(1L))
-                .thenReturn(Optional.of(new User(1L,USERNAME,EMAIL,null, false, null, 1L, 1L)));
+                .thenReturn(Optional.of(new User(1L,USERNAME,EMAIL,null, false, null, 1L, 1L, "PLACEHOLDER")));
 
         boolean ans = userService.sameAsOldPassword(PASSWORD,1L);
 
@@ -105,7 +105,7 @@ public class UserServiceImplTest{
     @Test
     public void testNotTheOldPassword(){
         Mockito.when(mockUserDao.findById(1L))
-                .thenReturn(Optional.of(new User(1L,USERNAME,EMAIL,PASSWORD, false, null, 1L, 1L)));
+                .thenReturn(Optional.of(new User(1L,USERNAME,EMAIL,PASSWORD, false, null, 1L, 1L, "PLACEHOLDER")));
         Mockito.when(passwordEncoder.matches(PASSWORD,PASSWORD)).thenReturn(false);
 
         boolean ans = userService.sameAsOldPassword(PASSWORD,1L);

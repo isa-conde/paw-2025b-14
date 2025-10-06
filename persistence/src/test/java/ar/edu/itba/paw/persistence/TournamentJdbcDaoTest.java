@@ -332,7 +332,7 @@ public class TournamentJdbcDaoTest {
                 .addValue("tournament_started", false)
                 .addValue("format_id", ID);
         jdbcInsert.execute(values);
-        List<Tournament> tournaments = tournamentJdbcDao.findByCreator(ID);
+        List<Tournament> tournaments = tournamentJdbcDao.findByCreator(ID, 1L);
 
         Assert.assertNotNull(tournaments);
         Assert.assertEquals(2, tournaments.size());
@@ -341,7 +341,7 @@ public class TournamentJdbcDaoTest {
 
     @Test
     public void testFindByCreatorNone(){
-        List<Tournament> tournaments = tournamentJdbcDao.findByCreator(-1L);
+        List<Tournament> tournaments = tournamentJdbcDao.findByCreator(-1L, 1L);
 
         Assert.assertNotNull(tournaments);
         Assert.assertTrue(tournaments.isEmpty());
@@ -703,7 +703,7 @@ public class TournamentJdbcDaoTest {
                 .withTableName("participant");
         participantInsert.execute(Map.of("id",ID,"user_id", ID, "tournament_id", OTHER_ID, "points", 0));
         participantInsert.execute(Map.of("id",ID+1,"user_id", ID, "tournament_id", OTHER_ID+1, "points", 0));
-        List<Tournament> list = tournamentJdbcDao.findUserActiveTournaments(ID);
+        List<Tournament> list = tournamentJdbcDao.findUserActiveTournaments(ID, 1L);
 
         Assert.assertNotNull(list);
         Assert.assertFalse(list.isEmpty());
@@ -737,7 +737,7 @@ public class TournamentJdbcDaoTest {
                 .withTableName("participant");
         participantInsert.execute(Map.of("id",ID,"user_id", ID, "tournament_id", OTHER_ID, "points", 0));
         participantInsert.execute(Map.of("id",ID+1,"user_id", ID, "tournament_id", OTHER_ID+1, "points", 0));
-        List<Tournament> list = tournamentJdbcDao.findUserPastTournaments(ID);
+        List<Tournament> list = tournamentJdbcDao.findUserPastTournaments(ID, 1L);
 
         Assert.assertNotNull(list);
         Assert.assertFalse(list.isEmpty());
