@@ -359,7 +359,7 @@ body, html {
     content: "";
     position: absolute;
     inset: 0;
-    background-image: url('/images/crown.png');
+    background-image: url('../images/crown.png');
     background-repeat: repeat;
     background-size: 250px 250px;
     background-position: 0 -50px;

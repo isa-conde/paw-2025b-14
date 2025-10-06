@@ -92,10 +92,13 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public void setFinished(Long tournament_id, Long lastMatchId) { // TODO: check for possible error handling
         Tournament t = findById(tournament_id).orElse(null);
-        Long winner;
+        Long winner = null;
         if (t != null) {
             if (t.getStructure() == Structure.LEAGUE) {
                 List<Participant> tops = getLeagueTournamentTopPositions(tournament_id);
+                if(tops.isEmpty()) {
+                    LOGGER.debug("Top positions list for league format is empty");
+                }
                 if (tops.size() > 1) {
                     createMatchesLeague(t, tops, lastMatchId + 1, matchDao.getTournamentMaxStage(tournament_id) + 1, null);
                     return;
@@ -108,6 +111,15 @@ public class TournamentServiceImpl implements TournamentService {
             LOGGER.info("User with ID {} has won the tournament with ID {}", winner, tournament_id);
             tournamentDao.setFinished(tournament_id);
             LOGGER.info("Tournament with ID {} has successfully ended", tournament_id);
+        }
+        List<Participant> participants = participantDao.getTournamentParticipantUsers(tournament_id);
+        for(Participant p : participants){
+            User user = userDao.findById(p.getId()).get();
+            if(p.getId().equals(winner)) {
+                ms.sendTournamentWinnerEmail(tournament_id, user.getUsername(), t.getName(), user.getEmail());
+            } else {
+                ms.sendTournamentEndedEmail(tournament_id, user.getUsername(), t.getName(), user.getEmail());
+            }
         }
     }
 
@@ -125,7 +137,14 @@ public class TournamentServiceImpl implements TournamentService {
             LOGGER.warn("The inscriptions for the tournament with ID {} have already been closed", tournament_id);
             throw new TournamentAlreadyClosedException();
         }
-        createMatches(tournament_id, participantDao.getTournamentParticipantUsers(tournament_id));
+        Integer teamSize = getPlayersPerTeam(tournament_id);
+        List<Participant> participants;
+        if (teamSize > 1){
+            participants = participantDao.getTournamentParticipantTeams(tournament_id);
+        }else {
+            participants = participantDao.getTournamentParticipantUsers(tournament_id);
+        }
+        createMatches(tournament_id, participants);
         tournamentDao.closeInscriptions(tournament_id);
         LOGGER.info("The inscriptions for the tournament with ID {} have been successfully closed", tournament_id);
     }
@@ -156,7 +175,7 @@ public class TournamentServiceImpl implements TournamentService {
         tournamentDao.startTournament(tournament_id);
         LOGGER.info("The tournament with ID {} has successfully been started", tournament_id);
         Tournament t = optTournament.get();
-        if(t.getStructure().equals(Structure.HYBRID)){
+        if(t.getStructure().equals(Structure.HYBRID) && t.getIs_group_stage()){
             createGroupStageMatches(t);
         }
         List<Participant> participants = participantDao.getTournamentParticipantUsers(tournament_id);
@@ -304,7 +323,7 @@ public class TournamentServiceImpl implements TournamentService {
                 List<Participant> group = new ArrayList<>(participants.subList(index, index + size));
                 Long[] ids = group.stream().map(Participant::getId).toArray(Long[]::new);
                 int groupNumber = g + 1;
-                participantDao.updateGroupNumberForUsers(t.getId(), groupNumber, Arrays.asList(ids),teamSize);
+                participantDao.updateGroupNumberForUsers(t.getId(), groupNumber, Arrays.asList(ids), teamSize);
                 index += size;
             }
         }else{
@@ -350,13 +369,10 @@ public class TournamentServiceImpl implements TournamentService {
                 createMatchesLeague(t, topPositions.get(1), lastMatchId + 1, matchDao.getTournamentGroupMaxStage(tournamentId, i) + 1, true);
                 return;
             }else if(topPositions.get(2).size() > 1){
-                participantDao.sumPoints(tournamentId, topPositions.get(1).getFirst().getId(), 3 * (topPositions.get(2).size() / 2));
+                participantDao.sumPoints(tournamentId, topPositions.get(1).getFirst().getId(), 3 * (topPositions.get(2).size() / 2), getPlayersPerTeam(tournamentId));
                 createMatchesLeague(t, topPositions.get(2), lastMatchId + 1, matchDao.getTournamentGroupMaxStage(tournamentId, i) + 1, true);
                 return;
             }
-            System.out.println("Error in bracket creation group " + i);
-            System.out.println("topPositions.get(1) " + topPositions.get(1));
-            System.out.println("topPositions.get(2) " + topPositions.get(2));
             if(topPositions.get(1).isEmpty() || topPositions.get(2).isEmpty()){
                 return;
             }

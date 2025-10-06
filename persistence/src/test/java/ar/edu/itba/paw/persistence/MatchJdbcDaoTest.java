@@ -122,7 +122,7 @@ public class MatchJdbcDaoTest {
 
     @Test
     public void testGetTournamentMatches(){
-        List<MatchInfo> ans = matchJdbcDao.getTournamentMatches(OTHER_ID);
+        List<MatchInfo> ans = matchJdbcDao.getTournamentMatches(OTHER_ID, 1);
 
         Assert.assertNotNull(ans);
         Assert.assertFalse(ans.isEmpty());
@@ -137,14 +137,12 @@ public class MatchJdbcDaoTest {
         Assert.assertEquals(Integer.valueOf(2),match.getWinner());
         Assert.assertEquals(Integer.valueOf(1),match.getStage());
         Assert.assertTrue(match.getIsGroupStage());
-        Assert.assertEquals(USERNAME,match.getLocalPlayerName());
-        Assert.assertEquals(OTHER_USERNAME,match.getVisitorPlayerName());
         Assert.assertEquals(Integer.valueOf(1),match.getGroupNumber());
     }
 
     @Test
     public void testGetTournamentMatchesNoGroup(){
-        List<MatchInfo> ans = matchJdbcDao.getTournamentMatches(OTHER_ID+1);
+        List<MatchInfo> ans = matchJdbcDao.getTournamentMatches(OTHER_ID+1, 1);
 
         Assert.assertNotNull(ans);
         Assert.assertFalse(ans.isEmpty());
@@ -159,14 +157,12 @@ public class MatchJdbcDaoTest {
         Assert.assertNull(match.getWinner());
         Assert.assertEquals(1,match.getStage().intValue());
         Assert.assertFalse(match.getIsGroupStage());
-        Assert.assertEquals(USERNAME,match.getLocalPlayerName());
-        Assert.assertEquals(OTHER_USERNAME,match.getVisitorPlayerName());
         Assert.assertEquals(Integer.valueOf(0),match.getGroupNumber());
     }
 
     @Test
     public void testGetNoMatches(){
-        List<MatchInfo> ans = matchJdbcDao.getTournamentMatches(ID);
+        List<MatchInfo> ans = matchJdbcDao.getTournamentMatches(ID, 1);
 
         Assert.assertNotNull(ans);
         Assert.assertTrue(ans.isEmpty());

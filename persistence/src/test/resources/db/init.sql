@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS users(
     verified BOOLEAN DEFAULT false NOT NULL,
     bio varchar(255),
     profile_picture_id integer,
-    banner_id integer
+    banner_id integer,
+    locale varchar(100)
 );
 
 create table if not exists user_favourites(

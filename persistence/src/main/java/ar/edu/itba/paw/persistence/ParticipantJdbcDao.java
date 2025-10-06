@@ -3,6 +3,8 @@ package ar.edu.itba.paw.persistence;
 import ar.edu.itba.paw.interfaces.persistence.ParticipantDao;
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.model.Participant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -22,6 +24,8 @@ import java.util.stream.Collectors;
 
 @Repository
 public class ParticipantJdbcDao implements ParticipantDao {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(ParticipantJdbcDao.class);
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
@@ -50,8 +54,6 @@ public class ParticipantJdbcDao implements ParticipantDao {
             rs.getInt("group_number"),
             rs.getLong("profile_picture_id")
     );
-
-
 
     @Override
     public List<Participant> getTournamentParticipantUsers(Long tournament_id) {
@@ -99,11 +101,32 @@ public class ParticipantJdbcDao implements ParticipantDao {
     }
 
     @Override
-    public Participant getTournamentParticipantByUserId(Long tournament_id, Long user_id) {
-        return jdbcTemplate.query("SELECT * FROM participant " +
-                        "INNER JOIN users ON participant.user_id = users.id " +
-                        "WHERE tournament_id = ? AND user_id = ?",
-                                       ROW_MAPPER_USER, tournament_id, user_id).stream().findFirst().orElse(null);
+    public Participant getTournamentParticipantById(Long tournament_id, Long participantId, Integer teamSize) {
+        if (teamSize > 1) {
+            final String sql = """
+              SELECT * FROM participant
+               INNER JOIN team ON participant.team_id = team.id
+               WHERE participant.tournament_id = ? 
+                 AND participant.team_id = ?
+              """;
+
+            return jdbcTemplate.query(sql, ROW_MAPPER_TEAM, tournament_id, participantId)
+                    .stream()
+                    .findFirst()
+                    .orElse(null);
+        } else {
+            final String sql = """
+              SELECT * FROM participant
+               INNER JOIN users ON participant.user_id = users.id
+               WHERE participant.tournament_id = ? 
+                 AND participant.user_id = ?
+              """;
+
+            return jdbcTemplate.query(sql, ROW_MAPPER_USER, tournament_id, participantId)
+                    .stream()
+                    .findFirst()
+                    .orElse(null);
+        }
     }
 
     @Override
@@ -164,10 +187,17 @@ public class ParticipantJdbcDao implements ParticipantDao {
 
     @Override
     public Integer getTournamentMaxPointsGroup(Long tournamentId, Integer group){
-        return jdbcTemplate.queryForObject(
-                "SELECT MAX(points) FROM participant WHERE tournament_id = ? AND group_number = ?",
-                Integer.class, tournamentId, group
-        );
+        if (group == null) {
+            return jdbcTemplate.queryForObject(
+                    "SELECT COALESCE(MAX(points), 0) FROM participant WHERE tournament_id = ?",
+                    Integer.class, tournamentId
+            );
+        } else {
+            return jdbcTemplate.queryForObject(
+                    "SELECT COALESCE(MAX(points), 0) FROM participant WHERE tournament_id = ? AND group_number = ?",
+                    Integer.class, tournamentId, group
+            );
+        }
     }
 
     @Override
@@ -256,7 +286,17 @@ public class ParticipantJdbcDao implements ParticipantDao {
     }
 
     @Override
-    public void sumPoints(Long tournamentId, Long userId, Integer points){
-        jdbcTemplate.update("UPDATE participant SET points = points + ? WHERE user_id = ?", points, userId);
+    public void sumPoints(Long tournamentId, Long userId, Integer points, Integer teamSize) {
+        if (teamSize != null && teamSize > 1) {
+            jdbcTemplate.update(
+                    "UPDATE participant SET points = points + ? WHERE team_id = ? AND tournament_id = ? AND user_id IS NULL",
+                    points, userId, tournamentId
+            );
+        } else {
+            jdbcTemplate.update(
+                    "UPDATE participant SET points = points + ? WHERE user_id = ? AND tournament_id = ?",
+                    points, userId, tournamentId
+            );
+        }
     }
 }

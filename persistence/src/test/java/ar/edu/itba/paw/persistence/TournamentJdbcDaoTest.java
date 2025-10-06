@@ -25,10 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = TestConfig.class)
@@ -743,5 +740,383 @@ public class TournamentJdbcDaoTest {
         Assert.assertFalse(list.isEmpty());
         Assert.assertEquals(1,list.size());
         Assert.assertEquals(OTHER_ID+1,list.get(0).getId().longValue());
+    }
+
+    @Test
+    public void testFindTournamentsWithNameAndFormatFilter() {
+        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("tournament");
+        SqlParameterSource values = new MapSqlParameterSource()
+                .addValue("id", OTHER_ID + 1)
+                .addValue("creator_id", ID)
+                .addValue("name", "Different Tournament")
+                .addValue("game_id", ID)
+                .addValue("region", REGION)
+                .addValue("elo", ELO)
+                .addValue("start_date", START_DATE)
+                .addValue("end_date", END_DATE)
+                .addValue("format", FORMAT)
+                .addValue("structure", STRUCTURE)
+                .addValue("max_participants", MAX_PARTICIPANTS)
+                .addValue("image_id", ID)
+                .addValue("open_inscriptions", true)
+                .addValue("is_finished", false)
+                .addValue("tournament_started", false)
+                .addValue("format_id", ID);
+        jdbcInsert.execute(values);
+        values = new MapSqlParameterSource()
+                .addValue("id", ID)
+                .addValue("creator_id", ID)
+                .addValue("name", NAME + " 2")
+                .addValue("game_id", ID)
+                .addValue("region", REGION)
+                .addValue("elo", ELO)
+                .addValue("start_date", START_DATE)
+                .addValue("end_date", END_DATE)
+                .addValue("format", "otro")
+                .addValue("structure", STRUCTURE)
+                .addValue("max_participants", MAX_PARTICIPANTS)
+                .addValue("image_id", ID)
+                .addValue("open_inscriptions", true)
+                .addValue("is_finished", false)
+                .addValue("tournament_started", false)
+                .addValue("format_id", ID);
+        jdbcInsert.execute(values);
+
+        TournamentFilter filter = new TournamentFilter();
+        filter.setName(NAME);
+        filter.setFormat(FORMAT);
+        List<Tournament> tournaments = tournamentJdbcDao.findTournaments(filter, 0L);
+
+        Assert.assertNotNull(tournaments);
+        Assert.assertEquals(1, tournaments.size());
+        Assert.assertEquals(NAME, tournaments.get(0).getName());
+        Assert.assertEquals(FORMAT, tournaments.get(0).getFormat());
+    }
+
+    @Test
+    public void testFindTournamentsWithGameIdAndEloFilter() {
+        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("tournament");
+        SqlParameterSource values = new MapSqlParameterSource()
+                .addValue("id", OTHER_ID + 1)
+                .addValue("creator_id", ID)
+                .addValue("name", NAME)
+                .addValue("game_id", OTHER_ID)
+                .addValue("region", REGION)
+                .addValue("elo", ELO)
+                .addValue("start_date", START_DATE)
+                .addValue("end_date", END_DATE)
+                .addValue("format", FORMAT)
+                .addValue("structure", STRUCTURE)
+                .addValue("max_participants", MAX_PARTICIPANTS)
+                .addValue("image_id", ID)
+                .addValue("open_inscriptions", true)
+                .addValue("is_finished", false)
+                .addValue("tournament_started", false)
+                .addValue("format_id", ID);
+        jdbcInsert.execute(values);
+        values = new MapSqlParameterSource()
+                .addValue("id", ID)
+                .addValue("creator_id", ID)
+                .addValue("name", NAME)
+                .addValue("game_id", ID)
+                .addValue("region", REGION)
+                .addValue("elo", Elo.HIGH)
+                .addValue("start_date", START_DATE)
+                .addValue("end_date", END_DATE)
+                .addValue("format", FORMAT)
+                .addValue("structure", STRUCTURE)
+                .addValue("max_participants", MAX_PARTICIPANTS)
+                .addValue("image_id", ID)
+                .addValue("open_inscriptions", true)
+                .addValue("is_finished", false)
+                .addValue("tournament_started", false)
+                .addValue("format_id", ID);
+        jdbcInsert.execute(values);
+
+        TournamentFilter filter = new TournamentFilter();
+        filter.setGame_id(ID);
+        filter.setElo(ELO);
+        List<Tournament> tournaments = tournamentJdbcDao.findTournaments(filter, 0L);
+
+        Assert.assertNotNull(tournaments);
+        Assert.assertEquals(1, tournaments.size());
+        Assert.assertEquals(ID, tournaments.get(0).getGame_id());
+        Assert.assertEquals(ELO, tournaments.get(0).getElo());
+    }
+
+    @Test
+    public void testFindTournamentsWithRegionAndStructureFilter() {
+        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("tournament");
+        SqlParameterSource values = new MapSqlParameterSource()
+                .addValue("id", OTHER_ID + 1)
+                .addValue("creator_id", ID)
+                .addValue("name", NAME)
+                .addValue("game_id", ID)
+                .addValue("region", Region.LAN)
+                .addValue("elo", ELO)
+                .addValue("start_date", START_DATE)
+                .addValue("end_date", END_DATE)
+                .addValue("format", FORMAT)
+                .addValue("structure", STRUCTURE)
+                .addValue("max_participants", MAX_PARTICIPANTS)
+                .addValue("image_id", ID)
+                .addValue("open_inscriptions", true)
+                .addValue("is_finished", false)
+                .addValue("tournament_started", false)
+                .addValue("format_id", ID);
+        jdbcInsert.execute(values);
+        values = new MapSqlParameterSource()
+                .addValue("id", ID)
+                .addValue("creator_id", ID)
+                .addValue("name", NAME)
+                .addValue("game_id", ID)
+                .addValue("region", REGION)
+                .addValue("elo", ELO)
+                .addValue("start_date", START_DATE)
+                .addValue("end_date", END_DATE)
+                .addValue("format", FORMAT)
+                .addValue("structure", Structure.HYBRID)
+                .addValue("max_participants", MAX_PARTICIPANTS)
+                .addValue("image_id", ID)
+                .addValue("open_inscriptions", true)
+                .addValue("is_finished", false)
+                .addValue("tournament_started", false)
+                .addValue("format_id", ID);
+        jdbcInsert.execute(values);
+
+        TournamentFilter filter = new TournamentFilter();
+        filter.setRegion(REGION);
+        filter.setStructure(STRUCTURE);
+        List<Tournament> tournaments = tournamentJdbcDao.findTournaments(filter, 0L);
+
+        Assert.assertNotNull(tournaments);
+        Assert.assertEquals(1, tournaments.size());
+        Assert.assertEquals(REGION, tournaments.get(0).getRegion());
+        Assert.assertEquals(STRUCTURE, tournaments.get(0).getStructure());
+    }
+
+    @Test
+    public void testFindTournamentsWithGenreAndPlayersPerTeamFilter() {
+        SimpleJdbcInsert formatInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("game_format");
+        formatInsert.execute(Map.of("id", OTHER_ID, "name", FORMAT, "players_per_team", 4, "game_id", OTHER_ID+1));
+        formatInsert.execute(Map.of("id", OTHER_ID+1, "name", FORMAT, "players_per_team", 6, "game_id", OTHER_ID+1));
+        SimpleJdbcInsert gameInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("game");
+        gameInsert.execute(Map.of("id",OTHER_ID+1,"name",NAME+"b","genre",Genre.FPS,"image_id",ID));
+
+        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("tournament");
+        SqlParameterSource values = new MapSqlParameterSource()
+                .addValue("id", OTHER_ID + 1)
+                .addValue("creator_id", ID)
+                .addValue("name", NAME)
+                .addValue("game_id", OTHER_ID+1)
+                .addValue("region", REGION)
+                .addValue("elo", ELO)
+                .addValue("start_date", START_DATE)
+                .addValue("end_date", END_DATE)
+                .addValue("format", FORMAT)
+                .addValue("structure", STRUCTURE)
+                .addValue("max_participants", MAX_PARTICIPANTS)
+                .addValue("image_id", ID)
+                .addValue("open_inscriptions", true)
+                .addValue("is_finished", false)
+                .addValue("tournament_started", false)
+                .addValue("format_id", OTHER_ID);
+        jdbcInsert.execute(values);
+        values = new MapSqlParameterSource()
+                .addValue("id", ID)
+                .addValue("creator_id", ID)
+                .addValue("name", NAME)
+                .addValue("game_id", OTHER_ID+1)
+                .addValue("region", REGION)
+                .addValue("elo", ELO)
+                .addValue("start_date", START_DATE)
+                .addValue("end_date", END_DATE)
+                .addValue("format", FORMAT)
+                .addValue("structure", STRUCTURE)
+                .addValue("max_participants", MAX_PARTICIPANTS)
+                .addValue("image_id", ID)
+                .addValue("open_inscriptions", true)
+                .addValue("is_finished", false)
+                .addValue("tournament_started", false)
+                .addValue("format_id", OTHER_ID+1);
+        jdbcInsert.execute(values);
+
+        TournamentFilter filter = new TournamentFilter();
+        filter.setGenre(Genre.FPS);
+        filter.setPlayersPerTeam(6);
+        List<Tournament> tournaments = tournamentJdbcDao.findTournaments(filter, 0L);
+
+        Assert.assertNotNull(tournaments);
+        Assert.assertTrue(tournaments.stream().allMatch((tournament -> Objects.equals(tournament.getGame_id(), OTHER_ID+1))));
+        Assert.assertTrue(tournaments.stream().allMatch((tournament -> Objects.equals(tournament.getFormat_id(), OTHER_ID+1))));
+        Assert.assertEquals(1, tournaments.size());
+    }
+
+    @Test
+    public void testFindTournamentsWithDateFilters() {
+        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("tournament");
+        SqlParameterSource values = new MapSqlParameterSource()
+                .addValue("id", OTHER_ID + 1)
+                .addValue("creator_id", ID)
+                .addValue("name", NAME)
+                .addValue("game_id", ID)
+                .addValue("region", REGION)
+                .addValue("elo", ELO)
+                .addValue("start_date", START_DATE.plusDays(1))
+                .addValue("end_date", END_DATE)
+                .addValue("format", FORMAT)
+                .addValue("structure", STRUCTURE)
+                .addValue("max_participants", MAX_PARTICIPANTS)
+                .addValue("image_id", ID)
+                .addValue("open_inscriptions", true)
+                .addValue("is_finished", false)
+                .addValue("tournament_started", false)
+                .addValue("format_id", ID);
+        jdbcInsert.execute(values);
+        values = new MapSqlParameterSource()
+                .addValue("id", ID)
+                .addValue("creator_id", ID)
+                .addValue("name", NAME)
+                .addValue("game_id", ID)
+                .addValue("region", REGION)
+                .addValue("elo", ELO)
+                .addValue("start_date", START_DATE)
+                .addValue("end_date", END_DATE.plusDays(1))
+                .addValue("format", FORMAT)
+                .addValue("structure", STRUCTURE)
+                .addValue("max_participants", MAX_PARTICIPANTS)
+                .addValue("image_id", ID)
+                .addValue("open_inscriptions", true)
+                .addValue("is_finished", false)
+                .addValue("tournament_started", false)
+                .addValue("format_id", ID);
+        jdbcInsert.execute(values);
+
+        TournamentFilter filter = new TournamentFilter();
+        filter.setStart_date(START_DATE);
+        filter.setEnd_date(END_DATE);
+        List<Tournament> tournaments = tournamentJdbcDao.findTournaments(filter, 0L);
+
+        Assert.assertNotNull(tournaments);
+        Assert.assertEquals(1, tournaments.size());
+        Assert.assertEquals(START_DATE, tournaments.get(0).getStart_date());
+    }
+
+    @Test
+    public void testFindTournamentsPagination() {
+        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("tournament");
+        for (int i = 1; i <= 10; i++) {
+            SqlParameterSource values = new MapSqlParameterSource()
+                    .addValue("id", OTHER_ID + i)
+                    .addValue("creator_id", ID)
+                    .addValue("name", NAME + i)
+                    .addValue("game_id", ID)
+                    .addValue("region", REGION)
+                    .addValue("elo", ELO)
+                    .addValue("start_date", START_DATE)
+                    .addValue("end_date", END_DATE)
+                    .addValue("format", FORMAT)
+                    .addValue("structure", STRUCTURE)
+                    .addValue("max_participants", MAX_PARTICIPANTS)
+                    .addValue("image_id", ID)
+                    .addValue("open_inscriptions", true)
+                    .addValue("is_finished", false)
+                    .addValue("tournament_started", false)
+                    .addValue("format_id", ID);
+            jdbcInsert.execute(values);
+        }
+
+        TournamentFilter filter = new TournamentFilter();
+        filter.setGame_id(ID);
+        List<Tournament> firstPage = tournamentJdbcDao.findTournaments(filter, 0L);
+        List<Tournament> secondPage = tournamentJdbcDao.findTournaments(filter, 1L);
+
+        Assert.assertNotNull(firstPage);
+        Assert.assertNotNull(secondPage);
+        Assert.assertEquals(9, firstPage.size());
+        Assert.assertEquals(2, secondPage.size());
+    }
+
+    @Test
+    public void testFindTournamentsNoResults() {
+        TournamentFilter filter = new TournamentFilter();
+        filter.setName("NonExistent");
+        List<Tournament> tournaments = tournamentJdbcDao.findTournaments(filter, 0L);
+
+        Assert.assertNotNull(tournaments);
+        Assert.assertTrue(tournaments.isEmpty());
+    }
+
+    @Test
+    public void testFindNoFilter() {
+        TournamentFilter filter = new TournamentFilter();
+        List<Tournament> tournaments = tournamentJdbcDao.findTournaments(filter, 0L);
+
+        Assert.assertNotNull(tournaments);
+        Assert.assertFalse(tournaments.isEmpty());
+        Assert.assertEquals(1,tournaments.size());
+        Assert.assertEquals(OTHER_ID,tournaments.get(0).getId());
+    }
+
+    @Test
+    public void testFindTournamentsAllFilters() {
+        SimpleJdbcInsert gameInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("game");
+        gameInsert.execute(Map.of("id", OTHER_ID + 1, "name", "Other Game", "genre", Genre.FPS, "image_id", ID));
+        SimpleJdbcInsert formatInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("game_format");
+        formatInsert.execute(Map.of("id", OTHER_ID + 1, "name", "other format", "players_per_team", 4, "game_id", OTHER_ID + 1));
+
+        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("tournament");
+        SqlParameterSource values = new MapSqlParameterSource()
+                .addValue("id", OTHER_ID + 1)
+                .addValue("creator_id", ID)
+                .addValue("name", "the One")
+                .addValue("game_id", OTHER_ID + 1)
+                .addValue("region", Region.NA)
+                .addValue("elo", Elo.HIGH)
+                .addValue("start_date", START_DATE.minusDays(1))
+                .addValue("end_date", END_DATE.minusDays(1))
+                .addValue("format", "other format")
+                .addValue("structure", Structure.HYBRID)
+                .addValue("max_participants", MAX_PARTICIPANTS)
+                .addValue("image_id", ID)
+                .addValue("open_inscriptions", true)
+                .addValue("is_finished", false)
+                .addValue("tournament_started", false)
+                .addValue("format_id", OTHER_ID + 1);
+        jdbcInsert.execute(values);
+
+        TournamentFilter filter = new TournamentFilter();
+        filter.setName("The One");
+        filter.setGame_id(OTHER_ID + 1);
+        filter.setElo(Elo.HIGH);
+        filter.setRegion(Region.NA);
+        filter.setFormat("other format");
+        filter.setStructure(Structure.HYBRID);
+        filter.setStart_date(START_DATE.minusDays(1));
+        filter.setEnd_date(END_DATE.minusDays(1));
+        filter.setPlayersPerTeam(4);
+        filter.setGenre(Genre.FPS);
+        List<Tournament> tournaments = tournamentJdbcDao.findTournaments(filter, 0L);
+
+        Assert.assertNotNull(tournaments);
+        Assert.assertEquals(1, tournaments.size());
+        Tournament tournament = tournaments.get(0);
+        Assert.assertEquals("the One", tournament.getName());
+        Assert.assertEquals(OTHER_ID + 1, tournament.getGame_id().longValue());
+        Assert.assertEquals(Elo.HIGH, tournament.getElo());
+        Assert.assertEquals(Region.NA, tournament.getRegion());
+        Assert.assertEquals("other format", tournament.getFormat());
+        Assert.assertEquals(Structure.HYBRID, tournament.getStructure());
     }
 }

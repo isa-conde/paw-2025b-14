@@ -74,37 +74,20 @@ public class MatchServiceImpl implements MatchService {
     }
 
     @Override
-    public Map<Integer, Map<Integer, List<MatchInfo>>> getTournamentMatchesByGroup(Long tournamentId) {
-        List<MatchInfo> matches = matchDao.getTournamentMatches(tournamentId);
-        if (matches.isEmpty()) {
-            return Collections.emptyMap();
-        }
-        Map<Integer, Map<Integer, List<MatchInfo>>> result = new TreeMap<>();
-
-        for (MatchInfo m : matches) {
-            Integer stage = m.getStage();
-            if (stage == null) {
-                continue;
-            }
-            Optional<Tournament> t = tournamentDao.findById(tournamentId);
-            Integer teamSize = gameDao.getFormatById(t.get().getFormat_id()).get().getPlayers_per_team();
-            Integer group = participantDao.getGroupNumber(tournamentId, m.getLocalId(), teamSize);
-            result.computeIfAbsent(group, g -> new TreeMap<>())
-                    .computeIfAbsent(stage, s -> new ArrayList<>())
-                    .add(m);
-        }
-        return result;
-    }
-
-    @Override
     public Map<Integer, List<MatchInfo>> getTournamentMatchesByStage(Long tournamentId){
-        List<MatchInfo> matches = matchDao.getTournamentMatches(tournamentId);
+        List<MatchInfo> matches = matchDao.getTournamentMatches(tournamentId, ts.getPlayersPerTeam(tournamentId));
         if (matches.isEmpty()) {
             return Collections.emptyMap();
+        }
+        Integer teamSize = ts.getPlayersPerTeam(tournamentId);
+        if(teamSize == null){
+            teamSize = 1;
         }
         Map<Integer, List<MatchInfo>> result = new TreeMap<>();
         Boolean isGroupStage = tournamentDao.getIsGroupStage(tournamentId);
         for (MatchInfo m : matches) {
+            m.setLocal(participantDao.getTournamentParticipantById(tournamentId, m.getLocalId(), teamSize));
+            m.setVisitor(participantDao.getTournamentParticipantById(tournamentId, m.getVisitorId(), teamSize));
             Integer stage = m.getStage();
             if (stage == null || (m.getIsGroupStage() != null && isGroupStage != null && m.getIsGroupStage() != isGroupStage)) {
                 continue;
@@ -146,7 +129,7 @@ public class MatchServiceImpl implements MatchService {
         if(!isFinished && (structure.equals(Structure.ELIMINATION) || ( structure.equals(Structure.HYBRID) && !isGroupStage))) {
             setNextMatchInfo(matchId, tournamentId, winnerId);
         }else if(structure.equals(Structure.LEAGUE) || ( structure.equals(Structure.HYBRID) && isGroupStage)){
-            participantDao.sumPoints(tournamentId, winnerId, 3);
+            participantDao.sumPoints(tournamentId, winnerId, 3, ts.getPlayersPerTeam(tournamentId));
         }
         if (structure.equals(Structure.HYBRID) && isGroupStage && isFinished) {
             ts.createBracketFromGroups(tournamentId, matchId);

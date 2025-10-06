@@ -146,6 +146,11 @@ public class GameJdbcDao implements GameDao {
 
     @Override
     public Integer getPlayersPerTeam(Long id){
-        return jdbcTemplate.queryForObject("SELECT players_per_team FROM game_format WHERE id = ?", Integer.class, id);
+        List<Integer> results = jdbcTemplate.query(
+                "SELECT players_per_team FROM game_format WHERE id = ?",
+                (rs, rowNum) -> rs.getInt("players_per_team"),
+                id
+        );
+        return results.isEmpty() ? null : results.get(0);
     }
 }

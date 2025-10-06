@@ -16,7 +16,8 @@
                     <c:forEach var="match" items="${stageMatches}" varStatus="loop">
                         <div class="bracket-match round-${stageEntry.key} match-${loop.index}">
                             <div class="bracket-team ${match.winner == 1 ? 'winner' : ''}">
-                                <span><c:out value="${match.localPlayerName}"/></span>
+                                <c:set var="localName" value="${match.local == null ? 'TBD' : match.local.name}"/>
+                                <span><c:out value="${localName}"/></span>
                                 <c:if test="${isEditing and match.localId != null}">
                                     <input type="checkbox"
                                            class="edit-check"
@@ -29,7 +30,8 @@
                                 </c:if>
                             </div>
                             <div class="bracket-team ${match.winner == 2 ? 'winner' : ''}">
-                                <span><c:out value="${match.visitorPlayerName}"/></span>
+                                <c:set var="visitorName" value="${match.visitor == null ? 'TBD' : match.visitor.name}"/>
+                                <span><c:out value="${visitorName}"/></span>
                                 <c:if test="${isEditing and match.visitorId != null}">
                                     <input type="checkbox"
                                            class="edit-check"

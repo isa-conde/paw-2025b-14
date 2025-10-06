@@ -1,12 +1,13 @@
 package ar.edu.itba.paw.model;
 
 public class MatchInfo {
+
     private final Long id;
     private final Long tournamentId;
-    private final Long localId;
-    private final Long visitorId;
-    private final String localPlayerName;
-    private final String visitorPlayerName;
+    private final Long local_id;
+    private final Long visitor_id;
+    private Participant local;
+    private Participant visitor;
     private final Integer localScore;
     private final Integer visitorScore;
     private final Integer winner;
@@ -14,15 +15,11 @@ public class MatchInfo {
     private final Integer groupNumber;
     private final Boolean isGroupStage;
 
-    public MatchInfo(Long id, Long tournamentId, Long localId, Long visitorId, 
-                           String localPlayerName, String visitorPlayerName,
-                           Integer localScore, Integer visitorScore, Integer winner, Integer stage, Integer groupNumber, Boolean isGroupStage) {
+    public MatchInfo(Long id, Long tournamentId, Long local_id, Long visitor_id, Integer localScore, Integer visitorScore, Integer winner, Integer stage, Integer groupNumber, Boolean isGroupStage) {
         this.id = id;
         this.tournamentId = tournamentId;
-        this.localId = localId;
-        this.visitorId = visitorId;
-        this.localPlayerName = localPlayerName;
-        this.visitorPlayerName = visitorPlayerName;
+        this.local_id = local_id;
+        this.visitor_id = visitor_id;
         this.localScore = localScore;
         this.visitorScore = visitorScore;
         this.winner = winner;
@@ -40,19 +37,27 @@ public class MatchInfo {
     }
 
     public Long getLocalId() {
-        return localId;
+        return local_id;
     }
 
     public Long getVisitorId() {
-        return visitorId;
+        return visitor_id;
     }
 
-    public String getLocalPlayerName() {
-        return localPlayerName;
+    public Participant getLocal() {
+        return local;
     }
 
-    public String getVisitorPlayerName() {
-        return visitorPlayerName;
+    public void setLocal(final Participant local) {
+        this.local = local;
+    }
+
+    public Participant getVisitor() {
+        return visitor;
+    }
+
+    public void setVisitor(final Participant visitor) {
+        this.visitor = visitor;
     }
 
     public Integer getLocalScore() {
