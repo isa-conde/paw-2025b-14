@@ -11,7 +11,7 @@
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 
 
-<c:url var="btnImg" value="${pageContext.request.contextPath}/pfp/${imageId}"/>
+<c:url var="btnImg" value="/pfp/${imageId}"/>
 <c:set var="btnSize" value="${not empty size ? size : 'm'}" />
 
 <paw:button

@@ -5,10 +5,10 @@
 <%@attribute name="isTeam" type="java.lang.Boolean" %>
 <c:choose>
     <c:when test="${isUser}">
-        <c:set var="url" value="/profile/${userProfile.id}"/>
+        <c:url var="url" value="/profile/${userProfile.id}"/>
     </c:when>
     <c:when test="${isTeam}">
-        <c:set var="url" value="/team/profile/${teamProfile.id}"/>
+        <c:url var="url" value="/team/profile/${teamProfile.id}"/>
     </c:when>
 </c:choose>
 <div class="profile-card">
