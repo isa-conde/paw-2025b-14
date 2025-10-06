@@ -232,6 +232,7 @@ public class UserServiceImpl implements UserService {
         return userDao.searchByName(name);
     }
 
+    @Transactional
     @Override
     public void updateUserLocale(Locale locale, Long userId) {
         String language = locale.getLanguage();

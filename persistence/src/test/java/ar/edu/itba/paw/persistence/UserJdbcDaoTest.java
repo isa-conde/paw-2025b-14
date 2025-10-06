@@ -84,6 +84,7 @@ public class UserJdbcDaoTest {
     private static final Log log = LogFactory.getLog(UserJdbcDaoTest.class);
     private long usedId;
     private int rows;
+
     private static final RowMapper<User> ROW_MAPPER = (rs, rowNum) -> new User(rs.getLong("id"), rs.getString("username"), rs.getString("email"), rs.getString("password"), rs.getBoolean("verified"), rs.getString("bio"), rs.getLong("profile_picture_id"), rs.getLong("banner_id"), rs.getString("locale"));
 
     @Autowired
