@@ -84,6 +84,11 @@ public class TeamJdbcDao implements TeamDao {
     }
 
     @Override
+    public List<Team> searchByName(String name) {
+        return jdbcTemplate.query("SELECT * FROM team WHERE LOWER(name) LIKE '%' || LOWER(?) || '%'", ROW_MAPPER, name);
+    }
+
+    @Override
     public List<Long> getPastTournaments(Long teamId) {
         return findTeamTournamentIds(teamId, true);
     }

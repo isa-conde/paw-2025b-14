@@ -23,5 +23,7 @@ public interface TeamDao {
 
     Boolean teamNameTaken(String name);
 
+    List<Team> searchByName(String name);
+
     List<Team> getUserTeamsBySize(Long userId, Integer minSize);
 }
