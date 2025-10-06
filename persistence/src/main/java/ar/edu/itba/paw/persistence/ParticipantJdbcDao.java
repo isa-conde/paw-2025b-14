@@ -61,7 +61,7 @@ public class ParticipantJdbcDao implements ParticipantDao {
     public List<Participant> getTournamentParticipantTeams(Long tournament_id) {
         return jdbcTemplate.query("SELECT * FROM participant " +
                 "INNER JOIN team ON participant.team_id = team.id " +
-                "WHERE tournament_id = ?", ROW_MAPPER_TEAM, tournament_id);
+                "WHERE tournament_id = ? AND user_id IS NULL", ROW_MAPPER_TEAM, tournament_id);
     }
 
     @Override
@@ -110,6 +110,20 @@ public class ParticipantJdbcDao implements ParticipantDao {
     @Override
     public void leaveTournamentUser(Long user_id, Long tournament_id) {
         jdbcTemplate.update("DELETE FROM participant WHERE user_id = ? AND tournament_id = ?", user_id, tournament_id);
+    }
+
+    @Override
+    public void leaveTournamentTeam(Long userId, Long tournamentId) {
+        final String sql = """
+            DELETE FROM participant p
+            USING participant pu
+            WHERE pu.user_id = ? 
+              AND pu.tournament_id = ?
+              AND pu.team_id IS NOT NULL
+              AND p.tournament_id = pu.tournament_id
+              AND p.team_id = pu.team_id
+        """;
+        jdbcTemplate.update(sql, userId, tournamentId);
     }
 
     @Override

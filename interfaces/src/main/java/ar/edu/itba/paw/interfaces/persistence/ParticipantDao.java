@@ -18,6 +18,8 @@ public interface ParticipantDao {
 
     void leaveTournamentUser(Long user_id, Long tournament_id);
 
+    void leaveTournamentTeam(Long user_id, Long tournament_id);
+
     void updateGroupNumberForUsers(long tournamentId, int groupNumber, List<Long> userIds, Integer teamSize);
 
     void swapGroups(Long tournament_id, Long user1, Long user2, Integer group1, Integer group2, Integer teamSize);

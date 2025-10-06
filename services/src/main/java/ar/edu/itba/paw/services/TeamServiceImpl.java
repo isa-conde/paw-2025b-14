@@ -2,6 +2,7 @@ package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.persistence.*;
 import ar.edu.itba.paw.interfaces.services.TeamService;
+import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.Team;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.User;
@@ -20,14 +21,16 @@ public class TeamServiceImpl implements TeamService {
     UserDao userDao;
     TournamentDao tournamentDao;
     ParticipantDao participantDao;
+    TournamentService ts;
 
-    public TeamServiceImpl(ImageDao imageDao, TeamDao teamDao, TeamMemberDao teamMemberDao, UserDao userDao, TournamentDao tournamentDao, ParticipantDao participantDao){
+    public TeamServiceImpl(ImageDao imageDao, TeamDao teamDao, TeamMemberDao teamMemberDao, UserDao userDao, TournamentDao tournamentDao, ParticipantDao participantDao, TournamentService ts){
         this.imageDao = imageDao;
         this.teamDao = teamDao;
         this.teamMemberDao = teamMemberDao;
         this.userDao = userDao;
         this.tournamentDao = tournamentDao;
         this.participantDao = participantDao;
+        this.ts = ts;
     }
 
 
@@ -46,11 +49,15 @@ public class TeamServiceImpl implements TeamService {
 
         if (members != null){
             for (String s : members){
-                teamMemberDao.AddMember(team.getId(), userDao.findByUsername(s).get().getId());
+                teamMemberDao.addMember(team.getId(), userDao.findByUsername(s).get().getId());
             }
+            User owner = userDao.findById(owner_id).get();
+            if (!members.contains(owner.getUsername())) {
+                teamMemberDao.addMember(team.getId(), owner_id);
+            }
+        }else{
+            teamMemberDao.addMember(team.getId(), owner_id);
         }
-        teamMemberDao.AddMember(team.getId(), owner_id);
-
 
         return team;
     }
@@ -92,7 +99,7 @@ public class TeamServiceImpl implements TeamService {
             for (String s : members){
                 Long userid =  userDao.findByUsername(s).get().getId();
                 if (!teamMemberDao.isMember(teamId,userid)){
-                    teamMemberDao.AddMember(teamId, userid);
+                    teamMemberDao.addMember(teamId, userid);
                 }
             }
         }
@@ -118,6 +125,11 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public Boolean teamNameTaken(String name) {
         return teamDao.teamNameTaken(name);
+    }
+
+    @Override
+    public List<Team> getUserTeamsByTournamentSize(Long userId, Long tournamentId) {
+        return teamDao.getUserTeamsBySize(userId, ts.getPlayersPerTeam(tournamentId));
     }
 
     private List<Tournament> getTournamentsFromIds(List<Long> tournamentIds) {

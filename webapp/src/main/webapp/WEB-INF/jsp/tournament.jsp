@@ -346,9 +346,11 @@
     <form:form method="post" modelAttribute="joinTeamForm" action="${pageContext.request.contextPath}/tournament/join/step2" cssClass="form" data-required-members="${format.players_per_team}">
         <form:hidden path="tournamentId" value="${tournament.id}"/>
         <form:hidden path="teamId" value="${selectedTeamId}"/>
-        <paw:text size="l"><spring:message code="tournament.join.requiredSize" arguments="${format.players_per_team}"/></paw:text>
+        <c:if test="${teamMembers.size() > format.players_per_team}">
+            <paw:text size="l"><spring:message code="tournament.join.requiredSize" arguments="${format.players_per_team}"/></paw:text>
+        </c:if>
         <div class="teams-list-container">
-            <paw:member-list members="${teamMembers}"/>
+            <paw:member-list members="${teamMembers}" requiredSize="${format.players_per_team}"/>
         </div>
         <div class="join-team-error">
             <form:errors path="members" cssClass="form-error" element="h1"/>

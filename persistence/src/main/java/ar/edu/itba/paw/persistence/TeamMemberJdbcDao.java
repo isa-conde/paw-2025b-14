@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.interfaces.persistence.TeamMemberDao;
+import ar.edu.itba.paw.model.Team;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
@@ -21,9 +22,8 @@ public class TeamMemberJdbcDao implements TeamMemberDao {
                 .withTableName("team_member");
     }
 
-
     @Override
-    public void AddMember(Long team_id, Long user_id) {
+    public void addMember(Long team_id, Long user_id) {
         Map<String, Object> values = Map.of("team_id", team_id, "user_id", user_id);
         jdbcInsert.execute(values);
     }
@@ -32,7 +32,6 @@ public class TeamMemberJdbcDao implements TeamMemberDao {
     public Boolean isMember(Long team_id, Long user_id) {
         Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM team_member WHERE user_id = ? AND team_id = ?", Integer.class , user_id, team_id);
         return count != null && count > 0;
-
     }
 
     @Override

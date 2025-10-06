@@ -97,4 +97,25 @@ public class TeamJdbcDao implements TeamDao {
     """;
         return jdbcTemplate.queryForList(sql, Long.class, teamId, isFinished);
     }
+
+    @Override
+    public List<Team> getUserTeamsBySize(Long userId, Integer minSize) {
+        String sql = """
+        SELECT t.*
+        FROM team t
+        WHERE EXISTS (
+            SELECT 1
+            FROM team_member tm
+            WHERE tm.team_id = t.id
+              AND tm.user_id = ?
+        )
+        AND (
+            SELECT COUNT(*)
+            FROM team_member tm2
+            WHERE tm2.team_id = t.id
+        ) >= ?
+        ORDER BY t.id
+    """;
+        return jdbcTemplate.query(sql, ROW_MAPPER, userId, minSize);
+    }
 }

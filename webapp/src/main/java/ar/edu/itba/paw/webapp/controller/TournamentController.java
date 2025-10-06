@@ -163,6 +163,8 @@ public class TournamentController {
 
         if (result.hasErrors()) {
             ModelAndView mav = tournamentPage(principal, tournamentId, form, new JoinTournamentTeamForm());
+            mav.addObject("editTournamentForm", form);
+            mav.addObject("joinTeamForm", new JoinTournamentTeamForm());
             mav.addObject("openModal", "'editTournamentModal'");
             return mav;
         }
@@ -228,7 +230,7 @@ public class TournamentController {
             Boolean isIndividualTournament = optionalGameFormat.isEmpty() || optionalGameFormat.get().getPlayers_per_team() == 1;
             Boolean isParticipant = user != null && ps.hasJoined(user.getId(), tournamentId);
             if (user != null && !isIndividualTournament && !isParticipant){
-                mav.addObject("userTeams", tms.getUserTeams(user.getId()));
+                mav.addObject("userTeams", tms.getUserTeamsByTournamentSize(user.getId(), tournamentId));
             }
             mav.addObject("isIndividualTournament", isIndividualTournament);
             mav.addObject("isParticipant", isParticipant);
@@ -313,7 +315,7 @@ public class TournamentController {
         if (user == null) {
             return new ModelAndView("redirect:/");
         }
-        ps.leaveTournamentUser(user.getId(), tournamentId);
+        ps.leaveTournament(user.getId(), tournamentId);
         return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
     }
 

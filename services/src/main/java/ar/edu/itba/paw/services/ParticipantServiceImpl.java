@@ -71,8 +71,15 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
-    public void leaveTournamentUser(Long user_id, Long tournament_id) {
-        participantDao.leaveTournamentUser(user_id, tournament_id);
+    public void leaveTournament(Long user_id, Long tournament_id) {
+        Integer playersPerTeam = ts.getPlayersPerTeam(tournament_id);
+        if(playersPerTeam != null){
+            if(playersPerTeam > 1){
+                participantDao.leaveTournamentTeam(user_id, tournament_id);
+            }else{
+                participantDao.leaveTournamentUser(user_id, tournament_id);
+            }
+        }
     }
 
     @Override
@@ -98,6 +105,6 @@ public class ParticipantServiceImpl implements ParticipantService {
         for(Long p : participants){
             participantDao.joinTournamentUserWithTeam(p, tournamentId, teamId);
         }
-        participantDao.joinTournamentTeam(teamId, tournamentId);
+        participantDao.joinTournamentTeam(tournamentId, teamId);
     }
 }
