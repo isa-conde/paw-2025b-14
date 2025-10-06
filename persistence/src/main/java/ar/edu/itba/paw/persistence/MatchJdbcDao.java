@@ -80,11 +80,10 @@ public class MatchJdbcDao implements MatchDao {
     public Long getMatchWinner(Long tournamentId, Long matchId) {
         return jdbcTemplate.queryForObject(
                 "SELECT ( " +
-                        "  SELECT CASE WHEN winner = 1 THEN local_id " +
-                        "              WHEN winner = 2 THEN visitor_id " +
-                        "              ELSE NULL END " +
-                        "  FROM match WHERE tournament_id = ? AND id = ? " +
-                        ")",
+                        "CASE WHEN winner = 1 THEN local_id " +
+                        "WHEN winner = 2 THEN visitor_id " +
+                        "ELSE NULL END ) AS winner_id" +
+                        "  FROM match WHERE tournament_id = ? AND id = ? ",
                 Long.class, tournamentId, matchId
         );
     }
@@ -149,10 +148,14 @@ public class MatchJdbcDao implements MatchDao {
     @Override
     public Boolean allMatchesPlayed(Long tournamentId){
         final String sql = """
-            SELECT (COUNT(*) > 0)
-                   AND (COUNT(*) = COUNT(*) FILTER (WHERE winner IS NOT NULL AND winner > 0))
-            FROM match
-            WHERE tournament_id = ?
+            SELECT CASE
+                      WHEN COUNT(*) > 0
+                           AND COUNT(*) = COUNT(CASE WHEN winner IS NOT NULL AND winner > 0 THEN 1 END)
+                      THEN TRUE
+                      ELSE FALSE
+                  END AS all_played
+           FROM match
+           WHERE tournament_id = ?
         """;
         return jdbcTemplate.queryForObject(sql, Boolean.class, tournamentId);
     }

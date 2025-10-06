@@ -3,6 +3,7 @@ package ar.edu.itba.paw.persistence;
 import ar.edu.itba.paw.interfaces.persistence.ParticipantDao;
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.model.Participant;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Repository
 public class ParticipantJdbcDao implements ParticipantDao {
@@ -81,6 +83,7 @@ public class ParticipantJdbcDao implements ParticipantDao {
         values.put("user_id", user_id);
         values.put("tournament_id", tournament_id);
         values.put("team_id", team_id);
+        values.put("points", 0);
         jdbcInsert.execute(values);
     }
 
@@ -103,8 +106,8 @@ public class ParticipantJdbcDao implements ParticipantDao {
 
     @Override
     public Boolean hasJoined(Long userId, Long tournamentId) {
-        String sql = "SELECT EXISTS (SELECT 1 FROM participant WHERE user_id = ? AND tournament_id = ?)";
-        return jdbcTemplate.queryForObject(sql, Boolean.class, userId, tournamentId);
+        String sql = "SELECT 1 FROM participant WHERE user_id = ? AND tournament_id = ? LIMIT 1";
+        return !jdbcTemplate.query(sql, (rs, rowNum) -> 1, userId, tournamentId).isEmpty();
     }
 
     @Override
@@ -175,18 +178,20 @@ public class ParticipantJdbcDao implements ParticipantDao {
 
     @Override
     public Integer getGroupNumber(Long tournamentId, Long userId, Integer teamSize) {
-        String sql = "SELECT COALESCE((" +
+        String sql =
                 "  SELECT group_number FROM participant " +
                 "  WHERE tournament_id = :tournamentId AND " +
                 (teamSize != null && teamSize > 1 ? "team_id = :id " : "user_id = :id ") +
-                "  LIMIT 1" +
-                "), 0)";
+                "  LIMIT 1";
 
         MapSqlParameterSource params = new MapSqlParameterSource()
                 .addValue("tournamentId", tournamentId)
                 .addValue("id", userId);
-
-        return namedJdbcTemplate.queryForObject(sql, params, Integer.class);
+        Integer ans = namedJdbcTemplate.queryForObject(sql, params, Integer.class);
+        if(ans == null){
+            return 0;
+        }
+        return ans;
     }
 
     @Override
@@ -204,7 +209,7 @@ public class ParticipantJdbcDao implements ParticipantDao {
     private List<Participant> getTournamentParticipantsByPointsUser(Long tournamentId, Integer groupNumber, Integer points) {
 
         StringBuilder sql = new StringBuilder(
-                "SELECT p.* FROM participant p " +
+                "SELECT * FROM participant p " +
                         "INNER JOIN users u ON p.user_id = u.id " +
                         "WHERE p.tournament_id = :tournamentId AND p.points = :points"
         );
@@ -223,7 +228,7 @@ public class ParticipantJdbcDao implements ParticipantDao {
 
     private List<Participant> getTournamentParticipantsByPointsTeam(Long tournamentId, Integer groupNumber, Integer points) {
         StringBuilder sql = new StringBuilder(
-                "SELECT p.* FROM participant p " +
+                "SELECT * FROM participant p " +
                         "INNER JOIN team t ON p.team_id = t.id " +
                         "WHERE p.tournament_id = :tournamentId AND p.points = :points"
         );

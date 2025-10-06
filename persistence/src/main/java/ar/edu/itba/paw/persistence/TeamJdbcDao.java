@@ -3,6 +3,7 @@ package ar.edu.itba.paw.persistence;
 import ar.edu.itba.paw.interfaces.persistence.TeamDao;
 import ar.edu.itba.paw.model.Team;
 import ar.edu.itba.paw.model.User;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
@@ -79,8 +80,13 @@ public class TeamJdbcDao implements TeamDao {
 
     @Override
     public Boolean teamNameTaken(String name) {
-        final String sql = "SELECT EXISTS(SELECT 1 FROM team WHERE name = ?)";
-        return jdbcTemplate.queryForObject(sql, Boolean.class, name);
+        final String sql = "SELECT id FROM team WHERE name = ? LIMIT 1";
+        try {
+            jdbcTemplate.queryForObject(sql, Long.class, name);
+        }catch (EmptyResultDataAccessException e){
+            return false;
+        }
+        return true;
     }
 
     @Override

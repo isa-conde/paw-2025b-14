@@ -70,13 +70,13 @@ public class UserJdbcDao implements UserDao {
     @Override
     public Boolean checkUsernameExists (String username) {
         Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM users WHERE username = ?", Integer.class , username);
-        return count != null && count > 0;
+        return count > 0;
     }
 
     @Override
     public Boolean checkEmailExists(String email) {
         Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM users WHERE email = ?", Integer.class , email);
-        return count != null && count > 0;
+        return count > 0;
     }
 
     @Override

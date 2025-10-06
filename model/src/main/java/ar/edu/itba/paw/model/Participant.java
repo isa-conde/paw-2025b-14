@@ -22,10 +22,6 @@ public class Participant {
         return id;
     }
 
-    public Integer getGroup_number() {
-        return group_number;
-    }
-
     public Integer getPoints() {
         return points;
     }

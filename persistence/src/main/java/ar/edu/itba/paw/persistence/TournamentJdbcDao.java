@@ -367,7 +367,4 @@ public class TournamentJdbcDao implements TournamentDao {
         );
         return !open;
     }
-
-
-
 }
