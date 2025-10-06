@@ -5,6 +5,7 @@ import ar.edu.itba.paw.interfaces.services.TeamService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.Team;
 import ar.edu.itba.paw.model.Tournament.Tournament;
+import ar.edu.itba.paw.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -28,13 +29,12 @@ public class TeamServiceImpl implements TeamService {
     private final TournamentService ts;
 
 
-    public TeamServiceImpl(ImageDao imageDao, TeamDao teamDao, TeamMemberDao teamMemberDao, UserDao userDao, TournamentDao tournamentDao, ParticipantDao participantDao, TournamentService ts){
+    public TeamServiceImpl(ImageDao imageDao, TeamDao teamDao, TeamMemberDao teamMemberDao, UserDao userDao, TournamentDao tournamentDao, TournamentService ts){
         this.imageDao = imageDao;
         this.teamDao = teamDao;
         this.teamMemberDao = teamMemberDao;
         this.userDao = userDao;
         this.tournamentDao = tournamentDao;
-        this.participantDao = participantDao;
         this.ts = ts;
     }
 
