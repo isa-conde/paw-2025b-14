@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.webapp.controller.advice;
 
 import ar.edu.itba.paw.interfaces.exception.*;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.support.RequestContextUtils;
@@ -52,7 +54,9 @@ public class CustomExceptionHandler {
             MethodArgumentNotValidException.class,
             BindException.class,
             MissingServletRequestParameterException.class,
-            HttpMessageNotReadableException.class
+            HttpMessageNotReadableException.class,
+            MethodArgumentTypeMismatchException.class,
+            TypeMismatchException.class
     })
     public ModelAndView handleBadRequestException() {
         ModelAndView mav = new ModelAndView("error/exception");
@@ -103,6 +107,14 @@ public class CustomExceptionHandler {
         ModelAndView mav = new ModelAndView("error/exception");
         mav.addObject("message", "errorExceptionPage.tournamentAlreadyStarted.description");
         mav.addObject("title", "errorExceptionPage.tournamentAlreadyStarted.title");
+        return mav;
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ModelAndView handleGeneralException() {
+        ModelAndView mav = new ModelAndView("error/exception");
+        mav.addObject("message", "errorExceptionPage.general.description");
+        mav.addObject("title", "errorExceptionPage.general.title");
         return mav;
     }
 
