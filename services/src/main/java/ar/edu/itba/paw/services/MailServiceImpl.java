@@ -4,6 +4,8 @@ import ar.edu.itba.paw.interfaces.services.MailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -18,6 +20,7 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 
 @Component
 @Service
@@ -29,57 +32,111 @@ public class MailServiceImpl implements MailService {
     @Autowired
     private SpringTemplateEngine templateEngine;
 
+    @Autowired
+    private MessageSource messageSource;
+
+    @Value("${app.baseUrl}")
+    private String baseUrl;
+
     @Async
     @Override
-    public void sendTournamentCreatedEmail(String userName, String tournamentName, String tournamentLink, String recipient) {
-        Context ctx = new Context();
+    public void sendTournamentCreatedEmail(Long tournamentId, String userName, String tournamentName, String recipient) {
+        Locale locale = Locale.getDefault();
+        Context ctx = new Context(locale);
         ctx.setVariable("userName", userName);
         ctx.setVariable("tournamentName", tournamentName);
+        String tournamentLink = baseUrl + "/tournament?tournamentId=" + tournamentId.toString();
         ctx.setVariable("tournamentLink", tournamentLink);
 
         String body = templateEngine.process("tournament-creation-confirmation", ctx);
 
-        sendEmail(recipient, "You just created " + tournamentName + "!", body);
+        String subject = messageSource.getMessage(
+                "email.tournamentCreationConfirmation.subject",
+                new Object[]{tournamentName},
+                locale
+        );
+        sendEmail(recipient, subject, body);
     }
 
     @Async
     @Override
-    public void sendTournamentJoinedEmail(String userName, String tournamentName, String tournamentLink, String recipient, String creatorMail) {
-        Context ctx = new Context();
+    public void sendTournamentJoinedEmail(Long tournamentId, String userName, String tournamentName, String recipient, String creatorMail) {
+        Locale locale = Locale.getDefault();
+        Context ctx = new Context(locale);
         ctx.setVariable("userName", userName);
         ctx.setVariable("tournamentName", tournamentName);
+        String tournamentLink = baseUrl + "/tournament?tournamentId=" + tournamentId;
         ctx.setVariable("tournamentLink", tournamentLink);
         ctx.setVariable("creatorMail", creatorMail);
 
         String body = templateEngine.process("tournament-joined-confirmation", ctx);
 
-        sendEmail(recipient, "You just joined " + tournamentName + "!", body);
+        String subject = messageSource.getMessage(
+                "email.tournamentJoinedConfirmation.subject",
+                new Object[]{tournamentName},
+                locale);
+
+        sendEmail(recipient, subject, body);
     }
 
     @Async
     @Override
-    public void sendVerificationEmail(Long userId, String userName, Long token, String recipient, String baseUrl) {
-        Context ctx = new Context();
+    public void sendVerificationEmail(Long userId, String userName, Long token, String recipient) {
+        Locale locale = Locale.getDefault();
+        Context ctx = new Context(locale);
         ctx.setVariable("userName", userName);
         String verificationUrl = baseUrl + "/verify/confirm?token=" + token.toString() + "&userId=" + userId.toString();
         ctx.setVariable("verificationUrl", verificationUrl);
 
-        String body = templateEngine.process("verification-email", ctx);
+        String body = templateEngine.process("verification", ctx);
 
-        sendEmail(recipient, "Email Verification", body);
+        String subject = messageSource.getMessage(
+                "email.verification.subject",
+                null,
+                locale);
+
+        sendEmail(recipient, subject, body);
     }
 
     @Async
     @Override
-    public void sendResetPasswordEmail(Long userId, Long token, String recipient, String baseUrl) {
-        Context ctx = new Context();
+    public void sendResetPasswordEmail(Long userId, Long token, String recipient) {
+        Locale locale = Locale.getDefault();
+        Context ctx = new Context(locale);
         String resetPasswordUrl = baseUrl + "/forgotPassword/reset?token=" + token.toString() + "&userId=" + userId;
         ctx.setVariable("resetPasswordUrl", resetPasswordUrl);
 
         String body = templateEngine.process("reset-password", ctx);
 
-        sendEmail(recipient, "Reset your Password", body);
+        String subject = messageSource.getMessage(
+                "email.resetPassword.subject",
+                null,
+                locale);
+
+        sendEmail(recipient, subject, body);
     }
+
+    @Async
+    @Override
+    public void sendTournamentStartedEmail(Long tournamentId, String username, String tournamentName, String creatorMail, String recipient) {
+        Locale locale = Locale.getDefault();
+        Context ctx = new Context(locale);
+        ctx.setVariable("userName", username);
+        ctx.setVariable("tournamentName", tournamentName);
+        String tournamentLink = baseUrl + "/tournament?tournamentId=" + tournamentId;
+        ctx.setVariable("tournamentLink", tournamentLink);
+        ctx.setVariable("creatorMail", creatorMail);
+
+        String body = templateEngine.process("tournament-started-notification", ctx);
+
+        String subject = messageSource.getMessage(
+                "email.tournamentStartedNotification.subject",
+                new Object[]{tournamentName},
+                locale);
+
+        sendEmail(recipient, subject, body);
+    }
+
 
     private void sendEmail(String recipient, String subject, String body) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();

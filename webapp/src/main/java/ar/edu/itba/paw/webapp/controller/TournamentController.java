@@ -273,10 +273,6 @@ public class TournamentController {
     @RequestMapping(value = "/tournament/join", method = { RequestMethod.POST })
     public ModelAndView joinTournament(@ModelAttribute("user") Optional<PawUserDetails> currentUser, HttpServletRequest request, @RequestParam("tournamentId") final long tournamentId) {
         User user = currentUser.get().getPawUser();
-
-        String tournamentLink = request.getRequestURL().toString()
-                .replace("/tournament/join", "/tournament?tournamentId=" + tournamentId);
-        us.sendTournamentJoinedEmail(user.getUsername(), tournamentId, tournamentLink, user.getEmail());
         ps.joinTournamentUser(user.getId(), tournamentId);
         return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
     }
@@ -296,7 +292,7 @@ public class TournamentController {
     }
 
     @RequestMapping(value = "/tournament/startTournament", method = { RequestMethod.POST })
-    public ModelAndView startTournament(@RequestParam("tournamentId") final long tournamentId) {
+    public ModelAndView startTournament(@RequestParam("tournamentId") final long tournamentId, HttpServletRequest request) {
         ts.startTournament(tournamentId);
         return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
     }
@@ -372,9 +368,6 @@ public class TournamentController {
         final Tournament t = ts.create(user.getId(), form.getName(), form.getGame_id(),
                 form.getRegion(), form.getElo(), form.getStart_date(), form.getEnd_date(),
                 null, form.getStructure(), form.getMax_participants(), imageBytes, true, false, form.getFormat_id());
-        String tournamentLink = request.getRequestURL().toString()
-                .replace("/tournament/create", "/tournament?tournamentId=" + t.getId());
-        us.sendTournamentCreatedEmail(user.getUsername(), form.getName(), tournamentLink, user.getEmail());
         status.setComplete();
         return new ModelAndView("redirect:/tournament?tournamentId=" + t.getId());
     }

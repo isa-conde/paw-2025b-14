@@ -59,12 +59,12 @@
 </head>
 <body>
 <div class="card">
-    <h1>Verify your Email</h1>
-    <p th:text="'Hello ' + ${userName} + ','">Hello user,</p>
-    <p th:text="'Thank you for joining! Please finish the verification process by clicking the button below.'">
-        Your tournament has been successfully created.
+    <h1 th:text="#{email.verification.title}">Verify your account</h1>
+    <p th:text="#{email.verification.greeting(${userName})}">Hello user,</p>
+    <p th:text="#{email.verification.body}">
+        Thank you for joining! Please finish the verification process by clicking the button below.
     </p>
-    <a class="btn" th:href="${verificationUrl}">Verify Email</a>
+    <a class="btn" th:href="${verificationUrl}" th:text="#{email.verification.buttonLabel}">Verify Account</a>
 </div>
 </body>
 </html>

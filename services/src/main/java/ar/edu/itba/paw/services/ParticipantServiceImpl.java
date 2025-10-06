@@ -4,10 +4,13 @@ import ar.edu.itba.paw.interfaces.exception.UserAlreadyJoinedException;
 import ar.edu.itba.paw.interfaces.persistence.GameDao;
 import ar.edu.itba.paw.interfaces.persistence.ParticipantDao;
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
+import ar.edu.itba.paw.interfaces.persistence.UserDao;
+import ar.edu.itba.paw.interfaces.services.MailService;
 import ar.edu.itba.paw.interfaces.services.ParticipantService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.Participant;
 import ar.edu.itba.paw.model.Tournament.Tournament;
+import ar.edu.itba.paw.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -27,12 +30,16 @@ public class ParticipantServiceImpl implements ParticipantService {
     private final TournamentDao tournamentDao;
     private final TournamentService ts;
     private final GameDao gameDao;
+    private final UserDao userDao;
+    private final MailService ms;
 
-    public ParticipantServiceImpl(ParticipantDao participantDao, TournamentDao tournamentDao, TournamentService ts, GameDao gameDao){
+    public ParticipantServiceImpl(ParticipantDao participantDao, TournamentDao tournamentDao, TournamentService ts, GameDao gameDao, UserDao userDao, MailService ms){
         this.participantDao = participantDao;
         this.tournamentDao = tournamentDao;
         this.ts = ts;
         this.gameDao = gameDao;
+        this.userDao = userDao;
+        this.ms = ms;
     }
 
     @Transactional
@@ -52,6 +59,10 @@ public class ParticipantServiceImpl implements ParticipantService {
             LOGGER.info("Max participant count has been reached. The inscriptions for tournament with ID {} have been closed", tournament_id);
         }
         LOGGER.info("User with ID {} has joined tournament with ID {}", user_id, tournament_id);
+        User user = userDao.findById(user_id).get();
+        User creator = userDao.findById(tournament.get().getCreator_id()).get();
+        ms.sendTournamentJoinedEmail(tournament_id, user.getUsername(), tournament.get().getName(), user.getEmail(), creator.getEmail());
+        LOGGER.info("Tournament joined email correctly sent to the address {}", user.getEmail());
     }
 
     private List<Participant> getTournamentParticipantUsers(Long tournament_id) {

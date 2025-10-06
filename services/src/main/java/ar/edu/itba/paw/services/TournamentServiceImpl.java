@@ -3,6 +3,7 @@ package ar.edu.itba.paw.services;
 import ar.edu.itba.paw.interfaces.exception.*;
 import ar.edu.itba.paw.interfaces.persistence.*;
 import ar.edu.itba.paw.interfaces.persistence.*;
+import ar.edu.itba.paw.interfaces.services.MailService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.*;
@@ -33,13 +34,17 @@ public class TournamentServiceImpl implements TournamentService {
     private final ParticipantDao participantDao;
     private final MatchDao matchDao;
     private final GameDao gameDao;
+    private final UserDao userDao;
+    private final MailService ms;
 
-    public TournamentServiceImpl(TournamentDao tournamentDao, ImageDao imageDao, ParticipantDao participantDao, MatchDao matchDao, GameDao gameDao) {
+    public TournamentServiceImpl(TournamentDao tournamentDao, ImageDao imageDao, ParticipantDao participantDao, MatchDao matchDao, GameDao gameDao, UserDao userDao, MailService ms) {
         this.tournamentDao = tournamentDao;
         this.imageDao = imageDao;
         this.participantDao = participantDao;
         this.matchDao = matchDao;
         this.gameDao = gameDao;
+        this.userDao = userDao;
+        this.ms = ms;
     }
 
     @Override
@@ -72,6 +77,8 @@ public class TournamentServiceImpl implements TournamentService {
     public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, byte[] image, Boolean openInscriptions, Boolean isFinished, Long format_id) {
         Long image_id = imageDao.insertImage(image);
         Tournament toReturn = tournamentDao.create(creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, openInscriptions, isFinished, format_id);
+        User creator = userDao.findById(creator_id).get();
+        ms.sendTournamentCreatedEmail(toReturn.getId(), creator.getUsername(), name, creator.getEmail());
         LOGGER.info("Tournament {} has been successfully created", name);
         return toReturn;
     }
@@ -151,6 +158,12 @@ public class TournamentServiceImpl implements TournamentService {
         Tournament t = optTournament.get();
         if(t.getStructure().equals(Structure.HYBRID)){
             createGroupStageMatches(t);
+        }
+        List<Participant> participants = participantDao.getTournamentParticipantUsers(tournament_id);
+        User creator = userDao.findById(t.getCreator_id()).get();
+        for(Participant p : participants) {
+            User participant = userDao.findById(p.getId()).get();
+            ms.sendTournamentStartedEmail(tournament_id, participant.getUsername(), t.getName(), creator.getEmail(), participant.getEmail());
         }
     }
 
@@ -402,4 +415,5 @@ public class TournamentServiceImpl implements TournamentService {
         List<Tournament> allCreatedTournaments = findByCreator(userId);
         return allCreatedTournaments.stream().filter(t -> !t.getFinished()).toList();
     }
+
 }

@@ -2,9 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Reset Password</title>
+    <title>Tournament Joined</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Russo+One&display=swap" rel="stylesheet">
     <style>
-
         body {
             background-color: #00070E;
             color: #E6F7FF;
@@ -59,10 +59,13 @@
 </head>
 <body>
 <div class="card">
-    <h1 th:text="#{email.resetPassword.title}">Password reset requested</h1>
-    <p th:text="#{email.resetPassword.body}">You have requested a password reset.</p>
-    <p th:text="#{email.resetPassword.advice}">Please ignore this message if you didn't send the request.</p>
-    <a class="btn" th:href="${resetPasswordUrl}" th:text="#{email.resetPassword.buttonLabel}">Reset Password</a>
+    <h1 th:text="#{email.tournamentStartedNotification.title(${tournamentName})}">The tournament has begun!</h1>
+    <p th:text="#{email.tournamentStartedNotification.greeting(${userName})}">Hello user,</p>
+    <p th:text="#{email.tournamentStartedNotification.body(${tournamentName})}">
+        The tournament has begun! Click the button below to see your matches.
+    </p>
+    <p th:text="#{email.tournamentStartedNotification.advice(${creatorMail})}">Contact the creator with their email.</p>
+    <a class="btn" th:href="${tournamentLink}" th:text="#{email.tournamentStartedNotification.buttonLabel}">Go to Tournament</a>
 </div>
 </body>
 </html>

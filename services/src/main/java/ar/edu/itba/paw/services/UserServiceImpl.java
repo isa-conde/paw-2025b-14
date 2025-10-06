@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Transactional(readOnly = true)
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -54,7 +55,6 @@ public class UserServiceImpl implements UserService {
         this.imageDao = imageDao;
     }
 
-    @Transactional(readOnly = true)
     @Override
     public Optional<User> findById(long id) {
         return userDao.findById(id);
@@ -70,16 +70,18 @@ public class UserServiceImpl implements UserService {
             throw new EmailAlreadyUsedException(email);
         }
         LOGGER.info("The user {} has been created with email {}", username, email);
-        return userDao.create(username, email, passwordEncoder.encode(password));
+        User toReturn = userDao.create(username, email, passwordEncoder.encode(password));
+        Token token = generateToken(toReturn.getId(), VERIFICATION_DAYS_DURATION);
+        ms.sendVerificationEmail(toReturn.getId(), toReturn.getUsername(), token.getToken(), toReturn.getEmail());
+        LOGGER.info("Verification email correctly sent to the address {}", email);
+        return toReturn;
     }
 
-    @Transactional(readOnly = true)
     @Override
     public Optional<User> findByUsername(String username) {
         return userDao.findByUsername(username);
     }
 
-    @Transactional(readOnly = true)
     @Override
     public Optional<User> findByEmail(String email) {
         return userDao.findByEmail(email);
@@ -87,26 +89,12 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void requestPasswordReset(String email, String baseUrl) {
+    public void requestPasswordReset(String email) {
         Optional<User> user = findByEmail(email);
         long userId = user.get().getId();
         Token token = generateToken(userId, RESET_PASSWORD_DAYS_DURATION);
-        ms.sendResetPasswordEmail(userId, token.getToken(), email, baseUrl);
+        ms.sendResetPasswordEmail(userId, token.getToken(), email);
         LOGGER.info("Reset Password email correctly sent to the address {}", email);
-    }
-
-    @Transactional
-    @Override
-    public void sendVerificationEmail(String email, String baseUrl) {
-        Optional<User> user = findByEmail(email);
-        if(user.isEmpty()) {
-            throw new UserNotFoundException();
-        }
-        long userId = user.get().getId();
-        String username = user.get().getUsername();
-        Token token = generateToken(userId, VERIFICATION_DAYS_DURATION);
-        ms.sendVerificationEmail(userId, username, token.getToken(), email, baseUrl);
-        LOGGER.info("Verification email correctly sent to the address {}", email);
     }
 
     @Transactional
@@ -120,7 +108,6 @@ public class UserServiceImpl implements UserService {
         return optToken;
     }
 
-    @Transactional(readOnly = true)
     @Override
     public boolean sameAsOldPassword(String newPassword, Long userId) {
         String oldPassword = findById(userId).get().getPassword();
@@ -128,16 +115,22 @@ public class UserServiceImpl implements UserService {
         return passwordEncoder.matches(newPassword, oldPassword);
     }
 
-    @Transactional(readOnly = true)
     @Override
     public boolean usernameIsTaken(String username) {
         return findByUsername(username).isPresent();
     }
 
-    @Transactional(readOnly = true)
     @Override
     public boolean emailIsTaken(String email) {
         return findByEmail(email).isPresent();
+    }
+
+    @Transactional
+    @Override
+    public void resendVerification(User user) {
+        Token token = generateToken(user.getId(), VERIFICATION_DAYS_DURATION);
+        ms.sendVerificationEmail(user.getId(), user.getUsername(), token.getToken(), user.getEmail());
+        LOGGER.info("The verification email has been successfully resent to the address {}", user.getEmail());
     }
 
     @Transactional
@@ -157,7 +150,6 @@ public class UserServiceImpl implements UserService {
         return optToken;
     }
 
-    @Transactional(readOnly = true)
     @Override
     public void authenticateVerifiedUser(Long userId) {
         Optional<User> optUser = findById(userId);
@@ -170,6 +162,7 @@ public class UserServiceImpl implements UserService {
             Authentication authentication = new UsernamePasswordAuthenticationToken(user.getUsername(), null, authorities);
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
+            LOGGER.debug("User has been verified and authenticated");
         } else {
             LOGGER.error("User with ID {} does not exist", userId);
             throw new UserNotFoundException();
@@ -239,26 +232,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> searchByName(String name) {
         return userDao.searchByName(name);
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public void sendTournamentJoinedEmail(String username, Long tournamentId, String tournamentLink, String recipient) {
-        Optional<Tournament> tournamentOpt = tournamentDao.findById(tournamentId);
-        if(tournamentOpt.isEmpty()) {
-            LOGGER.error("Tournament of ID {} does not exist", tournamentId);
-            throw new TournamentNotFoundException();
-        }
-        Tournament tournament = tournamentOpt.get();
-        User creator = findById(tournament.getCreator_id()).get();
-        ms.sendTournamentJoinedEmail(username, tournament.getName(), tournamentLink, recipient, creator.getEmail());
-        LOGGER.info("Tournament joined email correctly sent to the address {}", recipient);
-    }
-
-    @Override
-    public void sendTournamentCreatedEmail(String username, String tournamentName, String tournamentLink, String recipient) {
-        ms.sendTournamentCreatedEmail(username, tournamentName, tournamentLink, recipient);
-        LOGGER.info("Tournament creation email correctly sent to the address {}", recipient);
     }
 
 }

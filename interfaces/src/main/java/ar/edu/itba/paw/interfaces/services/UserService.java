@@ -16,11 +16,9 @@ public interface UserService {
 
     Optional<User> findByEmail(String email);
 
-    void requestPasswordReset(String email, String baseUrl);
+    void requestPasswordReset(String email);
 
-    void sendVerificationEmail(String email, String baseUrl);
-
-    void sendTournamentJoinedEmail(String username, Long tournamentId, String tournamentLink, String recipient);
+    void resendVerification(User user);
 
     Optional<Token> checkTokenValidity(Long token, Long userId);
 
@@ -40,5 +38,4 @@ public interface UserService {
 
     List<User> searchByName(String name);
 
-    void sendTournamentCreatedEmail(String username, String tournamentName, String tournamentLink, String recipient);
 }
