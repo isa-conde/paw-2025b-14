@@ -27,4 +27,5 @@ public interface TeamService {
 
     Boolean teamNameTaken(String name);
 
+    List<Team> searchByName(String name);
 }

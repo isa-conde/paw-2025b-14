@@ -104,4 +104,9 @@ public class UserJdbcDao implements UserDao {
 
         jdbcTemplate.update(sql.toString(), params.toArray());    }
 
+    @Override
+    public List<User> searchByName(String name) {
+        return jdbcTemplate.query("SELECT * FROM users WHERE LOWER(username) LIKE '%' || LOWER(?) || '%'", ROW_MAPPER, name);
+    }
+
 }

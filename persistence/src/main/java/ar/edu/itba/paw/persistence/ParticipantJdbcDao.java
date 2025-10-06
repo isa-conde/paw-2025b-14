@@ -51,7 +51,6 @@ public class ParticipantJdbcDao implements ParticipantDao {
 
     @Override
     public List<Participant> getTournamentsParticipantUsers(Long tournament_id) {
-
         return jdbcTemplate.query("SELECT * FROM participant " +
                                       "INNER JOIN users ON participant.user_id = users.id " +
                                       "WHERE tournament_id = ?", ROW_MAPPER_USER, tournament_id);

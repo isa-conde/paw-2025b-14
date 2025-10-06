@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.webapp.controller;
 
 import ar.edu.itba.paw.interfaces.services.GameService;
+import ar.edu.itba.paw.interfaces.services.TeamService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.Game.Game;
@@ -31,11 +32,13 @@ public class UserController {
     private final GameService gs;
     private final UserService us;
     private final TournamentService ts;
+    private final TeamService tms;
 
-    public UserController(GameService gs, UserService us, TournamentService ts) {
+    public UserController(GameService gs, UserService us, TournamentService ts, TeamService tms) {
         this.gs = gs;
         this.us = us;
         this.ts = ts;
+        this.tms = tms;
     }
 
     @RequestMapping("/")
@@ -164,6 +167,8 @@ public class UserController {
         mav.addObject("user", user);
         mav.addObject("games", gs.searchByName(q));
         mav.addObject("tournaments", ts.searchByName(q));
+        mav.addObject("users", us.searchByName(q));
+        mav.addObject("teams", tms.searchByName(q));
 
         return mav;
     }

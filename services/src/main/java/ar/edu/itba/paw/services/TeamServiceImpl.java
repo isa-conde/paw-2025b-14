@@ -118,6 +118,11 @@ public class TeamServiceImpl implements TeamService {
         return teamDao.teamNameTaken(name);
     }
 
+    @Override
+    public List<Team> searchByName(String name) {
+        return teamDao.searchByName(name);
+    }
+
     private List<Tournament> getTournamentsFromIds(List<Long> tournamentIds) {
         List<Tournament> tournaments = new ArrayList<>();
         for (Long id : tournamentIds) {
