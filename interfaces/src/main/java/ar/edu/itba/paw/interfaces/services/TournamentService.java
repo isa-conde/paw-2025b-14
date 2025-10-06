@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.interfaces.services;
 
+import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
 import ar.edu.itba.paw.model.Tournament.Tournament;
@@ -35,7 +36,7 @@ public interface TournamentService {
 
     void startTournament(Long tournament_id);
 
-    Map<Long,List<Tournament>> getUnfilteredTournamentPages(Long page);
+    Map<Game,List<Tournament>> getUnfilteredTournamentPages(Long page);
 
     Integer getPageAmount(Integer pageSize, TournamentFilter tf);
 
@@ -44,4 +45,9 @@ public interface TournamentService {
     int tournamentParticipantsCount(Long tournamentId);
 
     void createBracketFromGroups(Long tournamentId);
+
+    List<Tournament> getCreatedAndFinishedTournaments(Long userId);
+
+    List<Tournament> getCreatedAndOngoingTournaments(Long userId);
+
 }

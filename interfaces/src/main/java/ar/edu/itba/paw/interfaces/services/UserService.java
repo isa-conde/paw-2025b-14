@@ -19,6 +19,8 @@ public interface UserService {
 
     void sendVerificationEmail(String email, String baseUrl);
 
+    void sendTournamentJoinedEmail(String username, Long tournamentId, String tournamentLink, String recipient);
+
     Optional<Token> checkTokenValidity(Long token, Long userId);
 
     Optional<Token> resetPassword(Long token, Long userId, String newPassword);
@@ -31,5 +33,9 @@ public interface UserService {
 
     Optional<Token> verifyEmail(Long token, Long userId);
 
+    void authenticateVerifiedUser(Long userId);
+
     void updateProfileInfo(Long userId, String username, String bio, byte[] pfp, byte[] banner);
+
+    void sendTournamentCreatedEmail(String username, String tournamentName, String tournamentLink, String recipient);
 }

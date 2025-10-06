@@ -9,6 +9,8 @@ import ar.edu.itba.paw.webapp.form.EmailForm;
 import ar.edu.itba.paw.webapp.form.ResetPasswordForm;
 import ar.edu.itba.paw.webapp.form.UserForm;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -17,8 +19,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.sql.Array;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -35,17 +41,7 @@ public class AuthController {
         if (result.hasErrors()) {
             return registerPage(form);
         }
-
-        User user = null;
-        try {
-            user = us.create(form.getUsername(), form.getEmail(), form.getPassword());
-        } catch (EmailAlreadyUsedException e) {
-            result.rejectValue("email", "error.registerForm.emailUsed", e.getMessage());
-            // TODO: add mav return?
-        } catch (UsernameAlreadyUsedException e) {
-            result.rejectValue("username", "error.registerForm.usernameUsed", e.getMessage());
-            // TODO: add mav return?
-        }
+        User user = us.create(form.getUsername(), form.getEmail(), form.getPassword());
         String baseUrl = getBaseUrl(request);
         us.sendVerificationEmail(form.getEmail(), baseUrl);
         return new ModelAndView("redirect:/verify?userId=" + user.getId());
@@ -92,9 +88,10 @@ public class AuthController {
     }
 
     @RequestMapping("/verify/confirm")
-    public ModelAndView confirmedVerificationPage(@RequestParam("token") Long token, @RequestParam("userId") long userId) {
+    public ModelAndView confirmedVerificationPage(@RequestParam("token") Long token, @RequestParam("userId") long userId, HttpServletRequest request) {
         ModelAndView mav = new ModelAndView("confirmedVerificationPage");
         Optional<Token> validToken = us.verifyEmail(token, userId);
+        us.authenticateVerifiedUser(userId);
         mav.addObject("validToken", validToken.isPresent());
         mav.addObject("userId", userId);
         return mav;

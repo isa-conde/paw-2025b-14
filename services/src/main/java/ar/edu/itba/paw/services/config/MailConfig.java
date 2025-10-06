@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.templatemode.TemplateMode;
@@ -13,6 +14,7 @@ import org.thymeleaf.templateresolver.ITemplateResolver;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
+@EnableAsync
 @Configuration
 public class MailConfig {
 

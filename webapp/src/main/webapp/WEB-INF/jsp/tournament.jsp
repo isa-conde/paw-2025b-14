@@ -279,7 +279,16 @@
             </c:when>
         </c:choose>
     </div>
-    <paw:modal title="tournament.edit.modal.title" id="editTournamentModal">
+    <c:url var="tournamentUrl" value="/tournament">
+        <c:param name="tournamentId" value="${tournament.id}"/>
+        <c:if test="${not empty param.section}">
+            <c:param name="section" value="${param.section}"/>
+        </c:if>
+        <c:if test="${not empty param.group}">
+            <c:param name="group" value="${param.group}"/>
+        </c:if>
+    </c:url>
+    <paw:modal title="tournament.edit.modal.title" id="editTournamentModal" returnUrl="${tournamentUrl}">
         <form:form method="post" modelAttribute="editTournamentForm"
                    action="${pageContext.request.contextPath}/tournament/update"
                    enctype="multipart/form-data" cssClass="form">
@@ -287,27 +296,17 @@
             <div class="row">
                 <paw:input path="name" label="home.createTournament.name" hasConstraint="true"/>
             </div>
-            <c:choose>
-                <c:when test="${!tournament.finished}">
-                    <div class="row">
-                        <c:choose>
-                            <c:when test="${!tournament.tournamentStarted}">
-                                <paw:input path="start_date" label="home.createTournament.startDate" inputType="date" hasConstraint="true"/>
-                            </c:when>
-                            <c:otherwise>
-                                <input type="hidden" name="start_date" value="${tournament.start_date}"/>
-                            </c:otherwise>
-                        </c:choose>
-                        <paw:input path="end_date" label="home.createTournament.endDate" inputType="date" hasConstraint="true"/>
-                    </div>
+            <c:if test="${!tournament.finished}">
+                <div class="row">
+                    <c:if test="${!tournament.tournamentStarted}">
+                        <paw:input path="start_date" label="home.createTournament.startDate" inputType="date" hasConstraint="true"/>
+                    </c:if>
+                    <paw:input path="end_date" label="home.createTournament.endDate" inputType="date" hasConstraint="true"/>
+                </div>
+                <c:if test="${tournament.openInscriptions}">
                     <paw:input path="max_participants" label="home.createTournament.maxParticipants" inputType="number" hasConstraint="true"/>
-                </c:when>
-                <c:otherwise>
-                    <input type="hidden" name="start_date" value="${tournament.start_date}"/>
-                    <input type="hidden" name="end_date" value="${tournament.end_date}"/>
-                    <input type="hidden" name="max_participants" value="${tournament.max_participants}"/>
-                </c:otherwise>
-            </c:choose>
+                </c:if>
+            </c:if>
             <paw:input path="image" label="home.createTournament.image" inputType="file"/>
             <div class="row center">
                 <paw:input path="" label="tournament.edit.saveChanges" containerType="half" inputType="submit"/>
@@ -335,4 +334,5 @@
     </c:forEach>
 </paw:modal>
 
+<div id="page-flags" data-open-edit-modal="${openEditModal}"/>
 <script src="${pageContext.request.contextPath}/js/swap.js"></script>

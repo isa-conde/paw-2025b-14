@@ -37,7 +37,7 @@
             <div class="carrousel-title">
                 <paw:text type="title" size="s"><c:out value="${game.name}"/></paw:text>
             </div>
-            <paw:carrousel id="game-${game.id}-tournaments" elements="${gameTournaments[game.id]}"/>
+            <paw:carrousel id="game-${game.id}-tournaments" elements="${gameTournaments[game]}"/>
         </c:if>
     </c:forEach>
   </c:if>

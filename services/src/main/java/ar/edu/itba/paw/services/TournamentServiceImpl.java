@@ -1,10 +1,10 @@
 package ar.edu.itba.paw.services;
 
-import ar.edu.itba.paw.interfaces.persistence.ImageDao;
-import ar.edu.itba.paw.interfaces.persistence.MatchDao;
-import ar.edu.itba.paw.interfaces.persistence.ParticipantDao;
-import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
+import ar.edu.itba.paw.interfaces.exception.*;
+import ar.edu.itba.paw.interfaces.persistence.*;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
+import ar.edu.itba.paw.model.Game.Game;
+import ar.edu.itba.paw.model.ParticipantUser;
 import ar.edu.itba.paw.model.*;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.enums.Elo;
@@ -25,24 +25,30 @@ public class TournamentServiceImpl implements TournamentService {
     private final ImageDao imageDao;
     private final ParticipantDao participantDao;
     private final MatchDao matchDao;
+    private final GameDao gameDao;
 
-    public TournamentServiceImpl(TournamentDao tournamentDao, ImageDao imageDao, ParticipantDao participantDao, MatchDao matchDao) {
+    public TournamentServiceImpl(TournamentDao tournamentDao, ImageDao imageDao, ParticipantDao participantDao, MatchDao matchDao, GameDao gameDao) {
         this.tournamentDao = tournamentDao;
         this.imageDao = imageDao;
         this.participantDao = participantDao;
         this.matchDao = matchDao;
+        this.gameDao = gameDao;
     }
 
     @Override
     public Optional<Tournament> findById(Long id) {
-        if (id != null){
-            return tournamentDao.findById(id);
+        Optional<Tournament> toReturn = tournamentDao.findById(id);
+        if(toReturn.isEmpty()) {
+            throw new TournamentNotFoundException();
         }
-        return Optional.empty();
+        return toReturn;
     }
 
     @Override
     public List<Tournament> findTournaments(TournamentFilter tournamentFilter, Long page) {
+        if(gameDao.findById(tournamentFilter.getGame_id()).isEmpty()) {
+            throw new GameNotFoundException();
+        }
         return tournamentDao.findTournaments(tournamentFilter, page);
     }
 
@@ -90,8 +96,13 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Override
     public void closeInscriptions(Long tournament_id){
+        if(findById(tournament_id).isEmpty()) {
+            throw new TournamentNotFoundException();
+        }
+        if(tournamentDao.isClosed(tournament_id)) {
+            throw new TournamentAlreadyClosedException();
+        }
         tournamentDao.closeInscriptions(tournament_id);
-        createMatches(tournament_id, participantDao.getTournamentParticipantUsers(tournament_id));
     }
 
     @Override
@@ -111,16 +122,28 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Override
     public void startTournament(Long tournament_id){
+        Optional<Tournament> optTournament = findById(tournament_id);
+        if(optTournament.isEmpty()) {
+            throw new TournamentNotFoundException();
+        }
+        if(optTournament.get().getTournamentStarted()) {
+            throw new TournamentAlreadyStartedException();
+        }
         tournamentDao.startTournament(tournament_id);
-        Tournament t = findById(tournament_id).orElse(null);
-        if(t != null && t.getStructure().equals(Structure.HYBRID)){
+        Tournament t = optTournament.get();
+        if(t.getStructure().equals(Structure.HYBRID)){
             createGroupStageMatches(t);
         }
     }
 
     @Override
-    public Map<Long,List<Tournament>> getUnfilteredTournamentPages(Long page) {
-        return tournamentDao.getUnfilteredTournamentPages(page);
+    public Map<Game, List<Tournament>> getUnfilteredTournamentPages(Long page) {
+        Map<Long, List<Tournament>> mapWithGameIdAsKey = tournamentDao.getUnfilteredTournamentPages(page);
+        Map<Game, List<Tournament>> mapWithGameAsKey = new HashMap<>();
+        for(Long gameId : mapWithGameIdAsKey.keySet()) {
+            mapWithGameAsKey.putIfAbsent(gameDao.findById(gameId).get(), mapWithGameIdAsKey.get(gameId));
+        }
+        return mapWithGameAsKey;
     }
 
     @Override
@@ -335,5 +358,17 @@ public class TournamentServiceImpl implements TournamentService {
             grouped.computeIfAbsent(p.getGroupNumber(), k -> new ArrayList<>()).add(p);
         }
         return grouped;
+    }
+
+    @Override
+    public List<Tournament> getCreatedAndFinishedTournaments(Long userId) {
+        List<Tournament> allCreatedTournaments = findByCreator(userId);
+        return allCreatedTournaments.stream().filter(t -> t.getFinished()).toList();
+    }
+
+    @Override
+    public List<Tournament> getCreatedAndOngoingTournaments(Long userId) {
+        List<Tournament> allCreatedTournaments = findByCreator(userId);
+        return allCreatedTournaments.stream().filter(t -> !t.getFinished()).toList();
     }
 }

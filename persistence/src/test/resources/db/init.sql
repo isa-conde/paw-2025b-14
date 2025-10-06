@@ -93,12 +93,14 @@ create table if not exists participant(
 );
 
 create table if not exists match(
-    id integer identity primary key not null,
+    id integer identity not null,
     tournament_id integer not null ,
     local_id integer,
     visitor_id integer,
+    local_score integer,
+    visitor_score integer,
     winner integer,
     stage integer,
-    group_number integer,
-    is_group_stage boolean
+    is_group_stage boolean,
+    primary key (id,tournament_id)
 );

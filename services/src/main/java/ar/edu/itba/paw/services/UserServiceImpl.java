@@ -1,20 +1,28 @@
 package ar.edu.itba.paw.services;
 
+import ar.edu.itba.paw.interfaces.exception.*;
 import ar.edu.itba.paw.interfaces.persistence.ImageDao;
 import ar.edu.itba.paw.interfaces.persistence.TokenDao;
+import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.interfaces.persistence.UserDao;
 import ar.edu.itba.paw.interfaces.services.MailService;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.Token;
+import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.User;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import ar.edu.itba.paw.interfaces.exception.BusinessException;
-import ar.edu.itba.paw.interfaces.exception.EmailAlreadyUsedException;
-import ar.edu.itba.paw.interfaces.exception.UsernameAlreadyUsedException;
 import org.springframework.stereotype.Service;
 
+import java.security.InvalidAlgorithmParameterException;
 import java.security.SecureRandom;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -25,15 +33,17 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final MailService ms;
     private final ImageDao imageDao;
+    private final TournamentDao tournamentDao;
 
     private final static int RESET_PASSWORD_DAYS_DURATION = 1;
     private final static int VERIFICATION_DAYS_DURATION = 2;
 
 
-    public UserServiceImpl(final UserDao userDao, final TokenDao tokenDao, final PasswordEncoder passwordEncoder, final MailService ms, final ImageDao imageDao) {
+    public UserServiceImpl(final UserDao userDao, final TokenDao tokenDao, final PasswordEncoder passwordEncoder, final TournamentDao tournamentDao, final MailService ms, final ImageDao imageDao) {
         this.userDao = userDao;
         this.tokenDao = tokenDao;
         this.passwordEncoder = passwordEncoder;
+        this.tournamentDao = tournamentDao;
         this.ms = ms;
         this.imageDao = imageDao;
     }
@@ -120,15 +130,41 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<Token> verifyEmail(Long token, Long userId) {
         Optional<Token> optToken = checkTokenValidity(token, userId);
-        if(optToken.isPresent()) {
-            userDao.verifyUser(userId);
+        Optional<User> user = findById(userId);
+        if(user.isPresent()) {
+            if(optToken.isPresent()) {
+                userDao.verifyUser(userId);
+            }
+        } else {
+            throw new UserNotFoundException();
         }
+
         return optToken;
+    }
+
+    @Override
+    public void authenticateVerifiedUser(Long userId) {
+        Optional<User> optUser = findById(userId);
+        if(optUser.isPresent()) {
+            User user = optUser.get();
+            List<GrantedAuthority> authorities = new ArrayList<>();
+            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+            authorities.add(new SimpleGrantedAuthority("ROLE_VERIFIED"));
+
+            Authentication authentication = new UsernamePasswordAuthenticationToken(user.getUsername(), null, authorities);
+
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        } else {
+            throw new UserNotFoundException();
+        }
     }
 
     @Override
     public Optional<Token> checkTokenValidity(Long token, Long userId) {
         Optional<Token> optToken = tokenDao.findByToken(token);
+        if(findById(userId).isEmpty()) {
+            throw new UserNotFoundException();
+        }
         if(optToken.isPresent()) {
             Token foundToken = optToken.get();
             if(foundToken.getUser_id().equals(userId)) {
@@ -176,4 +212,21 @@ public class UserServiceImpl implements UserService {
         }
         userDao.updateProfileInfo(userId, username, bio, pfpId, bannerId);
     }
+
+    @Override
+    public void sendTournamentJoinedEmail(String username, Long tournamentId, String tournamentLink, String recipient) {
+        Optional<Tournament> tournamentOpt = tournamentDao.findById(tournamentId);
+        if(tournamentOpt.isEmpty()) {
+            throw new TournamentNotFoundException();
+        }
+        Tournament tournament = tournamentOpt.get();
+        User creator = findById(tournament.getCreator_id()).get();
+        ms.sendTournamentJoinedEmail(username, tournament.getName(), tournamentLink, recipient, creator.getEmail());
+    }
+
+    @Override
+    public void sendTournamentCreatedEmail(String username, String tournamentName, String tournamentLink, String recipient) {
+        ms.sendTournamentCreatedEmail(username, tournamentName, tournamentLink, recipient);
+    }
+
 }

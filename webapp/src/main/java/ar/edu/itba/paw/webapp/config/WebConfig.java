@@ -5,15 +5,21 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.io.Resource;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.jdbc.datasource.init.DataSourceInitializer;
 import org.springframework.jdbc.datasource.init.DatabasePopulator;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.multipart.MultipartResolver;
@@ -29,6 +35,9 @@ import java.nio.charset.StandardCharsets;
 
 import javax.sql.DataSource;
 
+@PropertySource("classpath:application.properties")
+@EnableAsync
+@EnableTransactionManagement
 @EnableWebMvc
 @Configuration
 @EnableScheduling
@@ -40,8 +49,22 @@ import javax.sql.DataSource;
 })
 public class WebConfig implements WebMvcConfigurer {
 
+    @Value("${spring.datasource.url}")
+    private String databaseUrl;
+
+    @Value("${spring.datasource.username}")
+    private String databaseUsername;
+
+    @Value("${spring.datasource.password}")
+    private String databasePassword;
+
     @Value("classpath:db/schema.sql")
     private Resource schemaSql;
+
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+        return new PropertySourcesPlaceholderConfigurer();
+    }
 
     @Bean
     public MessageSource messageSource() {
@@ -81,9 +104,9 @@ public class WebConfig implements WebMvcConfigurer {
     public DataSource dataSource() {
         final SimpleDriverDataSource ds = new SimpleDriverDataSource();
         ds.setDriverClass(org.postgresql.Driver.class);
-        ds.setUrl("jdbc:postgresql://localhost:5433/paw");
-        ds.setUsername("paw");
-        ds.setPassword("paw");
+        ds.setUrl(databaseUrl);
+        ds.setUsername(databaseUsername);
+        ds.setPassword(databasePassword);
 
         return ds;
     }
@@ -115,6 +138,11 @@ public class WebConfig implements WebMvcConfigurer {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public PlatformTransactionManager transactionManager(final DataSource ds) {
+        return new DataSourceTransactionManager(ds);
     }
 
 }

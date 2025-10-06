@@ -1,4 +1,4 @@
-package ar.edu.itba.paw.webapp.validation;
+package ar.edu.itba.paw.webapp.constraints;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -7,14 +7,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
-@Constraint(validatedBy = PasswordValidator.class)
-public @interface  PasswordValidation {
-    
-    String message() default "Password must be 8-20 characters long and contain at least one lowercase letter, one uppercase letter, and one digit";
-    
+@Constraint(validatedBy = DatesNullabilityValidator.class)
+public @interface DatesNullabilityConstraint {
+    String message() default "{tournament.dates.nullability}";
     Class<?>[] groups() default {};
-    
     Class<? extends Payload>[] payload() default {};
 }

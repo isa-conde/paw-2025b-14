@@ -10,10 +10,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.jdbc.JdbcTestUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
 import java.time.LocalDate;
@@ -21,6 +23,8 @@ import java.time.LocalDate;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = TestConfig.class)
 @Sql("classpath:db/init.sql")
+@Transactional
+@Rollback
 public class TournamentJdbcDaoTest {
     private static final String NAME = "Jerma Rumble";
     private static final Elo ELO = Elo.MID;

@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.services;
 
+import ar.edu.itba.paw.interfaces.exception.UserAlreadyJoinedException;
 import ar.edu.itba.paw.interfaces.persistence.ParticipantDao;
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.interfaces.services.ParticipantService;
@@ -28,6 +29,10 @@ public class ParticipantServiceImpl implements ParticipantService {
 
     @Override
     public void joinTournamentUser(Long user_id, Long tournament_id) {
+        if(hasJoined(user_id, tournament_id)) {
+            throw new UserAlreadyJoinedException();
+        }
+
         participantDao.joinTournamentUser(user_id, tournament_id);
 
         List<ParticipantUser> participantUsers = getTournamentParticipantUsers(tournament_id);
