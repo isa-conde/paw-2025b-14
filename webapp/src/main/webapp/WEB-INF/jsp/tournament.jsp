@@ -60,7 +60,7 @@
                 </div>
                 <c:if test="${tournamentWinner != null && tournamentWinner > 0}">
                         <c:forEach var="p" items="${participants}">
-                            <c:if test="${p.user_id == tournamentWinner}">
+                            <c:if test="${p.id == tournamentWinner}">
                                 <div class="cards-container">
                                     <paw:winner-card winnerName="${p.name}"/>
                                 </div>

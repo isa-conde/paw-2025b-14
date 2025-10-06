@@ -113,7 +113,7 @@ public class TournamentServiceImpl implements TournamentService {
 
     private List<Participant> getLeagueTournamentTopPositions(Long tournamentId){
         Optional<Tournament> t = tournamentDao.findById(tournamentId);
-        Integer maxPoints = participantDao.getTournamentMaxPoints(tournamentId);
+        Integer maxPoints = participantDao.getTournamentMaxPointsGroup(tournamentId, null);
         if (maxPoints == null) return java.util.Collections.emptyList();
         return participantDao.getTournamentParticipantsByPoints(tournamentId, null, maxPoints,  gameDao.getFormatById(t.get().getFormat_id()).get().getPlayers_per_team());
     }
@@ -339,19 +339,25 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Transactional
     @Override
-    public void createBracketFromGroups(Long tournamentId) { // TODO: error handling here?
+    public void createBracketFromGroups(Long tournamentId, Long lastMatchId) { // TODO: error handling here?
         Integer groups = participantDao.getTournamentGroups(tournamentId);
         Tournament t = findById(tournamentId).orElse(null);
         List<Participant> classified = new ArrayList<>(groups * 2);
         for(int i = 1; i <= groups; i++){
+
             Map<Integer, List<Participant>> topPositions = getGroupTopPositions(tournamentId, i);
             if(topPositions.get(1).size() > 1){
-                createMatchesLeague(t, topPositions.get(1), 1L, matchDao.getTournamentGroupMaxStage(tournamentId, i), true);
+                createMatchesLeague(t, topPositions.get(1), lastMatchId + 1, matchDao.getTournamentGroupMaxStage(tournamentId, i) + 1, true);
                 return;
             }else if(topPositions.get(2).size() > 1){
                 participantDao.sumPoints(tournamentId, topPositions.get(1).getFirst().getId(), 3 * (topPositions.get(2).size() / 2));
-
-                createMatchesLeague(t, topPositions.get(2), 1L, matchDao.getTournamentGroupMaxStage(tournamentId, i), true);
+                createMatchesLeague(t, topPositions.get(2), lastMatchId + 1, matchDao.getTournamentGroupMaxStage(tournamentId, i) + 1, true);
+                return;
+            }
+            System.out.println("Error in bracket creation group " + i);
+            System.out.println("topPositions.get(1) " + topPositions.get(1));
+            System.out.println("topPositions.get(2) " + topPositions.get(2));
+            if(topPositions.get(1).isEmpty() || topPositions.get(2).isEmpty()){
                 return;
             }
             Participant local   = topPositions.get(1).getFirst();
@@ -367,9 +373,18 @@ public class TournamentServiceImpl implements TournamentService {
     private Map<Integer, List<Participant>> getGroupTopPositions(Long tournament_id, Integer group_number){
         Map<Integer, List<Participant>> out = new HashMap<>();
         Optional<Tournament> t = tournamentDao.findById(tournament_id);
-        Integer teamSize = gameDao.getFormatById(t.get().getFormat_id()).get().getPlayers_per_team();
-        out.put(1, participantDao.getTournamentParticipantsByPoints(tournament_id, group_number, participantDao.getTournamentMaxPoints(tournament_id), teamSize));
-        out.put(2, participantDao.getTournamentParticipantsByPoints(tournament_id, group_number, participantDao.getTournamentSecondMaxPoints(tournament_id), teamSize));
+        if(t.isEmpty()) {
+            return out;
+        }
+        Tournament tournament = t.get();
+        Integer teamSize;
+        if(tournament.getFormat_id() != null){
+            teamSize = gameDao.getFormatById(t.get().getFormat_id()).get().getPlayers_per_team();
+        }else{
+            teamSize = 1;
+        }
+        out.put(1, participantDao.getTournamentParticipantsByPoints(tournament_id, group_number, participantDao.getTournamentMaxPointsGroup(tournament_id, group_number), teamSize));
+        out.put(2, participantDao.getTournamentParticipantsByPoints(tournament_id, group_number, participantDao.getTournamentSecondMaxPointsGroup(tournament_id, group_number), teamSize));
         return out;
     }
 

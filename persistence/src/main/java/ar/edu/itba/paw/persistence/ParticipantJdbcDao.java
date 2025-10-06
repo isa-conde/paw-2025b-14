@@ -161,18 +161,18 @@ public class ParticipantJdbcDao implements ParticipantDao {
     }
 
     @Override
-    public Integer getTournamentMaxPoints(Long tournamentId){
+    public Integer getTournamentMaxPointsGroup(Long tournamentId, Integer group){
         return jdbcTemplate.queryForObject(
-                "SELECT MAX(points) FROM participant WHERE tournament_id = ?",
-                Integer.class, tournamentId
+                "SELECT MAX(points) FROM participant WHERE tournament_id = ? AND group_number = ?",
+                Integer.class, tournamentId, group
         );
     }
 
     @Override
-    public Integer getTournamentSecondMaxPoints(Long tournamentId) {
+    public Integer getTournamentSecondMaxPointsGroup(Long tournamentId, Integer group) {
         return jdbcTemplate.queryForObject(
-                "SELECT MAX(points) FROM participant WHERE tournament_id = ? AND points < ?",
-                Integer.class, tournamentId, getTournamentMaxPoints(tournamentId)
+                "SELECT MAX(points) FROM participant WHERE tournament_id = ? AND points < ? AND group_number = ?",
+                Integer.class, tournamentId, getTournamentMaxPointsGroup(tournamentId, group), group
         );
     }
 

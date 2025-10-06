@@ -2,12 +2,14 @@ package ar.edu.itba.paw.webapp.form;
 
 import ar.edu.itba.paw.webapp.constraints.MembersBelongToTeamConstraint;
 import ar.edu.itba.paw.webapp.constraints.MembersCountConstraint;
+import ar.edu.itba.paw.webapp.constraints.MembersNotInTournamentConstraint;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @MembersCountConstraint(groups = JoinTournamentTeamForm.StepTwo.class)
 @MembersBelongToTeamConstraint(groups = JoinTournamentTeamForm.StepTwo.class)
+@MembersNotInTournamentConstraint(groups = JoinTournamentTeamForm.StepTwo.class)
 public class JoinTournamentTeamForm {
     public interface StepOne {}
     public interface StepTwo {}

@@ -131,6 +131,7 @@ public class ParticipantServiceImpl implements ParticipantService {
         LOGGER.info("Users with IDs {} and {} have successfully swapped groups", user1, user2);
     }
 
+    @Transactional
     @Override
     public void joinTournamentTeam(Long tournamentId, Long teamId, List<Long> participants){
         for(Long p : participants){

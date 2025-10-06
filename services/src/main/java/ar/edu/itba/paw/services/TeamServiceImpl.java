@@ -89,6 +89,7 @@ public class TeamServiceImpl implements TeamService {
         return teamDao.getUserTeams(user_id);
     }
 
+    @Transactional
     @Override
     public void updateTeam(Long teamId, String name, byte[] pfp, byte[] banner, List<String> members) {
         Optional<Team> optionalTeam = teamDao.getById(teamId);
@@ -134,8 +135,8 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public List<Team> getUserTeamsByTournamentSize(Long userId, Long tournamentId) {
-        return teamDao.getUserTeamsBySize(userId, ts.getPlayersPerTeam(tournamentId));
+    public List<Team> getUserTeamsBySizeNotInTournament(Long userId, Long tournamentId) {
+        return teamDao.getUserTeamsBySizeNotInTournament(userId, tournamentId, ts.getPlayersPerTeam(tournamentId));
     }
 
     @Override

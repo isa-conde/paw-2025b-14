@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -248,34 +249,86 @@ public class TeamJdbcDaoTest {
         Assert.assertTrue(foundTeams.isEmpty());
     }
 
+    private Long insertTournament(String name) {
+        SimpleJdbcInsert ins = new SimpleJdbcInsert(jdbcTemplate)
+                .withTableName("tournament")
+                .usingGeneratedKeyColumns("id");
+
+        LocalDate today = LocalDate.now();
+
+        Map<String, Object> values = new HashMap<>();
+        values.put("name", name);
+        values.put("creator_id", ID);
+        values.put("game_id", 5L);
+        values.put("region", "NA");
+        values.put("elo", "LOW");
+        values.put("start_date", today);
+        values.put("end_date", today.plusDays(7));
+        values.put("format", "5vs5");
+        values.put("structure", "LEAGUE");
+        values.put("max_participants", 4);
+        values.put("open_inscriptions", true);
+        values.put("is_finished", false);
+        values.put("is_group_stage", false);
+        values.put("tournament_started", false);
+        values.put("format_id", 4L);
+        values.put("image_id", null);
+        values.put("tournament_winner", null);
+
+        Number id = ins.executeAndReturnKey(values);
+        return id.longValue();
+    }
+
     @Test
-    public void testGetUserTeamsBySize(){
+    public void testGetUserTeamsBySize_NotInTournament_ReturnsTeam() {
         SimpleJdbcInsert teamMemberInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("team_member");
         teamMemberInsert.execute(Map.of("team_id", used_id, "user_id", ID));
         teamMemberInsert.execute(Map.of("team_id", used_id, "user_id", OTHER_ID));
 
-        List<Team> teams = teamJdbcDao.getUserTeamsBySize(ID, 2);
+        Long tournamentId = insertTournament("Tournament X");
+
+        List<Team> teams = teamJdbcDao.getUserTeamsBySizeNotInTournament(ID, tournamentId, 2);
 
         Assert.assertNotNull(teams);
         Assert.assertFalse(teams.isEmpty());
         Assert.assertEquals(1, teams.size());
+
         Team team = teams.get(0);
-        Assert.assertEquals(OTHER_TEAM, team.getName());
         Assert.assertEquals(used_id, team.getId());
+        Assert.assertEquals(OTHER_TEAM, team.getName());
         Assert.assertEquals(OTHER_ID, team.getOwner_id());
         Assert.assertEquals(OTHER_ID, team.getPfp_id());
         Assert.assertEquals(OTHER_ID, team.getBanner_id());
+
         Integer memberCount = jdbcTemplate.queryForObject(
                 "SELECT COUNT(*) FROM team_member WHERE team_id = ?",
-                Integer.class,
-                used_id
+                Integer.class, used_id
         );
         Assert.assertTrue(memberCount >= 2);
     }
 
     @Test
-    public void testGetUserNoTeamsBySize(){
-        List<Team> teams = teamJdbcDao.getUserTeamsBySize(9L, 12);
+    public void testGetUserNoTeamsBySize_NotInTournament_ReturnsEmpty() {
+        Long tournamentId = insertTournament("Tournament Y");
+
+        List<Team> teams = teamJdbcDao.getUserTeamsBySizeNotInTournament(9L, tournamentId, 12);
+
+        Assert.assertNotNull(teams);
+        Assert.assertTrue(teams.isEmpty());
+    }
+
+    @Test
+    public void testGetUserTeamsBySize_ExcludesTeamAlreadyInTournament() {
+        SimpleJdbcInsert tmIns = new SimpleJdbcInsert(jdbcTemplate).withTableName("team_member");
+        tmIns.execute(Map.of("team_id", used_id, "user_id", ID));
+        tmIns.execute(Map.of("team_id", used_id, "user_id", OTHER_ID));
+
+        Long tournamentId = insertTournament("Torneo Z");
+
+        new SimpleJdbcInsert(jdbcTemplate).withTableName("participant")
+                .execute(Map.of("tournament_id", tournamentId, "team_id", used_id, "points", 0));
+
+        List<Team> teams = teamJdbcDao.getUserTeamsBySizeNotInTournament(ID, tournamentId, 2);
 
         Assert.assertNotNull(teams);
         Assert.assertTrue(teams.isEmpty());
