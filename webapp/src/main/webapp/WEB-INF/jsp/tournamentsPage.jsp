@@ -32,12 +32,12 @@
       </c:if>
 
       <c:if test="${!isFiltered}">
-        <c:forEach var="game" items="${games}" varStatus="status">
-            <c:if test="${not empty gameTournaments[game.id]}">
+        <c:forEach var="game" items="${gameTournaments.keySet()}" varStatus="status">
+            <c:if test="${not empty gameTournaments[game]}">
                 <div class="carrousel-title">
                     <paw:text type="title" size="s"><c:out value="${game.name}"/></paw:text>
                 </div>
-                <paw:carrousel id="game-${game.id}-tournaments" elements="${gameTournaments[game.id]}"/>
+                <paw:carrousel id="game-${game.id}-tournaments" elements="${gameTournaments[game]}"/>
             </c:if>
         </c:forEach>
       </c:if>

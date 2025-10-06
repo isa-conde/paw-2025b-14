@@ -16,11 +16,11 @@
     <button class="carrousel-arrow carrousel-arrow-left" onclick="moveCarrousel('${id}', -1)">
         <img src="${pageContext.request.contextPath}/images/arrow.png" alt="Previous" class="arrow-icon arrow-left">
     </button>
-    
+
     <div class="carrousel" id="${id}">
         <div class="carrousel-track">
             <c:forEach var="e" items="${elements}" varStatus="status">
-                    <c:choose>
+                <c:choose>
                         <c:when test="${isUserProfile eq true}">
                             <paw:profile-card userProfile="${e}" isUser="true"/>
                         </c:when>
@@ -29,7 +29,6 @@
                         </c:when>
                         <c:otherwise>
                             <div class="carrousel-item">
-
                             <paw:element-card
                                     image="${pageContext.request.contextPath}/image/${e.image_id}"
                                     title="${isGame? e.name : e.name}"
@@ -38,7 +37,6 @@
                                     id="${isGame? e.id : e.id}"
                                     isGame="${isGame}"/>
                             </div>
-
                         </c:otherwise>
                     </c:choose>
             </c:forEach>
