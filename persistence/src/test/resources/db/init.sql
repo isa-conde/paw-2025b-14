@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS tournament(
     tournament_winner integer,
     is_group_stage boolean,
     tournament_started boolean,
+    format_id integer,
     CONSTRAINT tournament_dates_check
         CHECK  ((start_date IS NULL) OR (end_date IS NULL) OR (start_date < end_date))
 );
