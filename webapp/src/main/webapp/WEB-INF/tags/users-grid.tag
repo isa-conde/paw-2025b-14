@@ -9,10 +9,10 @@
     <c:forEach var="p" items="${participants}">
         <c:choose>
             <c:when test="${isIndividualTournament}">
-                <c:set value="/profile/${p.id}" var="url"/>
+                <c:url value="/profile/${p.id}" var="url"/>
             </c:when>
             <c:otherwise>
-                <c:set value="/team/profile/${p.id}" var="url"/>
+                <c:url value="/team/profile/${p.id}" var="url"/>
             </c:otherwise>
         </c:choose>
         <paw:profileButton text="${p.name}" imageId="${p.pfp_id}" onclick="window.location.href='${url}'" isNotSafe="true" size="l" fill="false"/>
