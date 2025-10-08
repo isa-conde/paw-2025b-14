@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS tournament(
     elo varchar(10) ,
     start_date date ,
     end_date date ,
-    format varchar(100) NOT NULL ,
+    format varchar(100),
     structure varchar(20) ,
     max_participants INTEGER NOT NULL ,
     image_id INTEGER ,
