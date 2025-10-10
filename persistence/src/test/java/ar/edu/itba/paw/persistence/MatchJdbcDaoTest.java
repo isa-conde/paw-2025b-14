@@ -2,6 +2,7 @@ package ar.edu.itba.paw.persistence;
 
 import ar.edu.itba.paw.model.Match;
 import ar.edu.itba.paw.model.MatchInfo;
+import ar.edu.itba.paw.persistence.Jdbc.MatchJdbcDao;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

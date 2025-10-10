@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.persistence;
 
+import ar.edu.itba.paw.persistence.Jdbc.TeamMemberJdbcDao;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

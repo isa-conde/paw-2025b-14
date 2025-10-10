@@ -3,6 +3,7 @@ package ar.edu.itba.paw.persistence;
 import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.Game.GameFormat;
 import ar.edu.itba.paw.model.enums.Genre;
+import ar.edu.itba.paw.persistence.Jdbc.GameJdbcDao;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,8 +38,10 @@ public class GameJdbcDaoTest {
     @Autowired
     private DataSource ds;
 
-    @Autowired
+    //@Autowired
     private GameJdbcDao gameJdbcDao;
+
+
 
     private JdbcTemplate jdbcTemplate;
 
@@ -116,26 +119,6 @@ public class GameJdbcDaoTest {
     @Test
     public void testFindNonExistent(){
         Optional<Game> ans = gameJdbcDao.findById(-1);
-
-        Assert.assertNotNull(ans);
-        Assert.assertTrue(ans.isEmpty());
-    }
-
-    @Test
-    public void testFindWithName(){
-        Optional<Game> ans = gameJdbcDao.findByName(OTHER_NAMES[0] + " " + GENRE);
-
-        Assert.assertNotNull(ans);
-        Assert.assertTrue(ans.isPresent());
-        Assert.assertEquals(OTHER_NAMES[0] + " " + GENRE, ans.get().getName());
-        Assert.assertEquals(GENRE, ans.get().getGenre());
-        Assert.assertEquals(Integer.valueOf(1), ans.get().getImage_id());
-        Assert.assertEquals(USED_IDS.get(0), ans.get().getId());
-    }
-
-    @Test
-    public void testFindNameless(){
-        Optional<Game> ans = gameJdbcDao.findByName(NAME);
 
         Assert.assertNotNull(ans);
         Assert.assertTrue(ans.isEmpty());

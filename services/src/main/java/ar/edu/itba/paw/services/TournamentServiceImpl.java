@@ -36,8 +36,9 @@ public class TournamentServiceImpl implements TournamentService {
     private final GameDao gameDao;
     private final UserDao userDao;
     private final MailService ms;
+    private final GameFormatDao gameFormatDao;
 
-    public TournamentServiceImpl(TournamentDao tournamentDao, ImageDao imageDao, ParticipantDao participantDao, MatchDao matchDao, GameDao gameDao, UserDao userDao, MailService ms) {
+    public TournamentServiceImpl(TournamentDao tournamentDao, ImageDao imageDao, ParticipantDao participantDao, MatchDao matchDao, GameDao gameDao, UserDao userDao, MailService ms, GameFormatDao gameFormatDao) {
         this.tournamentDao = tournamentDao;
         this.imageDao = imageDao;
         this.participantDao = participantDao;
@@ -45,6 +46,7 @@ public class TournamentServiceImpl implements TournamentService {
         this.gameDao = gameDao;
         this.userDao = userDao;
         this.ms = ms;
+        this.gameFormatDao = gameFormatDao;
     }
 
     @Override
@@ -127,7 +129,7 @@ public class TournamentServiceImpl implements TournamentService {
         Optional<Tournament> t = tournamentDao.findById(tournamentId);
         Integer maxPoints = participantDao.getTournamentMaxPointsGroup(tournamentId, null);
         if (maxPoints == null) return java.util.Collections.emptyList();
-        return participantDao.getTournamentParticipantsByPoints(tournamentId, null, maxPoints,  gameDao.getFormatById(t.get().getFormat_id()).get().getPlayers_per_team());
+        return participantDao.getTournamentParticipantsByPoints(tournamentId, null, maxPoints,  gameFormatDao.getFormatById(t.get().getFormat_id()).get().getPlayers_per_team());
     }
 
     @Transactional
@@ -312,7 +314,7 @@ public class TournamentServiceImpl implements TournamentService {
 
     private void createMatchesHybrid(Tournament t, List<Participant> participants) {
         int n = participants.size();
-        Integer teamSize = gameDao.getFormatById(t.getFormat_id()).get().getPlayers_per_team();
+        Integer teamSize = gameFormatDao.getFormatById(t.getFormat_id()).get().getPlayers_per_team();
         if (n > 8){
             tournamentDao.setIsGroupStage(t.getId(), true);
             int groupsCount = calculateGroups(n);
@@ -395,7 +397,7 @@ public class TournamentServiceImpl implements TournamentService {
         Tournament tournament = t.get();
         Integer teamSize;
         if(tournament.getFormat_id() != null){
-            teamSize = gameDao.getFormatById(t.get().getFormat_id()).get().getPlayers_per_team();
+            teamSize = gameFormatDao.getFormatById(t.get().getFormat_id()).get().getPlayers_per_team();
         }else{
             teamSize = 1;
         }
@@ -430,7 +432,7 @@ public class TournamentServiceImpl implements TournamentService {
     public Integer getPlayersPerTeam(Long tournamentId){
         Tournament t = findById(tournamentId).orElse(null);
         if(t != null && t.getFormat_id() != null){
-            return gameDao.getPlayersPerTeam(t.getFormat_id());
+            return gameFormatDao.getPlayersPerTeam(t.getFormat_id());
         }
         return null;
     }

@@ -2,6 +2,8 @@ package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.exception.NameAlreadyUsedException;
 import ar.edu.itba.paw.interfaces.persistence.GameDao;
+import ar.edu.itba.paw.interfaces.persistence.GameFormatDao;
+import ar.edu.itba.paw.interfaces.persistence.ImageDao;
 import ar.edu.itba.paw.interfaces.services.GameService;
 import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.Game.GameFormat;
@@ -9,6 +11,7 @@ import ar.edu.itba.paw.model.enums.Genre;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.awt.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,19 +20,18 @@ import java.util.Optional;
 public class GameServiceImpl implements GameService {
 
     private final GameDao gameDao;
+    private final GameFormatDao gameFormatDao;
+    private final ImageDao imageDao;
 
-    public GameServiceImpl(final GameDao gameDao){
+    public GameServiceImpl(final GameDao gameDao, final GameFormatDao gameFormatDao, final ImageDao imageDao){
         this.gameDao = gameDao;
+        this.gameFormatDao = gameFormatDao;
+        this.imageDao = imageDao;
     }
 
     @Override
     public Optional<Game> findById(long id) {
         return gameDao.findById(id);
-    }
-
-    @Override
-    public Optional<Game> findByName(String name) {
-        return gameDao.findByName(name);
     }
 
     @Override
@@ -59,12 +61,16 @@ public class GameServiceImpl implements GameService {
     @Transactional
     @Override
     public Game createWithFormats(String name, Genre genre, List<GameFormat> formats, byte[] image) {
-        return gameDao.createWithFormats(name, genre, formats, image);
+        Long imageId = imageDao.insertImage(image);
+        for (GameFormat f : formats){
+            gameFormatDao.insertFormat(f);
+        }
+        return gameDao.create(name, genre, imageId.intValue());
     }
 
     @Override
     public List<GameFormat> getFormats(Long gameId) {
-        return gameDao.getFormats(gameId);
+        return gameFormatDao.getFormats(gameId);
     }
 
     @Transactional
@@ -93,6 +99,6 @@ public class GameServiceImpl implements GameService {
         if (id == null){
             return Optional.empty();
         }
-        return gameDao.getFormatById(id);
+        return gameFormatDao.getFormatById(id);
     }
 }

@@ -1,11 +1,24 @@
 package ar.edu.itba.paw.model.Game;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "game_format")
 public class GameFormat {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "game_format_id_seq")
+    @SequenceGenerator(sequenceName = "game_format_id_seq", name = "game_format_id_seq", allocationSize = 1)
+    @Column(name = "id")
     private Long id;
+    @Column(name = "name", nullable = false)
     private String name;
+    @Column(name = "players_per_team", nullable = false)
     private Integer players_per_team;
+    @Column(name = "game_id", nullable = false)
     private Long game_id;
+
+    GameFormat(){}
 
     public GameFormat(Long id, String name, Integer playersPerTeam, Long gameId) {
         this.id = id;
@@ -13,8 +26,6 @@ public class GameFormat {
         players_per_team = playersPerTeam;
         game_id = gameId;
     }
-
-    public GameFormat (){}
 
     public Long getId() {
         return id;

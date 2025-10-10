@@ -4,6 +4,7 @@ import ar.edu.itba.paw.model.Team;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
+import ar.edu.itba.paw.persistence.Jdbc.TeamJdbcDao;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

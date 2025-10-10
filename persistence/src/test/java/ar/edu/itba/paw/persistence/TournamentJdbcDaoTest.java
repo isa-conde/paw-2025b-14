@@ -6,6 +6,7 @@ import ar.edu.itba.paw.model.filters.TournamentFilter;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
+import ar.edu.itba.paw.persistence.Jdbc.TournamentJdbcDao;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

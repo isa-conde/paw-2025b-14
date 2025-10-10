@@ -1,7 +1,6 @@
-package ar.edu.itba.paw.persistence;
+package ar.edu.itba.paw.persistence.Jdbc;
 
 import ar.edu.itba.paw.interfaces.persistence.TeamMemberDao;
-import ar.edu.itba.paw.model.Team;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;

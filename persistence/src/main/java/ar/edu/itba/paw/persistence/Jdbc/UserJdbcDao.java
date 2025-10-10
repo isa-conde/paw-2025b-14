@@ -1,14 +1,10 @@
-package ar.edu.itba.paw.persistence;
+package ar.edu.itba.paw.persistence.Jdbc;
 
 import ar.edu.itba.paw.interfaces.persistence.UserDao;
 import ar.edu.itba.paw.model.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
@@ -17,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@Repository
 public class UserJdbcDao implements UserDao {
 
     private final JdbcTemplate jdbcTemplate;
@@ -38,6 +33,7 @@ public class UserJdbcDao implements UserDao {
     }
 
     @Override
+    @Transactional
     public User create(String username, String email, String password) {
         final Map<String, Object> values = Map.of("username", username, "email", email, "password", password, "verified", false, "locale", "es");
         final Number key = jdbcInsert.executeAndReturnKey(values);

@@ -1,10 +1,7 @@
 package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.exception.UserAlreadyJoinedException;
-import ar.edu.itba.paw.interfaces.persistence.GameDao;
-import ar.edu.itba.paw.interfaces.persistence.ParticipantDao;
-import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
-import ar.edu.itba.paw.interfaces.persistence.UserDao;
+import ar.edu.itba.paw.interfaces.persistence.*;
 import ar.edu.itba.paw.interfaces.services.MailService;
 import ar.edu.itba.paw.interfaces.services.ParticipantService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
@@ -32,14 +29,16 @@ public class ParticipantServiceImpl implements ParticipantService {
     private final GameDao gameDao;
     private final UserDao userDao;
     private final MailService ms;
+    private final GameFormatDao gameFormatDao;
 
-    public ParticipantServiceImpl(ParticipantDao participantDao, TournamentDao tournamentDao, TournamentService ts, GameDao gameDao, UserDao userDao, MailService ms){
+    public ParticipantServiceImpl(ParticipantDao participantDao, TournamentDao tournamentDao, TournamentService ts, GameDao gameDao, UserDao userDao, MailService ms, GameFormatDao gameFormatDao){
         this.participantDao = participantDao;
         this.tournamentDao = tournamentDao;
         this.ts = ts;
         this.gameDao = gameDao;
         this.userDao = userDao;
         this.ms = ms;
+        this.gameFormatDao = gameFormatDao;
     }
 
     @Transactional
@@ -112,7 +111,7 @@ public class ParticipantServiceImpl implements ParticipantService {
             throw new IllegalStateException("Members cannot be swapped after the tournament has started"); // TODO: custom handling
         }
         Optional<Tournament> t = tournamentDao.findById(tournament_id);
-        Integer teamSize = gameDao.getFormatById(t.get().getFormat_id()).get().getPlayers_per_team();
+        Integer teamSize = gameFormatDao.getFormatById(t.get().getFormat_id()).get().getPlayers_per_team();
 
         Integer g1 = participantDao.getGroupNumber(tournament_id, user1, teamSize);
         Integer g2 = participantDao.getGroupNumber(tournament_id, user2, teamSize);

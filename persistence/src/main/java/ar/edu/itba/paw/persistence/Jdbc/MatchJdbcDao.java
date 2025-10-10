@@ -1,20 +1,15 @@
-package ar.edu.itba.paw.persistence;
+package ar.edu.itba.paw.persistence.Jdbc;
 
 import ar.edu.itba.paw.interfaces.persistence.MatchDao;
 import ar.edu.itba.paw.model.Match;
 import ar.edu.itba.paw.model.MatchInfo;
-import ar.edu.itba.paw.model.Tournament.Tournament;
-import ar.edu.itba.paw.model.enums.Structure;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

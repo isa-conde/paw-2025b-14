@@ -213,7 +213,6 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void updateProfileInfo(Long userId, String username, String bio, byte[] pfp, byte[] banner){
-        Optional<User> user = userDao.findById(userId);
         Long bannerId = null;
         Long pfpId = null;
         if (pfp != null){

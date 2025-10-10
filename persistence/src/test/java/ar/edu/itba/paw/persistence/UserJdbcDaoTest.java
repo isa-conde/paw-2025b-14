@@ -48,6 +48,7 @@ package ar.edu.itba.paw.persistence;
 
 
 import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.persistence.Jdbc.UserJdbcDao;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;

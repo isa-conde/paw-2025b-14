@@ -1,4 +1,4 @@
-package ar.edu.itba.paw.persistence;
+package ar.edu.itba.paw.persistence.Jdbc;
 
 import ar.edu.itba.paw.interfaces.persistence.ImageDao;
 import org.springframework.jdbc.core.JdbcTemplate;
