@@ -105,19 +105,7 @@ public class AuthController {
         mav.addObject("userId", userId);
 
         if (validToken.isPresent()) {
-            us.findById(userId).ifPresent(user -> {
-                UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
-
-                Authentication auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                ((UsernamePasswordAuthenticationToken) auth).setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                SecurityContext context = SecurityContextHolder.createEmptyContext();
-                context.setAuthentication(auth);
-                SecurityContextHolder.setContext(context);
-
-                request.changeSessionId();
-                new HttpSessionSecurityContextRepository().saveContext(context, request, response);
-            });
+            verifyUser(userId, request, response);
         }
 
         return mav;
@@ -156,12 +144,18 @@ public class AuthController {
     }
 
     @RequestMapping(value = "/forgotPassword/reset", method = RequestMethod.POST)
-    public ModelAndView resetPassword(@RequestParam("token") Long token, @RequestParam("userId") long userId, @Valid @ModelAttribute("resetPasswordForm") ResetPasswordForm resetPasswordForm, BindingResult result) {
+    public ModelAndView resetPassword(@RequestParam("token") Long token, @RequestParam("userId") long userId, @Valid @ModelAttribute("resetPasswordForm") ResetPasswordForm resetPasswordForm, HttpServletRequest request,
+                                      HttpServletResponse response, BindingResult result) {
         if(result.hasErrors()) {
             return resetPasswordPage(token, userId, resetPasswordForm);
         }
         resetPasswordForm.setUserId(userId);
         us.resetPassword(token, userId, resetPasswordForm.getNewPassword());
+
+        Optional<Token> validToken = us.checkTokenValidity(token, userId);
+        if (validToken.isPresent()) {
+            verifyUser(userId, request, response);
+        }
         return new ModelAndView("redirect:/forgotPassword/reset/success");
     }
 
@@ -170,4 +164,19 @@ public class AuthController {
         return new ModelAndView("resetPasswordSuccess");
     }
 
+    private void verifyUser(Long userId, HttpServletRequest request, HttpServletResponse response){
+        us.findById(userId).ifPresent(user -> {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
+
+            Authentication auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            ((UsernamePasswordAuthenticationToken) auth).setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+            SecurityContext context = SecurityContextHolder.createEmptyContext();
+            context.setAuthentication(auth);
+            SecurityContextHolder.setContext(context);
+
+            request.changeSessionId();
+            new HttpSessionSecurityContextRepository().saveContext(context, request, response);
+        });
+    }
 }
