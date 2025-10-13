@@ -1,14 +1,12 @@
 package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.exception.UserAlreadyJoinedException;
-import ar.edu.itba.paw.interfaces.persistence.GameDao;
-import ar.edu.itba.paw.interfaces.persistence.ParticipantDao;
-import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
-import ar.edu.itba.paw.interfaces.persistence.UserDao;
+import ar.edu.itba.paw.interfaces.persistence.*;
 import ar.edu.itba.paw.interfaces.services.MailService;
 import ar.edu.itba.paw.interfaces.services.ParticipantService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.Participant;
+import ar.edu.itba.paw.model.Team;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.User;
 import org.slf4j.Logger;
@@ -31,14 +29,16 @@ public class ParticipantServiceImpl implements ParticipantService {
     private final TournamentService ts;
     private final GameDao gameDao;
     private final UserDao userDao;
+    private final TeamDao teamDao;
     private final MailService ms;
 
-    public ParticipantServiceImpl(ParticipantDao participantDao, TournamentDao tournamentDao, TournamentService ts, GameDao gameDao, UserDao userDao, MailService ms){
+    public ParticipantServiceImpl(ParticipantDao participantDao, TournamentDao tournamentDao, TournamentService ts, GameDao gameDao, UserDao userDao, TeamDao teamDao, MailService ms){
         this.participantDao = participantDao;
         this.tournamentDao = tournamentDao;
         this.ts = ts;
         this.gameDao = gameDao;
         this.userDao = userDao;
+        this.teamDao = teamDao;
         this.ms = ms;
     }
 
@@ -63,6 +63,8 @@ public class ParticipantServiceImpl implements ParticipantService {
         User creator = userDao.findById(tournament.get().getCreator_id()).get();
         ms.sendTournamentJoinedEmail(tournament_id, user.getUsername(), tournament.get().getName(), user.getEmail(), creator.getEmail());
         LOGGER.info("Tournament joined email correctly sent to the address {}", user.getEmail());
+        ms.sendTournamentJoinedOwnerEmail(tournament_id, creator.getUsername(), user.getUsername(), tournament.get().getName(), creator.getEmail());
+        LOGGER.info("Tournament joined notification email correctly sent to tournament owner with address {}", creator.getEmail());
     }
 
     private List<Participant> getTournamentParticipantUsers(Long tournament_id) {
@@ -130,10 +132,12 @@ public class ParticipantServiceImpl implements ParticipantService {
     @Override
     public void joinTournamentTeam(Long tournamentId, Long teamId, List<Long> participants){
         Optional<Tournament> tournament = tournamentDao.findById(tournamentId);
-        if(tournament.isEmpty()){
+        Optional<Team> optionalTeam = teamDao.getById(teamId);
+        if(tournament.isEmpty() || optionalTeam.isEmpty()){
             return;
         }
         Tournament t = tournament.get();
+        Team team = optionalTeam.get();
         User creator = userDao.findById(t.getCreator_id()).get();
 
         for(Long p : participants){
@@ -146,6 +150,9 @@ public class ParticipantServiceImpl implements ParticipantService {
             ms.sendTournamentJoinedEmail(tournamentId, user.getUsername(), t.getName(), user.getEmail(), creator.getEmail());
             LOGGER.info("Tournament joined email correctly sent to the address {}", user.getEmail());
         }
+
+        ms.sendTournamentTeamJoinedOwnerEmail(tournamentId, creator.getUsername(), team.getName(), t.getName(), creator.getEmail());
+        LOGGER.info("Tournament joined notification email correctly sent to tournament owner with address {}", creator.getEmail());
         participantDao.joinTournamentTeam(tournamentId, teamId);
         List<Participant> currentParticipants = getTournamentParticipants(tournamentId, ts.getPlayersPerTeam(tournamentId));
         if (currentParticipants.size() == t.getMax_participants()) {

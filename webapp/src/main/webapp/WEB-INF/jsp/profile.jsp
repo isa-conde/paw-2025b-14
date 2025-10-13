@@ -4,6 +4,8 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
+<c:url var="profileUrl" value="/profile/${profile.id}"/>
+
 <paw:layout user="${user}" pageTitle="${profile.username}" function="${openModal}">
 
     <c:set var="isMyProfile" value="${user.id == profile.id}"/>
@@ -66,12 +68,9 @@
                 </c:choose>
             </div>
         </div>
-
-
-
 </paw:layout>
 
-<paw:modal title="profile.edit.modal.title" id="editProfileModal" returnUrl="/profile/${profile.id}">
+<paw:modal title="profile.edit.modal.title" id="editProfileModal" returnUrl="${profileUrl}">
     <form:form method="post" modelAttribute="editProfileForm"
                action="${pageContext.request.contextPath}/profile/update"
                enctype="multipart/form-data" cssClass="form">
@@ -86,7 +85,7 @@
             <paw:input path="profilePicture" label="profile.edit.modal.profilePicture" inputType="file" hasConstraint="true"/>
         </div>
         <div class="row">
-            <paw:input path="bannerPicture" label="home.createTournament.image" inputType="file"/>
+            <paw:input path="bannerPicture" label="profile.edit.modal.bannerImage" inputType="file"/>
         </div>
         <div class="row center">
             <paw:input path="" label="tournament.edit.saveChanges" containerType="half" inputType="submit"/>

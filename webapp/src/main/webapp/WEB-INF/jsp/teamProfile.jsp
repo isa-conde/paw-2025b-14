@@ -4,6 +4,8 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
+<c:url var="teamUrl" value="/team/profile/${team.id}"/>
+
 <paw:layout user="${user}" function="${openModal}">
 
     <c:set var="isMyTeam" value="${user.id == team.owner_id}"/>
@@ -19,7 +21,8 @@
             </div>
             <div class="organizer-container">
                 <paw:text size="s"><spring:message code="team.profile.createdBy"/></paw:text>
-                <paw:profileButton imageId="${owner.pfp_id}" text="${owner.username}" onclick="window.location.href='/profile/${owner.id}'" size="xs" isNotSafe="true"/>
+                <c:url value="/profile/${owner.id}" var="ownerUrl"/>
+                <paw:profileButton imageId="${owner.pfp_id}" text="${owner.username}" onclick="window.location.href='${ownerUrl}'" size="xs" isNotSafe="true"/>
             </div>
         </div>
     </paw:banner>
@@ -73,13 +76,11 @@
                 </div>
             </c:otherwise>
         </c:choose>
-
-
     </div>
 </paw:layout>
 
 
-<paw:modal title="team.profile.edit.title" id="editProfileModal" returnUrl="/team/profile/${team.id}">
+<paw:modal title="team.profile.edit.title" id="editProfileModal" returnUrl="${teamUrl}">
     <form:form method="post" modelAttribute="teamForm"
                action="${pageContext.request.contextPath}/team/update"
                enctype="multipart/form-data" cssClass="form">

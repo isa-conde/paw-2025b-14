@@ -220,7 +220,7 @@ public class UserServiceImpl implements UserService {
             pfpId = imageDao.insertImage(pfp);
         }
         if (banner != null){
-            bannerId = imageDao.insertImage(pfp);
+            bannerId = imageDao.insertImage(banner);
         }
         userDao.updateProfileInfo(userId, username, bio, pfpId, bannerId);
         LOGGER.info("Profile of user {} has been correctly updated", username);

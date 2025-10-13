@@ -51,7 +51,15 @@
                     <form:input path="${path}" type="date" class="input"/>
                 </c:when>
                 <c:when test="${inputType == 'number'}">
-                    <form:input path="${path}" type="number" class="input"/>
+                    <form:input path="${path}"
+                                type="number"
+                                class="input"
+                                min="0"
+                                step="1"
+                                inputmode="numeric"
+                                onkeydown="return onlyUnsignedIntKeydown(event)"
+                                onpaste="return onlyUnsignedIntPaste(event)"
+                                oninput="this.value = this.value.replace(/\D+/g,'')" />
                 </c:when>
                 <c:when test="${inputType == 'email'}">
                     <form:input path="${path}" type="email" class="input"/>
