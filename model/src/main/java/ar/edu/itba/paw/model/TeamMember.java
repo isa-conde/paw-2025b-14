@@ -1,24 +1,35 @@
 package ar.edu.itba.paw.model;
 
+import ar.edu.itba.paw.model.ids.TeamMemberId;
+
+import javax.persistence.*;
+
+
+@Entity
+@Table(name = "team_member")
 public class TeamMember {
 
-    private final Long user_id;
-    private final Long team_id;
+    @EmbeddedId
+    private TeamMemberId id;
+    @ManyToOne
+    @MapsId("teamId")
+    @JoinColumn(name = "team_id")
+    private Team team;
+
+    @ManyToOne
+    @MapsId("userId")
+    @JoinColumn(name = "user_id")
+    private User user;
     private Boolean verified;
 
-
-    public TeamMember(Long userId, Long teamId, Boolean verified) {
-        user_id = userId;
-        team_id = teamId;
-        this.verified = verified;
-    }
+    TeamMember() {}
 
     public Long getUser_id() {
-        return user_id;
+        return user.getId();
     }
 
     public Long getTeam_id() {
-        return team_id;
+        return team.getId();
     }
 
     public Boolean getVerified() {

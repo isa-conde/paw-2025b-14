@@ -188,6 +188,7 @@ public class TournamentServiceImpl implements TournamentService {
         }
     }
 
+    @Transactional
     @Override
     public Map<Game, List<Tournament>> getUnfilteredTournamentPages(Long page) {
         Map<Long, List<Tournament>> mapWithGameIdAsKey = tournamentDao.getUnfilteredTournamentPages(page);

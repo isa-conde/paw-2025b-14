@@ -14,6 +14,8 @@ import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.stream.Collectors.toList;
+
 @Repository
 public class GameHibernateDao implements GameDao {
 
@@ -67,22 +69,33 @@ public class GameHibernateDao implements GameDao {
         User user = em.find(User.class, user_id);
         Game game = em.find(Game.class, game_id);
 
-        user.getFavoriteGames().add(game);
+        user.getFavouriteGames().add(game);
         em.persist(user);
     }
 
     @Override
     public List<Game> getFavourites(Long user_id) {
-        return em.find(User.class, user_id).getFavoriteGames();
+        return em.find(User.class, user_id).getFavouriteGames();
     }
 
     @Override
     public List<Game> findAllPaged(Long page) {
-        TypedQuery<Game> query = em.createQuery("SELECT g FROM Game g", Game.class);
-        query.setFirstResult((int) (page * GRID_PAGE_SIZE));
-        query.setMaxResults(GRID_PAGE_SIZE);
+        int pageSize = GRID_PAGE_SIZE;
+        int offset = (int) (page * pageSize);
 
-        return query.getResultList();
+        Query idQuery = em.createNativeQuery("SELECT DISTINCT (id) FROM Game ORDER BY id ASC ");
+        idQuery.setFirstResult(offset);
+        idQuery.setMaxResults(pageSize);
+
+        @SuppressWarnings("unchecked")
+        List<Long> ids = idQuery.getResultList().stream()
+                .map(it -> ((Number) it).longValue()).toList();
+
+
+        return em.createQuery(
+                        "SELECT g FROM Game g WHERE g.id IN (:ids) ORDER BY g.id", Game.class)
+                .setParameter("ids", ids)
+                .getResultList();
     }
 
     @Override

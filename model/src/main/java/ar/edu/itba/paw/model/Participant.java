@@ -1,12 +1,39 @@
 package ar.edu.itba.paw.model;
 
+import ar.edu.itba.paw.model.Tournament.Tournament;
+
+import javax.persistence.*;
+
+@Entity
+@Table(name = "participant")
 public class Participant {
 
-    private final Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "participant_user_id_seq")
+    @SequenceGenerator(sequenceName = "participant_user_id_seq", name = "participant_user_id_seq", allocationSize = 1)
+    private Long id;
+    @Column(nullable = false)
     private Integer points;
-    private final String name;
-    private final Integer group_number;
-    private final Long pfp_id;
+    private Integer group_number;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
+    private Team team;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tournament_id", nullable = false)
+    private Tournament tournament;
+
+    @Transient
+    private String name;
+    @Transient
+    private Long pfp_id;
+
+    Participant(){}
 
     public Participant(final Long id, final String name, Integer points, Integer group_number, Long pfp_id) {
         this.id = id;
@@ -38,5 +65,49 @@ public class Participant {
 
     public Long getPfp_id() {
         return pfp_id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setPfp_id(Long pfp_id) {
+        this.pfp_id = pfp_id;
+    }
+
+    public void setGroup_number(Integer group_number) {
+        this.group_number = group_number;
+    }
+
+    public Integer getGroup_number() {
+        return group_number;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Tournament getTournament() {
+        return tournament;
+    }
+
+    public void setTournament(Tournament tournament) {
+        this.tournament = tournament;
+    }
+
+    public Team getTeam() {
+        return team;
+    }
+
+    public void setTeam(Team team) {
+        this.team = team;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

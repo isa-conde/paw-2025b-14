@@ -25,6 +25,8 @@ public class Game {
     private Integer image_id;
     @ManyToMany(mappedBy = "favouriteGames", fetch = FetchType.LAZY)
     private List<User> likedByUsers = new ArrayList<>();
+    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<GameFormat> formats = new ArrayList<>();
 
     Game(){}
 
@@ -79,5 +81,13 @@ public class Game {
 
     public void setLikedByUsers(List<User> likedByUsers) {
         this.likedByUsers = likedByUsers;
+    }
+
+    public List<GameFormat> getFormats() {
+        return formats;
+    }
+
+    public void setFormats(List<GameFormat> formats) {
+        this.formats = formats;
     }
 }

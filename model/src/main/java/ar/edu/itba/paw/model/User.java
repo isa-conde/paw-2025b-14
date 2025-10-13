@@ -38,6 +38,11 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "game_id")
     )
     private List<Game> favouriteGames = new ArrayList<>();
+    @OneToMany(mappedBy = "owner")
+    private List<Team> ownedTeams = new ArrayList<>();
+    @ManyToMany(mappedBy = "members")
+    private List<Team> teams = new ArrayList<>();
+
 
     User(){}
 
@@ -131,7 +136,19 @@ public class User {
         return favouriteGames;
     }
 
-    public void setFavoriteGames(List<Game> favoriteGames) {
+    public void setFavouriteGames(List<Game> favoriteGames) {
         this.favouriteGames = favoriteGames;
+    }
+
+    public List<Team> getOwnedTeams() {
+        return ownedTeams;
+    }
+
+    public void setOwnedTeams(List<Team> ownedTeams) {
+        this.ownedTeams = ownedTeams;
+    }
+
+    public List<Team> getTeams() {
+        return teams;
     }
 }

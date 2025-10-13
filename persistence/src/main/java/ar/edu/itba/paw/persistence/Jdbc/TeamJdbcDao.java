@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.util.*;
 
-@Repository
 public class TeamJdbcDao implements TeamDao {
 
     private final JdbcTemplate jdbcTemplate;
@@ -24,7 +23,7 @@ public class TeamJdbcDao implements TeamDao {
                 .usingGeneratedKeyColumns("id");
     }
 
-    private static final RowMapper<Team> ROW_MAPPER = (rs, rowNum) -> new Team(rs.getLong("id"), rs.getString("name"), rs.getLong("profile_picture_id"), rs.getLong("banner_id"), rs.getLong("owner_id"));
+    private static final RowMapper<Team> ROW_MAPPER = (rs, rowNum) -> new Team(rs.getLong("id"), rs.getString("name"), rs.getLong("profile_picture_id"), rs.getLong("banner_id"));
 
     @Override
     public Team create(String name, Long pfp_id, Long banner_id, Long owner_id) {
@@ -35,17 +34,12 @@ public class TeamJdbcDao implements TeamDao {
         values.put("owner_id", owner_id);
 
         Number id = jdbcInsert.executeAndReturnKey(values);
-        return new Team(id.longValue(), name, pfp_id, banner_id, owner_id);
+        return new Team(id.longValue(), name, pfp_id, banner_id);
     }
 
     @Override
     public Optional<Team> getById(Long id) {
         return jdbcTemplate.query("SELECT * FROM team WHERE id = ?", ROW_MAPPER, id).stream().findFirst();
-    }
-
-    @Override
-    public List<Long> getActiveTournaments(Long teamId) {
-        return findTeamTournamentIds(teamId, false);
     }
 
     @Override
@@ -96,6 +90,11 @@ public class TeamJdbcDao implements TeamDao {
     @Override
     public List<Long> getPastTournaments(Long teamId) {
         return findTeamTournamentIds(teamId, true);
+    }
+
+    @Override
+    public List<Long> getActiveTournaments(Long teamId) {
+        return findTeamTournamentIds(teamId, false);
     }
 
     private List<Long> findTeamTournamentIds(Long teamId, Boolean isFinished) {

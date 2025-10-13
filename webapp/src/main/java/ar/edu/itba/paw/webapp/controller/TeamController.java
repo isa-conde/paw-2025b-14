@@ -89,7 +89,7 @@ public class TeamController {
 
         Team team = optionalTeam.get();
         mav.addObject("team", team);
-        mav.addObject("owner", us.findById(team.getOwner_id()).get());
+        mav.addObject("owner", us.findById(team.getOwner().getId()).get());
         mav.addObject("pastTournaments", ts.getPastTournaments(id));
         mav.addObject("activeTournaments", ts.getActiveTournaments(id));
         mav.addObject("teamForm", editTeamForm);

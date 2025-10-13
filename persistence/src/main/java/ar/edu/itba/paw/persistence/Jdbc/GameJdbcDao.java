@@ -27,7 +27,7 @@ public class GameJdbcDao implements GameDao {
 
     private static final RowMapper<Game> ROW_MAPPER = (rs, rowNum) -> new Game(rs.getLong("id"), rs.getString("name"), Genre.valueOf(rs.getString("genre")), rs.getInt("image_id"));
 
-    private static final RowMapper<GameFormat> ROW_MAPPER_FORMAT = (rs, rowNum) -> new GameFormat(rs.getLong("id"), rs.getString("name"), rs.getInt("players_per_team"), rs.getLong("game_id"));
+    private static final RowMapper<GameFormat> ROW_MAPPER_FORMAT = (rs, rowNum) -> new GameFormat(rs.getLong("id"), rs.getString("name"), rs.getInt("players_per_team"));
 
     //@Autowired
     public GameJdbcDao(final DataSource ds) {
