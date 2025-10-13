@@ -59,7 +59,7 @@
 </head>
 <body>
 <div class="card">
-    <h1 th:text="#{email.tournamentEndedNotification.title}">Tournament name has ended!</h1>
+    <h1 th:text="#{email.tournamentEndedNotification.title(${tournamentName})}">Tournament name has ended!</h1>
     <p th:text="#{email.tournamentEndedNotification.greeting(${userName})}">Hello user,</p>
     <p th:text="#{email.tournamentEndedNotification.body(${tournamentName})}">
         The tournament name you were participating in has ended. Click the button below to see how you did!
