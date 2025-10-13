@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Repository
+
 public class ParticipantJdbcDao implements ParticipantDao {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ParticipantJdbcDao.class);
@@ -135,7 +135,7 @@ public class ParticipantJdbcDao implements ParticipantDao {
     }
 
     @Override
-    public void leaveTournamentTeam(Long userId, Long tournamentId) {
+    public void leaveTournamentTeam(Long team_id, Long tournamentId) {
         final String sql = """
             DELETE FROM participant p
             USING participant pu
@@ -145,7 +145,7 @@ public class ParticipantJdbcDao implements ParticipantDao {
               AND p.tournament_id = pu.tournament_id
               AND p.team_id = pu.team_id
         """;
-        jdbcTemplate.update(sql, userId, tournamentId);
+        jdbcTemplate.update(sql, team_id, tournamentId);
     }
 
     @Override

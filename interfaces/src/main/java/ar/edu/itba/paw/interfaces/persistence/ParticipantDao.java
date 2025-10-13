@@ -12,13 +12,13 @@ public interface ParticipantDao {
 
     void joinTournamentTeam(Long tournamentId, Long teamId);
 
-    Participant getTournamentParticipantById(Long tournament_id, Long user_id, Integer teamSize);
+    Participant getTournamentParticipantById(Long tournament_id, Long particpant_id, Integer teamSize);
 
     Boolean hasJoined(Long userId, Long tournamentId);
 
     void leaveTournamentUser(Long user_id, Long tournament_id);
 
-    void leaveTournamentTeam(Long user_id, Long tournament_id);
+    void leaveTournamentTeam(Long team_id, Long tournament_id);
 
     void updateGroupNumberForUsers(long tournamentId, int groupNumber, List<Long> userIds, Integer teamSize);
 
