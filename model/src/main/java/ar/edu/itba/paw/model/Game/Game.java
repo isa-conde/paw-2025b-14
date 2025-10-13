@@ -23,7 +23,7 @@ public class Game {
     private Genre genre;
     @Column(name = "image_id")
     private Integer image_id;
-    @ManyToMany(mappedBy = "favoriteGames")
+    @ManyToMany(mappedBy = "favouriteGames", fetch = FetchType.LAZY)
     private List<User> likedByUsers = new ArrayList<>();
 
     Game(){}

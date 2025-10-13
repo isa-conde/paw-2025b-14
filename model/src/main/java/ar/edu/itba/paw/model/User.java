@@ -31,13 +31,13 @@ public class User {
     private Long banner_id;
     @Column(name = "locale", nullable = false, length = 10)
     private String locale;
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "user_favorites",
+            name = "user_favourites",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "game_id")
     )
-    private List<Game> favoriteGames = new ArrayList<>();
+    private List<Game> favouriteGames = new ArrayList<>();
 
     User(){}
 
@@ -127,11 +127,11 @@ public class User {
         this.email = email;
     }
 
-    public List<Game> getFavoriteGames() {
-        return favoriteGames;
+    public List<Game> getFavouriteGames() {
+        return favouriteGames;
     }
 
     public void setFavoriteGames(List<Game> favoriteGames) {
-        this.favoriteGames = favoriteGames;
+        this.favouriteGames = favoriteGames;
     }
 }
