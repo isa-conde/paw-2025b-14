@@ -1,20 +1,48 @@
 package ar.edu.itba.paw.model;
 
+import ar.edu.itba.paw.model.Tournament.Tournament;
+import ar.edu.itba.paw.model.ids.MatchId;
+
+import javax.persistence.*;
+
+@Entity
+@Table(name = "match")
 public class Match {
-    private final Long id;
-    private final Long tournamentId;
+
+    @EmbeddedId
+    private final MatchId id;
+
+    @MapsId("tournamentId")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "tournament_id")
+    private Tournament tournament;
+
+    @ManyToOne
+    @JoinColumn(name = "local_id")
     private final Long localId;
+
+    @ManyToOne
+    @JoinColumn(name = "visitor_id")
     private final Long visitorId;
+
+    @Column(name = "local_score")
     private final Integer localScore;
+
+    @Column(name = "visitor_score")
     private final Integer visitorScore;
+
+    @Column(name = "winner")
     private final Integer winner;
+
+    @Column(name = "stage")
     private final Integer stage;
+
+    @Column(name = "is_group_stage")
     private final Boolean isGroupStage;
 
-    public Match(Long id, Long tournamentId, Long localId, Long visitorId,
+    public Match(MatchId id, Long localId, Long visitorId,
                             Integer localScore, Integer visitorScore, Integer winner, Integer stage, Boolean isGroupStage) {
         this.id = id;
-        this.tournamentId = tournamentId;
         this.localId = localId;
         this.visitorId = visitorId;
         this.localScore = localScore;
@@ -26,10 +54,6 @@ public class Match {
 
     public Long getId() {
         return id;
-    }
-
-    public Long getTournamentId() {
-        return tournamentId;
     }
 
     public Long getLocalId() {

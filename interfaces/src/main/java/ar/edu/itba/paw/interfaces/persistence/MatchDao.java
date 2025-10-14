@@ -19,9 +19,9 @@ public interface MatchDao {
 
     Long getMaxMatchId(Long tournamentId);
 
-    void updateMatchLocal(Long tournament_id, Long match, Long user);
+    void updateMatchLocal(Long tournamentId, Long matchId, Long userId);
 
-    void updateMatchVisitor(Long tournament_id, Long match, Long user);
+    void updateMatchVisitor(Long tournamentId, Long matchId, Long userId);
 
     Boolean allMatchesPlayed(Long tournamentId);
 

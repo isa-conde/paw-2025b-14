@@ -2,6 +2,7 @@ package ar.edu.itba.paw.model.Tournament;
 
 import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.Game.GameFormat;
+import ar.edu.itba.paw.model.Match;
 import ar.edu.itba.paw.model.Participant;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Elo;
@@ -58,6 +59,9 @@ public class Tournament {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "tournament")
     private List<Participant> participants = new ArrayList<>();
+
+    @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Match> matches = new ArrayList<>();
 
     Tournament(){}
 
@@ -258,6 +262,13 @@ public class Tournament {
         return formatEntity;
     }
 
+    public List<Match> getMatches() {
+        return matches;
+    }
+
+    public void setMatches(List<Match> matches) {
+        this.matches = matches;
+    }
 }
 
 
