@@ -73,6 +73,7 @@ public class MatchServiceImpl implements MatchService {
         LOGGER.info("User {} and {} have been successfully swapped matches", username1, username2);
     }
 
+    @Transactional
     @Override
     public Map<Integer, List<MatchInfo>> getTournamentMatchesByStage(Long tournamentId){
         List<MatchInfo> matches = matchDao.getTournamentMatches(tournamentId, ts.getPlayersPerTeam(tournamentId));

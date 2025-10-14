@@ -17,34 +17,32 @@ public class Match {
     @JoinColumn(name = "tournament_id")
     private Tournament tournament;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "local_id")
-    private final Long localId;
+    private User local;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "visitor_id")
-    private final Long visitorId;
+    private User visitor;
 
     @Column(name = "local_score")
-    private final Integer localScore;
+    private Integer localScore;
 
     @Column(name = "visitor_score")
-    private final Integer visitorScore;
+    private Integer visitorScore;
 
     @Column(name = "winner")
-    private final Integer winner;
+    private Integer winner;
 
     @Column(name = "stage")
-    private final Integer stage;
+    private Integer stage;
 
     @Column(name = "is_group_stage")
-    private final Boolean isGroupStage;
+    private Boolean isGroupStage;
 
     public Match(MatchId id, Long localId, Long visitorId,
                             Integer localScore, Integer visitorScore, Integer winner, Integer stage, Boolean isGroupStage) {
         this.id = id;
-        this.localId = localId;
-        this.visitorId = visitorId;
         this.localScore = localScore;
         this.visitorScore = visitorScore;
         this.winner = winner;
@@ -53,15 +51,19 @@ public class Match {
     }
 
     public Long getId() {
-        return id;
+        return id.getId();
+    }
+
+    public Long getTournamentId() {
+        return id.getTournamentId();
     }
 
     public Long getLocalId() {
-        return localId;
+        return local.getId();
     }
 
     public Long getVisitorId() {
-        return visitorId;
+        return visitor.getId();
     }
 
     public Integer getLocalScore() {
@@ -82,6 +84,54 @@ public class Match {
 
     public Boolean getIsGroupStage() {
         return isGroupStage;
+    }
+
+    public Tournament getTournament() {
+        return tournament;
+    }
+
+    public Boolean getGroupStage() {
+        return isGroupStage;
+    }
+
+    public User getLocal() {
+        return local;
+    }
+
+    public User getVisitor() {
+        return visitor;
+    }
+
+    public void setTournament(Tournament tournament) {
+        this.tournament = tournament;
+    }
+
+    public void setWinner(Integer winner) {
+        this.winner = winner;
+    }
+
+    public void setGroupStage(Boolean groupStage) {
+        isGroupStage = groupStage;
+    }
+
+    public void setLocal(User local) {
+        this.local = local;
+    }
+
+    public void setLocalScore(Integer localScore) {
+        this.localScore = localScore;
+    }
+
+    public void setStage(Integer stage) {
+        this.stage = stage;
+    }
+
+    public void setVisitor(User visitor) {
+        this.visitor = visitor;
+    }
+
+    public void setVisitorScore(Integer visitorScore) {
+        this.visitorScore = visitorScore;
     }
 }
 

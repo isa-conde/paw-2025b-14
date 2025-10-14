@@ -119,14 +119,15 @@ public class TeamServiceImpl implements TeamService {
         return teamMemberDao.isMember(team_id, user_id);
     }
 
+    @Transactional
     @Override
     public List<User> getTeamMembers(Long team_id) {
-        List<Long> user_ids = teamMemberDao.getTeamMembers(team_id);
-        List<User> toReturn = new ArrayList<>();
-        for (Long l : user_ids){
-            toReturn.add(userDao.findById(l).get());
+        Optional<Team> t = teamDao.getById(team_id);
+        if (t.isEmpty()){
+            LOGGER.warn("Team not found for teamId={} ",team_id);
+            throw new IllegalArgumentException();
         }
-        return toReturn;
+        return t.get().getMembers();
     }
 
     @Override

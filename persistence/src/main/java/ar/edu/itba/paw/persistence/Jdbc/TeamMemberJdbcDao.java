@@ -9,7 +9,7 @@ import javax.sql.DataSource;
 import java.util.List;
 import java.util.Map;
 
-@Repository
+
 public class TeamMemberJdbcDao implements TeamMemberDao {
 
     JdbcTemplate jdbcTemplate;
@@ -33,7 +33,7 @@ public class TeamMemberJdbcDao implements TeamMemberDao {
         return count != null && count > 0;
     }
 
-    @Override
+    //@Override
     public List<Long> getTeamMembers(Long team_id) {
         return jdbcTemplate.queryForList("SELECT user_id FROM team_member WHERE team_id = ?", Long.class, team_id);
     }

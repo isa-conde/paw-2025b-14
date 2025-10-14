@@ -14,30 +14,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Repository
 public class MatchJdbcDao implements MatchDao {
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
 
-    @Autowired
+    //@Autowired
     public MatchJdbcDao(final DataSource ds) {
         this.jdbcTemplate = new JdbcTemplate(ds);
         this.jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("match");
     }
 
-    public static final RowMapper<Match> ROW_MAPPER_MATCH = (rs, rowNum) -> new Match(
-            rs.getLong("id"),
-            rs.getLong("tournament_id"),
-            rs.getObject("local_id") != null ? rs.getLong("local_id") : null,
-            rs.getObject("visitor_id") != null ? rs.getLong("visitor_id") : null,
-            rs.getObject("local_score") != null ? rs.getInt("local_score") : null,
-            rs.getObject("visitor_score") != null ? rs.getInt("visitor_score") : null,
-            rs.getObject("winner") != null ? rs.getInt("winner") : null,
-            rs.getInt("stage"),
-            rs.getObject("is_group_stage") != null ? rs.getBoolean("is_group_stage") : null
-    );
+//    public static final RowMapper<Match> ROW_MAPPER_MATCH = (rs, rowNum) -> new Match(
+//            rs.getLong("id"),
+//            rs.getLong("tournament_id"),
+//            rs.getObject("local_id") != null ? rs.getLong("local_id") : null,
+//            rs.getObject("visitor_id") != null ? rs.getLong("visitor_id") : null,
+//            rs.getObject("local_score") != null ? rs.getInt("local_score") : null,
+//            rs.getObject("visitor_score") != null ? rs.getInt("visitor_score") : null,
+//            rs.getObject("winner") != null ? rs.getInt("winner") : null,
+//            rs.getInt("stage"),
+//            rs.getObject("is_group_stage") != null ? rs.getBoolean("is_group_stage") : null
+//    );
 
     private static final RowMapper<MatchInfo> ROW_MAPPER_MATCH_INFO = (rs, rowNum) ->
         new MatchInfo(
@@ -134,10 +133,11 @@ public class MatchJdbcDao implements MatchDao {
 
     @Override
     public Match getMatch(long tournamentId, long matchId) {
-        return jdbcTemplate.queryForObject(
-                "SELECT * FROM match WHERE tournament_id = ? AND id = ?",
-                ROW_MAPPER_MATCH, tournamentId, matchId
-        );
+//        return jdbcTemplate.queryForObject(
+//                "SELECT * FROM match WHERE tournament_id = ? AND id = ?",
+//                ROW_MAPPER_MATCH, tournamentId, matchId
+//        );
+        return null;
     }
 
     @Override

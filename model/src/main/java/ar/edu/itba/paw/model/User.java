@@ -15,22 +15,31 @@ public class User {
     @SequenceGenerator(sequenceName = "users_userid_seq", name = "users_userid_seq", allocationSize = 1)
     @Column(name = "id")
     private long id;
+
     @Column(name = "username", nullable = false, unique = true)
     private String username;
+
     @Column(name = "email", nullable = false, unique = true)
     private String email;
+
     @Column(name = "password", length = 100, nullable = false)
     private String password;
+
     @Column(name = "verified", nullable = false)
     private boolean verified;
+
     @Column(name = "bio", length = 255)
     private String bio;
+
     @Column(name = "profile_picture_id")
     private Long pfp_id;
+
     @Column(name = "banner_id")
     private Long banner_id;
+
     @Column(name = "locale", nullable = false, length = 10)
     private String locale;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_favourites",
@@ -38,10 +47,12 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "game_id")
     )
     private List<Game> favouriteGames = new ArrayList<>();
+
     @OneToMany(mappedBy = "owner")
     private List<Team> ownedTeams = new ArrayList<>();
-    @ManyToMany(mappedBy = "members")
-    private List<Team> teams = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TeamMember> teamMembers = new ArrayList<>();
 
 
     User(){}
@@ -149,6 +160,10 @@ public class User {
     }
 
     public List<Team> getTeams() {
-        return teams;
+        return teamMembers.stream().map(TeamMember::getTeam).toList();
+    }
+
+    public List<TeamMember> getTeamMembers() {
+        return teamMembers;
     }
 }

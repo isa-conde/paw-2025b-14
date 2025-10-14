@@ -8,6 +8,4 @@ public interface TeamMemberDao {
 
     Boolean isMember(Long team_id, Long user_id);
 
-    List<Long> getTeamMembers(Long team_id);
-
 }

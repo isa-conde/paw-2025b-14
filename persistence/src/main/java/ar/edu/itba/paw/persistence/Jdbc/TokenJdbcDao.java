@@ -13,7 +13,7 @@ import java.time.LocalDate;
 import java.util.Map;
 import java.util.Optional;
 
-@Repository
+
 public class TokenJdbcDao implements TokenDao {
 
     private final JdbcTemplate jdbcTemplate;
@@ -21,7 +21,7 @@ public class TokenJdbcDao implements TokenDao {
 
     private static final RowMapper<Token> ROW_MAPPER_TOKEN = (rs, rowNum) -> new Token(rs.getLong("id"), rs.getLong("user_id"), rs.getLong("token"), rs.getDate("expiry_date").toLocalDate());
 
-    @Autowired
+    //@Autowired
     public TokenJdbcDao(final DataSource ds) {
         this.jdbcTemplate = new JdbcTemplate(ds);
         this.jdbcInsertToken = new SimpleJdbcInsert(jdbcTemplate)

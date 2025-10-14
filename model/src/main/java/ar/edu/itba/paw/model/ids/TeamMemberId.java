@@ -7,4 +7,9 @@ import java.io.Serializable;
 public class TeamMemberId implements Serializable {
     private Long teamId;
     private Long userId;
+
+    public TeamMemberId(Long teamId, Long userId){
+        this.teamId = teamId;
+        this.userId = userId;
+    }
 }

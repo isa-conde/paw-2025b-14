@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.model;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,16 +19,13 @@ public class Team {
     private Long pfp_id;
     @Column(name = "banner_id")
     private Long banner_id;
+
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
-    @ManyToMany
-    @JoinTable(
-            name = "team_member",
-            joinColumns = @JoinColumn(name = "team_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )    private List<Team> members;
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TeamMember> teamMembers = new ArrayList<>();
 
 
     Team(){}
@@ -85,7 +83,11 @@ public class Team {
         this.owner = owner;
     }
 
-    public List<Team> getMembers() {
-        return members;
+    public List<User> getMembers() {
+        return teamMembers.stream().map(TeamMember::getUser).toList();
+    }
+
+    public List<TeamMember> getTeamMembers() {
+        return teamMembers;
     }
 }

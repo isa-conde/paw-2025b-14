@@ -11,6 +11,7 @@ public class TeamMember {
 
     @EmbeddedId
     private TeamMemberId id;
+
     @ManyToOne
     @MapsId("teamId")
     @JoinColumn(name = "team_id")
@@ -20,9 +21,16 @@ public class TeamMember {
     @MapsId("userId")
     @JoinColumn(name = "user_id")
     private User user;
+
     private Boolean verified;
 
     TeamMember() {}
+
+    public TeamMember(TeamMemberId id, Team team, User user){
+        this.id = id;
+        this.team = team;
+        this.user = user;
+    }
 
     public Long getUser_id() {
         return user.getId();
@@ -38,5 +46,13 @@ public class TeamMember {
 
     public void setVerified(Boolean verified) {
         this.verified = verified;
+    }
+
+    public Team getTeam() {
+        return team;
+    }
+
+    public User getUser() {
+        return user;
     }
 }
