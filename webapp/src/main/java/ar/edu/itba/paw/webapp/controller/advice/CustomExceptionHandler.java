@@ -110,12 +110,12 @@ public class CustomExceptionHandler {
         return mav;
     }
 
-    @ExceptionHandler(Exception.class)
-    public ModelAndView handleGeneralException() {
-        ModelAndView mav = new ModelAndView("error/exception");
-        mav.addObject("message", "errorExceptionPage.general.description");
-        mav.addObject("title", "errorExceptionPage.general.title");
-        return mav;
-    }
+//    @ExceptionHandler(Exception.class)
+//    public ModelAndView handleGeneralException() {
+//        ModelAndView mav = new ModelAndView("error/exception");
+//        mav.addObject("message", "errorExceptionPage.general.description");
+//        mav.addObject("title", "errorExceptionPage.general.title");
+//        return mav;
+//    }
 
 }

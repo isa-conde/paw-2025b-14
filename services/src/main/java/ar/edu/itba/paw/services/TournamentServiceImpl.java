@@ -62,16 +62,11 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public List<Tournament> findTournaments(TournamentFilter tournamentFilter, Long page) {
         Long gameId = tournamentFilter.getGame_id();
-        if(gameDao.findById(gameId).isEmpty()) {
+        if(gameId != null && gameDao.findById(gameId).isEmpty()) {
             LOGGER.error("Game with ID {} does not exist", gameId);
             throw new GameNotFoundException();
         }
         return tournamentDao.findTournaments(tournamentFilter, page);
-    }
-
-    @Override
-    public List<Tournament> findGameTournaments(Long game_id){
-        return tournamentDao.findGameTournaments(game_id);
     }
 
     @Transactional

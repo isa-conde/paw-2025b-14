@@ -294,7 +294,7 @@ public class ParticipantHibernateDao implements ParticipantDao{
 
     @Override
     public List<Participant> getTournamentParticipantUsers(Long tournament_id) {
-        TypedQuery<Participant> query = em.createQuery("SELECT p FROM Participant p JOIN FETCH P.user u WHERE p.tournament.id = :tournamentId", Participant.class);
+        TypedQuery<Participant> query = em.createQuery("SELECT p FROM Participant p JOIN FETCH p.user u WHERE p.tournament.id = :tournamentId", Participant.class);
         query.setParameter("tournamentId", tournament_id);
         List<Participant> toReturn = query.getResultList();
 
