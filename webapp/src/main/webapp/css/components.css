@@ -459,14 +459,6 @@ button:disabled {
     display: block;
 }
 
-.cards-container {
-    display: flex;
-    gap: 100px;
-    justify-content: center;
-    align-items: flex-start;
-    margin: 50px 0;
-}
-
 .card.texture {
     position: relative;
     overflow: hidden;
@@ -1665,4 +1657,15 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-weight: bold;
     text-align: center;
     word-wrap: break-word;
+}
+
+.tournament-buttons-container {
+    gap: 50px;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    background-color: var(--background-secondary);
+    padding: 20px;
+    border-radius: 15px;
+    margin: 20px 0;
 }
