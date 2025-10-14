@@ -22,14 +22,13 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Repository
 public class TournamentJdbcDao implements TournamentDao {
 
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
 
-    @Autowired
+//    @Autowired
     public TournamentJdbcDao(final DataSource ds) {
         this.jdbcTemplate = new JdbcTemplate(ds);
         this.namedJdbcTemplate = new NamedParameterJdbcTemplate(ds);
@@ -63,7 +62,7 @@ public class TournamentJdbcDao implements TournamentDao {
         return jdbcTemplate.query("SELECT * FROM tournament WHERE id = ?", ROW_MAPPER, id).stream().findFirst();
     }
 
-    @Override
+    //@Override
     public List<Tournament> findGameTournaments(Long game_id) {
         return jdbcTemplate.query("SELECT * FROM tournament t WHERE game_id = ? AND open_inscriptions = true", ROW_MAPPER, game_id);
     }

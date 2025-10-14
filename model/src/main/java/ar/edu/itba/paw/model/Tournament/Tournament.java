@@ -35,12 +35,14 @@ public class Tournament {
     @Column(name = "game_id", insertable = false, updatable = false)
     private Long gameId;
     @Enumerated(EnumType.STRING)
+    @Column(name = "region")
     private Region region;
     @Enumerated(EnumType.STRING)
     private Elo elo;
     private LocalDate start_date;
     private LocalDate end_date;
     private String format;
+    @Enumerated(EnumType.STRING)
     private Structure structure;
     @Column(nullable = false)
     private Integer max_participants;
@@ -64,6 +66,24 @@ public class Tournament {
     private List<Match> matches = new ArrayList<>();
 
     Tournament(){}
+
+    public Tournament(User creator, String name, Game game, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Long image_id, Boolean openInscriptions, Boolean isFinished, GameFormat formatEntity){
+        this.creator = creator;
+        this.name = name;
+        this.game = game;
+        this.gameId = game.getId();
+        this.region = region;
+        this.elo = elo;
+        this.start_date = start_date;
+        this.end_date = end_date;
+        this.format = format;
+        this.structure = structure;
+        this.max_participants = max_participants;
+        this.image_id = image_id;
+        this.open_inscriptions = openInscriptions;
+        this.is_finished = isFinished;
+        this.formatEntity = formatEntity;
+    }
 
     public Tournament(Long id, Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Long imageId, Boolean openInscriptions, Boolean isFinished, Long tournamentWinner, Boolean isGroupStage, Boolean tournamentStarted, Long format_id) {
         this.id = id;
@@ -143,6 +163,8 @@ public class Tournament {
     }
 
     public Long getTournament_winner() {
+        if (winner == null)
+            return null;
         return winner.getId();
     }
 
@@ -155,6 +177,8 @@ public class Tournament {
     }
 
     public Long getFormat_id(){
+        if (formatEntity == null)
+            return null;
         return formatEntity.getId();
     }
 

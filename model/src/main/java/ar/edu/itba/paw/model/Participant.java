@@ -43,6 +43,10 @@ public class Participant {
         this.pfp_id = pfp_id;
     }
 
+    public Participant(Tournament tournament){
+        this.tournament = tournament;
+    }
+
     public String getName() {
         return name;
     }
