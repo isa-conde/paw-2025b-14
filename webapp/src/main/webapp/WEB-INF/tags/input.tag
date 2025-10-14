@@ -15,6 +15,7 @@
 <%@ attribute name="inline" required="false"%>
 <%@ attribute name="value" required="false"%>
 <%@ attribute name="secondary" required="false"%>
+<%@ attribute name="arg" required="false" type="java.lang.Integer" %>
 <%@ attribute name="hasConstraint" required="false" type="java.lang.Boolean" %>
 
 <c:set var="secondaryClass" value="${not empty secondary && secondary == 'true' ? 'secondary' : ''}"/>
@@ -22,7 +23,7 @@
 <c:choose>
     <c:when test="${inputType != 'submit'}">
         <form:label path="${path}" class="input-label ${inline == 'true' ? 'inline-input-container' : (containerType == 'half' ? 'half-input-container' : 'input-container')}">
-            <paw:text weight="3" size="l"><spring:message code="${label}"/></paw:text>
+            <paw:text weight="3" size="l"><spring:message code="${label}" arguments="${arg}"/></paw:text>
             <c:choose>
                 <c:when test="${inputType == 'input' || inputType == null}">
                     <form:input path="${path}" class="input"/>
