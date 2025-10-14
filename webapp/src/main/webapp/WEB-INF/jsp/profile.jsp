@@ -26,7 +26,21 @@
         <div class="content-container">
             <div class="profile-main">
                 <div class="carrousel-title">
-                    <paw:text size="xl"><spring:message code="profile.favouriteGames.title"/></paw:text>
+                    <paw:text type="title"><spring:message code="profile.upcomingTournaments.title"/></paw:text>
+                </div>
+                <c:choose>
+                    <c:when test="${activeTournaments.size() > 0}">
+                        <paw:carrousel id="activeTournaments" elements="${activeTournaments}"/>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="no-cards-container">
+                            <paw:text weight="thin"><spring:message code="profile.activeTournaments.empty" arguments="${profile.username}"/></paw:text>
+                        </div>
+                    </c:otherwise>
+                </c:choose>
+
+                <div class="carrousel-title">
+                    <paw:text type="title"><spring:message code="profile.favouriteGames.title"/></paw:text>
                 </div>
                 <c:choose>
                     <c:when test="${favouriteGames.size() > 0}">
@@ -40,7 +54,7 @@
                 </c:choose>
 
                 <div class="carrousel-title">
-                    <paw:text size="xl"><spring:message code="profile.lastTournaments.title"/></paw:text>
+                    <paw:text type="title"><spring:message code="profile.lastTournaments.title"/></paw:text>
                 </div>
                 <c:choose>
                     <c:when test="${lastTournaments.size() > 0}">
@@ -54,7 +68,7 @@
                 </c:choose>
 
                 <div class="carrousel-title">
-                    <paw:text type="title" size="s"><spring:message code="profile.teams.title"/></paw:text>
+                    <paw:text type="title"><spring:message code="profile.teams.title"/></paw:text>
                 </div>
                 <c:choose>
                     <c:when test="${teams.size() > 0}">
@@ -66,6 +80,10 @@
                         </div>
                     </c:otherwise>
                 </c:choose>
+                <c:set var="createTeamFunction" value="window.location.href='${pageContext.request.contextPath}/team/create'"/>
+                <div class="cards-container">
+                    <paw:button onclick="${createTeamFunction}" text="tournaments.team.butText" size="l"/>
+                </div>
             </div>
         </div>
 </paw:layout>

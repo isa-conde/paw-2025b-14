@@ -32,7 +32,7 @@
     <spring:message code="team.profile.members" var="membersTab"/>
     <c:set var="sections" value="${['overview', 'membersTab']}"/>
     <c:set var="labels"   value="${[overview, membersTab]}"/>
-    <c:set var="activeSection" value="${param.section}"/>
+    <c:set var="activeSection" value="${param.section != null ? param.section : 'overview'}"/>
 
     <paw:navbar sections="${sections}" labels="${labels}" activeSection="${activeSection}"/>
 
@@ -48,7 +48,7 @@
             <c:otherwise>
                 <div class="profile-main">
                     <div class="carrousel-title">
-                        <paw:text size="xl"><spring:message code="team.profile.activeTournaments"/></paw:text>
+                        <paw:text type="title"><spring:message code="team.profile.activeTournaments"/></paw:text>
                     </div>
                     <c:choose>
                         <c:when test="${activeTournaments.size() == 0}">
@@ -61,7 +61,7 @@
                         </c:otherwise>
                     </c:choose>
                     <div class="carrousel-title">
-                        <paw:text size="xl"><spring:message code="team.profile.pastTournaments"/></paw:text>
+                        <paw:text type="title"><spring:message code="team.profile.pastTournaments"/></paw:text>
                     </div>
                     <c:choose>
                         <c:when test="${pastTournaments.size() == 0}">
