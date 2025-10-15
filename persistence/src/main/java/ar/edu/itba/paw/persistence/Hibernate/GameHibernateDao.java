@@ -74,14 +74,21 @@ public class GameHibernateDao implements GameDao {
     }
 
     @Override
-    public List<Game> getFavourites(Long user_id) {
-        TypedQuery<User> query = em.createQuery(
-                "SELECT u FROM User u LEFT JOIN FETCH u.favouriteGames WHERE u.id = :id",
-                User.class
-        );
-        query.setParameter("id", user_id);
-        User u = query.getSingleResult();
-        return u.getFavouriteGames();
+    public List<Game> getFavourites(Long userId) {
+        TypedQuery<Game> q = em.createQuery("""
+            SELECT g
+            FROM Tournament t
+            JOIN t.game g
+            WHERE EXISTS (
+                SELECT 1 FROM Participant p
+                WHERE p.tournament = t AND p.user.id = :uid
+            )
+            GROUP BY g
+            ORDER BY COUNT(DISTINCT t) DESC, g.name ASC
+        """, Game.class);
+        q.setParameter("uid", userId);
+        q.setMaxResults(6);
+        return q.getResultList();
     }
 
     @Override
