@@ -3,6 +3,7 @@ package ar.edu.itba.paw.model;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "participant")
@@ -35,6 +36,12 @@ public class Participant {
     private String name;
     @Transient
     private Long pfp_id;
+
+    @OneToMany(mappedBy = "local")
+    private List<Match> localMatch;
+
+    @OneToMany(mappedBy = "visitor")
+    private List<Match> visitorMatch;
 
 
     public Participant(final Long id, final String name, Integer points, Integer group_number, Long pfp_id) {
@@ -117,5 +124,21 @@ public class Participant {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public List<Match> getLocalMatch() {
+        return localMatch;
+    }
+
+    public void setLocalMatch(List<Match> localMatch) {
+        this.localMatch = localMatch;
+    }
+
+    public List<Match> getVisitorMatch() {
+        return visitorMatch;
+    }
+
+    public void setVisitorMatch(List<Match> visitorMatch) {
+        this.visitorMatch = visitorMatch;
     }
 }

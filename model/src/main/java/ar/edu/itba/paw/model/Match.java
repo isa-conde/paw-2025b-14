@@ -17,11 +17,11 @@ public class Match {
     @JoinColumn(name = "tournament_id")
     private Tournament tournament;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "local_id")
     private Participant local;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "visitor_id")
     private Participant visitor;
 
@@ -60,11 +60,19 @@ public class Match {
     }
 
     public Long getLocalId() {
-        return local.getId();
+        if(local != null){
+            return local.getId();
+        }else {
+            return null;
+        }
     }
 
     public Long getVisitorId() {
-        return visitor.getId();
+        if(visitor != null){
+            return visitor.getId();
+        }else {
+            return null;
+        }
     }
 
     public Integer getLocalScore() {

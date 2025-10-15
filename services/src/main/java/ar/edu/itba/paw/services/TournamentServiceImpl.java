@@ -278,6 +278,7 @@ public class TournamentServiceImpl implements TournamentService {
         for (int i = 0; i < extras; i++) {
             Participant home = participants.get(i * 2);
             Participant away = participants.get(i * 2 + 1);
+
             Long homeId = (home != null) ? home.getId() : null;
             Long awayId = (away != null) ? away.getId() : null;
 
