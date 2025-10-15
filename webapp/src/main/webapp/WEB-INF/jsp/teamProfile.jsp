@@ -48,7 +48,7 @@
             <c:otherwise>
                 <div class="profile-main">
                     <div class="carrousel-title">
-                        <paw:text type="title"><spring:message code="team.profile.activeTournaments"/></paw:text>
+                        <paw:text type="title"><spring:message code="profile.upcomingTournaments.title"/></paw:text>
                     </div>
                     <c:choose>
                         <c:when test="${activeTournaments.size() == 0}">
