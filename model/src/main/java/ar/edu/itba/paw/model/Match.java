@@ -51,8 +51,6 @@ public class Match {
         this.isGroupStage = isGroupStage;
     }
 
-    public Match(){}
-
     public Long getId() {
         return id.getId();
     }

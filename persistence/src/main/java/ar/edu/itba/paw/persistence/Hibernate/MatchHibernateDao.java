@@ -29,8 +29,16 @@ public class MatchHibernateDao implements MatchDao {
         MatchId matchId = new MatchId(id, tournamentId);
         Match match = new Match(matchId, localScore, visitorScore, winner, stage, isGroupStage);
         match.setTournament(em.getReference(Tournament.class, matchId.getTournamentId()));
-        match.setLocal(em.getReference(Participant.class, localId));
-        match.setVisitor(em.getReference(Participant.class, visitorId));
+        if (localId != null) {
+            match.setLocal(em.getReference(Participant.class, localId));
+        } else {
+            match.setLocal(null);
+        }
+        if (visitorId != null) {
+            match.setVisitor(em.getReference(Participant.class, visitorId));
+        } else {
+            match.setVisitor(null);
+        }
         em.persist(match);
     }
 
