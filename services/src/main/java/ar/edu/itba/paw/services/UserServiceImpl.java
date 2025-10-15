@@ -42,6 +42,7 @@ public class UserServiceImpl implements UserService {
 
     private final static int RESET_PASSWORD_DAYS_DURATION = 1;
     private final static int VERIFICATION_DAYS_DURATION = 2;
+    private final static String ID_USER_UNEXISTANT = "User with ID {} does not exist";
 
 
     public UserServiceImpl(final UserDao userDao, final TokenDao tokenDao, final PasswordEncoder passwordEncoder, final TournamentDao tournamentDao, final MailService ms, final ImageDao imageDao) {
@@ -141,7 +142,7 @@ public class UserServiceImpl implements UserService {
                 userDao.verifyUser(userId);
             }
         } else {
-            LOGGER.error("User with ID {} does not exist", userId);
+            LOGGER.error(ID_USER_UNEXISTANT, userId);
             throw new UserNotFoundException();
         }
 
@@ -162,7 +163,7 @@ public class UserServiceImpl implements UserService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             LOGGER.debug("User has been verified and authenticated");
         } else {
-            LOGGER.error("User with ID {} does not exist", userId);
+            LOGGER.error(ID_USER_UNEXISTANT, userId);
             throw new UserNotFoundException();
         }
     }
@@ -172,7 +173,7 @@ public class UserServiceImpl implements UserService {
     public Optional<Token> checkTokenValidity(Long token, Long userId) {
         Optional<Token> optToken = tokenDao.findByToken(token);
         if(findById(userId).isEmpty()) {
-            LOGGER.error("User with ID {} does not exist", userId);
+            LOGGER.error(ID_USER_UNEXISTANT, userId);
             throw new UserNotFoundException();
         }
         if(optToken.isPresent()) {

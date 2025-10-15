@@ -1,4 +1,4 @@
-//package ar.edu.itba.paw.persistence;
+//package ar.edu.itba.paw.persistence.jdbc;
 //
 //import ar.edu.itba.paw.persistence.Jdbc.TeamMemberJdbcDao;
 //import org.junit.Assert;
@@ -83,22 +83,4 @@
 //        Assert.assertFalse(isMember);
 //    }
 //
-////    @Test
-////    public void testGetTeamMembers(){
-////        List<Long> members = teamMemberJdbcDao.getTeamMembers(0L);
-////
-////        Assert.assertNotNull(members);
-////        Assert.assertFalse(members.isEmpty());
-////        Assert.assertEquals(2, members.size());
-////        Assert.assertTrue(members.contains(0L));
-////        Assert.assertTrue(members.contains(1L));
-////    }
-////
-////    @Test
-////    public void testGetNoTeamMembers(){
-////        List<Long> members = teamMemberJdbcDao.getTeamMembers((long) -1);
-////
-////        Assert.assertNotNull(members);
-////        Assert.assertTrue(members.isEmpty());
-////    }
 //}
