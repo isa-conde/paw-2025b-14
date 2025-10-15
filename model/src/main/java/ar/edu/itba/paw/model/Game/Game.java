@@ -25,7 +25,7 @@ public class Game {
     private Integer image_id;
     @ManyToMany(mappedBy = "favouriteGames", fetch = FetchType.LAZY)
     private List<User> likedByUsers = new ArrayList<>();
-    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<GameFormat> formats = new ArrayList<>();
 
     Game(){}

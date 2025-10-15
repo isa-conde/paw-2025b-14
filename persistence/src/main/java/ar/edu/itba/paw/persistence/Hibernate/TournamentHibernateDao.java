@@ -110,7 +110,7 @@ public class TournamentHibernateDao implements TournamentDao {
 
     @Override
     public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Long image_id, Boolean openInscriptions, Boolean isFinished, Long format_id) {
-        Tournament t = new Tournament(em.getReference(User.class, creator_id), name,em.getReference(Game.class,  game_id), region, elo, start_date, end_date, format, structure, max_participants, image_id, openInscriptions, isFinished, em.getReference(GameFormat.class, format_id));
+        Tournament t = new Tournament(em.getReference(User.class, creator_id), name, em.getReference(Game.class,  game_id), region, elo, start_date, end_date, format, structure, max_participants, image_id, openInscriptions, isFinished, em.getReference(GameFormat.class, format_id));
         em.persist(em);
         return t;
     }

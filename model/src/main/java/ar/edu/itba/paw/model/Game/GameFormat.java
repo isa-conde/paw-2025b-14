@@ -15,6 +15,7 @@ public class GameFormat {
     private String name;
     @Column(name = "players_per_team", nullable = false)
     private Integer players_per_team;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "game_id", nullable = false)
     private Game game;
