@@ -13,7 +13,7 @@ public class Image {
     @Column(name = "image", nullable = false)
     private byte[] image;
 
-    Image(){}
+    public Image(){}
 
     public Image(byte[] image){
         this.image = image;

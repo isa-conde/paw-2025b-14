@@ -10,7 +10,7 @@ import javax.persistence.*;
 public class Match {
 
     @EmbeddedId
-    private final MatchId id;
+    private MatchId id;
 
     @MapsId("tournamentId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -48,6 +48,8 @@ public class Match {
         this.stage = stage;
         this.isGroupStage = isGroupStage;
     }
+
+    public Match(){}
 
     public Long getId() {
         return id.getId();

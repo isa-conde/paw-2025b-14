@@ -24,7 +24,7 @@ public class TeamMember {
 
     private Boolean verified;
 
-    TeamMember() {}
+    public TeamMember() {}
 
     public TeamMember(TeamMemberId id, Team team, User user){
         this.id = id;

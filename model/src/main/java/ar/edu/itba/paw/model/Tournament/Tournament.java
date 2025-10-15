@@ -8,6 +8,7 @@ import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
+import org.hibernate.annotations.ColumnTransformer;
 import org.w3c.dom.css.CSSStyleRule;
 
 import javax.persistence.*;
@@ -40,36 +41,49 @@ public class Tournament {
     private Long gameId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "region")
+    @Column(name = "region", columnDefinition = "region_enum")
+    @ColumnTransformer(read = "region::text", write = "?::region_enum")
     private Region region;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "elo", columnDefinition = "elo_enum")
+    @ColumnTransformer(read = "elo::text", write = "?::elo_enum")
     private Elo elo;
 
+    @Column(name = "start_date")
     private LocalDate start_date;
 
+    @Column(name = "end_date")
     private LocalDate end_date;
 
+    @Column(name = "format")
     private String format;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "structure", columnDefinition = "structure_enum")
+    @ColumnTransformer(read = "structure::text", write = "?::structure_enum")
     private Structure structure;
 
-    @Column(nullable = false)
+    @Column(name = "max_participants", nullable = false)
     private Integer max_participants;
 
+    @Column(name = "image_id")
     private Long image_id;
 
+    @Column(name = "open_inscriptions")
     private Boolean open_inscriptions;
 
+    @Column(name = "is_finished")
     private Boolean is_finished;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tournament_winner")
     private User winner;
 
+    @Column(name = "is_group_stage")
     private Boolean is_group_stage;
 
+    @Column(name = "tournament_started")
     private Boolean tournament_started;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -82,15 +96,12 @@ public class Tournament {
     @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Match> matches = new ArrayList<>();
 
-    Tournament(){}
-
-    public Tournament(User creator, String name, Game game, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Long image_id, Boolean openInscriptions, Boolean isFinished, GameFormat formatEntity){
+    public Tournament(User creator, String name, Game game, Region region, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Long image_id, Boolean openInscriptions, Boolean isFinished, GameFormat formatEntity){
         this.creator = creator;
         this.name = name;
         this.game = game;
         this.gameId = game.getId();
         this.region = region;
-        this.elo = elo;
         this.start_date = start_date;
         this.end_date = end_date;
         this.format = format;
@@ -119,6 +130,8 @@ public class Tournament {
         this.tournament_started = tournamentStarted;
         this.gameId = game_id;
     }
+
+    public Tournament() {}
 
     public Long getId() {
         return id;
@@ -155,6 +168,7 @@ public class Tournament {
     public String getFormat() {
         return format;
     }
+
     public void setFormat(String format) {
         this.format = format;
     }

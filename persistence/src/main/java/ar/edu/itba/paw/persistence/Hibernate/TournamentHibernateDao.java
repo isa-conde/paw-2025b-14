@@ -97,7 +97,7 @@ public class TournamentHibernateDao implements TournamentDao {
             params.put("endDate", filter.getEnd_date());
         }
         if (filter.getPlayersPerTeam() != null) {
-            jpql.append(" AND t.format.playersPerTeam = :playersPerTeam");
+            jpql.append(" AND t.formatEntity.players_per_team = :playersPerTeam");
             params.put("playersPerTeam", filter.getPlayersPerTeam());
         }
         if (filter.getGenre() != null) {
@@ -110,8 +110,10 @@ public class TournamentHibernateDao implements TournamentDao {
 
     @Override
     public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Long image_id, Boolean openInscriptions, Boolean isFinished, Long format_id) {
-        Tournament t = new Tournament(em.getReference(User.class, creator_id), name, em.getReference(Game.class,  game_id), region, elo, start_date, end_date, format, structure, max_participants, image_id, openInscriptions, isFinished, em.getReference(GameFormat.class, format_id));
-        em.persist(em);
+        Tournament t = new Tournament(em.getReference(User.class, creator_id), name, em.getReference(Game.class,  game_id), region, start_date, end_date, format, structure, max_participants, image_id, openInscriptions, isFinished, em.getReference(GameFormat.class, format_id));
+        t.setTournament_started(false);
+        t.setElo(elo);
+        em.persist(t);
         return t;
     }
 
@@ -165,14 +167,14 @@ public class TournamentHibernateDao implements TournamentDao {
 
     private List<Tournament> findUserTournaments(Long userId, Boolean isFinished, Long page) {
         TypedQuery<Long> idQuery = em.createQuery(
-                "SELECT t.id\n" +
-                    "FROM Tournament t\n" +
-                    "WHERE t.is_finished = :isFinished\n" +
-                    "  AND t IN (\n" +
-                        "    SELECT p.tournament\n" +
-                        "    FROM Participant p\n" +
-                        "    WHERE p.user = :user\n" +
-                    "  )\n" +
+                "SELECT t.id " +
+                    "FROM Tournament t " +
+                    "WHERE t.is_finished = :isFinished " +
+                    "  AND t IN ( " +
+                        "    SELECT p.tournament " +
+                        "    FROM Participant p " +
+                        "    WHERE p.user = :user " +
+                    ") " +
                     "ORDER BY t.start_date ASC",
                 Long.class
         );
@@ -220,10 +222,10 @@ public class TournamentHibernateDao implements TournamentDao {
     public Map<Long, List<Tournament>> getUnfilteredTournamentPages(Long page) {
         TypedQuery<Long> topGamesQuery = em.createQuery(
                 "SELECT g.id " +
-                        "FROM Game g " +
-                        "JOIN Tournament t ON g.id = t.game.id " +
+                        "FROM Tournament t " +
+                        "JOIN t.game g " +
                         "GROUP BY g.id " +
-                        "ORDER BY COUNT(t.id) DESC",
+                        "ORDER BY COUNT(t) DESC",
                 Long.class
         );
         topGamesQuery.setFirstResult((int)(page * TOP_GAMES_LIMIT));
