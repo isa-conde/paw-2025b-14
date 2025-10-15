@@ -74,14 +74,23 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public List<Tournament> getActiveTournaments(Long team_id) {
-        return getTournamentsFromIds(teamDao.getActiveTournaments(team_id));
-
+    public List<Tournament> getActiveTournaments(Long team_id, Integer page) {
+        return getTournamentsFromIds(teamDao.getActiveTournaments(team_id, page));
     }
 
     @Override
-    public List<Tournament> getPastTournaments(Long team_id) {
-        return getTournamentsFromIds(teamDao.getPastTournaments(team_id));
+    public List<Tournament> getPastTournaments(Long team_id, Integer page) {
+        return getTournamentsFromIds(teamDao.getPastTournaments(team_id, page));
+    }
+
+    @Override
+    public Integer getActivePages(Long team_id) {
+        return teamDao.getActivePages(team_id);
+    }
+
+    @Override
+    public Integer getPastPages(Long team_id) {
+        return teamDao.getPastPages(team_id);
     }
 
     @Override

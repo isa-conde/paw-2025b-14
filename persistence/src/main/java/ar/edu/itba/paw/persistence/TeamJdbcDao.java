@@ -45,8 +45,29 @@ public class TeamJdbcDao implements TeamDao {
     }
 
     @Override
-    public List<Long> getActiveTournaments(Long teamId) {
-        return findTeamTournamentIds(teamId, false);
+    public List<Long> getActiveTournaments(Long teamId, Integer page) {
+        return findTeamTournamentIds(teamId, false, page);
+    }
+
+    @Override
+    public Integer getActivePages(Long team_id) {
+        return countTeamTournaments(team_id, false);
+    }
+
+    @Override
+    public Integer getPastPages(Long team_id) {
+        return countTeamTournaments(team_id, true);
+    }
+
+    private int countTeamTournaments(Long teamId, Boolean isFinished) {
+        String sql = """
+        SELECT COUNT(*)
+        FROM tournament t
+        INNER JOIN participant p ON p.tournament_id = t.id
+        WHERE p.team_id = ? AND t.is_finished = ? AND p.user_id IS NULL
+    """;
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, teamId, isFinished);
+        return (int) Math.ceil((double) count / 9L);
     }
 
     @Override
@@ -95,18 +116,20 @@ public class TeamJdbcDao implements TeamDao {
     }
 
     @Override
-    public List<Long> getPastTournaments(Long teamId) {
-        return findTeamTournamentIds(teamId, true);
+    public List<Long> getPastTournaments(Long teamId, Integer page) {
+        return findTeamTournamentIds(teamId, true, page);
     }
 
-    private List<Long> findTeamTournamentIds(Long teamId, Boolean isFinished) {
+    private List<Long> findTeamTournamentIds(Long teamId, Boolean isFinished, Integer page) {
         String sql = """
         SELECT t.id
         FROM tournament t
         INNER JOIN participant p ON p.tournament_id = t.id
         WHERE p.team_id = ? AND t.is_finished = ? AND p.user_id IS NULL
+        ORDER BY t.id DESC
+        LIMIT ? OFFSET ?
     """;
-        return jdbcTemplate.queryForList(sql, Long.class, teamId, isFinished);
+        return jdbcTemplate.queryForList(sql, Long.class, teamId, isFinished, 9, page * 9);
     }
 
     @Override

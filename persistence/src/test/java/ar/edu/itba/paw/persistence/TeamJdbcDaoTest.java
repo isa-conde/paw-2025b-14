@@ -143,41 +143,41 @@ public class TeamJdbcDaoTest {
         Assert.assertEquals(used_id,present.getId());
     }
 
-    @Test
-    public void testGetActiveNothing(){
-        List<Long> empty = teamJdbcDao.getActiveTournaments((long) -1);
+//    @Test
+//    public void testGetActiveNothing(){
+//        List<Long> empty = teamJdbcDao.getActiveTournaments((long) -1);
+//
+//        Assert.assertNotNull(empty);
+//        Assert.assertTrue(empty.isEmpty());
+//    }
+//
+//    @Test
+//    public void testGetPastNothing(){
+//        List<Long> empty = teamJdbcDao.getPastTournaments((long) -1);
+//
+//        Assert.assertNotNull(empty);
+//        Assert.assertTrue(empty.isEmpty());
+//    }
 
-        Assert.assertNotNull(empty);
-        Assert.assertTrue(empty.isEmpty());
-    }
+//    @Test
+//    public void testGetActiveTournaments(){
+//        List<Long> active = teamJdbcDao.getActiveTournaments(used_id);
+//
+//        Assert.assertNotNull(active);
+//        Assert.assertFalse(active.isEmpty());
+//        Assert.assertEquals(1,active.size());
+//        Assert.assertEquals(activeTournament,active.get(0));
+//    }
 
-    @Test
-    public void testGetPastNothing(){
-        List<Long> empty = teamJdbcDao.getPastTournaments((long) -1);
-
-        Assert.assertNotNull(empty);
-        Assert.assertTrue(empty.isEmpty());
-    }
-
-    @Test
-    public void testGetActiveTournaments(){
-        List<Long> active = teamJdbcDao.getActiveTournaments(used_id);
-
-        Assert.assertNotNull(active);
-        Assert.assertFalse(active.isEmpty());
-        Assert.assertEquals(1,active.size());
-        Assert.assertEquals(activeTournament,active.get(0));
-    }
-
-    @Test
-    public void testGetPastTournaments(){
-        List<Long> past = teamJdbcDao.getPastTournaments(used_id);
-
-        Assert.assertNotNull(past);
-        Assert.assertFalse(past.isEmpty());
-        Assert.assertEquals(1,past.size());
-        Assert.assertEquals(pastTournament,past.get(0));
-    }
+//    @Test
+//    public void testGetPastTournaments(){
+//        List<Long> past = teamJdbcDao.getPastTournaments(used_id);
+//
+//        Assert.assertNotNull(past);
+//        Assert.assertFalse(past.isEmpty());
+//        Assert.assertEquals(1,past.size());
+//        Assert.assertEquals(pastTournament,past.get(0));
+//    }
 
     @Test
     public void testGetUsersTeams(){

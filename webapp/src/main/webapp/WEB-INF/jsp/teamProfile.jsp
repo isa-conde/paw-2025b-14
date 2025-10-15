@@ -6,7 +6,7 @@
 
 <paw:layout user="${user}" function="${openModal}">
 
-    <c:set var="isMyTeam" value="${user.id == team.owner.id }"/>
+    <c:set var="isMyTeam" value="${user.id == team.owner_id }"/>
     <c:url value="/images/pencil.png" var="pencilUrl"/>
     <c:set var="icon" value="${isMyTeam ? pencilUrl : null }"/>
     <paw:banner cornerIcon="${icon}" cornerOnClick="openModal('editProfileModal')" image="${pageContext.request.contextPath}/banner/${team.banner_id}">
@@ -54,7 +54,8 @@
                             </div>
                         </c:when>
                         <c:otherwise>
-                            <paw:carrousel id="activetourneys" elements="${activeTournaments}"/>
+                            <paw:elements-grid elements="${activeTournaments}" id="active-${team.id}"/>
+                            <paw:pagination currentPage="${currentPage1}" totalPages="${totalPages1}" url="/team/profile/${team.id}"/>
                         </c:otherwise>
                     </c:choose>
                     <div class="carrousel-title">
@@ -67,7 +68,8 @@
                             </div>
                         </c:when>
                         <c:otherwise>
-                            <paw:carrousel id="pasttourneys" elements="${pastTournaments}"/>
+                            <paw:elements-grid elements="${pastTournaments}" id="past-${team.id}"/>
+                            <paw:pagination currentPage="${currentPage2}" totalPages="${totalPages2}" url="/team/profile/${team.id}"/>
                         </c:otherwise>
                     </c:choose>
                 </div>
