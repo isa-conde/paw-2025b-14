@@ -19,11 +19,11 @@ public class Match {
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "local_id")
-    private User local;
+    private Participant local;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "visitor_id")
-    private User visitor;
+    private Participant visitor;
 
     @Column(name = "local_score")
     private Integer localScore;
@@ -40,8 +40,7 @@ public class Match {
     @Column(name = "is_group_stage")
     private Boolean isGroupStage;
 
-    public Match(MatchId id, Long localId, Long visitorId,
-                            Integer localScore, Integer visitorScore, Integer winner, Integer stage, Boolean isGroupStage) {
+    public Match(MatchId id, Integer localScore, Integer visitorScore, Integer winner, Integer stage, Boolean isGroupStage) {
         this.id = id;
         this.localScore = localScore;
         this.visitorScore = visitorScore;
@@ -94,11 +93,11 @@ public class Match {
         return isGroupStage;
     }
 
-    public User getLocal() {
+    public Participant getLocal() {
         return local;
     }
 
-    public User getVisitor() {
+    public Participant getVisitor() {
         return visitor;
     }
 
@@ -114,7 +113,7 @@ public class Match {
         isGroupStage = groupStage;
     }
 
-    public void setLocal(User local) {
+    public void setLocal(Participant local) {
         this.local = local;
     }
 
@@ -126,7 +125,7 @@ public class Match {
         this.stage = stage;
     }
 
-    public void setVisitor(User visitor) {
+    public void setVisitor(Participant visitor) {
         this.visitor = visitor;
     }
 

@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import java.time.LocalDate;
@@ -32,7 +33,13 @@ public class TokenHibernateDao implements TokenDao {
     public Optional<Token> findByToken(Long token) {
         TypedQuery<Token> query = em.createQuery("SELECT t FROM Token t WHERE t.token = :token", Token.class);
         query.setParameter("token", token);
-        return Optional.ofNullable(query.getSingleResult());
+        Token result;
+        try {
+            result = query.getSingleResult();
+        } catch(NoResultException e) {
+            return Optional.empty();
+        }
+        return Optional.of(result);
     }
 
     @Override

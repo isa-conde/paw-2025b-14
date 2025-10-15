@@ -26,16 +26,14 @@ public class ParticipantServiceImpl implements ParticipantService {
     private final ParticipantDao participantDao;
     private final TournamentDao tournamentDao;
     private final TournamentService ts;
-    private final GameDao gameDao;
     private final UserDao userDao;
     private final MailService ms;
     private final GameFormatDao gameFormatDao;
 
-    public ParticipantServiceImpl(ParticipantDao participantDao, TournamentDao tournamentDao, TournamentService ts, GameDao gameDao, UserDao userDao, MailService ms, GameFormatDao gameFormatDao){
+    public ParticipantServiceImpl(ParticipantDao participantDao, TournamentDao tournamentDao, TournamentService ts, UserDao userDao, MailService ms, GameFormatDao gameFormatDao){
         this.participantDao = participantDao;
         this.tournamentDao = tournamentDao;
         this.ts = ts;
-        this.gameDao = gameDao;
         this.userDao = userDao;
         this.ms = ms;
         this.gameFormatDao = gameFormatDao;

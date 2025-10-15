@@ -3,6 +3,7 @@ package ar.edu.itba.paw.persistence.Hibernate;
 import ar.edu.itba.paw.interfaces.persistence.MatchDao;
 import ar.edu.itba.paw.model.Match;
 import ar.edu.itba.paw.model.MatchInfo;
+import ar.edu.itba.paw.model.Participant;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.ids.MatchId;
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -26,7 +28,10 @@ public class MatchHibernateDao implements MatchDao {
     @Override
     public void insertMatch(Long id, Long tournamentId, Long localId, Long visitorId, Integer stage, Integer localScore, Integer visitorScore, Integer winner, Boolean isGroupStage) {
         MatchId matchId = new MatchId(id, tournamentId);
-        Match match = new Match(matchId, localId, visitorId, localScore, visitorScore, winner, stage, isGroupStage);
+        Match match = new Match(matchId, localScore, visitorScore, winner, stage, isGroupStage);
+        match.setTournament(em.getReference(Tournament.class, matchId.getTournamentId()));
+        match.setLocal(em.getReference(Participant.class, localId));
+        match.setVisitor(em.getReference(Participant.class, visitorId));
         em.persist(match);
     }
 
@@ -60,7 +65,12 @@ public class MatchHibernateDao implements MatchDao {
     @Override
     public List<MatchInfo> getTournamentMatches(Long tournament_id, Integer teamSize) {
         Tournament tournament = em.find(Tournament.class, tournament_id);
-        return null;
+        List<MatchInfo> matchesWithParticipants = new ArrayList<>();
+        for(Match m : tournament.getMatches()) {
+            MatchInfo toAdd = new MatchInfo(m.getId(), m.getTournamentId(), m.getLocalId(), m.getVisitorId(), m.getLocalScore(), m.getVisitorScore(), m.getWinner(), m.getStage(), m.getLocal().getGroupNumber(), m.getGroupStage());
+            matchesWithParticipants.add(toAdd);
+        }
+        return matchesWithParticipants;
     }
 
     @Override
@@ -79,16 +89,18 @@ public class MatchHibernateDao implements MatchDao {
     @Override
     public void updateMatchLocal(Long tournamentId, Long matchId, Long userId) { // TODO: will probably change with MatchInfo refactor
         MatchId id = new MatchId(matchId, tournamentId);
-        Query query = em.createQuery("UPDATE Match m SET m.localId = :newLocal WHERE m.id = :id");
-        query.setParameter("newLocal", userId).setParameter("id", id);
+        Query query = em.createQuery("UPDATE Match m SET m.local = :newLocal WHERE m.id = :id");
+        Participant newLocal = em.find(Participant.class, userId);
+        query.setParameter("newLocal", newLocal).setParameter("id", id);
         query.executeUpdate();
     }
 
     @Override
     public void updateMatchVisitor(Long tournamentId, Long matchId, Long userId) {
         MatchId id = new MatchId(matchId, tournamentId);
-        Query query = em.createQuery("UPDATE Match m SET m.visitorId = :newVisitor WHERE m.id = :id");
-        query.setParameter("newVisitor", userId).setParameter("id", id);
+        Query query = em.createQuery("UPDATE Match m SET m.visitor = :newVisitor WHERE m.id = :id");
+        Participant newVisitor = em.find(Participant.class, userId);
+        query.setParameter("newVisitor", newVisitor).setParameter("id", id);
         query.executeUpdate();
     }
 

@@ -12,8 +12,11 @@ public class Participant {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "participant_user_id_seq")
     @SequenceGenerator(sequenceName = "participant_user_id_seq", name = "participant_user_id_seq", allocationSize = 1)
     private Long id;
-    @Column(nullable = false)
+
+    @Column(name = "points", nullable = false)
     private Integer points;
+
+    @Column(name = "group_number")
     private Integer group_number;
 
     @ManyToOne(fetch = FetchType.LAZY)

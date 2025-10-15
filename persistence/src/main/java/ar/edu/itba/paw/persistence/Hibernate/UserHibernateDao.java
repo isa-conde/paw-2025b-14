@@ -5,6 +5,7 @@ import ar.edu.itba.paw.model.User;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import java.util.List;
@@ -23,17 +24,28 @@ public class UserHibernateDao implements UserDao {
 
     @Override
     public Optional<User> findByEmail(String email) {
-        final TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE u.username = :username", User.class);
-        final User result = query.getSingleResult();
-        return Optional.ofNullable(result);
+        final TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class);
+        query.setParameter("email", email);
+        User result;
+        try {
+            result = query.getSingleResult();
+        } catch(NoResultException e) {
+            return Optional.empty();
+        }
+        return Optional.of(result);
     }
 
     @Override
     public Optional<User> findByUsername(String username) {
         final TypedQuery<User> query = em.createQuery("SELECT u FROM User u where u.username = :username", User.class);
         query.setParameter("username", username);
-        final User result = query.getSingleResult();
-        return Optional.ofNullable(result);
+        User result;
+        try {
+            result = query.getSingleResult();
+        } catch(NoResultException e) {
+            return Optional.empty();
+        }
+        return Optional.of(result);
     }
 
     @Override

@@ -124,10 +124,10 @@ public class TournamentHibernateDao implements TournamentDao {
     @Override
     public List<Tournament> findByCreator(Long creator_id, Long page) {
         TypedQuery<Long> idQuery = em.createQuery(
-                "SELECT t.id FROM Tournament t WHERE t.creator.id = :creatorId ORDER BY t.start_date ASC",
+                "SELECT t.id FROM Tournament t WHERE t.creator = :creator ORDER BY t.start_date ASC",
                 Long.class
         );
-        idQuery.setParameter("creatorId", creator_id);
+        idQuery.setParameter("creator", em.getReference(User.class, creator_id));
         idQuery.setFirstResult((int) (page * 9));
         idQuery.setMaxResults(9);
 
@@ -165,13 +165,18 @@ public class TournamentHibernateDao implements TournamentDao {
 
     private List<Tournament> findUserTournaments(Long userId, Boolean isFinished, Long page) {
         TypedQuery<Long> idQuery = em.createQuery(
-                "SELECT p.tournament.id " +
-                        "FROM Participant p " +
-                        "WHERE p.user.id = :userId AND p.tournament.is_finished = :isFinished " +
-                        "ORDER BY p.tournament.start_date ASC",
+                "SELECT t.id\n" +
+                    "FROM Tournament t\n" +
+                    "WHERE t.is_finished = :isFinished\n" +
+                    "  AND t IN (\n" +
+                        "    SELECT p.tournament\n" +
+                        "    FROM Participant p\n" +
+                        "    WHERE p.user = :user\n" +
+                    "  )\n" +
+                    "ORDER BY t.start_date ASC",
                 Long.class
         );
-        idQuery.setParameter("userId", userId);
+        idQuery.setParameter("user", em.getReference(User.class, userId));
         idQuery.setParameter("isFinished", isFinished);
         idQuery.setFirstResult((int)(page * PAGE_SIZE));
         idQuery.setMaxResults(PAGE_SIZE);
@@ -301,12 +306,12 @@ public class TournamentHibernateDao implements TournamentDao {
         String jpql = """
         SELECT COUNT(p)
         FROM Participant p
-        WHERE p.tournament.id = :tournamentId
+        WHERE p.tournament = :tournament
           AND (p.user IS NULL OR p.team IS NULL)
     """;
 
         TypedQuery<Long> query = em.createQuery(jpql, Long.class);
-        query.setParameter("tournamentId", tournamentId);
+        query.setParameter("tournament", em.getReference(Tournament.class, tournamentId));
 
         return query.getSingleResult().intValue();
     }
@@ -367,10 +372,15 @@ public class TournamentHibernateDao implements TournamentDao {
         TypedQuery<Long> query = em.createQuery(
                 "SELECT COUNT(p) " +
                         "FROM Participant p " +
-                        "WHERE p.user.id = :userId AND p.tournament.is_finished = :isFinished",
+                        "WHERE p.user = :user " +
+                        "AND p.tournament IN (" +
+                        "SELECT t " +
+                        "FROM Tournament t " +
+                        "WHERE t.is_finished = :isFinished" +
+                        ")",
                 Long.class
         );
-        query.setParameter("userId", userId);
+        query.setParameter("user", em.getReference(User.class, userId));
         query.setParameter("isFinished", isFinished);
 
         Long count = query.getSingleResult();
@@ -403,10 +413,10 @@ public class TournamentHibernateDao implements TournamentDao {
 
     private int countCreatedTournaments(Long userId, boolean isFinished) {
         TypedQuery<Long> query = em.createQuery(
-                "SELECT COUNT(t) FROM Tournament t WHERE t.creator.id = :creatorId AND t.is_finished = :isFinished",
+                "SELECT COUNT(t) FROM Tournament t WHERE t.creator = :creator AND t.is_finished = :isFinished",
                 Long.class
         );
-        query.setParameter("creatorId", userId);
+        query.setParameter("creator", em.getReference(User.class, userId));
         query.setParameter("isFinished", isFinished);
 
         return query.getSingleResult().intValue();

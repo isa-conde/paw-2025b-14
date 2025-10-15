@@ -24,35 +24,52 @@ public class Tournament {
     @SequenceGenerator(sequenceName = "tournament_id_seq", name = "tournament_id_seq", allocationSize = 1)
     @Column(name = "id")
     private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creator_id", nullable = false)
     private User creator;
+
     @Column(name = "name", nullable = false)
     private String name;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "game_id", nullable = false)
     private Game game;
+
     @Column(name = "game_id", insertable = false, updatable = false)
     private Long gameId;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "region")
     private Region region;
+
     @Enumerated(EnumType.STRING)
     private Elo elo;
+
     private LocalDate start_date;
+
     private LocalDate end_date;
+
     private String format;
+
     @Enumerated(EnumType.STRING)
     private Structure structure;
+
     @Column(nullable = false)
     private Integer max_participants;
+
     private Long image_id;
+
     private Boolean open_inscriptions;
+
     private Boolean is_finished;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tournament_winner")
     private User winner;
+
     private Boolean is_group_stage;
+
     private Boolean tournament_started;
 
     @ManyToOne(fetch = FetchType.LAZY)
