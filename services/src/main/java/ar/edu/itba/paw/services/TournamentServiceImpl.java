@@ -453,7 +453,7 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public List<Tournament> getCreatedAndFinishedTournaments(Long userId, Long page) {
         List<Tournament> allCreatedTournaments = findByCreator(userId, page);
-        return allCreatedTournaments.stream().filter(t -> t.getFinished()).toList();
+        return allCreatedTournaments.stream().filter(Tournament::getFinished).toList();
     }
 
     @Override

@@ -174,11 +174,9 @@ public class UserController {
         User profile = profileOpt.get();
 
         List<Tournament> onGoingTournaments = ts.getCreatedAndOngoingTournaments(profile.getId(), page1);
-        List<Tournament> finishedTournaments = ts.getCreatedAndFinishedTournaments(profile.getId(), page1);
+        List<Tournament> finishedTournaments = ts.getCreatedAndFinishedTournaments(profile.getId(), page2);
         List<Tournament> joinedTournaments = ts.findUserActiveTournaments(profile.getId(), page1);
-        List<Tournament> pastTournaments = ts.findUserPastTournaments(profile.getId(), page2);
-
-
+        List<Tournament> pastTournaments = ts.findUserPastTournaments(profile.getId(), page1);
 
         mav.addObject("user", currentUser.isPresent() ? currentUser.get().getPawUser() : null);
         mav.addObject("profile", profile);
@@ -193,7 +191,6 @@ public class UserController {
             mav.addObject("totalPages1", ts.getPagesBySection(profile.getId(), section + "Ongoing"));
             mav.addObject("totalPages2", ts.getPagesBySection(profile.getId(), section + "Finished"));
         }
-
         return mav;
     }
 

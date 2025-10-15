@@ -138,9 +138,21 @@ public class TournamentJdbcDao implements TournamentDao {
 
 
     @Override
-    public List<Tournament> findByCreator(Long creator_id, Long page) {
-        return jdbcTemplate.query("SELECT * FROM tournament t WHERE creator_id = ? LIMIT 9 OFFSET ?", ROW_MAPPER, creator_id, 9*page);
+    public List<Tournament> findByCreator(Long creatorId, Long page) {
+        final int pageSize = 9;
+        final Long offset = page * pageSize;
+
+        String sql = """
+        SELECT t.*
+        FROM tournament t
+        WHERE t.creator_id = ?
+        ORDER BY t.start_date DESC, t.id DESC
+        LIMIT ? OFFSET ?
+        """;
+
+        return jdbcTemplate.query(sql, ROW_MAPPER, creatorId, pageSize, offset);
     }
+
 
     @Override
     public void setFinished(Long tournament_id) {
