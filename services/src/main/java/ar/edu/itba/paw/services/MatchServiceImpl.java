@@ -9,7 +9,6 @@ import ar.edu.itba.paw.interfaces.services.MatchService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.Match;
-import ar.edu.itba.paw.model.MatchInfo;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.enums.Structure;
 import org.slf4j.Logger;
@@ -75,8 +74,8 @@ public class MatchServiceImpl implements MatchService {
 
     @Transactional
     @Override
-    public Map<Integer, List<MatchInfo>> getTournamentMatchesByStage(Long tournamentId){
-        List<MatchInfo> matches = matchDao.getTournamentMatches(tournamentId, ts.getPlayersPerTeam(tournamentId));
+    public Map<Integer, List<Match>> getTournamentMatchesByStage(Long tournamentId){
+        List<Match> matches = matchDao.getTournamentMatches(tournamentId, ts.getPlayersPerTeam(tournamentId));
         if (matches.isEmpty()) {
             return Collections.emptyMap();
         }
@@ -84,9 +83,9 @@ public class MatchServiceImpl implements MatchService {
         if(teamSize == null){
             teamSize = 1;
         }
-        Map<Integer, List<MatchInfo>> result = new TreeMap<>();
+        Map<Integer, List<Match>> result = new TreeMap<>();
         Boolean isGroupStage = tournamentDao.getIsGroupStage(tournamentId);
-        for (MatchInfo m : matches) {
+        for (Match m : matches) {
             m.setLocal(participantDao.getTournamentParticipantById(tournamentId, m.getLocalId(), teamSize));
             m.setVisitor(participantDao.getTournamentParticipantById(tournamentId, m.getVisitorId(), teamSize));
             Integer stage = m.getStage();

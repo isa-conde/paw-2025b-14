@@ -10,7 +10,7 @@ import javax.persistence.*;
 public class Match {
 
     @EmbeddedId
-    private final MatchId id;
+    private MatchId id;
 
     @MapsId("tournamentId")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -39,6 +39,8 @@ public class Match {
 
     @Column(name = "is_group_stage")
     private Boolean isGroupStage;
+
+    public Match() {}
 
     public Match(MatchId id, Integer localScore, Integer visitorScore, Integer winner, Integer stage, Boolean isGroupStage) {
         this.id = id;

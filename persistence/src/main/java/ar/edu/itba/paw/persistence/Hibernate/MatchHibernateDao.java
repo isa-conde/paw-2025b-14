@@ -2,7 +2,6 @@ package ar.edu.itba.paw.persistence.Hibernate;
 
 import ar.edu.itba.paw.interfaces.persistence.MatchDao;
 import ar.edu.itba.paw.model.Match;
-import ar.edu.itba.paw.model.MatchInfo;
 import ar.edu.itba.paw.model.Participant;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.ids.MatchId;
@@ -48,7 +47,12 @@ public class MatchHibernateDao implements MatchDao {
             LOGGER.warn("Match does not have a winner");
             return null; // TODO: add custom excep
         }
-        return winner.longValue();
+        if(winner == 1) {
+            return match.getLocalId();
+        }else if(winner == 2) {
+            return match.getVisitorId();
+        }
+        return null;
     }
 
     @Override
@@ -63,14 +67,9 @@ public class MatchHibernateDao implements MatchDao {
     }
 
     @Override
-    public List<MatchInfo> getTournamentMatches(Long tournament_id, Integer teamSize) {
+    public List<Match> getTournamentMatches(Long tournament_id, Integer teamSize) {
         Tournament tournament = em.find(Tournament.class, tournament_id);
-        List<MatchInfo> matchesWithParticipants = new ArrayList<>();
-        for(Match m : tournament.getMatches()) {
-            MatchInfo toAdd = new MatchInfo(m.getId(), m.getTournamentId(), m.getLocalId(), m.getVisitorId(), m.getLocalScore(), m.getVisitorScore(), m.getWinner(), m.getStage(), m.getLocal().getGroupNumber(), m.getGroupStage());
-            matchesWithParticipants.add(toAdd);
-        }
-        return matchesWithParticipants;
+        return tournament.getMatches();
     }
 
     @Override
@@ -87,7 +86,7 @@ public class MatchHibernateDao implements MatchDao {
     }
 
     @Override
-    public void updateMatchLocal(Long tournamentId, Long matchId, Long userId) { // TODO: will probably change with MatchInfo refactor
+    public void updateMatchLocal(Long tournamentId, Long matchId, Long userId) {
         MatchId id = new MatchId(matchId, tournamentId);
         Query query = em.createQuery("UPDATE Match m SET m.local = :newLocal WHERE m.id = :id");
         Participant newLocal = em.find(Participant.class, userId);

@@ -5,7 +5,6 @@ import ar.edu.itba.paw.interfaces.services.*;
 import ar.edu.itba.paw.model.*;
 import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.Game.GameFormat;
-import ar.edu.itba.paw.model.MatchInfo;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Genre;
@@ -178,7 +177,7 @@ public class TournamentController {
 
         Optional<Tournament> optionalTournament = ts.findById(tournamentId);
 
-        Map<Integer, List<MatchInfo>> matches = ms.getTournamentMatchesByStage(tournamentId);
+        Map<Integer, List<Match>> matches = ms.getTournamentMatchesByStage(tournamentId);
         long maxStage = matches != null ? matches.keySet().stream().max(Integer::compareTo).orElse(0) : 0L;
 
         Integer groups = ps.getTournamentGroups(tournamentId);
