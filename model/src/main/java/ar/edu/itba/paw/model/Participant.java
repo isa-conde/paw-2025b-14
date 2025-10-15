@@ -36,7 +36,6 @@ public class Participant {
     @Transient
     private Long pfp_id;
 
-    Participant(){}
 
     public Participant(final Long id, final String name, Integer points, Integer group_number, Long pfp_id) {
         this.id = id;
@@ -49,6 +48,8 @@ public class Participant {
     public Participant(Tournament tournament){
         this.tournament = tournament;
     }
+
+    public Participant() {}
 
     public String getName() {
         return name;

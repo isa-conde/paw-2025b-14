@@ -25,7 +25,7 @@ public class Token {
     @Column(name = "used", nullable = false)
     private boolean used;
 
-    Token(){}
+    public Token(){}
 
     public Token(User user, Long token, LocalDate expiry_date){
         this.user = user;

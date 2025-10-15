@@ -27,9 +27,6 @@ public class Team {
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TeamMember> teamMembers = new ArrayList<>();
 
-
-    Team(){}
-
     public Team(String name, Long pfp_id, Long banner_id) {
         this.name = name;
         this.pfp_id = pfp_id;
@@ -42,6 +39,8 @@ public class Team {
         this.pfp_id = pfp_id;
         this.banner_id = banner_id;
     }
+
+    public Team() {}
 
     public Long getId() {
         return id;

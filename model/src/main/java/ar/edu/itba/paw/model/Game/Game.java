@@ -2,6 +2,7 @@ package ar.edu.itba.paw.model.Game;
 
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Genre;
+import org.hibernate.annotations.ColumnTransformer;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -16,19 +17,25 @@ public class Game {
     @SequenceGenerator(sequenceName = "game_id_seq", name = "game_id_seq", allocationSize = 1)
     @Column(name = "id")
     private Long id;
+
     @Column(name = "name", nullable = false)
     private  String name;
+
     @Enumerated(EnumType.STRING)
-    @Column(name = "genre")
+    @Column(name = "genre", columnDefinition = "genre_enum")
+    @ColumnTransformer(read = "genre::text", write = "?::genre_enum")
     private Genre genre;
+
     @Column(name = "image_id")
     private Integer image_id;
+
     @ManyToMany(mappedBy = "favouriteGames", fetch = FetchType.LAZY)
     private List<User> likedByUsers = new ArrayList<>();
+
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<GameFormat> formats = new ArrayList<>();
 
-    Game(){}
+    public Game(){}
 
     public Game(String name, Genre genre, Integer image_id){
         this.name = name;

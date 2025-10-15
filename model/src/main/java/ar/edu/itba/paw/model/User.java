@@ -28,7 +28,7 @@ public class User {
     @Column(name = "verified", nullable = false)
     private boolean verified;
 
-    @Column(name = "bio", length = 255)
+    @Column(name = "bio")
     private String bio;
 
     @Column(name = "profile_picture_id")
@@ -54,8 +54,7 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TeamMember> teamMembers = new ArrayList<>();
 
-
-    User(){}
+    public User(){}
 
     public User(final long id, final String username, final String email, String password, boolean verified, String bio, Long pfp_id, Long banner_id, String locale) {
         this.id = id;

@@ -20,7 +20,7 @@ public class GameFormat {
     @JoinColumn(name = "game_id", nullable = false)
     private Game game;
 
-    GameFormat(){}
+    public GameFormat(){}
 
     public GameFormat(Long id, String name, Integer playersPerTeam) {
         this.id = id;
