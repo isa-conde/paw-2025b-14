@@ -21,7 +21,7 @@ public interface TournamentDao {
 
     Structure getTournamentStructure(Long tournament_id);
 
-    List<Tournament> findByCreator(Long creator_id, Long page);
+    List<Tournament> findByCreator(Long creator_id, Long page, Boolean isFinished);
 
     void setFinished(Long tournament_id);
 

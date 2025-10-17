@@ -81,8 +81,8 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public List<Tournament> findByCreator(Long creator_id, Long page) {
-        return tournamentDao.findByCreator(creator_id, page);
+    public List<Tournament> findByCreator(Long creator_id, Long page, Boolean isFinished) {
+        return tournamentDao.findByCreator(creator_id, page, isFinished);
     }
 
     @Transactional
@@ -451,14 +451,12 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Override
     public List<Tournament> getCreatedAndFinishedTournaments(Long userId, Long page) {
-        List<Tournament> allCreatedTournaments = findByCreator(userId, page);
-        return allCreatedTournaments.stream().filter(t -> t.getFinished()).toList();
+        return findByCreator(userId, page, true);
     }
 
     @Override
     public List<Tournament> getCreatedAndOngoingTournaments(Long userId, Long page) {
-        List<Tournament> allCreatedTournaments = findByCreator(userId, page);
-        return allCreatedTournaments.stream().filter(t -> !t.getFinished()).toList();
+        return findByCreator(userId, page, false);
     }
 
 }

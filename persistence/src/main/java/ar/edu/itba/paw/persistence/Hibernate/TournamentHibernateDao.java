@@ -124,12 +124,13 @@ public class TournamentHibernateDao implements TournamentDao {
     }
 
     @Override
-    public List<Tournament> findByCreator(Long creator_id, Long page) {
+    public List<Tournament> findByCreator(Long creator_id, Long page, Boolean isFinished) {
         TypedQuery<Long> idQuery = em.createQuery(
-                "SELECT t.id FROM Tournament t WHERE t.creator = :creator ORDER BY t.start_date ASC",
+                "SELECT t.id FROM Tournament t WHERE t.creator = :creator AND t.is_finished = :isFinished ORDER BY t.start_date ASC",
                 Long.class
         );
         idQuery.setParameter("creator", em.getReference(User.class, creator_id));
+        idQuery.setParameter("isFinished", isFinished);
         idQuery.setFirstResult((int) (page * 9));
         idQuery.setMaxResults(9);
 
