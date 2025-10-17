@@ -287,15 +287,15 @@ public class GameJdbcDaoTest {
         }
     }
 
-    @Test
-    public void testAddFavourites(){
-        gameJdbcDao.addFavourite(1L, USED_IDS.get(0));
-
-        Long ans = jdbcTemplate.queryForObject("select user_id from user_favourites where game_id = ?",Long.class,USED_IDS.get(0));
-
-        Assert.assertNotNull(ans);
-        Assert.assertEquals(Long.valueOf(1), ans);
-    }
+//    @Test
+//    public void testAddFavourites(){
+//        gameJdbcDao.addFavourite(1L, USED_IDS.get(0));
+//
+//        Long ans = jdbcTemplate.queryForObject("select user_id from user_favourites where game_id = ?",Long.class,USED_IDS.get(0));
+//
+//        Assert.assertNotNull(ans);
+//        Assert.assertEquals(Long.valueOf(1), ans);
+//    }
 
     @Test
     public void testGetFavourites(){

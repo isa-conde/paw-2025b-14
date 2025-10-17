@@ -171,27 +171,32 @@ public class UserController {
             throw new UserNotFoundException();
         }
         User profile = profileOpt.get();
-
-        List<Tournament> onGoingTournaments = ts.getCreatedAndOngoingTournaments(profile.getId(), page1);
-        List<Tournament> finishedTournaments = ts.getCreatedAndFinishedTournaments(profile.getId(), page1);
-        List<Tournament> joinedTournaments = ts.findUserActiveTournaments(profile.getId(), page1);
-        List<Tournament> pastTournaments = ts.findUserPastTournaments(profile.getId(), page2);
-
-
-
+        Integer totalPages1 = ts.getPagesBySection(profile.getId(), section);
+        Integer totalPages2 = ts.getPagesBySection(profile.getId(), section);
+        page1 = page1 > totalPages1 - 1 ? totalPages1 - 1 : page1;
+        page2 = page2 > totalPages2 - 1 ? totalPages2 - 1 : page2;
         mav.addObject("user", currentUser.isPresent() ? currentUser.get().getPawUser() : null);
         mav.addObject("profile", profile);
-        mav.addObject("pastTournaments", pastTournaments);
-        mav.addObject("onGoingTournaments", onGoingTournaments);
-        mav.addObject("finishedTournaments", finishedTournaments);
-        mav.addObject("joinedTournaments", joinedTournaments);
+        if (section.equals("owned")){
+            totalPages1 = ts.getPagesBySection(profile.getId(), section + "Ongoing");
+            totalPages2 = ts.getPagesBySection(profile.getId(), section + "Finished");
+            page1 = page1 > totalPages1 - 1 ? totalPages1 - 1 : page1;
+            page2 = page2 > totalPages2 - 1? totalPages2 : page2;
+            List<Tournament> onGoingTournaments = ts.getCreatedAndOngoingTournaments(profile.getId(), page1);
+            List<Tournament> finishedTournaments = ts.getCreatedAndFinishedTournaments(profile.getId(), page1);
+            mav.addObject("onGoingTournaments", onGoingTournaments);
+            mav.addObject("finishedTournaments", finishedTournaments);
+        }else if (section.equals("finished")){
+            List<Tournament> pastTournaments = ts.findUserPastTournaments(profile.getId(), page2);
+            mav.addObject("pastTournaments", pastTournaments);
+        }else if (section.equals("active")){
+            List<Tournament> joinedTournaments = ts.findUserActiveTournaments(profile.getId(), page1);
+            mav.addObject("joinedTournaments", joinedTournaments);
+        }
+        mav.addObject("totalPages1", totalPages1);
+        mav.addObject("totalPages2", totalPages2);
         mav.addObject("currentPage1", page1);
         mav.addObject("currentPage2", page2);
-        mav.addObject("totalPages1", ts.getPagesBySection(profile.getId(), section));
-        if (section.equals("owned")){
-            mav.addObject("totalPages1", ts.getPagesBySection(profile.getId(), section + "Ongoing"));
-            mav.addObject("totalPages2", ts.getPagesBySection(profile.getId(), section + "Finished"));
-        }
 
         return mav;
     }

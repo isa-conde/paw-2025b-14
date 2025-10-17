@@ -67,11 +67,6 @@ public class GameServiceImpl implements GameService {
         return gameDao.getFormats(gameId);
     }
 
-    @Transactional
-    @Override
-    public void addFavourite(Long user_id, Long game_id) {
-        gameDao.addFavourite(user_id, game_id);
-    }
 
     @Override
     public List<Game> getFavourites(Long user_id) {

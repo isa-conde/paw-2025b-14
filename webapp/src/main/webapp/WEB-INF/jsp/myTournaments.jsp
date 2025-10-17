@@ -32,26 +32,26 @@
                     <paw:text type="title"><spring:message code="tournaments.active"/></paw:text>
                 </div>
                 <paw:elements-grid elements="${joinedTournaments}" id="on-going-${profile.id}"/>
-                <paw:pagination currentPage="${currentPage1}" totalPages="${totalPages1}" url="/profile/${profile.id}/tournaments"/>
+                <paw:pagination currentPage="${currentPage1}" totalPages="${totalPages1}" url="/profile/${profile.id}/tournaments" pageNumber="1"/>
             </c:when>
             <c:when test="${activeSection == 'finished'}">
                 <div class="grid-title">
                     <paw:text type="title"><spring:message code="tournaments.finished"/></paw:text>
                 </div>
                 <paw:elements-grid elements="${pastTournaments}" id="finished-${profile.id}"/>
-                <paw:pagination currentPage="${currentPage1}" totalPages="${totalPages1}" url="/profile/${profile.id}/tournaments"/>
+                <paw:pagination currentPage="${currentPage1}" totalPages="${totalPages1}" url="/profile/${profile.id}/tournaments" pageNumber="1"/>
             </c:when>
             <c:when test="${activeSection == 'owned'}">
                 <div class="grid-title">
                     <paw:text type="title"><spring:message code="tournaments.owned.active"/></paw:text>
                 </div>
                 <paw:elements-grid elements="${onGoingTournaments}" id="on-going-${profile.id}-creations"/>
-                <paw:pagination currentPage="${currentPage1}" totalPages="${totalPages1}" url="/profile/${profile.id}/tournaments"/>
+                <paw:pagination currentPage="${currentPage1}" totalPages="${totalPages1}" url="/profile/${profile.id}/tournaments" pageNumber="1"/>
                 <div class="grid-title">
                     <paw:text type="title"><spring:message code="tournaments.owned.finished"/></paw:text>
                 </div>
                 <paw:elements-grid elements="${finishedTournaments}" id="finished-${profile.id}-creations"/>
-                <paw:pagination currentPage="${currentPage2}" totalPages="${totalPages2}" url="/profile/${profile.id}/tournaments"/>
+                <paw:pagination currentPage="${currentPage2}" totalPages="${totalPages2}" url="/profile/${profile.id}/tournaments" pageNumber="2"/>
             </c:when>
         </c:choose>
     </div>
