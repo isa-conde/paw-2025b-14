@@ -138,9 +138,21 @@ public class TournamentJdbcDao implements TournamentDao {
 
 
     @Override
-    public List<Tournament> findByCreator(Long creator_id, Long page) {
-        return jdbcTemplate.query("SELECT * FROM tournament t WHERE creator_id = ? LIMIT 9 OFFSET ?", ROW_MAPPER, creator_id, 9*page);
+    public List<Tournament> findByCreator(Long creatorId, Long page) {
+        final int pageSize = 9;
+        final Long offset = page * pageSize;
+
+        String sql = """
+        SELECT t.*
+        FROM tournament t
+        WHERE t.creator_id = ?
+        ORDER BY t.start_date DESC, t.id DESC
+        LIMIT ? OFFSET ?
+        """;
+
+        return jdbcTemplate.query(sql, ROW_MAPPER, creatorId, pageSize, offset);
     }
+
 
     @Override
     public void setFinished(Long tournament_id) {
@@ -176,13 +188,24 @@ public class TournamentJdbcDao implements TournamentDao {
 
     @Override
     public List<Tournament> findUserActiveTournaments(Long userId, Long page) {
-        return findUserTournaments(userId, false, page);
+        List<Tournament> ts = findUserTournaments(userId, false, page);
+        ts.sort(Comparator.comparing(
+                Tournament::getStart_date,
+                Comparator.nullsLast(Comparator.naturalOrder())
+        ));
+        return ts;
     }
 
     @Override
     public List<Tournament> findUserPastTournaments(Long userId, Long page) {
-        return findUserTournaments(userId, true, page);
+        List<Tournament> ts = findUserTournaments(userId, true, page);
+        ts.sort(Comparator.comparing(
+                Tournament::getEnd_date,
+                Comparator.nullsLast(Comparator.reverseOrder())
+        ));
+        return ts;
     }
+
 
     private List<Tournament> findUserTournaments(Long userId, Boolean isFinished, Long page) {
         String sql = "SELECT t.* " +

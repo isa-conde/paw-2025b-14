@@ -4,6 +4,8 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
+<c:url var="profileUrl" value="/profile/${profile.id}"/>
+
 <paw:layout user="${user}" pageTitle="${profile.username}" function="${openModal}">
 
     <c:set var="isMyProfile" value="${user.id == profile.id}"/>
@@ -24,7 +26,21 @@
         <div class="content-container">
             <div class="profile-main">
                 <div class="carrousel-title">
-                    <paw:text size="xl"><spring:message code="profile.favouriteGames.title"/></paw:text>
+                    <paw:text type="title"><spring:message code="profile.upcomingTournaments.title"/></paw:text>
+                </div>
+                <c:choose>
+                    <c:when test="${activeTournaments.size() > 0}">
+                        <paw:carrousel id="activeTournaments" elements="${activeTournaments}"/>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="no-cards-container">
+                            <paw:text weight="thin"><spring:message code="profile.activeTournaments.empty" arguments="${profile.username}"/></paw:text>
+                        </div>
+                    </c:otherwise>
+                </c:choose>
+
+                <div class="carrousel-title">
+                    <paw:text type="title"><spring:message code="profile.favouriteGames.title"/></paw:text>
                 </div>
                 <c:choose>
                     <c:when test="${favouriteGames.size() > 0}">
@@ -38,7 +54,7 @@
                 </c:choose>
 
                 <div class="carrousel-title">
-                    <paw:text size="xl"><spring:message code="profile.lastTournaments.title"/></paw:text>
+                    <paw:text type="title"><spring:message code="profile.lastTournaments.title"/></paw:text>
                 </div>
                 <c:choose>
                     <c:when test="${lastTournaments.size() > 0}">
@@ -52,7 +68,7 @@
                 </c:choose>
 
                 <div class="carrousel-title">
-                    <paw:text type="title" size="s"><spring:message code="profile.teams.title"/></paw:text>
+                    <paw:text type="title"><spring:message code="profile.teams.title"/></paw:text>
                 </div>
                 <c:choose>
                     <c:when test="${teams.size() > 0}">
@@ -64,14 +80,15 @@
                         </div>
                     </c:otherwise>
                 </c:choose>
+                <c:set var="createTeamFunction" value="window.location.href='${pageContext.request.contextPath}/team/create'"/>
+                <div class="cards-container">
+                    <paw:button onclick="${createTeamFunction}" text="tournaments.team.butText" size="l"/>
+                </div>
             </div>
         </div>
-
-
-
 </paw:layout>
 
-<paw:modal title="profile.edit.modal.title" id="editProfileModal" returnUrl="/profile/${profile.id}">
+<paw:modal title="profile.edit.modal.title" id="editProfileModal" returnUrl="${profileUrl}">
     <form:form method="post" modelAttribute="editProfileForm"
                action="${pageContext.request.contextPath}/profile/update"
                enctype="multipart/form-data" cssClass="form">
@@ -86,7 +103,7 @@
             <paw:input path="profilePicture" label="profile.edit.modal.profilePicture" inputType="file" hasConstraint="true"/>
         </div>
         <div class="row">
-            <paw:input path="bannerPicture" label="home.createTournament.image" inputType="file"/>
+            <paw:input path="bannerPicture" label="profile.edit.modal.bannerImage" inputType="file"/>
         </div>
         <div class="row center">
             <paw:input path="" label="tournament.edit.saveChanges" containerType="half" inputType="submit"/>

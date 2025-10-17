@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = SameAsOldPasswordValidator.class)
 public @interface SameAsOldPassword {
 
-    String message() default "Please choose a password different to your old one.";
+    String message() default "{passwordReset.error.sameAsOld}";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 

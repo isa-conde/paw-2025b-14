@@ -4,6 +4,8 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
+<c:url var="teamUrl" value="/team/profile/${team.id}"/>
+
 <paw:layout user="${user}" function="${openModal}">
 
     <c:set var="isMyTeam" value="${user.id == team.owner_id }"/>
@@ -19,7 +21,8 @@
             </div>
             <div class="organizer-container">
                 <paw:text size="s"><spring:message code="team.profile.createdBy"/></paw:text>
-                <paw:profileButton imageId="${owner.pfp_id}" text="${owner.username}" onclick="window.location.href='/profile/${owner.id}'" size="xs" isNotSafe="true"/>
+                <c:url value="/profile/${owner.id}" var="ownerUrl"/>
+                <paw:profileButton imageId="${owner.pfp_id}" text="${owner.username}" onclick="window.location.href='${ownerUrl}'" size="xs" isNotSafe="true"/>
             </div>
         </div>
     </paw:banner>
@@ -29,7 +32,7 @@
     <spring:message code="team.profile.members" var="membersTab"/>
     <c:set var="sections" value="${['overview', 'membersTab']}"/>
     <c:set var="labels"   value="${[overview, membersTab]}"/>
-    <c:set var="activeSection" value="${param.section}"/>
+    <c:set var="activeSection" value="${param.section != null ? param.section : 'overview'}"/>
 
     <paw:navbar sections="${sections}" labels="${labels}" activeSection="${activeSection}"/>
 
@@ -45,7 +48,7 @@
             <c:otherwise>
                 <div class="profile-main">
                     <div class="carrousel-title">
-                        <paw:text size="xl"><spring:message code="team.profile.activeTournaments"/></paw:text>
+                        <paw:text type="title"><spring:message code="profile.upcomingTournaments.title"/></paw:text>
                     </div>
                     <c:choose>
                         <c:when test="${activeTournaments.size() == 0}">
@@ -59,7 +62,7 @@
                         </c:otherwise>
                     </c:choose>
                     <div class="carrousel-title">
-                        <paw:text size="xl"><spring:message code="team.profile.pastTournaments"/></paw:text>
+                        <paw:text type="title"><spring:message code="team.profile.pastTournaments"/></paw:text>
                     </div>
                     <c:choose>
                         <c:when test="${pastTournaments.size() == 0}">
@@ -75,13 +78,11 @@
                 </div>
             </c:otherwise>
         </c:choose>
-
-
     </div>
 </paw:layout>
 
 
-<paw:modal title="team.profile.edit.title" id="editProfileModal" returnUrl="/team/profile/${team.id}">
+<paw:modal title="team.profile.edit.title" id="editProfileModal" returnUrl="${teamUrl}">
     <form:form method="post" modelAttribute="teamForm"
                action="${pageContext.request.contextPath}/team/update"
                enctype="multipart/form-data" cssClass="form">

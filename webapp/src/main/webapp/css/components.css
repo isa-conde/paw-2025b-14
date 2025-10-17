@@ -173,6 +173,8 @@ button:disabled {
     display: flex;
     align-items: center;
     justify-content: center;
+    object-fit: cover;
+    aspect-ratio: 1 / 1;
 }
 
 .button-image.xs {
@@ -384,7 +386,7 @@ button:disabled {
     background-color: transparent;
     border: 3px solid var(--primary-button);
     border-radius: 15px;
-    padding: 16px;
+    padding: 16px 8px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -407,6 +409,20 @@ button:disabled {
     align-items: flex-start;
     margin: 50px 0;
 }
+
+.inline-text-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 30px;
+    flex-wrap: wrap;
+}
+
+.inline-text-container .subtext {
+    color: var(--secondary-text);
+}
+
 
 /* ------- BUTTON CONTENT CARD ------- */
 
@@ -455,14 +471,6 @@ button:disabled {
     height: 300px;
     width: auto;
     display: block;
-}
-
-.cards-container {
-    display: flex;
-    gap: 100px;
-    justify-content: center;
-    align-items: flex-start;
-    margin: 50px 0;
 }
 
 .card.texture {
@@ -1663,4 +1671,15 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-weight: bold;
     text-align: center;
     word-wrap: break-word;
+}
+
+.tournament-buttons-container {
+    gap: 50px;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    background-color: var(--background-secondary);
+    padding: 20px;
+    border-radius: 15px;
+    margin: 20px 0;
 }

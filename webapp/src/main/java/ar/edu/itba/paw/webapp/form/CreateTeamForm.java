@@ -31,7 +31,7 @@ public class CreateTeamForm {
     public MultipartFile getBanner() {
         return banner;
     }
-    public void setBanner_id(MultipartFile banner) {
+    public void setBanner(MultipartFile banner) {
         this.banner = banner;
     }
 

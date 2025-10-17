@@ -143,7 +143,8 @@ public class UserController {
         mav.addObject("isMyProfile", profile.getId() == currentUser.get().getPawUser().getId());
         mav.addObject("profile", profileOpt.get());
         mav.addObject("favouriteGames", gs.getFavourites(id));
-        mav.addObject("lastTournaments", ts.findUserActiveTournaments(id, 1L));
+        mav.addObject("activeTournaments", ts.findUserActiveTournaments(id, 0L));
+        mav.addObject("lastTournaments", ts.findUserPastTournaments(id, 0L));
         mav.addObject("teams", tms.getUserTeams(id));
         mav.addObject("EditProfileForm", editProfileForm);
 

@@ -19,9 +19,12 @@
         .card {
             background-color: #00244D;
             border-radius: 15px;
-            padding: 20px;
             text-align: center;
             min-width: 500px;
+        }
+
+        .content {
+            padding: 20px;
         }
 
         h1 {
@@ -59,13 +62,18 @@
 </head>
 <body>
 <div class="card">
-    <h1 th:text="#{email.tournamentJoinedConfirmation.title(${tournamentName})}">You joined Tournament!</h1>
-    <p th:text="#{email.tournamentJoinedConfirmation.greeting(${userName})}">Hello user,</p>
-    <p th:text="#{email.tournamentJoinedConfirmation.body(${tournamentName})}">
-        You have successfully joined the tournament. See you in the tourney!
-    </p>
-    <p th:text="#{email.tournamentJoinedConfirmation.advice(${creatorMail})}"></p>
-    <a class="btn" th:href="${tournamentLink}" th:text="#{email.tournamentJoinedConfirmation.buttonLabel}">View Tournament</a>
+    <div th:insert="email-header :: header"></div>
+
+    <div class="content">
+        <h1 th:text="#{email.tournamentJoinedConfirmation.title(${tournamentName})}">You joined Tournament!</h1>
+        <p th:text="#{email.tournamentJoinedConfirmation.greeting(${userName})}">Hello user,</p>
+        <p th:text="#{email.tournamentJoinedConfirmation.body(${tournamentName})}">
+            You have successfully joined the tournament. See you in the tourney!
+        </p>
+        <p th:text="#{email.tournamentJoinedConfirmation.advice(${creatorMail})}"></p>
+        <a class="btn" th:href="${tournamentLink}" th:text="#{email.tournamentJoinedConfirmation.buttonLabel}">View Tournament</a>
+    </div>
+
 </div>
 </body>
 </html>

@@ -6,6 +6,10 @@ public interface MailService {
 
     void sendTournamentJoinedEmail(Long tournamentId, String userName, String tournamentName, String recipient, String creatorMail);
 
+    void sendTournamentJoinedOwnerEmail(Long tournamentId, String ownerUsername, String joinerUsername, String tournamentName, String recipientOwnerEmail);
+
+    void sendTournamentTeamJoinedOwnerEmail(Long tournamentId, String ownerUsername, String teamName, String tournamentName, String recipientOwnerEmail);
+
     void sendTournamentStartedEmail(Long tournamentId, String username, String tournamentName, String creatorMail, String recipient);
 
     void sendTournamentEndedEmail(Long tournamentId, String username, String tournamentName, String recipient);

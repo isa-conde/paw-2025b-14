@@ -12,6 +12,7 @@
 <c:set var="editMode" value="${param.edit eq 'true' && isCreator}"/>
 <c:url value="/images/pencil.png" var="pencilUrl"/>
 <c:set var="cornerIcon" value="${isCreator ? pencilUrl : null}"/>
+<c:set var="playersPerTeam" value="${empty format.players_per_team ? 1 : format.players_per_team}"/>
 
 <paw:layout user="${user}" pageTitle="${tournament.name}" function="${openModal}">
     <paw:banner
@@ -53,12 +54,18 @@
         <c:choose>
             <c:when test="${activeSection == 'overview'}">
                 <div class="icon-card-container">
-                    <c:set var="teamsText" value="${tournament.openInscriptions ? tournament.max_participants : participantCount}"/>
-                    <spring:message code="tournament.participants" var="teams" arguments="${teamsText}"/>
+                    <c:set var="countText" value="${tournament.openInscriptions ? tournament.max_participants : participantCount}"/>
+                    <c:set var="teamSizeNorm" value="${empty format or empty format.players_per_team ? 1 : format.players_per_team}"/>
+
+                    <spring:message code="tournament.participants" var="teams">
+                        <spring:argument value="${countText}"/>
+                        <spring:argument value="${teamSizeNorm}"/>
+                    </spring:message>
+
                     <paw:icon-card icon="${pageContext.request.contextPath}/images/map.png" text="${tournament.region}"/>
                     <paw:icon-card icon="${pageContext.request.contextPath}/images/team.png" text="${tournament.format}"/>
                     <paw:icon-card icon="${pageContext.request.contextPath}/images/level.png" text="${tournament.elo}"/>
-                    <paw:icon-card icon="${pageContext.request.contextPath}/images/members.png" text="${teams}"/>
+                    <paw:icon-card icon="${pageContext.request.contextPath}/images/members.png" text="${teams}" subtext="${participantCount} / "/>
                 </div>
                 <c:if test="${tournamentWinner != null && tournamentWinner > 0}">
                         <c:forEach var="p" items="${participants}">
@@ -314,7 +321,7 @@
             <c:if test="${!tournament.finished}">
                 <div class="row">
                     <c:if test="${!tournament.tournamentStarted}">
-                        <paw:input path="start_date" label="home.createTournament.startDate" inputType="date" hasConstraint="true"/>
+                        <paw:input path="start_date" label="home.createTournament.startDate" inputType="date" hasConstraint="true" arg="${playersPerTeam}"/>
                     </c:if>
                     <paw:input path="end_date" label="home.createTournament.endDate" inputType="date" hasConstraint="true"/>
                 </div>
