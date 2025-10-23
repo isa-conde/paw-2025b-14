@@ -1,3 +1,6 @@
+set database sql syntax pgs true;
+set ignorecase true;
+
 CREATE TABLE IF NOT EXISTS users(
     id INTEGER IDENTITY PRIMARY KEY ,
     email varchar(100) NOT NULL UNIQUE ,
