@@ -15,6 +15,26 @@
         </div>
     </div>
 </paw:banner>
+    <c:url var="baseUrl" value="/profile/${profile.id}/tournaments"/>
+
+    <c:url var="activeUrl" value="${baseUrl}">
+        <c:param name="section" value="active"/>
+        <c:param name="page1" value="0"/>
+        <c:param name="page2" value="0"/>
+    </c:url>
+
+    <c:url var="finishedUrl" value="${baseUrl}">
+        <c:param name="section" value="finished"/>
+        <c:param name="page1" value="0"/>
+        <c:param name="page2" value="0"/>
+    </c:url>
+
+    <c:url var="ownedUrl" value="${baseUrl}">
+        <c:param name="section" value="owned"/>
+        <c:param name="page1" value="0"/>
+        <c:param name="page2" value="0"/>
+    </c:url>
+
     <spring:message code="tournament.navbar.active" var="activeLabel"/>
     <spring:message code="tournament.navbar.finished" var="finishedLabel"/>
     <spring:message code="tournament.navbar.owned" var="ownedLabel"/>
