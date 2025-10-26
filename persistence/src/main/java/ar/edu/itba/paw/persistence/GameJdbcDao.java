@@ -111,12 +111,6 @@ public class GameJdbcDao implements GameDao {
     }
 
     @Override
-    public void addFavourite(Long user_id, Long game_id) {
-        Map<String, Long> map = Map.of("user_id", user_id, "game_id", game_id);
-        jdbcInsertFavourites.execute(map);
-    }
-
-    @Override
     public List<Game> getFavourites(Long userId) {
         final String sql = """
             SELECT g.*

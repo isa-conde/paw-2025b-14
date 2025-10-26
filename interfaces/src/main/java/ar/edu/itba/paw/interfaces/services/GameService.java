@@ -25,8 +25,6 @@ public interface GameService {
 
     public List<GameFormat> getFormats(Long gameId);
 
-    void addFavourite(Long user_id, Long game_id);
-
     List<Game> getFavourites(Long user_id);
 
     List<Game> findAllPaged(Long page);
