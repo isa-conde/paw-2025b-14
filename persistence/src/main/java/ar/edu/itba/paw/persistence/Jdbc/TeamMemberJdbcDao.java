@@ -1,7 +1,6 @@
-package ar.edu.itba.paw.persistence;
+package ar.edu.itba.paw.persistence.Jdbc;
 
 import ar.edu.itba.paw.interfaces.persistence.TeamMemberDao;
-import ar.edu.itba.paw.model.Team;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
@@ -10,7 +9,7 @@ import javax.sql.DataSource;
 import java.util.List;
 import java.util.Map;
 
-@Repository
+
 public class TeamMemberJdbcDao implements TeamMemberDao {
 
     JdbcTemplate jdbcTemplate;
@@ -34,7 +33,7 @@ public class TeamMemberJdbcDao implements TeamMemberDao {
         return count != null && count > 0;
     }
 
-    @Override
+    //@Override
     public List<Long> getTeamMembers(Long team_id) {
         return jdbcTemplate.queryForList("SELECT user_id FROM team_member WHERE team_id = ?", Long.class, team_id);
     }

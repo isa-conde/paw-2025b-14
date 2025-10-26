@@ -9,7 +9,6 @@ import ar.edu.itba.paw.interfaces.services.MatchService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.Match;
-import ar.edu.itba.paw.model.MatchInfo;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.enums.Structure;
 import org.slf4j.Logger;
@@ -18,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Transactional(readOnly = true)
 @Service
@@ -68,14 +68,13 @@ public class MatchServiceImpl implements MatchService {
         } else {
             matchDao.updateMatchVisitor(tournament_id, match2, user1);
         }
-        String username1 = us.findById(user1).get().getUsername();
-        String username2 = us.findById(user2).get().getUsername();
-        LOGGER.info("User {} and {} have been successfully swapped matches", username1, username2);
+        LOGGER.info("User {} and {} have been successfully swapped matches", user1, user2);
     }
 
+    @Transactional
     @Override
-    public Map<Integer, List<MatchInfo>> getTournamentMatchesByStage(Long tournamentId){
-        List<MatchInfo> matches = matchDao.getTournamentMatches(tournamentId, ts.getPlayersPerTeam(tournamentId));
+    public Map<Integer, List<Match>> getTournamentMatchesByStage(Long tournamentId){
+        List<Match> matches = matchDao.getTournamentMatches(tournamentId, ts.getPlayersPerTeam(tournamentId));
         if (matches.isEmpty()) {
             return Collections.emptyMap();
         }
@@ -83,9 +82,9 @@ public class MatchServiceImpl implements MatchService {
         if(teamSize == null){
             teamSize = 1;
         }
-        Map<Integer, List<MatchInfo>> result = new TreeMap<>();
+        Map<Integer, List<Match>> result = new TreeMap<>();
         Boolean isGroupStage = tournamentDao.getIsGroupStage(tournamentId);
-        for (MatchInfo m : matches) {
+        for (Match m : matches) {
             m.setLocal(participantDao.getTournamentParticipantById(tournamentId, m.getLocalId(), teamSize));
             m.setVisitor(participantDao.getTournamentParticipantById(tournamentId, m.getVisitorId(), teamSize));
             Integer stage = m.getStage();
@@ -143,10 +142,11 @@ public class MatchServiceImpl implements MatchService {
 
     private void setNextMatchInfo(Long matchId, Long tournamentId, Long winnerId) {
         Integer currentStage = matchDao.getMatchStage(tournamentId, matchId);
-        List<Long> idsThisStage = matchDao.getStageMatchIds(currentStage, tournamentId);
-        int indexInStage = idsThisStage.indexOf(matchId);
 
-        List<Long> idsNextStage = matchDao.getStageMatchIds(currentStage + 1, tournamentId);
+        List<Long> idsThisStage = matchDao.getStageMatchIds(currentStage, tournamentId).stream().sorted().toList();
+        List<Long> idsNextStage = matchDao.getStageMatchIds(currentStage + 1, tournamentId).stream().sorted().toList();
+
+        int indexInStage = idsThisStage.indexOf(matchId);
         if(idsNextStage.isEmpty()){
             return;
         }

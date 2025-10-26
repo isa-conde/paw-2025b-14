@@ -61,14 +61,14 @@
 
     <div class="matches-grid">
         <c:forEach var="match" items="${matches}">
-            <c:if test="${empty groupNumber or match.groupNumber eq groupNumber}">
+            <c:if test="${empty groupNumber or match.local.group_number eq groupNumber}">
                 <paw:match-card
                     matchId="${match.id}"
                     tournamentId="${tournamentId}"
                     localPlayer="${match.local}"
                     visitorPlayer="${match.visitor}"
-                    localPlayerId="${match.localId}"
-                    visitorPlayerId="${match.visitorId}"
+                    localPlayerId="${match.local.id}"
+                    visitorPlayerId="${match.visitor.id}"
                     winner="${match.winner}"
                     groupNumber="${groupNumber}"
                     isCreator="${isCreator}"/>

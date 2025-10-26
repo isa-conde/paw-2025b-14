@@ -19,10 +19,6 @@ public interface GameDao {
 
     public Game create(String name, Genre genre, Integer image_id);
 
-    public Game createWithFormats(String name, Genre genre, List<GameFormat> formats, byte[] image);
-
-    Optional<Game> findByName(String name);
-
     public boolean checkNameExists(String name);
 
     public List<GameFormat> getFormats(Long gameId);
@@ -32,8 +28,4 @@ public interface GameDao {
     List<Game> findAllPaged(Long page);
 
     Long getPageAmount();
-
-    Optional<GameFormat> getFormatById(Long id);
-
-    Integer getPlayersPerTeam(Long id);
 }

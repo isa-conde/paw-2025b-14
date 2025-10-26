@@ -20,7 +20,7 @@ public interface UserDao {
 
     Boolean checkUsernameExists(String username);
 
-    Boolean checkEmailExists(String username);
+    Boolean checkEmailExists(String email);
 
     void verifyUser(long user_id);
 

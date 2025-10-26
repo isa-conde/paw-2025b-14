@@ -1,28 +1,21 @@
-package ar.edu.itba.paw.persistence;
+package ar.edu.itba.paw.persistence.Jdbc;
 
 import ar.edu.itba.paw.interfaces.persistence.ParticipantDao;
-import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.model.Participant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.sql.Array;
-import java.sql.PreparedStatement;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-@Repository
+
 public class ParticipantJdbcDao implements ParticipantDao {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ParticipantJdbcDao.class);
@@ -101,7 +94,7 @@ public class ParticipantJdbcDao implements ParticipantDao {
     }
 
     @Override
-    public Participant getTournamentParticipantById(Long tournament_id, Long participantId, Integer teamSize) {
+    public Participant getTournamentParticipantById(Long tournament_id, Long participant_id, Integer teamSize) {
         if (teamSize > 1) {
             final String sql = """
               SELECT * FROM participant
@@ -110,7 +103,7 @@ public class ParticipantJdbcDao implements ParticipantDao {
                  AND participant.team_id = ?
               """;
 
-            return jdbcTemplate.query(sql, ROW_MAPPER_TEAM, tournament_id, participantId)
+            return jdbcTemplate.query(sql, ROW_MAPPER_TEAM, tournament_id, participant_id)
                     .stream()
                     .findFirst()
                     .orElse(null);
@@ -122,7 +115,7 @@ public class ParticipantJdbcDao implements ParticipantDao {
                  AND participant.user_id = ?
               """;
 
-            return jdbcTemplate.query(sql, ROW_MAPPER_USER, tournament_id, participantId)
+            return jdbcTemplate.query(sql, ROW_MAPPER_USER, tournament_id, participant_id)
                     .stream()
                     .findFirst()
                     .orElse(null);
@@ -141,7 +134,7 @@ public class ParticipantJdbcDao implements ParticipantDao {
     }
 
     @Override
-    public void leaveTournamentTeam(Long userId, Long tournamentId) {
+    public void leaveTournamentTeam(Long team_id, Long tournamentId) {
         final String sql = """
             DELETE FROM participant p
             USING participant pu
@@ -151,7 +144,7 @@ public class ParticipantJdbcDao implements ParticipantDao {
               AND p.tournament_id = pu.tournament_id
               AND p.team_id = pu.team_id
         """;
-        jdbcTemplate.update(sql, userId, tournamentId);
+        jdbcTemplate.update(sql, team_id, tournamentId);
     }
 
     @Override

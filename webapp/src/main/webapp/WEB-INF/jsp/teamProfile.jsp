@@ -8,7 +8,7 @@
 
 <paw:layout user="${user}" function="${openModal}">
 
-    <c:set var="isMyTeam" value="${user.id == team.owner_id }"/>
+    <c:set var="isMyTeam" value="${user.id == team.owner.id}"/>
     <c:url value="/images/pencil.png" var="pencilUrl"/>
     <c:set var="icon" value="${isMyTeam ? pencilUrl : null }"/>
     <paw:banner cornerIcon="${icon}" cornerOnClick="openModal('editProfileModal')" image="${pageContext.request.contextPath}/banner/${team.banner_id}">

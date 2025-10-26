@@ -2,6 +2,7 @@ package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.persistence.*;
 import ar.edu.itba.paw.interfaces.services.MailService;
+import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.Game.GameFormat;
 import ar.edu.itba.paw.model.Participant;
 import ar.edu.itba.paw.model.Tournament.Tournament;
@@ -62,11 +63,13 @@ public class TournamentServiceImplTest {
 
     @Test
     public void testCreate(){
+        User fakeUser = new User(ID,NAME,NAME,NAME,true,null,null,null,"");
+        Tournament fakeTournament = createFakeTournament(fakeUser);
         Mockito.when(imageDao.insertImage(IMAGE)).thenReturn(ID);
         Mockito.when(mockDao.create(ID,NAME,ID,REGION,ELO,START_DATE,END_DATE,FORMAT,STRUCTURE,MAX_PARTICIPANTS,ID,true,false,ID))
-                .thenReturn(new Tournament(ID,ID,NAME,ID,REGION,ELO,START_DATE,END_DATE,FORMAT,STRUCTURE,MAX_PARTICIPANTS,ID,true,false,null,null,false,ID));
+                .thenReturn(fakeTournament);
         Mockito.when(userDao.findById(ID))
-                .thenReturn(Optional.of(new User(ID,NAME,NAME,NAME,true,null,null,null,"")));
+                .thenReturn(Optional.of(fakeUser));
 
         Tournament ans = tournamentService.create(ID,NAME,ID,REGION,ELO,START_DATE,END_DATE,FORMAT,STRUCTURE,MAX_PARTICIPANTS,IMAGE,true,false,ID);
 
@@ -89,5 +92,17 @@ public class TournamentServiceImplTest {
         Assert.assertNull(ans.getIs_group_stage());
         Assert.assertFalse(ans.getTournamentStarted());
         Assert.assertEquals(ID,ans.getFormat_id());
+    }
+
+    private Tournament createFakeTournament(User fakeUser){
+        GameFormat fakeFormat = new GameFormat(ID,NAME,8);
+        Game fakeGame = new Game(NAME,GENRE,ID.intValue());
+        fakeGame.setId(ID);
+        Tournament fakeTournament = new Tournament(fakeUser,NAME,fakeGame,REGION,START_DATE,END_DATE,FORMAT,STRUCTURE,MAX_PARTICIPANTS,ID,true,false,fakeFormat);
+        fakeTournament.setCreator(fakeUser);
+        fakeTournament.setId(ID);
+        fakeTournament.setElo(ELO);
+        fakeTournament.setTournament_started(false);
+        return fakeTournament;
     }
 }

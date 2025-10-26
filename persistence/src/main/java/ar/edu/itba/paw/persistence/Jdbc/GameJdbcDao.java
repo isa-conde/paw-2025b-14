@@ -1,4 +1,4 @@
-package ar.edu.itba.paw.persistence;
+package ar.edu.itba.paw.persistence.Jdbc;
 
 import ar.edu.itba.paw.interfaces.persistence.GameDao;
 import ar.edu.itba.paw.model.Game.Game;
@@ -16,7 +16,7 @@ import javax.sql.DataSource;
 import java.sql.Types;
 import java.util.*;
 
-@Repository
+
 public class GameJdbcDao implements GameDao {
 
     private final JdbcTemplate jdbcTemplate;
@@ -27,9 +27,9 @@ public class GameJdbcDao implements GameDao {
 
     private static final RowMapper<Game> ROW_MAPPER = (rs, rowNum) -> new Game(rs.getLong("id"), rs.getString("name"), Genre.valueOf(rs.getString("genre")), rs.getInt("image_id"));
 
-    private static final RowMapper<GameFormat> ROW_MAPPER_FORMAT = (rs, rowNum) -> new GameFormat(rs.getLong("id"), rs.getString("name"), rs.getInt("players_per_team"), rs.getLong("game_id"));
+    private static final RowMapper<GameFormat> ROW_MAPPER_FORMAT = (rs, rowNum) -> new GameFormat(rs.getLong("id"), rs.getString("name"), rs.getInt("players_per_team"));
 
-    @Autowired
+    //@Autowired
     public GameJdbcDao(final DataSource ds) {
         jdbcTemplate = new JdbcTemplate(ds);
         jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
@@ -50,7 +50,7 @@ public class GameJdbcDao implements GameDao {
         return jdbcTemplate.query("SELECT * FROM game WHERE id = ?", ROW_MAPPER, id).stream().findFirst();
     }
 
-    @Override
+    //@Override
     public Optional<Game> findByName(String name) {
         return jdbcTemplate.query("SELECT * FROM game WHERE name = ?", ROW_MAPPER, name).stream().findFirst();
     }
@@ -83,7 +83,7 @@ public class GameJdbcDao implements GameDao {
         return new Game(key.longValue(), name, genre, image_id);
     }
 
-    @Override
+    //@Override
     public Game createWithFormats(String name, Genre genre, List<GameFormat> formats, byte[] image) {
         SqlParameterSource img = new MapSqlParameterSource().addValue("image", image);
         Integer image_id = jdbcInsertImage.executeAndReturnKey(img).intValue();
@@ -105,7 +105,7 @@ public class GameJdbcDao implements GameDao {
         Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM game WHERE name = ?", Integer.class, name);
         return count > 0;
     }
-    @Override
+    //@Override
     public List<GameFormat> getFormats(Long gameId) {
         return jdbcTemplate.query("SELECT * FROM game_format WHERE game_id = ?", ROW_MAPPER_FORMAT, gameId);
     }
@@ -145,12 +145,12 @@ public class GameJdbcDao implements GameDao {
         return (long) Math.ceil( gameAmount / 9L);
     }
 
-    @Override
+    //@Override
     public Optional<GameFormat> getFormatById(Long id) {
         return jdbcTemplate.query("SELECT * FROM game_format WHERE id = ?", ROW_MAPPER_FORMAT, id).stream().findFirst();
     }
 
-    @Override
+    //@Override
     public Integer getPlayersPerTeam(Long id){
         List<Integer> results = jdbcTemplate.query(
                 "SELECT players_per_team FROM game_format WHERE id = ?",

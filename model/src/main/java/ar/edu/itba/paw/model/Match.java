@@ -1,22 +1,49 @@
 package ar.edu.itba.paw.model;
 
-public class Match {
-    private final Long id;
-    private final Long tournamentId;
-    private final Long localId;
-    private final Long visitorId;
-    private final Integer localScore;
-    private final Integer visitorScore;
-    private final Integer winner;
-    private final Integer stage;
-    private final Boolean isGroupStage;
+import ar.edu.itba.paw.model.Tournament.Tournament;
+import ar.edu.itba.paw.model.ids.MatchId;
 
-    public Match(Long id, Long tournamentId, Long localId, Long visitorId,
-                            Integer localScore, Integer visitorScore, Integer winner, Integer stage, Boolean isGroupStage) {
+import javax.persistence.*;
+
+@Entity
+@Table(name = "match")
+public class Match {
+
+    @EmbeddedId
+    private MatchId id;
+
+    @MapsId("tournamentId")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "tournament_id")
+    private Tournament tournament;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "local_id")
+    private Participant local;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "visitor_id")
+    private Participant visitor;
+
+    @Column(name = "local_score")
+    private Integer localScore;
+
+    @Column(name = "visitor_score")
+    private Integer visitorScore;
+
+    @Column(name = "winner")
+    private Integer winner;
+
+    @Column(name = "stage")
+    private Integer stage;
+
+    @Column(name = "is_group_stage")
+    private Boolean isGroupStage;
+
+    public Match() {}
+
+    public Match(MatchId id, Integer localScore, Integer visitorScore, Integer winner, Integer stage, Boolean isGroupStage) {
         this.id = id;
-        this.tournamentId = tournamentId;
-        this.localId = localId;
-        this.visitorId = visitorId;
         this.localScore = localScore;
         this.visitorScore = visitorScore;
         this.winner = winner;
@@ -25,19 +52,27 @@ public class Match {
     }
 
     public Long getId() {
-        return id;
+        return id.getId();
     }
 
     public Long getTournamentId() {
-        return tournamentId;
+        return id.getTournamentId();
     }
 
     public Long getLocalId() {
-        return localId;
+        if(local != null){
+            return local.getId();
+        }else {
+            return null;
+        }
     }
 
     public Long getVisitorId() {
-        return visitorId;
+        if(visitor != null){
+            return visitor.getId();
+        }else {
+            return null;
+        }
     }
 
     public Integer getLocalScore() {
@@ -58,6 +93,54 @@ public class Match {
 
     public Boolean getIsGroupStage() {
         return isGroupStage;
+    }
+
+    public Tournament getTournament() {
+        return tournament;
+    }
+
+    public Boolean getGroupStage() {
+        return isGroupStage;
+    }
+
+    public Participant getLocal() {
+        return local;
+    }
+
+    public Participant getVisitor() {
+        return visitor;
+    }
+
+    public void setTournament(Tournament tournament) {
+        this.tournament = tournament;
+    }
+
+    public void setWinner(Integer winner) {
+        this.winner = winner;
+    }
+
+    public void setGroupStage(Boolean groupStage) {
+        isGroupStage = groupStage;
+    }
+
+    public void setLocal(Participant local) {
+        this.local = local;
+    }
+
+    public void setLocalScore(Integer localScore) {
+        this.localScore = localScore;
+    }
+
+    public void setStage(Integer stage) {
+        this.stage = stage;
+    }
+
+    public void setVisitor(Participant visitor) {
+        this.visitor = visitor;
+    }
+
+    public void setVisitorScore(Integer visitorScore) {
+        this.visitorScore = visitorScore;
     }
 }
 

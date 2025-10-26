@@ -27,19 +27,19 @@ public class ParticipantServiceImpl implements ParticipantService {
     private final ParticipantDao participantDao;
     private final TournamentDao tournamentDao;
     private final TournamentService ts;
-    private final GameDao gameDao;
     private final UserDao userDao;
     private final TeamDao teamDao;
     private final MailService ms;
+    private final GameFormatDao gameFormatDao;
 
-    public ParticipantServiceImpl(ParticipantDao participantDao, TournamentDao tournamentDao, TournamentService ts, GameDao gameDao, UserDao userDao, TeamDao teamDao, MailService ms){
+    public ParticipantServiceImpl(ParticipantDao participantDao, TournamentDao tournamentDao, TournamentService ts, GameFormatDao gameFormatDao, UserDao userDao, TeamDao teamDao, MailService ms){
         this.participantDao = participantDao;
         this.tournamentDao = tournamentDao;
         this.ts = ts;
-        this.gameDao = gameDao;
         this.userDao = userDao;
         this.teamDao = teamDao;
         this.ms = ms;
+        this.gameFormatDao = gameFormatDao;
     }
 
     @Transactional
@@ -114,7 +114,7 @@ public class ParticipantServiceImpl implements ParticipantService {
             throw new IllegalStateException("Members cannot be swapped after the tournament has started"); // TODO: custom handling
         }
         Optional<Tournament> t = tournamentDao.findById(tournament_id);
-        Integer teamSize = gameDao.getFormatById(t.get().getFormat_id()).get().getPlayers_per_team();
+        Integer teamSize = gameFormatDao.getFormatById(t.get().getFormat_id()).get().getPlayers_per_team();
 
         Integer g1 = participantDao.getGroupNumber(tournament_id, user1, teamSize);
         Integer g2 = participantDao.getGroupNumber(tournament_id, user2, teamSize);

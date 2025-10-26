@@ -1,8 +1,7 @@
-package ar.edu.itba.paw.persistence;
+package ar.edu.itba.paw.persistence.Jdbc;
 
 import ar.edu.itba.paw.interfaces.persistence.TeamDao;
 import ar.edu.itba.paw.model.Team;
-import ar.edu.itba.paw.model.User;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.util.*;
 
-@Repository
 public class TeamJdbcDao implements TeamDao {
 
     private final JdbcTemplate jdbcTemplate;
@@ -25,7 +23,7 @@ public class TeamJdbcDao implements TeamDao {
                 .usingGeneratedKeyColumns("id");
     }
 
-    private static final RowMapper<Team> ROW_MAPPER = (rs, rowNum) -> new Team(rs.getLong("id"), rs.getString("name"), rs.getLong("profile_picture_id"), rs.getLong("banner_id"), rs.getLong("owner_id"));
+    private static final RowMapper<Team> ROW_MAPPER = (rs, rowNum) -> new Team(rs.getLong("id"), rs.getString("name"), rs.getLong("profile_picture_id"), rs.getLong("banner_id"));
 
     @Override
     public Team create(String name, Long pfp_id, Long banner_id, Long owner_id) {
@@ -36,7 +34,7 @@ public class TeamJdbcDao implements TeamDao {
         values.put("owner_id", owner_id);
 
         Number id = jdbcInsert.executeAndReturnKey(values);
-        return new Team(id.longValue(), name, pfp_id, banner_id, owner_id);
+        return new Team(id.longValue(), name, pfp_id, banner_id);
     }
 
     @Override
