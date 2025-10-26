@@ -36,16 +36,16 @@ public class TeamHibernateDao implements TeamDao {
     }
 
     @Override
-    public List<Long> getPastTournaments(Long team_id) {
-        return List.of();
+    public List<Long> getPastTournaments(Long team_id, Integer page) {
+        return findTeamTournamentIds(team_id, true, page);
     }
 
     @Override
-    public List<Long> getActiveTournaments(Long teamId) {
-        return List.of();
+    public List<Long> getActiveTournaments(Long teamId, Integer page) {
+        return findTeamTournamentIds(teamId, false, page);
     }
 
-    private List<Long> findTeamTournamentIds(Long teamId, Boolean isFinished) {
+    private List<Long> findTeamTournamentIds(Long teamId, Boolean isFinished, Integer page) {
         String jpql = """
             SELECT DISTINCT p.tournament.id
             FROM Participant p
@@ -57,7 +57,34 @@ public class TeamHibernateDao implements TeamDao {
         return em.createQuery(jpql, Long.class)
                 .setParameter("teamId", teamId)
                 .setParameter("isFinished", isFinished)
+                .setMaxResults(9)
+                .setFirstResult(page)
                 .getResultList();
+    }
+
+    @Override
+    public Integer getActivePages(Long team_id) {
+        return getTeamTournamentsPages(team_id, false);
+    }
+
+    @Override
+    public Integer getPastPages(Long team_id) {
+        return getTeamTournamentsPages(team_id, true);
+    }
+
+    private Integer getTeamTournamentsPages(Long team_id, Boolean isFinished){
+        String jpql = """
+            SELECT DISTINCT COUNT (DISTINCT (p.tournament.id))
+            FROM Participant p
+            WHERE p.team.id = :teamId
+            AND p.tournament.is_finished = :isFinished
+            AND p.user IS NULL
+        """;
+
+        return em.createQuery(jpql, Integer.class)
+                .setParameter("teamId", team_id)
+                .setParameter("isFinished", isFinished)
+                .getFirstResult();
     }
 
     @Override

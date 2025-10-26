@@ -21,8 +21,6 @@ public interface GameDao {
 
     public boolean checkNameExists(String name);
 
-    public List<GameFormat> getFormats(Long gameId);
-
     List<Game> getFavourites(Long user_id);
 
     List<Game> findAllPaged(Long page);
