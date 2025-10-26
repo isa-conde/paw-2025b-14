@@ -109,13 +109,33 @@ public class TournamentServiceImpl implements TournamentService {
             tournamentDao.setFinished(tournament_id);
             LOGGER.info("Tournament with ID {} has successfully ended", tournament_id);
         }
-        List<Participant> participants = participantDao.getTournamentParticipantUsers(tournament_id);
-        for(Participant p : participants){
-            User user = userDao.findById(p.getId()).get();
-            if(p.getId().equals(winner)) {
-                ms.sendTournamentWinnerEmail(tournament_id, user.getUsername(), t.getName(), user.getEmail());
-            } else {
-                ms.sendTournamentEndedEmail(tournament_id, user.getUsername(), t.getName(), user.getEmail());
+        List<Participant> participant_users = participantDao.getTournamentParticipantUsers(tournament_id);
+        Integer teamSize = getPlayersPerTeam(tournament_id);
+        if(teamSize > 1) {
+            List<Participant> participant_teams = participantDao.getTournamentParticipantTeams(tournament_id);
+            Long winnerTeam = null;
+            for(Participant team : participant_teams){
+                if(team.getId().equals(winner)) {
+                    winnerTeam = team.getTeam().getId();
+                    break;
+                }
+            }
+            for(Participant p : participant_users){
+                User user = userDao.findById(p.getUser().getId()).get();
+                if(p.getTeam().getId().equals(winnerTeam)) {
+                    ms.sendTournamentWinnerEmail(tournament_id, user.getUsername(), t.getName(), user.getEmail());
+                } else {
+                    ms.sendTournamentEndedEmail(tournament_id, user.getUsername(), t.getName(), user.getEmail());
+                }
+            }
+        }else {
+            for(Participant p : participant_users){
+                User user = userDao.findById(p.getUser().getId()).get();
+                if(p.getId().equals(winner)) {
+                    ms.sendTournamentWinnerEmail(tournament_id, user.getUsername(), t.getName(), user.getEmail());
+                } else {
+                    ms.sendTournamentEndedEmail(tournament_id, user.getUsername(), t.getName(), user.getEmail());
+                }
             }
         }
     }
@@ -165,20 +185,29 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public void startTournament(Long tournament_id){
         Optional<Tournament> optTournament = findById(tournament_id);
-        if(optTournament.get().getTournamentStarted()) {
+        if(optTournament.isEmpty()) {
+            LOGGER.error("Tournament with ID {} does not exist", tournament_id);
+            throw new TournamentNotFoundException();
+        }
+        Tournament t = optTournament.get();
+        if(t.getTournamentStarted()) {
             LOGGER.warn("The tournament with ID {} has already started", tournament_id);
             throw new TournamentAlreadyStartedException();
         }
         tournamentDao.startTournament(tournament_id);
         LOGGER.info("The tournament with ID {} has successfully been started", tournament_id);
-        Tournament t = optTournament.get();
         if(t.getStructure().equals(Structure.HYBRID) && t.getIs_group_stage()){
             createGroupStageMatches(t);
         }
         List<Participant> participants = participantDao.getTournamentParticipantUsers(tournament_id);
-        User creator = userDao.findById(t.getCreator_id()).get();
+        Optional<User> optCreator = userDao.findById(t.getCreator_id());
+        if(optCreator.isEmpty()) {
+            LOGGER.error("User with ID {} does not exist", t.getCreator_id());
+            throw new UserNotFoundException();
+        }
+        User creator = optCreator.get();
         for(Participant p : participants) {
-            User participant = userDao.findById(p.getId()).get();
+            User participant = userDao.findById(p.getUser().getId()).get();
             ms.sendTournamentStartedEmail(tournament_id, participant.getUsername(), t.getName(), creator.getEmail(), participant.getEmail());
         }
     }

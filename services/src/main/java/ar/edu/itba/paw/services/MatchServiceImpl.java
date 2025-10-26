@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Transactional(readOnly = true)
 @Service
@@ -67,9 +68,7 @@ public class MatchServiceImpl implements MatchService {
         } else {
             matchDao.updateMatchVisitor(tournament_id, match2, user1);
         }
-        String username1 = us.findById(user1).get().getUsername();
-        String username2 = us.findById(user2).get().getUsername();
-        LOGGER.info("User {} and {} have been successfully swapped matches", username1, username2);
+        LOGGER.info("User {} and {} have been successfully swapped matches", user1, user2);
     }
 
     @Transactional
@@ -143,10 +142,11 @@ public class MatchServiceImpl implements MatchService {
 
     private void setNextMatchInfo(Long matchId, Long tournamentId, Long winnerId) {
         Integer currentStage = matchDao.getMatchStage(tournamentId, matchId);
-        List<Long> idsThisStage = matchDao.getStageMatchIds(currentStage, tournamentId);
-        int indexInStage = idsThisStage.indexOf(matchId);
 
-        List<Long> idsNextStage = matchDao.getStageMatchIds(currentStage + 1, tournamentId);
+        List<Long> idsThisStage = matchDao.getStageMatchIds(currentStage, tournamentId).stream().sorted().toList();
+        List<Long> idsNextStage = matchDao.getStageMatchIds(currentStage + 1, tournamentId).stream().sorted().toList();
+
+        int indexInStage = idsThisStage.indexOf(matchId);
         if(idsNextStage.isEmpty()){
             return;
         }

@@ -3,6 +3,7 @@ package ar.edu.itba.paw.persistence.Hibernate;
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.Game.GameFormat;
+import ar.edu.itba.paw.model.Participant;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Elo;
@@ -333,9 +334,9 @@ public class TournamentHibernateDao implements TournamentDao {
     }
 
     @Override
-    public void setTournamentWinner(Long tournament_id, Long user_id) {
+    public void setTournamentWinner(Long tournament_id, Long winner_id) {
         Tournament t = em.find(Tournament.class, tournament_id);
-        t.setWinner(em.getReference(User.class, user_id));
+        t.setWinner(em.getReference(Participant.class, winner_id));
         em.persist(t);
     }
 

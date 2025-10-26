@@ -78,7 +78,7 @@ public class Tournament {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tournament_winner")
-    private User winner;
+    private Participant winner;
 
     @Column(name = "is_group_stage")
     private Boolean is_group_stage;
@@ -257,11 +257,11 @@ public class Tournament {
         this.elo = elo;
     }
 
-    public User getWinner() {
+    public Participant getWinner() {
         return winner;
     }
 
-    public void setWinner(User winner) {
+    public void setWinner(Participant winner) {
         this.winner = winner;
     }
 

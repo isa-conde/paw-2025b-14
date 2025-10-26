@@ -45,7 +45,7 @@ public class ParticipantHibernateDao implements ParticipantDao{
 
     @Override
     @Transactional(readOnly = true)
-    public Participant getTournamentParticipantById(Long tournament_id, Long particpant_id, Integer teamSize) {
+    public Participant getTournamentParticipantById(Long tournament_id, Long participant_id, Integer teamSize) {
         String jpql;
 
         if (teamSize > 1) {
@@ -54,7 +54,7 @@ public class ParticipantHibernateDao implements ParticipantDao{
             FROM Participant p
             JOIN FETCH p.team t
             WHERE p.tournament.id = :tournamentId
-              AND p.team.id = :participantId
+              AND p.id = :participantId
         """;
         } else {
             jpql = """
@@ -62,13 +62,13 @@ public class ParticipantHibernateDao implements ParticipantDao{
             FROM Participant p
             JOIN FETCH p.user u
             WHERE p.tournament.id = :tournamentId
-              AND p.user.id = :participantId
+              AND p.id = :participantId
         """;
         }
 
         TypedQuery<Participant> query = em.createQuery(jpql, Participant.class);
         query.setParameter("tournamentId", tournament_id);
-        query.setParameter("participantId", particpant_id);
+        query.setParameter("participantId", participant_id);
 
         List<Participant> toReturn = query.getResultList();
         fillParticipantTransientFields(toReturn);

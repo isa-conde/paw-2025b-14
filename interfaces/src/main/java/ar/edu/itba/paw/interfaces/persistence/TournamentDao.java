@@ -47,7 +47,7 @@ public interface TournamentDao {
 
     Boolean getIsGroupStage(Long tournamentId);
 
-    void setTournamentWinner(Long tournament_id, Long user_id);
+    void setTournamentWinner(Long tournament_id, Long winner_id);
 
     Boolean isTournamentStarted(Long tournament_id);
 
