@@ -84,12 +84,12 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public Integer getActivePages(Long team_id) {
+    public Long getActivePages(Long team_id) {
         return teamDao.getActivePages(team_id);
     }
 
     @Override
-    public Integer getPastPages(Long team_id) {
+    public Long getPastPages(Long team_id) {
         return teamDao.getPastPages(team_id);
     }
 
