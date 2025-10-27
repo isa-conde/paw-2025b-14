@@ -321,7 +321,7 @@ public class ParticipantHibernateDao implements ParticipantDao{
             jpql = """
             UPDATE Participant p
             SET p.points = p.points + :points
-            WHERE p.team.id = :id
+            WHERE p.id = :id
               AND p.tournament.id = :tournamentId
               AND p.user IS NULL
         """;
@@ -329,8 +329,9 @@ public class ParticipantHibernateDao implements ParticipantDao{
             jpql = """
             UPDATE Participant p
             SET p.points = p.points + :points
-            WHERE p.user.id = :id
+            WHERE p.id = :id
               AND p.tournament.id = :tournamentId
+              AND p.team IS NULL
         """;
         }
 

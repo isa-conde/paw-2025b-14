@@ -146,7 +146,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public List<Team> getUserTeamsBySizeNotInTournament(Long userId, Long tournamentId) {
-        return teamDao.getUserTeamsBySizeNotInTournament(userId, tournamentId, ts.getPlayersPerTeam(tournamentId));
+        return teamDao.getUserTeamsBySizeNotInTournament(userId, tournamentId, (long)ts.getPlayersPerTeam(tournamentId));
     }
 
     @Override
