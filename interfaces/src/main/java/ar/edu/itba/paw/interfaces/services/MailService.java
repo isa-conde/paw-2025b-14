@@ -1,5 +1,8 @@
 package ar.edu.itba.paw.interfaces.services;
 
+import ar.edu.itba.paw.model.Tournament.Tournament;
+import ar.edu.itba.paw.model.User;
+
 public interface MailService {
 
     void sendTournamentCreatedEmail(Long tournamentId, String userName, String tournamentName, String recipient);
@@ -19,5 +22,7 @@ public interface MailService {
     void sendVerificationEmail(Long userId, String userName, Long token, String recipient);
 
     void sendResetPasswordEmail(Long userId, Long token, String recipient);
+
+    void sendContactOwnerEmail(Tournament tournament, User user, String emailSubject, String emailBody, User creator);
 
 }

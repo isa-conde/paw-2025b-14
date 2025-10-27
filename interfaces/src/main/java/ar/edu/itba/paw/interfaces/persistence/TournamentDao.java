@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.interfaces.persistence;
 
+import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
 import ar.edu.itba.paw.model.Tournament.Tournament;
@@ -57,13 +58,12 @@ public interface TournamentDao {
 
     boolean isClosed(Long tournamentId);
 
-    public Integer getUserPastTournamentsPages(Long userId);
+    Integer getUserPastTournamentsPages(Long userId);
 
-    public Integer getUserActiveTournamentsPages(Long userId);
+    Integer getUserActiveTournamentsPages(Long userId);
 
-    public Integer getCreatedAndOngoingTournamentsPages(Long userId);
+    Integer getCreatedAndOngoingTournamentsPages(Long userId);
 
-    public Integer getCreatedAndFinishedTournamentsPages(Long userId);
-
+    Integer getCreatedAndFinishedTournamentsPages(Long userId);
 
     }

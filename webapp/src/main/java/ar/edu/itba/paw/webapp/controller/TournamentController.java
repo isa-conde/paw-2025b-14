@@ -63,6 +63,11 @@ public class TournamentController {
         return new EditTournamentForm();
     }
 
+    @ModelAttribute("contactOwnerForm")
+    public ContactOwnerForm getContactOwnerForm() {
+        return new ContactOwnerForm();
+    }
+
     @ModelAttribute("gameForm")
     public GameForm getGameForm() {
         return new GameForm();
@@ -76,32 +81,6 @@ public class TournamentController {
     @ModelAttribute("joinTournamentTeamForm")
     public JoinTournamentTeamForm getJoinTournamentTeamForm() {
         return new JoinTournamentTeamForm();
-    }
-
-    // TODO: delete this!!!
-    @RequestMapping(value = "/game/create", method = {RequestMethod.GET})
-    public ModelAndView createGameForm(@ModelAttribute("gameForm") final GameForm form){
-        ModelAndView mav = new ModelAndView("addGame");
-        mav.addObject("genres", Genre.values()); // 🔹 paso el enum a la vista
-        return mav;
-    }
-
-    // TODO: this too.......
-    @RequestMapping(value = "/game/create", method = { RequestMethod.POST })
-    public ModelAndView createGame(@Valid @ModelAttribute("gameForm") final GameForm form) {
-
-        byte[] imageBytes = null;
-        try {
-            if (form.getImage() != null && !form.getImage().isEmpty()) {
-                imageBytes = form.getImage().getBytes();
-            }
-        } catch (IOException e) {
-            //TBD
-            return new ModelAndView("index");
-        }
-
-        final Game g = gs.createWithFormats(form.getName(), form.getGenre(), form.getFormats(), imageBytes);
-        return new ModelAndView("redirect:/" + g.getId());
     }
 
     @RequestMapping(value = "/tournament/swap/groups", method = RequestMethod.POST)
@@ -164,9 +143,10 @@ public class TournamentController {
     }
 
     @RequestMapping(value = "/tournament", method = RequestMethod.GET)
-    public ModelAndView tournamentPage(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam("tournamentId") final long tournamentId,
+    public ModelAndView tournamentPage(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                       @RequestParam("tournamentId") final long tournamentId,
                                        @ModelAttribute("editTournamentForm") final EditTournamentForm editTournamentForm,
-                                       @ModelAttribute("joinTeamForm") JoinTournamentTeamForm joinTournamentTeamForm) {
+                                       @ModelAttribute("joinTeamForm") final JoinTournamentTeamForm joinTournamentTeamForm) {
 
         final ModelAndView mav = new ModelAndView("tournament");
         User user = null;
@@ -228,6 +208,8 @@ public class TournamentController {
             mav.addObject("tournamentWinner", t.getTournament_winner());
             mav.addObject("participantCount", participantCount);
             mav.addObject("maxStage", maxStage);
+            mav.addObject("editTournamentForm", editTournamentForm);
+            mav.addObject("joinTeamForm", joinTournamentTeamForm);
         }
         return mav;
     }
@@ -377,5 +359,19 @@ public class TournamentController {
                 null, form.getStructure(), form.getMax_participants(), imageBytes, true, false, form.getFormat_id());
         status.setComplete();
         return new ModelAndView("redirect:/tournament?tournamentId=" + t.getId());
+    }
+
+    @RequestMapping(value = "/tournament/contactOwner", method = { RequestMethod.POST })
+    public ModelAndView contactTournamentOwner(@Valid @ModelAttribute("contactOwnerForm") final ContactOwnerForm contactOwnerForm,
+                                               BindingResult result,
+                                               @ModelAttribute("user") Optional<PawUserDetails> currentUser) {
+        ModelAndView mav = tournamentPage(currentUser, contactOwnerForm.getTournamentId(), getEditTournamentForm(), getJoinTournamentTeamForm());
+        if(result.hasErrors()) {
+            mav.addObject("openModal", "'contactOwnerModal'");
+            return mav;
+        }
+        User user = currentUser.get().getPawUser();
+        ts.contactOwner(contactOwnerForm.getTournamentId(), user, contactOwnerForm.getSubject(), contactOwnerForm.getBody(), contactOwnerForm.getCreatorId());
+        return mav;
     }
 }

@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.interfaces.services;
 
 import ar.edu.itba.paw.model.Game.Game;
+import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
 import ar.edu.itba.paw.model.Tournament.Tournament;
@@ -51,6 +52,9 @@ public interface TournamentService {
     Integer getPlayersPerTeam(Long tournamentId);
 
     Integer getPagesBySection(Long userId, String section);
+
+    void contactOwner(Long tournamentId, User currentUser, String subject, String body, Long creatorId);
+
 }
 
 

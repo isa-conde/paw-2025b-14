@@ -80,6 +80,9 @@
                 <c:when test="${inputType == 'password'}">
                     <form:input type="password" path="${path}" class="input"/>
                 </c:when>
+                <c:when test="${inputType == 'textarea'}">
+                    <form:textarea path="${path}" class="input textarea"/>
+                </c:when>
             </c:choose>
             <c:if test="${hasConstraint}">
                 <form:errors path="${path}" cssClass="form-error" element="h1"/>

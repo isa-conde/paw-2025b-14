@@ -2,6 +2,7 @@ package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.persistence.UserDao;
 import ar.edu.itba.paw.interfaces.services.MailService;
+import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -248,6 +249,31 @@ public class MailServiceImpl implements MailService {
                 locale);
 
         sendEmail(recipient, subject, body);
+    }
+
+    @Async
+    @Override
+    public void sendContactOwnerEmail(Tournament tournament, User user, String emailSubject, String emailBody, User creator) {
+        Locale locale = toLocale(creator.getLocale());
+        Context ctx = new Context(locale);
+        ctx.setVariable("username", user.getUsername());
+        ctx.setVariable("userEmail", user.getEmail());
+        ctx.setVariable("creatorUsername", creator.getUsername());
+        ctx.setVariable("tournamentName", tournament.getName());
+        ctx.setVariable("subject", emailSubject);
+        ctx.setVariable("body", emailBody);
+        String tournamentLink = baseUrl + "/tournament?tournamentId=" + tournament.getId();
+        ctx.setVariable("tournamentLink", tournamentLink);
+        ctx.setVariable("crownCid", "cid:" + CROWN_CID);
+
+        String body = templateEngine.process("contact-owner", ctx);
+
+        String subject = messageSource.getMessage(
+                "email.contactOwner.subject",
+                new Object[]{tournament.getName()},
+                locale);
+
+        sendEmail(creator.getEmail(), subject, body);
     }
 
     private void sendEmail(String recipient, String subject, String body) {

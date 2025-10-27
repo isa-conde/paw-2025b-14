@@ -2,12 +2,10 @@ package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.exception.*;
 import ar.edu.itba.paw.interfaces.persistence.*;
-import ar.edu.itba.paw.interfaces.persistence.*;
 import ar.edu.itba.paw.interfaces.services.MailService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.*;
-import ar.edu.itba.paw.model.Game.GameFormat;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
@@ -477,7 +475,6 @@ public class TournamentServiceImpl implements TournamentService {
         return 1;
     }
 
-
     @Override
     public List<Tournament> getCreatedAndFinishedTournaments(Long userId, Long page) {
         return findByCreator(userId, page, true);
@@ -486,6 +483,13 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public List<Tournament> getCreatedAndOngoingTournaments(Long userId, Long page) {
         return findByCreator(userId, page, false);
+    }
+
+    @Override
+    public void contactOwner(Long tournamentId, User currentUser, String subject, String body, Long creatorId) {
+        Tournament tournament = findById(tournamentId).get();
+        User creator = userDao.findById(creatorId).get();
+        ms.sendContactOwnerEmail(tournament, currentUser, subject, body, creator);
     }
 
 }

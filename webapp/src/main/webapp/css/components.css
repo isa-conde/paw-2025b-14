@@ -1051,6 +1051,15 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     margin-top: 10px;
 }
 
+.textarea {
+    min-height: 200px;
+    line-height: 1.5;
+    resize: vertical;
+    overflow: auto;
+    width: 100%;
+    box-sizing: border-box;
+}
+
 
 /* -------SEARCH BAR--------*/
 
