@@ -141,4 +141,9 @@ public class Participant {
     public void setVisitorMatch(List<Match> visitorMatch) {
         this.visitorMatch = visitorMatch;
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

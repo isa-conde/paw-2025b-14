@@ -231,11 +231,11 @@ public class TournamentServiceImpl implements TournamentService {
         LOGGER.info("Matches for tournament with ID {} of {} format have successfully been created", t.getId(), t.getStructure());
     }
 
-    public void createMatchesLeague(Tournament t, List<Participant> participants) {
+    private void createMatchesLeague(Tournament t, List<Participant> participants) {
         createMatchesLeague(t, participants, 1L, 1, null);
     }
 
-    public void createMatchesLeague(Tournament t, List<Participant> participants, Long firstMatchId, Integer firstStage, Boolean isGroupStage) {
+    private void createMatchesLeague(Tournament t, List<Participant> participants, Long firstMatchId, Integer firstStage, Boolean isGroupStage) {
         int n = participants.size();
 
         if (n % 2 != 0) {
