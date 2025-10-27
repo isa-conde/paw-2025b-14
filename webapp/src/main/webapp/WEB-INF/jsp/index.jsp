@@ -30,14 +30,16 @@
                     texture="true"/>
         </div>
         <div class="content-title">
-            <a href="${pageContext.request.contextPath}/gamesPage" class="title-link">
+            <c:url value="gamesPage"  var="gamespageurl"/>
+            <a href="${gamespageurl}" class="title-link">
                 <paw:text type="title" size="l"><spring:message code="home.games"/></paw:text>
             </a>
         </div>
         <paw:carrousel id="game-list" elements="${games}" isGame="true"/>
 
         <div class="content-title">
-            <a href="${pageContext.request.contextPath}/tournamentsPage" class="title-link">
+            <c:url value="tournamentsPage"  var="tourneysurl"/>
+            <a href="${tourneysurl}" class="title-link">
                 <paw:text type="title" size="l"><spring:message code="home.tournaments"/></paw:text>
             </a>
         </div>
@@ -46,7 +48,10 @@
             <c:set var="gameTournaments" value="${requestScope['tournaments' += gameId]}"/>
             <c:set var="gameObject" value="${requestScope['game' += gameId]}"/>
                 <div class="carrousel-title">
-                    <paw:text type="title" size="s">${gameObject.name}</paw:text>
+                    <c:url value="tournamentsPage?game_id=${gameObject.id}"  var="gameurl"/>
+                    <a href="${gameurl}" class="title-link">
+                        <paw:text type="title" size="s">${gameObject.name}</paw:text>
+                    </a>
                 </div>
                 <paw:carrousel id="game-${gameId}-tournaments" elements="${gameTournaments}"/>
         </c:forEach>

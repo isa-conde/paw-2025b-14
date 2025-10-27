@@ -39,7 +39,7 @@ public class TournamentHibernateDao implements TournamentDao {
 
     @Override
     public List<Tournament> findTournaments(TournamentFilter tournamentFilter, Long page) {
-        StringBuilder idJpql = new StringBuilder("SELECT t.id FROM Tournament t");
+        StringBuilder idJpql = new StringBuilder("SELECT DISTINCT t.id FROM Tournament t");
         Map<String, Object> params = new HashMap<>();
 
         idJpql.append(buildTournamentFilterJpql(tournamentFilter, params));
@@ -47,8 +47,8 @@ public class TournamentHibernateDao implements TournamentDao {
         TypedQuery<Long> idQuery = em.createQuery(idJpql.toString(), Long.class);
         params.forEach(idQuery::setParameter);
 
-        idQuery.setFirstResult((int) (page * 9));
-        idQuery.setMaxResults(9);
+        idQuery.setFirstResult((int) (page * PAGE_SIZE));
+        idQuery.setMaxResults(PAGE_SIZE);
 
         List<Long> tournamentIds = idQuery.getResultList();
 
@@ -273,16 +273,12 @@ public class TournamentHibernateDao implements TournamentDao {
     @Override
     public Integer getPageAmount(Integer pageSize, TournamentFilter tf) {
         Map<String, Object> params = new HashMap<>();
-
-        StringBuilder jpql = new StringBuilder("SELECT ");
-        if (tf.getGame_id() != null) {
-            jpql.append("COUNT(t) ");
-        } else {
-            jpql.append("COUNT(DISTINCT t.game.id) ");
+        StringBuilder jpql;
+        if (tf.isEmpty()){
+            jpql = new StringBuilder("SELECT COUNT(DISTINCT t.game.id) FROM Tournament t");
+        }else {
+            jpql = new StringBuilder("SELECT COUNT(DISTINCT t.id) FROM Tournament t");
         }
-
-        jpql.append("FROM Tournament t");
-
         jpql.append(buildTournamentFilterJpql(tf, params));
 
         TypedQuery<Long> countQuery = em.createQuery(jpql.toString(), Long.class);

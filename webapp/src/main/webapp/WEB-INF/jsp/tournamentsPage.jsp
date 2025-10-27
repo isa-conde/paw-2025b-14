@@ -31,6 +31,7 @@
           <paw:input path="genre" label="tournaments.genre" inputType="select" items="${genres}" emptyOption="${allGenres}" inline="true"/>
           <paw:input path="playersPerTeam" label="tournaments.playerAmount" inputType="select" items="${teamSizes}" emptyOption="${allSizes}" inline="true"/>
           <paw:input path="" label="tournaments.filter" inputType="submit" inline="true"/>
+          <paw:refresh-button disabled="${!isFiltered}"/>
         </div>
       </form:form>
 
@@ -42,42 +43,17 @@
         <c:forEach var="game" items="${gameTournaments.keySet()}" varStatus="status">
             <c:if test="${not empty gameTournaments[game]}">
                 <div class="carrousel-title">
-                    <paw:text type="title" size="s"><c:out value="${game.name}"/></paw:text>
+                    <c:url value="tournamentsPage?game_id=${game.id}"  var="gameurl"/>
+                    <a href="${gameurl}" class="title-link">
+                        <paw:text type="title" size="s"><c:out value="${game.name}"/></paw:text>
+                    </a>
                 </div>
                 <paw:carrousel id="game-${game.id}-tournaments" elements="${gameTournaments[game]}"/>
             </c:if>
         </c:forEach>
       </c:if>
-        <div class="pagination-container">
-            <c:if test="${totalPages > 1}">
-                <div class="pagination">
-                    <c:if test="${currentPage > 0}">
-                        <paw:paginationLink page="${currentPage - 1}" url="/tournamentsPage">
-                            <paw:text size="l" weight="thin"><</paw:text>
-                        </paw:paginationLink>
-                    </c:if>
-
-                    <c:forEach begin="0" end="${totalPages - 1}" var="i">
-                        <c:choose>
-                            <c:when test="${i == currentPage}">
-                                <paw:text weight="bold" size="xl">${i + 1}</paw:text>
-                            </c:when>
-                            <c:otherwise>
-                                <paw:paginationLink page="${i}" url="/tournamentsPage">
-                                    <paw:text weight="thin" size="l">${i + 1}</paw:text>
-                                </paw:paginationLink>
-                            </c:otherwise>
-                        </c:choose>
-                    </c:forEach>
-
-                    <c:if test="${currentPage < totalPages - 1}">
-                        <paw:paginationLink page="${currentPage + 1}" url="/tournamentsPage">
-                            <paw:text size="l" weight="thin">></paw:text>
-                        </paw:paginationLink>
-                    </c:if>
-                </div>
-            </c:if>
-        </div>
+        <c:url value="/tournamentsPage" var="url"/>
+        <paw:pagination currentPage="${currentPage}" totalPages="${totalPages}" url="${url}"/>
     </div>
 </paw:layout>
 
