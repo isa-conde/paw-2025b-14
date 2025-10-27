@@ -16,6 +16,9 @@ import ar.edu.itba.paw.webapp.form.GameForm;
 import ar.edu.itba.paw.webapp.form.SetWinnerForm;
 import ar.edu.itba.paw.webapp.form.TournamentForm;
 import ar.edu.itba.paw.webapp.form.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -32,6 +35,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @SessionAttributes("tournamentForm")
@@ -44,7 +48,10 @@ public class TournamentController {
     private final ParticipantService ps;
     private final TeamService tms;
 
-    public TournamentController(final UserService us, final GameService gs, final TournamentService ts, final MatchService ms, final ParticipantService ps, final TeamService tms) {
+    @Autowired
+    MessageSource messageSource;
+
+    public TournamentController(final UserService us, final GameService gs, final TournamentService ts, final MatchService ms, final ParticipantService ps, final TeamService tms, MessageSource messageSource) {
         this.us = us;
         this.gs = gs;
         this.ts = ts;
@@ -347,7 +354,15 @@ public class TournamentController {
         mav.addObject("step", 2);
         mav.addObject("formats", formats);
         mav.addObject("playersPerTeamMax", playersPerTeamMax);
-        mav.addObject("elos", Arrays.stream(Elo.values()).toList());
+        Map<Elo, String> elosMap = Arrays.stream(Elo.values())
+                .collect(Collectors.toMap(
+                        elo -> elo,  // clave: el enum (valor del select)
+                        elo -> messageSource.getMessage("elo." + elo.name(), null, LocaleContextHolder.getLocale()),
+                        (a, b) -> a,
+                        LinkedHashMap::new
+                ));
+
+        mav.addObject("elos", elosMap);
         return mav;
     }
 

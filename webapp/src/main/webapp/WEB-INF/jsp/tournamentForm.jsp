@@ -22,7 +22,7 @@
                                 <paw:input path="name" label="home.createTournament.name" hasConstraint="true"/>
                             </div>
                             <div class="row">
-                                <paw:input path="region" label="home.createTournament.region" inputType="select" items="${regions}" hasConstraint="true" emptyOption="${emptyOption}"/>
+                                <paw:input path="region" label="home.createTournament.region" inputType="select" items="${regions}" hasConstraint="true" emptyOption="${emptyOption}" itemValue=""/>
                                 <paw:input path="game_id" label="home.createTournament.game"  inputType="select" items="${games}" itemValue="id" itemLabel="name" hasConstraint="true" emptyOption="${emptyOption}"/>
                             </div>
                             <div class="row">
@@ -47,7 +47,7 @@
                                 <paw:input path="format_id" label="home.createTournament.format" hasConstraint="true" inputType="select" items="${formats}" itemLabel="name" itemValue="id"/>
                             </div>
                             <div class="row center">
-                                <paw:input path="elo" label="home.createTournament.skillLevel" inputType="select" items="${elos}" hasConstraint="true" emptyOption="${emptyOption}"/>
+                                <paw:input path="elo" label="home.createTournament.skillLevel" inputType="select" itemMap="${elos}" hasConstraint="true" emptyOption="${emptyOption}" itemValue="a"/>
                                 <paw:input path="image" label="home.createTournament.image" inputType="file" hasConstraint="true"/>
                             </div>
                             <div class="row center">

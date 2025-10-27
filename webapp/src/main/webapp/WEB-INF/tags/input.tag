@@ -9,6 +9,7 @@
 <%@ attribute name="containerType" required="false"%>
 <%@ attribute name="inputType" required="false"%>
 <%@ attribute name="items" type="java.util.List" required="false"%>
+<%@attribute name="itemMap" type="java.util.LinkedHashMap" required="false" %>
 <%@ attribute name="itemValue" required="false"%>
 <%@ attribute name="itemLabel" required="false"%>
 <%@ attribute name="emptyOption" required="false"%>
@@ -30,12 +31,20 @@
                 </c:when>
                 <c:when test="${inputType == 'select'}">
                     <c:choose>
-                        <c:when test="${itemLabel != null && itemValue != null}">
+                        <c:when test="${(itemLabel != null && itemValue != null)}">
                             <form:select path="${path}" cssClass="input">
                                 <c:if test="${emptyOption != null}">
                                     <form:option value="" label="${emptyOption}"/>
                                 </c:if>
                                 <form:options items="${items}" itemLabel="${itemLabel}" itemValue="${itemValue}"/>
+                            </form:select>
+                        </c:when>
+                        <c:when test="${itemMap != null}">
+                            <form:select path="${path}" cssClass="input">
+                                <c:if test="${emptyOption != null}">
+                                    <form:option value="" label="${emptyOption}"/>
+                                </c:if>
+                                <form:options items="${itemMap}"/>
                             </form:select>
                         </c:when>
                         <c:otherwise>
