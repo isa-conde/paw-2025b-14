@@ -1,6 +1,6 @@
 package ar.edu.itba.paw.interfaces.services;
 
-import ar.edu.itba.paw.model.Match;
+import ar.edu.itba.paw.model.Match.Match;
 
 import java.util.*;
 

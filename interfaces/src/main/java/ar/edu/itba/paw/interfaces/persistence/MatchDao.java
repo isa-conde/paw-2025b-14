@@ -1,9 +1,8 @@
 package ar.edu.itba.paw.interfaces.persistence;
 
-import ar.edu.itba.paw.model.Match;
+import ar.edu.itba.paw.model.Match.Match;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface MatchDao {

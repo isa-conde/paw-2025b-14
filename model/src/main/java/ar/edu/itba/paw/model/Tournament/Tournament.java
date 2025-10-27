@@ -2,14 +2,13 @@ package ar.edu.itba.paw.model.Tournament;
 
 import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.Game.GameFormat;
-import ar.edu.itba.paw.model.Match;
+import ar.edu.itba.paw.model.Match.Match;
 import ar.edu.itba.paw.model.Participant;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 import org.hibernate.annotations.ColumnTransformer;
-import org.w3c.dom.css.CSSStyleRule;
 
 import javax.persistence.*;
 import java.time.LocalDate;

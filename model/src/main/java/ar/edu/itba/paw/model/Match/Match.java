@@ -1,5 +1,6 @@
-package ar.edu.itba.paw.model;
+package ar.edu.itba.paw.model.Match;
 
+import ar.edu.itba.paw.model.Participant;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.ids.MatchId;
 

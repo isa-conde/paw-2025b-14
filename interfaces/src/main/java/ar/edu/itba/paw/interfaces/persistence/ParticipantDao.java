@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.interfaces.persistence;
 
+import ar.edu.itba.paw.model.Match.PointsPair;
 import ar.edu.itba.paw.model.Participant;
 
 import java.util.List;
@@ -24,11 +25,11 @@ public interface ParticipantDao {
 
     void swapGroups(Long tournament_id, Long user1, Long user2, Integer group1, Integer group2, Integer teamSize);
 
-    List<Participant> getTournamentParticipantsByPoints(Long tournamentId, Integer group_number, Integer points, Integer teamSize);
+    List<Participant> getTournamentParticipantsByPointsPair(Long tournamentId, Integer group_number, PointsPair pointsPair, Integer teamSize);
 
-    Integer getTournamentMaxPointsGroup(Long tournamentId, Integer group);
+    PointsPair getTournamentMaxPointsPairGroup(Long tournamentId, Integer group);
 
-    Integer getTournamentSecondMaxPointsGroup(Long tournamentId, Integer group);
+    PointsPair getTournamentSecondMaxPointsPairGroup(Long tournamentId, Integer group);
 
     Integer getTournamentGroups(Long tournamentId);
 
