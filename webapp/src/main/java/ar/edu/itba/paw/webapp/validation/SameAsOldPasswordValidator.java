@@ -21,7 +21,7 @@ public class SameAsOldPasswordValidator implements ConstraintValidator<SameAsOld
         if (isSameAsOld) {
             context.disableDefaultConstraintViolation();
 
-            context.buildConstraintViolationWithTemplate("New password cannot be the same as your current password")
+            context.buildConstraintViolationWithTemplate("{passwordReset.error.sameAsOld}")
                     .addPropertyNode("newPassword")
                     .addConstraintViolation();
         }

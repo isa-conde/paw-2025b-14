@@ -45,16 +45,13 @@ public class UserController {
     @RequestMapping("/")
     public ModelAndView index(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @ModelAttribute("tournamentForm") TournamentForm tournamentForm) {
         final ModelAndView mav = new ModelAndView("index");
-        List<Game> allGames = gs.findAllPaged(0L);
+        List<Game> games = gs.findAllPaged(0L);
 
         currentUser.ifPresent(pawUserDetails -> us.updateUserLocale(LocaleContextHolder.getLocale(), pawUserDetails.getPawUser().getId()));
 
         mav.addObject("user", currentUser.isPresent() ? currentUser.get().getPawUser() : null);
-        mav.addObject("games", allGames);
-        mav.addObject("regions", Arrays.stream(Region.values()).toList());
-        mav.addObject("elos", Arrays.stream(Elo.values()).toList());
-        mav.addObject("structures", Arrays.stream(Structure.values()).toList());
-        mav.addObject("tournamentForm", tournamentForm);
+        mav.addObject("games", games);
+
 
         Map<Game, List<Tournament>> tournaments = ts.getUnfilteredTournamentPages(0L);
         List<Long> gameIds = new ArrayList<>();
@@ -143,7 +140,8 @@ public class UserController {
         mav.addObject("isMyProfile", profile.getId() == currentUser.get().getPawUser().getId());
         mav.addObject("profile", profileOpt.get());
         mav.addObject("favouriteGames", gs.getFavourites(id));
-        mav.addObject("lastTournaments", ts.findUserActiveTournaments(id, 1L));
+        mav.addObject("activeTournaments", ts.findUserActiveTournaments(id, 0L));
+        mav.addObject("lastTournaments", ts.findUserPastTournaments(id, 0L));
         mav.addObject("teams", tms.getUserTeams(id));
         mav.addObject("EditProfileForm", editProfileForm);
 
@@ -166,34 +164,58 @@ public class UserController {
     public ModelAndView profileTournaments(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @PathVariable Long id, @RequestParam(value = "section", required = false, defaultValue = "active") String section, @RequestParam(defaultValue = "0") Long page1, @RequestParam(defaultValue = "0") Long page2) {
         final ModelAndView mav = new ModelAndView("myTournaments");
 
-        Optional<User> profileOpt = us.findById(id);
-        if (profileOpt.isEmpty()){
-            throw new UserNotFoundException();
-        }
-        User profile = profileOpt.get();
-
-        List<Tournament> onGoingTournaments = ts.getCreatedAndOngoingTournaments(profile.getId(), page1);
-        List<Tournament> finishedTournaments = ts.getCreatedAndFinishedTournaments(profile.getId(), page1);
-        List<Tournament> joinedTournaments = ts.findUserActiveTournaments(profile.getId(), page1);
-        List<Tournament> pastTournaments = ts.findUserPastTournaments(profile.getId(), page2);
-
-
-
-        mav.addObject("user", currentUser.isPresent() ? currentUser.get().getPawUser() : null);
+        User profile = us.findById(id).orElseThrow(UserNotFoundException::new);
         mav.addObject("profile", profile);
-        mav.addObject("pastTournaments", pastTournaments);
-        mav.addObject("onGoingTournaments", onGoingTournaments);
-        mav.addObject("finishedTournaments", finishedTournaments);
-        mav.addObject("joinedTournaments", joinedTournaments);
+        mav.addObject("user", currentUser.map(PawUserDetails::getPawUser).orElse(null));
+
+        int totalPages1 = 0;
+        int totalPages2 = 0;
+
+        switch (section) {
+            case "owned" -> {
+                totalPages1 = ts.getPagesBySection(profile.getId(), "ownedOngoing");
+                totalPages2 = ts.getPagesBySection(profile.getId(), "ownedFinished");
+
+                page1 = adjustPage(page1, totalPages1);
+                page2 = adjustPage(page2, totalPages2);
+
+                List<Tournament> onGoingTournaments = ts.getCreatedAndOngoingTournaments(profile.getId(), page1);
+                List<Tournament> finishedTournaments = ts.getCreatedAndFinishedTournaments(profile.getId(), page2);
+
+                mav.addObject("onGoingTournaments", onGoingTournaments);
+                mav.addObject("finishedTournaments", finishedTournaments);
+            }
+
+            case "finished" -> {
+                totalPages1 = ts.getPagesBySection(profile.getId(), "finished");
+                page1 = adjustPage(page1, totalPages1);
+
+                List<Tournament> pastTournaments = ts.findUserPastTournaments(profile.getId(), page1);
+                mav.addObject("pastTournaments", pastTournaments);
+            }
+
+            case "active" -> {
+                totalPages1 = ts.getPagesBySection(profile.getId(), "active");
+                page1 = adjustPage(page1, totalPages1);
+
+                List<Tournament> joinedTournaments = ts.findUserActiveTournaments(profile.getId(), page1);
+                mav.addObject("joinedTournaments", joinedTournaments);
+            }
+        }
+
+        mav.addObject("totalPages1", totalPages1);
+        mav.addObject("totalPages2", totalPages2);
         mav.addObject("currentPage1", page1);
         mav.addObject("currentPage2", page2);
-        mav.addObject("totalPages1", ts.getPagesBySection(profile.getId(), section));
-        if (section.equals("owned")){
-            mav.addObject("totalPages1", ts.getPagesBySection(profile.getId(), section + "Ongoing"));
-            mav.addObject("totalPages2", ts.getPagesBySection(profile.getId(), section + "Finished"));
-        }
 
         return mav;
+    }
+
+    private long adjustPage(long page, int totalPages) {
+        if (totalPages <= 0) return 0;
+        if (page < 0) return 0;
+        if (page >= totalPages) return totalPages - 1;
+        return page;
     }
 
     @RequestMapping(value = "/profile/update", method = { RequestMethod.POST })

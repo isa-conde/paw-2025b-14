@@ -13,9 +13,13 @@ public interface TeamDao {
 
     Optional<Team> getById(Long id);
 
-    List<Long> getPastTournaments(Long team_id);
+    List<Long> getPastTournaments(Long team_id, Integer page);
 
-    List<Long> getActiveTournaments(Long teamId);
+    List<Long> getActiveTournaments(Long teamId, Integer page);
+
+    Long getActivePages(Long team_id);
+
+    Long getPastPages(Long team_id);
 
     List<Team> getUserTeams(Long user_id);
 

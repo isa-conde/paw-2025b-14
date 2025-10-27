@@ -19,9 +19,12 @@
         .card {
             background-color: #00244D;
             border-radius: 15px;
-            padding: 20px;
             text-align: center;
             min-width: 500px;
+        }
+
+        .content {
+            padding: 20px;
         }
 
         h1 {
@@ -59,12 +62,16 @@
 </head>
 <body>
 <div class="card">
-    <h1 th:text="#{email.tournamentWinnerNotification.title(${tournamentName})}">You just won tournament name!</h1>
-    <p th:text="#{email.tournamentWinnerNotification.greeting(${userName})}">Hello user,</p>
-    <p th:text="#{email.tournamentWinnerNotification.body(${tournamentName})}">
-        Congratulations! You just won the tournament name. Click the button below to see how everyone else did.
-    </p>
-    <a class="btn" th:href="${tournamentLink}" th:text="#{email.tournamentWinnerNotification.buttonLabel}">View Tournament</a>
+    <div th:insert="email-header :: header"></div>
+
+    <div class="content">
+        <h1 th:text="#{email.tournamentWinnerNotification.title(${tournamentName})}">You just won tournament name!</h1>
+        <p th:text="#{email.tournamentWinnerNotification.greeting(${userName})}">Hello user,</p>
+        <p th:text="#{email.tournamentWinnerNotification.body(${tournamentName})}">
+            Congratulations! You just won the tournament name. Click the button below to see how everyone else did.
+        </p>
+        <a class="btn" th:href="${tournamentLink}" th:text="#{email.tournamentWinnerNotification.buttonLabel}">View Tournament</a>
+    </div>
 </div>
 </body>
 </html>

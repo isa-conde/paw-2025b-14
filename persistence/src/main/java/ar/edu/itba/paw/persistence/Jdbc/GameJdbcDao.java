@@ -111,18 +111,24 @@ public class GameJdbcDao implements GameDao {
     }
 
     @Override
-    public void addFavourite(Long user_id, Long game_id) {
-        Map<String, Long> map = Map.of("user_id", user_id, "game_id", game_id);
-        jdbcInsertFavourites.execute(map);
-    }
-
-    @Override
-    public List<Game> getFavourites(Long user_id) {
-        String sql = "SELECT g.* " +
-                "FROM game g " +
-                "JOIN user_favourites uf ON g.id = uf.game_id " +
-                "WHERE uf.user_id = ?";
-        return jdbcTemplate.query(sql, ROW_MAPPER, user_id);
+    public List<Game> getFavourites(Long userId) {
+        final String sql = """
+            SELECT g.*
+            FROM (
+              SELECT t.game_id, COUNT(DISTINCT t.id) AS tournament_count
+              FROM tournament t
+              WHERE EXISTS (
+                SELECT 1 FROM participant p
+                WHERE p.tournament_id = t.id
+                  AND p.user_id       = ?
+              )
+              GROUP BY t.game_id
+            ) fav
+            JOIN game g ON g.id = fav.game_id
+            ORDER BY fav.tournament_count DESC, g.name ASC
+            LIMIT 6
+        """;
+        return jdbcTemplate.query(sql, ROW_MAPPER, userId);
     }
 
     @Override

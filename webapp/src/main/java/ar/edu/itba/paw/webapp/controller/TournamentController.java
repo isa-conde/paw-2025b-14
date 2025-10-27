@@ -335,11 +335,18 @@ public class TournamentController {
     @RequestMapping(value = "/tournaments/new/step2", method = { RequestMethod.GET })
     public ModelAndView newTournamentFormStep2(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @ModelAttribute("tournamentForm") final TournamentForm form){
         final ModelAndView mav = new ModelAndView("tournamentForm");
+        List<GameFormat> formats = gs.getFormats(form.getGame_id());
+        Integer playersPerTeamMax = formats.stream()
+        .map(GameFormat::getPlayers_per_team)
+        .filter(java.util.Objects::nonNull)
+        .max(Integer::compareTo)
+        .orElse(1);
 
         User user = currentUser.get().getPawUser();
         mav.addObject("user", user);
         mav.addObject("step", 2);
-        mav.addObject("formats", gs.getFormats(form.getGame_id()));
+        mav.addObject("formats", formats);
+        mav.addObject("playersPerTeamMax", playersPerTeamMax);
         mav.addObject("elos", Arrays.stream(Elo.values()).toList());
         return mav;
     }

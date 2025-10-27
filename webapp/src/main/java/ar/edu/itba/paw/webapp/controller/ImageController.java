@@ -44,8 +44,8 @@ public class ImageController {
     }
 
     @RequestMapping("/pfp/{id}")
-    public ResponseEntity<byte[]> getPfp(@PathVariable Long id){
-        if (id != 0){
+    public ResponseEntity<byte[]> getPfp(@PathVariable(required = false) Long id){
+        if (id != null && id != 0){
             return getImage(id);
         }
 
@@ -64,8 +64,8 @@ public class ImageController {
     }
 
     @RequestMapping("/banner/{id}")
-    public ResponseEntity<byte[]> getBanner(@PathVariable Long id){
-        if (id != 0){
+    public ResponseEntity<byte[]> getBanner(@PathVariable(required = false) Long id){
+        if (id != null && id != 0){
             return getImage(id);
         }
 
@@ -82,4 +82,15 @@ public class ImageController {
         return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK) ;
 
     }
+
+    @RequestMapping("/pfp")
+    public ResponseEntity<byte[]> getDefaultPfp() {
+        return getPfp(null);
+    }
+
+    @RequestMapping("/banner")
+    public ResponseEntity<byte[]> getDefaultBanner() {
+        return getBanner(null);
+    }
+
 }

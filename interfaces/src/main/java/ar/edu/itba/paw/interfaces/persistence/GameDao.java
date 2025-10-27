@@ -21,8 +21,6 @@ public interface GameDao {
 
     public boolean checkNameExists(String name);
 
-    void addFavourite(Long user_id, Long game_id);
-
     List<Game> getFavourites(Long user_id);
 
     List<Game> findAllPaged(Long page);

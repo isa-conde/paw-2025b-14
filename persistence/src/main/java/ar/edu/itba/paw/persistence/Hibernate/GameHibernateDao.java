@@ -65,15 +65,6 @@ public class GameHibernateDao implements GameDao {
 
 
     @Override
-    public void addFavourite(Long user_id, Long game_id) {
-        User user = em.find(User.class, user_id);
-        Game game = em.find(Game.class, game_id);
-
-        user.getFavouriteGames().add(game);
-        em.persist(user);
-    }
-
-    @Override
     public List<Game> getFavourites(Long userId) {
         TypedQuery<Game> q = em.createQuery("""
             SELECT g

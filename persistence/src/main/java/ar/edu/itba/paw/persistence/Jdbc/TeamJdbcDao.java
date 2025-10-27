@@ -43,6 +43,32 @@ public class TeamJdbcDao implements TeamDao {
     }
 
     @Override
+    public List<Long> getActiveTournaments(Long teamId, Integer page) {
+        return findTeamTournamentIds(teamId, false, page);
+    }
+
+    @Override
+    public Long getActivePages(Long team_id) {
+        return countTeamTournaments(team_id, false);
+    }
+
+    @Override
+    public Long getPastPages(Long team_id) {
+        return countTeamTournaments(team_id, true);
+    }
+
+    private Long countTeamTournaments(Long teamId, Boolean isFinished) {
+        String sql = """
+        SELECT COUNT(*)
+        FROM tournament t
+        INNER JOIN participant p ON p.tournament_id = t.id
+        WHERE p.team_id = ? AND t.is_finished = ? AND p.user_id IS NULL
+    """;
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, teamId, isFinished);
+        return (long) Math.ceil((double) count / 9L);
+    }
+
+    @Override
     public List<Team> getUserTeams(Long user_id) {
         return jdbcTemplate.query("SELECT DISTINCT t.* FROM team_member tm JOIN team t ON tm.team_id = t.id WHERE tm.user_id = ?", ROW_MAPPER, user_id);
     }
@@ -88,23 +114,20 @@ public class TeamJdbcDao implements TeamDao {
     }
 
     @Override
-    public List<Long> getPastTournaments(Long teamId) {
-        return findTeamTournamentIds(teamId, true);
+    public List<Long> getPastTournaments(Long teamId, Integer page) {
+        return findTeamTournamentIds(teamId, true, page);
     }
 
-    @Override
-    public List<Long> getActiveTournaments(Long teamId) {
-        return findTeamTournamentIds(teamId, false);
-    }
-
-    private List<Long> findTeamTournamentIds(Long teamId, Boolean isFinished) {
+    private List<Long> findTeamTournamentIds(Long teamId, Boolean isFinished, Integer page) {
         String sql = """
         SELECT t.id
         FROM tournament t
         INNER JOIN participant p ON p.tournament_id = t.id
         WHERE p.team_id = ? AND t.is_finished = ? AND p.user_id IS NULL
+        ORDER BY t.id DESC
+        LIMIT ? OFFSET ?
     """;
-        return jdbcTemplate.queryForList(sql, Long.class, teamId, isFinished);
+        return jdbcTemplate.queryForList(sql, Long.class, teamId, isFinished, 9, page * 9);
     }
 
     @Override

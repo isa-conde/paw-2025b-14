@@ -14,8 +14,15 @@
       <div class="page-title">
         <paw:text type="title" size="xl" stroke="true">${pageTitle}</paw:text>
       </div>
+
     </paw:banner>
     <div class="content-container">
+        <div class="tournament-buttons-container">
+            <c:set var="createTournamentFunction" value="window.location.href='${pageContext.request.contextPath}/tournaments/new/step1'"/>
+            <c:set var="createTeamFunction" value="window.location.href='${pageContext.request.contextPath}/team/create'"/>
+            <paw:button onclick="${createTournamentFunction}" text="home.createTournament.butText" size="l"/>
+            <paw:button onclick="${createTeamFunction}" text="tournaments.team.butText" size="l"/>
+        </div>
       <form:form cssClass="form" modelAttribute="filterForm" method="get">
         <div class="filter-container">
           <paw:input path="game_id" label="tournaments.game" inputType="select" items="${games}" itemValue="id" itemLabel="name" emptyOption="${allGames}" inline="true"/>
@@ -71,22 +78,6 @@
                 </div>
             </c:if>
         </div>
-
-        <div class="cards-container">
-            <c:set var="createTournamentFunction" value="window.location.href='${pageContext.request.contextPath}/tournaments/new/step1'"/>
-            <c:set var="createTeamFunction" value="window.location.href='${pageContext.request.contextPath}/team/create'"/>
-            <paw:button-card
-                    title="tournaments.create.title"
-                    butText="home.createTournament.butText"
-                    onclick="${createTournamentFunction}"
-                    texture="true"/>
-            <paw:button-card
-                    title="tournaments.team.title"
-                    butText="tournaments.team.butText"
-                    onclick="${createTeamFunction}"
-                    texture="true"/>
-        </div>
-
     </div>
 </paw:layout>
 
