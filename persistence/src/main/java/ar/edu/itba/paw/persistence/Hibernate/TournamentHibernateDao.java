@@ -410,7 +410,7 @@ public class TournamentHibernateDao implements TournamentDao {
 
     @Override
     public List<Tournament> getUserWonTournament(Long userId, Long page) {
-        Query nativeQuery = em.createNativeQuery("SELECT id FROM tournament WHERE tournament_winner = ?1");
+        Query nativeQuery = em.createNativeQuery("SELECT t.id FROM tournament t WHERE tournament_winner = (SELECT p.id FROM participant p WHERE p.user_id = ?1 AND p.tournament_id = t.id)");
         nativeQuery.setParameter(1, userId);
         nativeQuery.setMaxResults(PAGE_SIZE);
         nativeQuery.setFirstResult((int) (page * PAGE_SIZE));
@@ -426,7 +426,7 @@ public class TournamentHibernateDao implements TournamentDao {
 
     @Override
     public Integer getUserWonTournamentPages(Long userId) {
-        Query nativeQuery = em.createNativeQuery("SELECT COUNT(id) FROM tournament WHERE tournament_winner = ?1", Long.class);
+        Query nativeQuery = em.createNativeQuery("SELECT COUNT(t.id) FROM tournament t WHERE tournament_winner = (SELECT p.id FROM participant p WHERE p.user_id = ?1 AND p.tournament_id = t.id)", Long.class);
         nativeQuery.setParameter(1, userId);
         return nativeQuery.getFirstResult();
     }
