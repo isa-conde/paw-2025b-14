@@ -10,10 +10,12 @@ import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
+import org.hibernate.query.NativeQuery;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.time.LocalDate;
 import java.util.*;
@@ -407,6 +409,29 @@ public class TournamentHibernateDao implements TournamentDao {
     public Integer getCreatedAndFinishedTournamentsPages(Long userId) {
         int count = countCreatedTournaments(userId, true);
         return (int) Math.ceil(count / 9.0);
+    }
+
+    @Override
+    public List<Tournament> getUserWonTournament(Long userId, Long page) {
+        Query nativeQuery = em.createNativeQuery("SELECT id FROM tournament WHERE tournament_winner = ?1");
+        nativeQuery.setParameter(1, userId);
+        nativeQuery.setMaxResults(PAGE_SIZE);
+        nativeQuery.setFirstResult((int) (page * PAGE_SIZE));
+
+        @SuppressWarnings("unchecked")
+        List<Number> rawIds = nativeQuery.getResultList();
+        List<Long> ids = rawIds.stream().map(Number::longValue).toList();
+
+        return em.createQuery("SELECT t FROM Tournament t WHERE id in :ids", Tournament.class)
+                .setParameter("ids", ids)
+                .getResultList();
+    }
+
+    @Override
+    public Integer getUserWonTournamentPages(Long userId) {
+        Query nativeQuery = em.createNativeQuery("SELECT COUNT(id) FROM tournament WHERE tournament_winner = ?1", Long.class);
+        nativeQuery.setParameter(1, userId);
+        return nativeQuery.getFirstResult();
     }
 
     @Override

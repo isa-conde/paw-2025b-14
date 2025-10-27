@@ -477,6 +477,16 @@ public class TournamentServiceImpl implements TournamentService {
         return 1;
     }
 
+    @Override
+    public List<Tournament> getUserWonTournament(Long userId, Long page) {
+        return tournamentDao.getUserWonTournament(userId, page);
+    }
+
+    @Override
+    public Integer getUserWonTournamentPages(Long userId) {
+        return tournamentDao.getUserWonTournamentPages(userId);
+    }
+
 
     @Override
     public List<Tournament> getCreatedAndFinishedTournaments(Long userId, Long page) {
@@ -487,5 +497,6 @@ public class TournamentServiceImpl implements TournamentService {
     public List<Tournament> getCreatedAndOngoingTournaments(Long userId, Long page) {
         return findByCreator(userId, page, false);
     }
+
 
 }

@@ -65,5 +65,7 @@ public interface TournamentDao {
 
     public Integer getCreatedAndFinishedTournamentsPages(Long userId);
 
+    List <Tournament> getUserWonTournament(Long userId, Long page);
 
+    Integer getUserWonTournamentPages(Long userId);
     }

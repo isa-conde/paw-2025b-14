@@ -1206,7 +1206,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     display: flex;
     background-color: var(--background-card);
     border-top: 2px solid var(--secondary-details);
-    margin-bottom: 30px;
 }
 
 .navbar-section {

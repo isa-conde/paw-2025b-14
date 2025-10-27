@@ -188,10 +188,16 @@ public class UserController {
 
             case "finished" -> {
                 totalPages1 = ts.getPagesBySection(profile.getId(), "finished");
+                totalPages2 = ts.getUserWonTournamentPages(profile.getId());
+
                 page1 = adjustPage(page1, totalPages1);
+                page2 = adjustPage(page2, totalPages2);
 
                 List<Tournament> pastTournaments = ts.findUserPastTournaments(profile.getId(), page1);
+                List<Tournament> wonTournaments = ts.getUserWonTournament(profile.getId(), page2);
+
                 mav.addObject("pastTournaments", pastTournaments);
+                mav.addObject("wonTournaments", wonTournaments);
             }
 
             case "active" -> {
