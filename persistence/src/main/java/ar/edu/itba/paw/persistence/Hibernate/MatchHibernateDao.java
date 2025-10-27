@@ -44,6 +44,7 @@ public class MatchHibernateDao implements MatchDao {
 
     @Override
     public Long getMatchWinner(Long tournamentId, Long matchId) {
+        em.flush();
         MatchId id = new MatchId(matchId, tournamentId);
         Match match = em.find(Match.class, id);
         if(match == null) {
@@ -66,12 +67,12 @@ public class MatchHibernateDao implements MatchDao {
     @Override
     public void setMatchWinner(Long matchId, Long tournamentId, Integer winner) {
         MatchId id = new MatchId(matchId, tournamentId);
-        Query query = em.createQuery("UPDATE Match m SET m.winner = :winner WHERE m.id = :id");
-        int updated = query.setParameter("winner", winner).setParameter("id", id).executeUpdate();
-
-        if (updated == 0) {
-            LOGGER.warn("Match not found for tournamentId={} matchId={}", tournamentId, matchId); // TODO: add custom excep
+        Match match = em.find(Match.class, id);
+        if (match == null) {
+            LOGGER.warn("Match not found for tournamentId={} matchId={}", tournamentId, matchId);
+            return;
         }
+        match.setWinner(winner);
     }
 
     @Override
@@ -121,7 +122,7 @@ public class MatchHibernateDao implements MatchDao {
 
         TypedQuery<Long> playedMatchesCountQuery = em.createQuery("SELECT COUNT(m) FROM Match m WHERE m.tournament = :tournament AND m.winner IS NOT NULL", Long.class);
         playedMatchesCountQuery.setParameter("tournament", em.getReference(Tournament.class, tournamentId));
-        Long playedMatches = totalMatchesCountQuery.getSingleResult();
+        Long playedMatches = playedMatchesCountQuery.getSingleResult();
 
         return totalMatches.equals(playedMatches);
     }
@@ -136,7 +137,7 @@ public class MatchHibernateDao implements MatchDao {
 
     @Override
     public List<Long> getStageMatchIds(Integer stage, Long tournamentId) {
-        TypedQuery<Long> query = em.createQuery("SELECT m.id FROM Match m WHERE m.stage = :stage AND m.tournament = :tournament", Long.class);
+        TypedQuery<Long> query = em.createQuery("SELECT m.id.id FROM Match m WHERE m.stage = :stage AND m.tournament = :tournament", Long.class);
         query.setParameter("stage", stage).setParameter("tournament", em.getReference(Tournament.class, tournamentId));
         return query.getResultList();
     }

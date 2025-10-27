@@ -1,4 +1,4 @@
-//package ar.edu.itba.paw.persistence;
+//package ar.edu.itba.paw.persistence.jdbc;
 //
 //import ar.edu.itba.paw.model.Team;
 //import ar.edu.itba.paw.model.enums.Elo;

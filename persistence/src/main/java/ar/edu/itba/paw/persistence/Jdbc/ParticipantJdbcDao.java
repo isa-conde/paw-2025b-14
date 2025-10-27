@@ -9,7 +9,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
@@ -95,7 +94,7 @@ public class ParticipantJdbcDao implements ParticipantDao {
     }
 
     @Override
-    public Participant getTournamentParticipantById(Long tournament_id, Long participantId, Integer teamSize) {
+    public Participant getTournamentParticipantById(Long tournament_id, Long participant_id, Integer teamSize) {
         if (teamSize > 1) {
             final String sql = """
               SELECT * FROM participant
@@ -104,7 +103,7 @@ public class ParticipantJdbcDao implements ParticipantDao {
                  AND participant.team_id = ?
               """;
 
-            return jdbcTemplate.query(sql, ROW_MAPPER_TEAM, tournament_id, participantId)
+            return jdbcTemplate.query(sql, ROW_MAPPER_TEAM, tournament_id, participant_id)
                     .stream()
                     .findFirst()
                     .orElse(null);
@@ -116,7 +115,7 @@ public class ParticipantJdbcDao implements ParticipantDao {
                  AND participant.user_id = ?
               """;
 
-            return jdbcTemplate.query(sql, ROW_MAPPER_USER, tournament_id, participantId)
+            return jdbcTemplate.query(sql, ROW_MAPPER_USER, tournament_id, participant_id)
                     .stream()
                     .findFirst()
                     .orElse(null);

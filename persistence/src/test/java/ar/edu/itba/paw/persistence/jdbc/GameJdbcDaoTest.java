@@ -1,4 +1,4 @@
-//package ar.edu.itba.paw.persistence;
+//package ar.edu.itba.paw.persistence.jdbc;
 //
 //import ar.edu.itba.paw.model.Game.Game;
 //import ar.edu.itba.paw.model.Game.GameFormat;

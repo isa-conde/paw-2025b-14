@@ -54,7 +54,7 @@ public class ParticipantHibernateDao implements ParticipantDao{
             FROM Participant p
             JOIN FETCH p.team t
             WHERE p.tournament.id = :tournamentId
-              AND p.team.id = :participantId
+              AND p.id = :participantId
         """;
         } else {
             jpql = """
@@ -62,7 +62,7 @@ public class ParticipantHibernateDao implements ParticipantDao{
             FROM Participant p
             JOIN FETCH p.user u
             WHERE p.tournament.id = :tournamentId
-              AND p.user.id = :participantId
+              AND p.id = :participantId
         """;
         }
 

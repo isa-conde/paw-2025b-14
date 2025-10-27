@@ -21,7 +21,7 @@ public interface TournamentDao {
 
     Structure getTournamentStructure(Long tournament_id);
 
-    List<Tournament> findByCreator(Long creator_id, Long page);
+    List<Tournament> findByCreator(Long creator_id, Long page, Boolean isFinished);
 
     void setFinished(Long tournament_id);
 
@@ -47,7 +47,7 @@ public interface TournamentDao {
 
     Boolean getIsGroupStage(Long tournamentId);
 
-    void setTournamentWinner(Long tournament_id, Long user_id);
+    void setTournamentWinner(Long tournament_id, Long winner_id);
 
     Boolean isTournamentStarted(Long tournament_id);
 

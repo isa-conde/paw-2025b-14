@@ -1,4 +1,4 @@
-//package ar.edu.itba.paw.persistence;
+//package ar.edu.itba.paw.persistence.jdbc;
 //
 //import ar.edu.itba.paw.model.Tournament.Tournament;
 //import ar.edu.itba.paw.model.enums.Genre;
