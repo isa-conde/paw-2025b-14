@@ -29,17 +29,13 @@ public class MatchServiceImpl implements MatchService {
     private final MatchDao matchDao;
     private final ParticipantDao participantDao;
     private final TournamentDao tournamentDao;
-    private final GameDao gameDao;
     private final TournamentService ts;
-    private final UserService us;
 
-    public MatchServiceImpl(MatchDao matchDao, ParticipantDao participantDao, TournamentDao tournamentDao, TournamentService tournamentService, UserService userService, GameDao gameDao) {
+    public MatchServiceImpl(MatchDao matchDao, ParticipantDao participantDao, TournamentDao tournamentDao, TournamentService tournamentService) {
         this.matchDao = matchDao;
         this.participantDao = participantDao;
         this.tournamentDao = tournamentDao;
         this.ts = tournamentService;
-        this.gameDao = gameDao;
-        this.us = userService;
     }
 
     @Transactional
@@ -129,16 +125,17 @@ public class MatchServiceImpl implements MatchService {
         int winner = (localScore > visitorScore) ? 1 : (localScore < visitorScore ? 2 : -1);
         matchDao.setMatchResults(matchId, tournamentId, localScore, visitorScore, winner, LocalDate.now());
         Long winnerId = (winner == 1) ? localId : (winner == 2 ? visitorId : null);
+        Integer scoreDifference = (winner == 1) ? localScore - visitorScore : (winner == 2 ? visitorScore - localScore : 0);
 
         boolean isFinished = matchDao.allMatchesPlayed(tournamentId);
         if(!isFinished && isElimination) {
             setNextMatchInfo(matchId, tournamentId, winnerId);
         }else if(structure.equals(Structure.LEAGUE) || ( structure.equals(Structure.HYBRID) && isGroupStage)){
             if(winner == -1) {
-                participantDao.sumPoints(tournamentId, localId, 1, ts.getPlayersPerTeam(tournamentId));
-                participantDao.sumPoints(tournamentId, visitorId, 1, ts.getPlayersPerTeam(tournamentId));
+                participantDao.sumPoints(tournamentId, localId, 1, scoreDifference, ts.getPlayersPerTeam(tournamentId));
+                participantDao.sumPoints(tournamentId, visitorId, 1, scoreDifference, ts.getPlayersPerTeam(tournamentId));
             }else {
-                participantDao.sumPoints(tournamentId, winnerId, 3, ts.getPlayersPerTeam(tournamentId));
+                participantDao.sumPoints(tournamentId, winnerId, 3, scoreDifference, ts.getPlayersPerTeam(tournamentId));
             }
         }
         if (structure.equals(Structure.HYBRID) && isGroupStage && isFinished) {

@@ -153,4 +153,9 @@ public class Participant {
     public void setScore_difference(Integer score_difference) {
         this.score_difference = score_difference;
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

@@ -10,10 +10,12 @@ import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
+import org.hibernate.query.NativeQuery;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.time.LocalDate;
 import java.util.*;
@@ -126,16 +128,16 @@ public class TournamentHibernateDao implements TournamentDao {
 
     @Override
     public List<Tournament> findByCreator(Long creator_id, Long page, Boolean isFinished) {
-        TypedQuery<Long> idQuery = em.createQuery(
-                "SELECT t.id FROM Tournament t WHERE t.creator = :creator AND t.is_finished = :isFinished ORDER BY t.start_date ASC",
-                Long.class
+        Query idQuery = em.createNativeQuery(
+                "SELECT t.id FROM Tournament t WHERE t.creator_id = ?1 AND t.is_finished = ?2 ORDER BY t.start_date ASC"
         );
-        idQuery.setParameter("creator", em.getReference(User.class, creator_id));
-        idQuery.setParameter("isFinished", isFinished);
-        idQuery.setFirstResult((int) (page * 9));
-        idQuery.setMaxResults(9);
+        idQuery.setParameter(1, creator_id);
+        idQuery.setParameter(2, isFinished);
+        idQuery.setFirstResult((int) (page * PAGE_SIZE));
+        idQuery.setMaxResults(PAGE_SIZE);
 
-        List<Long> tournamentIds = idQuery.getResultList();
+        @SuppressWarnings("unchecked")
+        List<Number> tournamentIds = idQuery.getResultList();
 
         if (tournamentIds.isEmpty()) return Collections.emptyList();
 
@@ -145,7 +147,7 @@ public class TournamentHibernateDao implements TournamentDao {
                         "ORDER BY t.start_date ASC",
                 Tournament.class
         );
-        fullQuery.setParameter("ids", tournamentIds);
+        fullQuery.setParameter("ids", tournamentIds.stream().map(Number::longValue).toList());
 
         return fullQuery.getResultList();
     }
@@ -168,24 +170,25 @@ public class TournamentHibernateDao implements TournamentDao {
     }
 
     private List<Tournament> findUserTournaments(Long userId, Boolean isFinished, Long page) {
-        TypedQuery<Long> idQuery = em.createQuery(
+        Query idQuery = em.createNativeQuery(
                 "SELECT t.id " +
                     "FROM Tournament t " +
-                    "WHERE t.is_finished = :isFinished " +
-                    "  AND t IN ( " +
-                        "    SELECT p.tournament " +
+                    "WHERE t.is_finished = ?1 " +
+                    "  AND t.id IN ( " +
+                        "    SELECT p.tournament_id " +
                         "    FROM Participant p " +
-                        "    WHERE p.user = :user " +
+                        "    WHERE p.user_id = ?2 " +
                     ") " +
-                    "ORDER BY t.start_date ASC",
-                Long.class
+                    "ORDER BY t.start_date ASC"
+
         );
-        idQuery.setParameter("user", em.getReference(User.class, userId));
-        idQuery.setParameter("isFinished", isFinished);
+        idQuery.setParameter(1, isFinished);
+        idQuery.setParameter(2, userId);
         idQuery.setFirstResult((int)(page * PAGE_SIZE));
         idQuery.setMaxResults(PAGE_SIZE);
 
-        List<Long> tournamentIds = idQuery.getResultList();
+        @SuppressWarnings("unchecked")
+        List<Number> tournamentIds = idQuery.getResultList();
         if (tournamentIds.isEmpty()) return Collections.emptyList();
 
         TypedQuery<Tournament> fullQuery = em.createQuery(
@@ -194,7 +197,7 @@ public class TournamentHibernateDao implements TournamentDao {
                         "ORDER BY t.start_date ASC",
                 Tournament.class
         );
-        fullQuery.setParameter("ids", tournamentIds);
+        fullQuery.setParameter("ids", tournamentIds.stream().map(Number::longValue).toList());
 
         return fullQuery.getResultList();
     }
@@ -222,31 +225,31 @@ public class TournamentHibernateDao implements TournamentDao {
 
     @Override
     public Map<Long, List<Tournament>> getUnfilteredTournamentPages(Long page) {
-        TypedQuery<Long> topGamesQuery = em.createQuery(
-                "SELECT g.id " +
-                        "FROM Tournament t " +
-                        "JOIN t.game g " +
-                        "GROUP BY g.id " +
-                        "ORDER BY COUNT(t) DESC",
-                Long.class
+        Query topGamesQuery = em.createNativeQuery(
+                "SELECT game_id " +
+                        "FROM tournament " +
+                        "GROUP BY game_id " +
+                        "ORDER BY COUNT(*) DESC"
         );
         topGamesQuery.setFirstResult((int)(page * TOP_GAMES_LIMIT));
         topGamesQuery.setMaxResults(TOP_GAMES_LIMIT);
 
-        List<Long> topGameIds = topGamesQuery.getResultList();
+        @SuppressWarnings("unchecked")
+        List<Number> topGameIds = topGamesQuery.getResultList();
+
         if (topGameIds.isEmpty()) return Collections.emptyMap();
 
-        TypedQuery<Long> tournamentIdsQuery = em.createQuery(
+        Query tournamentIdsQuery = em.createNativeQuery(
                 "SELECT t.id " +
                         "FROM Tournament t " +
-                        "WHERE t.game.id IN :gameIds " +
+                        "WHERE t.game_id IN ?1 " +
                         "AND t.open_inscriptions = true " +
-                        "ORDER BY t.game.id, t.start_date ASC",
-                Long.class
-        );
-        tournamentIdsQuery.setParameter("gameIds", topGameIds);
+                        "ORDER BY t.game_id, t.start_date ASC ");
+        tournamentIdsQuery.setParameter(1, topGameIds.stream().map(Number::longValue).toList());
+        tournamentIdsQuery.setMaxResults(TOURNAMENTS_PER_GAME);
 
-        List<Long> tournamentIds = tournamentIdsQuery.getResultList();
+        @SuppressWarnings("unchecked")
+        List<Number> tournamentIds = tournamentIdsQuery.getResultList();
         if (tournamentIds.isEmpty()) return Collections.emptyMap();
 
         TypedQuery<Tournament> fullQuery = em.createQuery(
@@ -256,7 +259,7 @@ public class TournamentHibernateDao implements TournamentDao {
                         "ORDER BY t.game.id, t.start_date ASC",
                 Tournament.class
         );
-        fullQuery.setParameter("ids", tournamentIds);
+        fullQuery.setParameter("ids", tournamentIds.stream().map(Number::longValue).toList());
 
         List<Tournament> tournaments = fullQuery.getResultList();
         return tournaments.stream()
@@ -407,6 +410,29 @@ public class TournamentHibernateDao implements TournamentDao {
     public Integer getCreatedAndFinishedTournamentsPages(Long userId) {
         int count = countCreatedTournaments(userId, true);
         return (int) Math.ceil(count / 9.0);
+    }
+
+    @Override
+    public List<Tournament> getUserWonTournament(Long userId, Long page) {
+        Query nativeQuery = em.createNativeQuery("SELECT id FROM tournament WHERE tournament_winner = ?1");
+        nativeQuery.setParameter(1, userId);
+        nativeQuery.setMaxResults(PAGE_SIZE);
+        nativeQuery.setFirstResult((int) (page * PAGE_SIZE));
+
+        @SuppressWarnings("unchecked")
+        List<Number> rawIds = nativeQuery.getResultList();
+        List<Long> ids = rawIds.stream().map(Number::longValue).toList();
+
+        return em.createQuery("SELECT t FROM Tournament t WHERE id in :ids", Tournament.class)
+                .setParameter("ids", ids)
+                .getResultList();
+    }
+
+    @Override
+    public Integer getUserWonTournamentPages(Long userId) {
+        Query nativeQuery = em.createNativeQuery("SELECT COUNT(id) FROM tournament WHERE tournament_winner = ?1", Long.class);
+        nativeQuery.setParameter(1, userId);
+        return nativeQuery.getFirstResult();
     }
 
     @Override

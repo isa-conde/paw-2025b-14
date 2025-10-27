@@ -17,9 +17,9 @@ public interface TeamService {
 
     List<Tournament> getPastTournaments(Long team_id, Integer page);
 
-    Integer getActivePages(Long team_id);
+    Long getActivePages(Long team_id);
 
-    Integer getPastPages(Long team_id);
+    Long getPastPages(Long team_id);
 
     List<Team> getUserTeams(Long user_id);
 

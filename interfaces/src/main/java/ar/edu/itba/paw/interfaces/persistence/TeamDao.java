@@ -17,9 +17,9 @@ public interface TeamDao {
 
     List<Long> getActiveTournaments(Long teamId, Integer page);
 
-    Integer getActivePages(Long team_id);
+    Long getActivePages(Long team_id);
 
-    Integer getPastPages(Long team_id);
+    Long getPastPages(Long team_id);
 
     List<Team> getUserTeams(Long user_id);
 
@@ -29,5 +29,5 @@ public interface TeamDao {
 
     List<Team> searchByName(String name);
 
-    List<Team> getUserTeamsBySizeNotInTournament(Long userId, Long tournamentId, Integer minSize);
+    List<Team> getUserTeamsBySizeNotInTournament(Long userId, Long tournamentId, Long minSize);
 }

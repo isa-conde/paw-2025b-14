@@ -51,6 +51,10 @@ public interface TournamentService {
     Integer getPlayersPerTeam(Long tournamentId);
 
     Integer getPagesBySection(Long userId, String section);
+
+    List <Tournament> getUserWonTournament(Long userId, Long page);
+
+    Integer getUserWonTournamentPages(Long userId);
 }
 
 

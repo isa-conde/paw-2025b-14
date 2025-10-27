@@ -48,16 +48,16 @@ public class TeamJdbcDao implements TeamDao {
     }
 
     @Override
-    public Integer getActivePages(Long team_id) {
+    public Long getActivePages(Long team_id) {
         return countTeamTournaments(team_id, false);
     }
 
     @Override
-    public Integer getPastPages(Long team_id) {
+    public Long getPastPages(Long team_id) {
         return countTeamTournaments(team_id, true);
     }
 
-    private int countTeamTournaments(Long teamId, Boolean isFinished) {
+    private Long countTeamTournaments(Long teamId, Boolean isFinished) {
         String sql = """
         SELECT COUNT(*)
         FROM tournament t
@@ -65,7 +65,7 @@ public class TeamJdbcDao implements TeamDao {
         WHERE p.team_id = ? AND t.is_finished = ? AND p.user_id IS NULL
     """;
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, teamId, isFinished);
-        return (int) Math.ceil((double) count / 9L);
+        return (long) Math.ceil((double) count / 9L);
     }
 
     @Override
@@ -131,8 +131,8 @@ public class TeamJdbcDao implements TeamDao {
     }
 
     @Override
-    public List<Team> getUserTeamsBySizeNotInTournament(Long userId, Long tournamentId, Integer minSize) {
-        final int required = (minSize == null ? 1 : minSize);
+    public List<Team> getUserTeamsBySizeNotInTournament(Long userId, Long tournamentId, Long minSize) {
+        final long required = (minSize == null ? 1 : minSize);
         String sql = """
         SELECT t.*
         FROM team t

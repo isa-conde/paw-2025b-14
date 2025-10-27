@@ -317,28 +317,30 @@ public class ParticipantHibernateDao implements ParticipantDao{
     }
 
     @Override
-    public void sumPoints(Long tournamentId, Long userId, Integer points, Integer teamSize) {
+    public void sumPoints(Long tournamentId, Long userId, Integer points, Integer scoreDifference, Integer teamSize) {
         String jpql;
 
         if (teamSize != null && teamSize > 1) {
             jpql = """
             UPDATE Participant p
-            SET p.points = p.points + :points
-            WHERE p.team.id = :id
+            SET p.points = p.points + :points , p.score_difference = p.score_difference + :scoreDifference
+            WHERE p.id = :id
               AND p.tournament.id = :tournamentId
               AND p.user IS NULL
         """;
         } else {
             jpql = """
             UPDATE Participant p
-            SET p.points = p.points + :points
-            WHERE p.user.id = :id
+            SET p.points = p.points + :points , p.score_difference = p.score_difference + :scoreDifference
+            WHERE p.id = :id
               AND p.tournament.id = :tournamentId
+              AND p.team IS NULL
         """;
         }
 
         em.createQuery(jpql)
                 .setParameter("points", points)
+                .setParameter("scoreDifference", scoreDifference)
                 .setParameter("id", userId)
                 .setParameter("tournamentId", tournamentId)
                 .executeUpdate();

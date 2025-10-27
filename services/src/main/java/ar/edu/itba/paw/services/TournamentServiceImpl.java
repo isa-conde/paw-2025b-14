@@ -260,11 +260,11 @@ public class TournamentServiceImpl implements TournamentService {
         LOGGER.info("Matches for tournament with ID {} of {} format have successfully been created", t.getId(), t.getStructure());
     }
 
-    public void createMatchesLeague(Tournament t, List<Participant> participants) {
+    private void createMatchesLeague(Tournament t, List<Participant> participants) {
         createMatchesLeague(t, participants, 1L, 1, null);
     }
 
-    public void createMatchesLeague(Tournament t, List<Participant> participants, Long firstMatchId, Integer firstStage, Boolean isGroupStage) {
+    private void createMatchesLeague(Tournament t, List<Participant> participants, Long firstMatchId, Integer firstStage, Boolean isGroupStage) {
         int n = participants.size();
 
         if (n % 2 != 0) {
@@ -397,7 +397,7 @@ public class TournamentServiceImpl implements TournamentService {
                 createMatchesLeague(t, topPositions.get(1), lastMatchId + 1, matchDao.getTournamentGroupMaxStage(tournamentId, i) + 1, true);
                 return;
             }else if(topPositions.get(2).size() > 1){
-                participantDao.sumPoints(tournamentId, topPositions.get(1).getFirst().getId(), 3 * (topPositions.get(2).size() / 2), getPlayersPerTeam(tournamentId));
+                participantDao.sumPoints(tournamentId, topPositions.get(1).getFirst().getId(), 3 * (topPositions.get(2).size() / 2), 0, getPlayersPerTeam(tournamentId));
                 createMatchesLeague(t, topPositions.get(2), lastMatchId + 1, matchDao.getTournamentGroupMaxStage(tournamentId, i) + 1, true);
                 return;
             }
@@ -477,6 +477,16 @@ public class TournamentServiceImpl implements TournamentService {
         return 1;
     }
 
+    @Override
+    public List<Tournament> getUserWonTournament(Long userId, Long page) {
+        return tournamentDao.getUserWonTournament(userId, page);
+    }
+
+    @Override
+    public Integer getUserWonTournamentPages(Long userId) {
+        return tournamentDao.getUserWonTournamentPages(userId);
+    }
+
 
     @Override
     public List<Tournament> getCreatedAndFinishedTournaments(Long userId, Long page) {
@@ -487,5 +497,6 @@ public class TournamentServiceImpl implements TournamentService {
     public List<Tournament> getCreatedAndOngoingTournaments(Long userId, Long page) {
         return findByCreator(userId, page, false);
     }
+
 
 }

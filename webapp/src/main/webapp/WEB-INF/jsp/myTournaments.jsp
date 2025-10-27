@@ -43,6 +43,7 @@
     <c:set var="navbarLabels" value="${[activeLabel, finishedLabel, ownedLabel]}"/>
     <c:set var="activeSection" value="${param.section != null ? param.section : 'active'}"/>
 
+    <paw:profile-navbar user="${profile}" activeSection="tournaments"/>
     <paw:navbar sections="${navbarSections}" labels="${navbarLabels}" activeSection="${activeSection}"/>
 
     <div class="content-container">
@@ -60,6 +61,11 @@
                 </div>
                 <paw:elements-grid elements="${pastTournaments}" id="finished-${profile.id}"/>
                 <paw:pagination currentPage="${currentPage1}" totalPages="${totalPages1}" url="/profile/${profile.id}/tournaments" pageNumber="1"/>
+                <div class="grid-title">
+                    <paw:text type="title"><spring:message code="tournaments.finished.won"/></paw:text>
+                </div>
+                <paw:elements-grid elements="${wonTournaments}" id="won-${profile.id}"/>
+                <paw:pagination currentPage="${currentPage2}" totalPages="${totalPages2}" url="/profile/${profile.id}/tournaments" pageNumber="2"/>
             </c:when>
             <c:when test="${activeSection == 'owned'}">
                 <div class="grid-title">
