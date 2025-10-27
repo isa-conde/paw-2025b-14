@@ -1,8 +1,7 @@
 package ar.edu.itba.paw.interfaces.services;
 
-import ar.edu.itba.paw.model.Game;
-import ar.edu.itba.paw.model.GameFormat;
-import ar.edu.itba.paw.model.GameImg;
+import ar.edu.itba.paw.model.Game.Game;
+import ar.edu.itba.paw.model.Game.GameFormat;
 import ar.edu.itba.paw.model.enums.Genre;
 
 import java.util.List;
@@ -11,8 +10,6 @@ import java.util.Optional;
 public interface GameService {
 
     public Optional<Game> findById(long id);
-
-    Optional<Game> findByName(String name);
 
     public List<Game> searchByName(String name);
 
@@ -24,6 +21,13 @@ public interface GameService {
 
     public Game createWithFormats(String name, Genre genre, List<GameFormat> formats, byte[] image);
 
-    public List<GameImg> findAllWithImg();
+    public List<GameFormat> getFormats(Long gameId);
 
+    List<Game> getFavourites(Long user_id);
+
+    List<Game> findAllPaged(Long page);
+
+    Long getPageAmount();
+
+    Optional<GameFormat> getFormatById(Long id);
 }

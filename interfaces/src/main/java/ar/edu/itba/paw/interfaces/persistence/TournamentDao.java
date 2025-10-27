@@ -1,52 +1,69 @@
 package ar.edu.itba.paw.interfaces.persistence;
 
-import ar.edu.itba.paw.model.TournamentImg;
-import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
-import ar.edu.itba.paw.model.Match;
-import ar.edu.itba.paw.model.Pair;
-import ar.edu.itba.paw.model.Tournament;
+import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface TournamentDao {
 
-    public Optional<Tournament> findById(Long id);
+    Optional<Tournament> findById(Long id);
 
-    public List<Tournament> findTournaments(TournamentFilter tournamentFilter);
+    List<Tournament> findTournaments(TournamentFilter tournamentFilter, Long page);
 
-    public List<Tournament> findGameTournaments(Long game_id);
+    Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Long image_id, Boolean openInscriptions, Boolean isFinished, Long format_id);
 
-    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, byte[] image_id, Boolean open_inscriptions, Boolean is_finished);
+    Structure getTournamentStructure(Long tournament_id);
 
-    public void joinTournamentUser(Long user_id, Long tournament_id);
+    List<Tournament> findByCreator(Long creator_id, Long page, Boolean isFinished);
 
-    //public void joinTournamentTeam(Long team_id, Long tournament_id);
+    void setFinished(Long tournament_id);
 
-    public List<User> getTournamentParticipants(Long tournament_id);
-    
-    public void createMatches(Long tournament_id);
-    
-    public Optional<Structure> getTournamentStructure(Long tournament_id);
-    
-    public void loadScores(Long match_id, Long tournament_id, Integer local_score, Integer visitor_score);
-    
-    public List<Match> getTournamentMatches(Long tournament_id);
-    
-    public List<TournamentImg> findWithImg(TournamentFilter tournamentFilter);
+    List<Tournament> findUserActiveTournaments(Long userId, Long page);
 
-    public Optional<TournamentImg> findByIdWithImg(Long id);
+    List<Tournament> findUserPastTournaments(Long userId, Long page);
 
-    public List<TournamentImg> findByCreatorImg(Long creator_id);
+    void closeInscriptions(Long tournament_id);
 
-    public void setFinished(Long tournament_id);
+    List<Tournament> searchByName(String name);
 
-    public List<Pair<String,String>> getGenericMatches(Long tournament_id);
-    
-    public List<Pair<String,String>> getMatches(Long tournament_id);
-}
+    void startTournament(Long tournament_id);
+
+    Map<Long,List<Tournament>> getUnfilteredTournamentPages(Long page);
+
+    Integer getPageAmount(Integer pageSize, TournamentFilter tf);
+
+    void updateTournamentInfo(Long tournament_id, String name, LocalDate start_date, LocalDate end_date, Integer max_participants);
+
+    int getTournamentParticipantsCount(Long tournamentId);
+
+    void setIsGroupStage(Long tournamentId, Boolean bool);
+
+    Boolean getIsGroupStage(Long tournamentId);
+
+    void setTournamentWinner(Long tournament_id, Long winner_id);
+
+    Boolean isTournamentStarted(Long tournament_id);
+
+    void updateAllStartDates();
+
+    void updateAllEndDates();
+
+    boolean isClosed(Long tournamentId);
+
+    public Integer getUserPastTournamentsPages(Long userId);
+
+    public Integer getUserActiveTournamentsPages(Long userId);
+
+    public Integer getCreatedAndOngoingTournamentsPages(Long userId);
+
+    public Integer getCreatedAndFinishedTournamentsPages(Long userId);
+
+
+    }

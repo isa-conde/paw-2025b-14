@@ -11,20 +11,20 @@
 <%@ attribute name="isGame" required="false" rtexprvalue="true" %>
 
 <c:set var="hasDate" value="${not empty start_date && not empty end_date}"/>
-<c:set var="url" value="${pageContext.request.contextPath}/${isGame == 'true' ? 'game?game_id=' : 'tournament?tournamentId='}${id}"/>
+<c:set var="url" value="${pageContext.request.contextPath}/${isGame == 'true' ? 'tournamentsPage?game_id=' : 'tournament?tournamentId='}${id}"/>
 
 <a href="${url}" class="element-card">
     <img src="${image}" alt="Background" class="element-card-image">
     <div class="element-card-content game">
-        <paw:text type="title" size="xs"><c:out value="${game}"/></paw:text>
+        <paw:text type="title" size="xs" stroke="true"><c:out value="${game}"/></paw:text>
     </div>
     <div class="element-card-content">
-        <paw:text type="title" size="s"><c:out value="${title}"/></paw:text>
+        <paw:text type="title" size="s" stroke="true"><c:out value="${title}"/></paw:text>
         <c:if test="${hasDate}">
-            <div class="date-container">
-                <paw:datetime date="${start_date}" size="s" weight="thin"/>
-                <paw:text size="s" weight="thin"> - </paw:text>
-                <paw:datetime date="${end_date}" size="s" weight="thin"/>
+            <div class="element-card-date">
+                <paw:datetime date="${start_date}" size="s" weight="semi-bold"/>
+                <paw:text size="s" weight="semi-bold"> - </paw:text>
+                <paw:datetime date="${end_date}" size="s" weight="semi-bold"/>
             </div>
         </c:if>
     </div>

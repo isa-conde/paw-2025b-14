@@ -1,33 +1,52 @@
 <%@ taglib prefix="c"   uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ attribute name="user" required="true" type="ar.edu.itba.paw.model.User" %>
+<%@ attribute name="function" required="false" type="java.lang.String" %>
+<%@ attribute name="pageTitle" required="false" %>
 
 <c:set var="isLoggedIn" value="${user != null}"/>
+
+<c:url value="/register" var="registerUrl"/>
+<c:url value="/login" var="loginUrl"/>
 <c:url value="/logout" var="logoutUrl"/>
 
 <html>
     <head>
         <link rel="stylesheet" href="<c:url value='/css/components.css'/>">
-        <title></title>
+        <link rel="icon" type="image/x-icon" href="<c:url value="/public/favicon.ico"/>">
+        <title>
+            <c:choose>
+                <c:when test="${not empty pageTitle}">RankUp - <c:out value="${pageTitle}"/></c:when>
+                <c:otherwise>RankUp</c:otherwise>
+            </c:choose>
+        </title>
     </head>
-    <body>
+    <c:choose>
+        <c:when test="${function != null}">
+            <body onload="openModal(${function})">
+        </c:when>
+        <c:otherwise>
+            <body>
+        </c:otherwise>
+    </c:choose>
         <div class="container">
-            <paw:sidebar/>
+            <paw:sidebar user="${user}"/>
             <paw:header>
+                <paw:searchBar/>
                 <c:choose>
                     <c:when test="${isLoggedIn}">
-                        <paw:profileButton text="${user.username}" onclick="openModal('logoutModal')"/>
-                        <paw:modal id="logoutModal" title="Logout">
-                            <div class="row center">
-                                <paw:button text="Log out" onclick="window.location.href='${logoutUrl}'"/>
-                            </div>
-                        </paw:modal>
+                        <div class="header-buttons">
+                            <c:url value="/profile/${user.id}" var="profileurl"/>
+                            <paw:profileButton text="${user.username}" imageId="${user.pfp_id}" onclick="window.location.href='${profileurl}'" isNotSafe="true" size="m"/>
+                            <paw:logoutButton/>
+                        </div>
                     </c:when>
                     <c:otherwise>
                         <div>
-                            <paw:button text="Log in" size="m" onclick="openModal('loginModal')"/>
-                            <paw:button text="Register" size="m" onclick="openModal('registerModal')"/>
+                            <paw:button text="layout.login" size="m" onclick="window.location.href='${loginUrl}'"/>
+                            <paw:button text="layout.register" size="m" onclick="window.location.href='${registerUrl}'"/>
                         </div>
                     </c:otherwise>
                 </c:choose>

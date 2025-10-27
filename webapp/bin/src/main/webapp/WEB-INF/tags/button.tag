@@ -18,7 +18,7 @@
         onclick="${onclick}"
         <c:if test="${isDisabled}">disabled</c:if>>
     <c:if test="${hasImage}">
-        <img class="button-image ${btnSize}" src="${image}" alt="Profile Picture">
+        <img class="button-image ${btnSize}" src="${image}" alt="Button Picture">
     </c:if>
     <paw:text size="${btnSize}"><c:out value="${text}"/></paw:text>
 </button>

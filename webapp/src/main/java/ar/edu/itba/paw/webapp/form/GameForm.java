@@ -1,6 +1,6 @@
 package ar.edu.itba.paw.webapp.form;
 
-import ar.edu.itba.paw.model.GameFormat;
+import ar.edu.itba.paw.model.Game.GameFormat;
 import ar.edu.itba.paw.model.enums.Genre;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,9 +19,9 @@ public class GameForm {
     private Genre genre;
 
     private List<GameFormat> formats = new ArrayList<>(Arrays.asList(
-            new GameFormat(null, null, null, null),
-            new GameFormat(null, null, null, null),
-            new GameFormat(null, null, null, null)
+            new GameFormat(null, null, null),
+            new GameFormat(null, null, null),
+            new GameFormat(null, null, null)
     ));
 
     private MultipartFile image;

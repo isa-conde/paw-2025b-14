@@ -1,29 +1,44 @@
 <%@ tag language="java" pageEncoding="UTF-8" %>
-<%@ attribute name="elements" required="false" type="java.util.List" %>
-<%@ attribute name="isGame" required="false" rtexprvalue="true" description="game or [tournament] carrousel" %>
-<%@ attribute name="id" required="true" rtexprvalue="true" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
+<%@ attribute name="elements" required="true" type="java.util.List" %>
+<%@ attribute name="isGame" required="false" rtexprvalue="true" description="game or [tournament] carrousel" %>
+<%@ attribute name="isUserProfile" type="java.lang.Boolean" required="false" %>
+<%@ attribute name="isTeamProfile" type="java.lang.Boolean" required="false" %>
+<%@ attribute name="id" required="true" rtexprvalue="true" %>
 
 <c:set var="isGame" value="${not empty isGame? isGame : false}"/>
+<c:set var="isUserProfile" value="${not empty isUserProfile? isUserProfile : false}"/>
+<c:set var="isTeamProfile" value="${not empty isTeamProfile? isTeamProfile : false}"/>
+
 
 <div class="carrousel-container">
     <button class="carrousel-arrow carrousel-arrow-left" onclick="moveCarrousel('${id}', -1)">
         <img src="${pageContext.request.contextPath}/images/arrow.png" alt="Previous" class="arrow-icon arrow-left">
     </button>
-    
+
     <div class="carrousel" id="${id}">
         <div class="carrousel-track">
             <c:forEach var="e" items="${elements}" varStatus="status">
-                <div class="carrousel-item">
-                    <paw:element-card 
-                        image="data:image/png;base64,${e.base64Img}"
-                        title="${isGame? e.game.name : e.tournament.name}"
-                        start_date="${isGame? '' : e.tournament.start_date}"
-                        end_date="${isGame? '' : e.tournament.end_date}"
-                        id="${isGame? e.game.id : e.tournament.id}"
-                        isGame="${isGame}"/>
-                </div>
+                <c:choose>
+                        <c:when test="${isUserProfile eq true}">
+                            <paw:profile-card userProfile="${e}" isUser="true"/>
+                        </c:when>
+                        <c:when test="${isTeamProfile eq true}">
+                            <paw:profile-card teamProfile="${e}" isTeam="true"/>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="carrousel-item">
+                            <paw:element-card
+                                    image="${pageContext.request.contextPath}/image/${e.image_id}"
+                                    title="${isGame? e.name : e.name}"
+                                    start_date="${isGame? '' : e.start_date}"
+                                    end_date="${isGame? '' : e.end_date}"
+                                    id="${isGame? e.id : e.id}"
+                                    isGame="${isGame}"/>
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
             </c:forEach>
         </div>
     </div>
@@ -33,35 +48,4 @@
     </button>
 </div>
 
-<script>
-    window.carrouselState = window.carrouselState || {};
-
-    if (!carrouselState['${id}']) {
-        carrouselState['${id}'] = {
-            currentIndex: 0,
-            itemsPerView: 3,
-            totalItems: ${elements.size()}
-        };
-    }
-
-    function moveCarrousel(id, direction) {
-        const state = carrouselState[id];
-        const maxIndex = state.totalItems;
-
-        state.currentIndex += (direction * state.itemsPerView);
-        state.currentIndex = (maxIndex + state.currentIndex) % maxIndex;
-        while(state.currentIndex % state.itemsPerView !== 0){
-            state.currentIndex -= direction;
-        }
-
-        const carrousel = document.getElementById(id);
-        const track = carrousel.querySelector('.carrousel-track');
-
-        const itemWidth = 380;
-        const gapWidth = 20;
-
-        track.style.transition = 'transform 0.3s ease';
-        const translateX = -(state.currentIndex * (itemWidth + gapWidth));
-        track.style.transform = 'translateX(' + translateX + 'px)';
-    }
-</script>
+<script src="${pageContext.request.contextPath}/js/carrousel.js"></script>
