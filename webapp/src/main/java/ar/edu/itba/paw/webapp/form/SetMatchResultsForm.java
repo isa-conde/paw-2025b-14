@@ -2,7 +2,7 @@ package ar.edu.itba.paw.webapp.form;
 
 import javax.validation.constraints.NotNull;
 
-public class SetWinnerForm {
+public class SetMatchResultsForm {
     
     @NotNull
     private Long matchId;
@@ -11,7 +11,10 @@ public class SetWinnerForm {
     private Long tournamentId;
     
     @NotNull
-    private Integer winner; // 1 for local, 2 for visitor
+    private Integer localScore;
+
+    @NotNull
+    private Integer visitorScore;
 
     private Integer group;
     
@@ -32,12 +35,20 @@ public class SetWinnerForm {
         this.tournamentId = tournamentId;
     }
     
-    public Integer getWinner() {
-        return winner;
+    public Integer getLocalScore() {
+        return localScore;
     }
-    
-    public void setWinner(Integer winner) {
-        this.winner = winner;
+
+    public void setLocalScore(Integer localScore) {
+        this.localScore = localScore;
+    }
+
+    public Integer getVisitorScore() {
+        return visitorScore;
+    }
+
+    public void setVisitorScore(Integer visitorScore) {
+        this.visitorScore = visitorScore;
     }
 
     public Integer getGroup() {

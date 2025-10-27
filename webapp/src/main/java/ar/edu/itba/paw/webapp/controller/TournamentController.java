@@ -13,7 +13,7 @@ import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.webapp.auth.PawUserDetails;
 import ar.edu.itba.paw.webapp.form.EditTournamentForm;
 import ar.edu.itba.paw.webapp.form.GameForm;
-import ar.edu.itba.paw.webapp.form.SetWinnerForm;
+import ar.edu.itba.paw.webapp.form.SetMatchResultsForm;
 import ar.edu.itba.paw.webapp.form.TournamentForm;
 import ar.edu.itba.paw.webapp.form.*;
 import org.springframework.stereotype.Controller;
@@ -68,9 +68,9 @@ public class TournamentController {
         return new GameForm();
     }
 
-    @ModelAttribute("setWinnerForm")
-    public SetWinnerForm getSetWinnerForm() {
-        return new SetWinnerForm();
+    @ModelAttribute("setMatchResultsForm")
+    public SetMatchResultsForm getSetMatchResultsForm() {
+        return new SetMatchResultsForm();
     }
 
     @ModelAttribute("joinTournamentTeamForm")
@@ -82,7 +82,7 @@ public class TournamentController {
     @RequestMapping(value = "/game/create", method = {RequestMethod.GET})
     public ModelAndView createGameForm(@ModelAttribute("gameForm") final GameForm form){
         ModelAndView mav = new ModelAndView("addGame");
-        mav.addObject("genres", Genre.values()); // 🔹 paso el enum a la vista
+        mav.addObject("genres", Genre.values());
         return mav;
     }
 
@@ -298,8 +298,8 @@ public class TournamentController {
     }
 
     @RequestMapping(value = "/tournament/setWinner", method = { RequestMethod.POST })
-    public ModelAndView setWinner(@ModelAttribute("setWinnerForm") SetWinnerForm form, @RequestParam(value = "group", required = false) Integer group) {
-        ms.setMatchWinner(form.getMatchId(), form.getTournamentId(), form.getWinner());
+    public ModelAndView setWinner(@ModelAttribute("setWinnerForm") SetMatchResultsForm form, @RequestParam(value = "group", required = false) Integer group) {
+        ms.setMatchResults(form.getMatchId(), form.getTournamentId(), form.getLocalScore(), form.getVisitorScore());
         String redirect = UriComponentsBuilder.fromPath("/tournament")
                 .queryParam("tournamentId", form.getTournamentId())
                 .queryParam("section", "matchesTab")

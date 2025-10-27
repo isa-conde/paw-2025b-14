@@ -6,7 +6,7 @@ import java.util.*;
 
 public interface MatchService {
 
-    void setMatchWinner(Long matchId, Long tournamentId, Integer winner);
+    void setMatchResults(Long matchId, Long tournamentId, Integer localScore, Integer visitorScore);
 
     void swapMatchesMembers(Long tournament_id, Long match1, Long match2, Long user1, Long user2);
 

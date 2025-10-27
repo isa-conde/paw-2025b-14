@@ -13,6 +13,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,14 +66,17 @@ public class MatchHibernateDao implements MatchDao {
     }
 
     @Override
-    public void setMatchWinner(Long matchId, Long tournamentId, Integer winner) {
+    public void setMatchResults(Long matchId, Long tournamentId, Integer localScore, Integer visitorScore, Integer winner, LocalDate date) {
         MatchId id = new MatchId(matchId, tournamentId);
         Match match = em.find(Match.class, id);
         if (match == null) {
             LOGGER.warn("Match not found for tournamentId={} matchId={}", tournamentId, matchId);
             return;
         }
+        match.setLocalScore(localScore);
+        match.setVisitorScore(visitorScore);
         match.setWinner(winner);
+        match.setDate(date);
     }
 
     @Override

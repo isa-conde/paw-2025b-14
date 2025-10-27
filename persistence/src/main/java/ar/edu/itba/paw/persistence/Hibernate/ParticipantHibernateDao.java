@@ -25,6 +25,7 @@ public class ParticipantHibernateDao implements ParticipantDao{
         Participant participant = new Participant(em.getReference(Tournament.class, tournament_id));
         participant.setUser(em.getReference(User.class, user_id));
         participant.setPoints(0);
+        participant.setScore_difference(0);
         em.persist(participant);
     }
 
@@ -40,6 +41,8 @@ public class ParticipantHibernateDao implements ParticipantDao{
     public void joinTournamentTeam(Long tournamentId, Long teamId) {
         Participant participant = new Participant(em.getReference(Tournament.class, tournamentId));
         participant.setTeam(em.getReference(Team.class, teamId));
+        participant.setPoints(0);
+        participant.setScore_difference(0);
         em.persist(participant);
     }
 

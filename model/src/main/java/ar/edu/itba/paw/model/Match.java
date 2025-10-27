@@ -4,6 +4,7 @@ import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.ids.MatchId;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "match")
@@ -39,6 +40,9 @@ public class Match {
 
     @Column(name = "is_group_stage")
     private Boolean isGroupStage;
+
+    @Column(name = "date")
+    private LocalDate date;
 
     public Match() {}
 
@@ -141,6 +145,14 @@ public class Match {
 
     public void setVisitorScore(Integer visitorScore) {
         this.visitorScore = visitorScore;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
     }
 }
 
