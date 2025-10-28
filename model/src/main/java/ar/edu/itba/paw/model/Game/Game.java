@@ -23,7 +23,7 @@ public class Game {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "genre", columnDefinition = "genre_enum")
-    @ColumnTransformer(read = "genre::text", write = "?::genre_enum")
+//    @ColumnTransformer(read = "genre::text", write = "?::genre_enum")
     private Genre genre;
 
     @Column(name = "image_id")
