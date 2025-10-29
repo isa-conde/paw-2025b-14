@@ -31,7 +31,7 @@ public class GameHibernateDao implements GameDao {
 
     @Override
     public List<Game> searchByName(String name) {
-        TypedQuery<Game> query = em.createQuery("SELECT g FROM Game g WHERE g.name LIKE CONCAT('%', LOWER(:name), '%')", Game.class);
+        TypedQuery<Game> query = em.createQuery("SELECT g FROM Game g WHERE LOWER(g.name) LIKE CONCAT('%', LOWER(:name), '%')", Game.class);
         query.setParameter("name", name);
         return query.getResultList();
     }

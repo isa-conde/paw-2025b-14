@@ -215,7 +215,7 @@ public class TournamentHibernateDao implements TournamentDao {
 
     @Override
     public List<Tournament> searchByName(String name) {
-        TypedQuery<Tournament> query = em.createQuery("SELECT t FROM Tournament t WHERE t.name LIKE CONCAT('%', LOWER(:name), '%')", Tournament.class);
+        TypedQuery<Tournament> query = em.createQuery("SELECT t FROM Tournament t WHERE LOWER(t.name) LIKE CONCAT('%', LOWER(:name), '%')", Tournament.class);
         query.setParameter("name", name);
         return query.getResultList();
     }
