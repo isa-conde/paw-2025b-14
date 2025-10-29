@@ -256,7 +256,7 @@ public class UserServiceImpl implements UserService {
         User user = findById(userId).get();
         Float userRating = user.getRating();
         if(userRating == null) {
-            return 0;
+            return null;
         }
         return Math.round(userRating);
     }

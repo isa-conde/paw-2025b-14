@@ -150,6 +150,7 @@ public class UserController {
             throw new UserNotFoundException();
         }
         User profile = profileOpt.get();
+        Integer userRating = us.getUserRatingAsInteger(profile.getId());
         mav.addObject("user", currentUser.isPresent() ? currentUser.get().getPawUser() : null);
         mav.addObject("isMyProfile", profile.getId() == currentUser.get().getPawUser().getId());
         mav.addObject("profile", profileOpt.get());
@@ -158,6 +159,7 @@ public class UserController {
         mav.addObject("lastTournaments", ts.findUserPastTournaments(id, 0L));
         mav.addObject("teams", tms.getUserTeams(id));
         mav.addObject("EditProfileForm", editProfileForm);
+        mav.addObject("userRating", userRating);
 
         editProfileForm.setUsername(profileOpt.get().getUsername());
         editProfileForm.setBio(profileOpt.get().getBio());

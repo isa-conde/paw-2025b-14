@@ -36,6 +36,9 @@ public class Participant {
     @JoinColumn(name = "tournament_id", nullable = false)
     private Tournament tournament;
 
+    @Column(name = "has_rated")
+    private Boolean hasRated;
+
     @Transient
     private String name;
     @Transient
@@ -153,6 +156,14 @@ public class Participant {
 
     public void setScore_difference(Integer score_difference) {
         this.score_difference = score_difference;
+    }
+
+    public Boolean getHasRated() {
+        return hasRated;
+    }
+
+    public void setHasRated(Boolean hasRated) {
+        this.hasRated = hasRated;
     }
 
     @Override

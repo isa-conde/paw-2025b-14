@@ -17,6 +17,8 @@ public interface ParticipantDao {
 
     Boolean hasJoined(Long userId, Long tournamentId);
 
+    Boolean hasRated(Long userId, Long tournamentId);
+
     void leaveTournamentUser(Long user_id, Long tournament_id);
 
     void leaveTournamentTeam(Long team_id, Long tournament_id);
@@ -40,4 +42,6 @@ public interface ParticipantDao {
     void sumPoints(Long tournamentId, Long userId, Integer points, Integer scoreDifference, Integer teamSize);
 
     List<Participant> getTournamentParticipantTeams(Long tournament_id);
+
+    void updateHasRated(Long userId, Long tournamentId);
 }

@@ -29,10 +29,10 @@
                 <c:set var="cornerModal" value="contactOwnerModal"/>
                 <c:set var="cornerText" value="tournament.contactOwner.buttonLabel"/>
             </c:when>
-            <c:otherwise>
+            <c:when test="${!hasRankedTournament}">
                 <c:set var="cornerModal" value="rateTournamentModal"/>
                 <c:set var="cornerText" value="tournament.ratings.buttonLabel"/>
-            </c:otherwise>
+            </c:when>
         </c:choose>
     </c:when>
 </c:choose>
@@ -55,9 +55,11 @@
             <paw:text size="s"><spring:message code="tournament.organizedBy"/></paw:text>
             <c:url value="/profile/${creator.id}" var="profileurl"/>
             <paw:profileButton imageId="${creator.pfp_id}" text="${creator.username}" onclick="window.location.href='${profileurl}'" size="xs" isNotSafe="true"/>
-            <div class="star-rating__container">
-                <paw:star-rating name="demonstrativeRating" size="sm" disabled="true" value="${creatorRating}"/>
-            </div>
+            <c:if test="${creatorRating != null}">
+                <div class="star-rating__container">
+                    <paw:star-rating name="demonstrativeRating" size="sm" disabled="true" value="${creatorRating}"/>
+                </div>
+            </c:if>
         </div>
     </paw:banner>
     <spring:message code="tournament.overview" var="overview"/>
@@ -411,9 +413,6 @@
             <input type="hidden" name="tournamentId" value="${tournament.id}"/>
             <div class="row center">
                 <paw:star-rating path="rating" required="true"/>
-            </div>
-            <div class="row">
-                <paw:input inputType="textarea" path="feedback" label="tournament.ratings.feedback" hasConstraint="true"/>
             </div>
             <div class="row center">
                 <paw:input path="" label="tournament.ratings.rate" containerType="half" inputType="submit"/>

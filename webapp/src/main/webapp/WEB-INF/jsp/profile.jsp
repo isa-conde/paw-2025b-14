@@ -21,6 +21,9 @@
                 <paw:text size="xl"><c:out value="${profile.username}"/></paw:text>
                 <paw:text size="m"><c:out value="${profile.bio}"/></paw:text>
             </div>
+            <div class="star-rating__container">
+
+            </div>
         </div>
     </paw:banner>
     <paw:profile-navbar user="${profile}" activeSection="overview"/>

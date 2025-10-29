@@ -97,6 +97,24 @@ public class ParticipantHibernateDao implements ParticipantDao{
     }
 
     @Override
+    public Boolean hasRated(Long userId, Long tournamentId) {
+        String jpql = """
+        SELECT COUNT(p)
+        FROM Participant p
+        WHERE p.user.id = :userId
+          AND p.tournament.id = :tournamentId
+          AND p.hasRated = true
+    """;
+
+        Long count = em.createQuery(jpql, Long.class)
+                .setParameter("userId", userId)
+                .setParameter("tournamentId", tournamentId)
+                .getSingleResult();
+
+        return count != null && count > 0;
+    }
+
+    @Override
     public void leaveTournamentUser(Long user_id, Long tournament_id) {
         String jpql = """
         DELETE FROM Participant p
@@ -377,6 +395,21 @@ public class ParticipantHibernateDao implements ParticipantDao{
 
         fillParticipantTransientFields(toReturn);
         return toReturn;
+    }
+
+    @Override
+    public void updateHasRated(Long userId, Long tournamentId) {
+        String jpql = """
+        UPDATE Participant p
+        SET p.hasRated = true
+        WHERE p.user.id = :userId
+        AND p.tournament.id = :tournamentId
+    """;
+
+        em.createQuery(jpql)
+                .setParameter("userId", userId)
+                .setParameter("tournamentId", tournamentId)
+                .executeUpdate();
     }
 
     private void fillParticipantTransientFields(List<Participant> participants) {

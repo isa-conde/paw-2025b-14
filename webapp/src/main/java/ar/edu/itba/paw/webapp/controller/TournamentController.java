@@ -213,6 +213,7 @@ public class TournamentController {
             Optional<User> optionalUser = us.findById(t.getCreator_id());
             Boolean isIndividualTournament = optionalGameFormat.isEmpty() || optionalGameFormat.get().getPlayers_per_team() == 1;
             Boolean isParticipant = user != null && ps.hasJoined(user.getId(), tournamentId);
+            Boolean hasRankedTournament = user != null && ps.participantHasRatedTournament(user.getId(), tournamentId);
             Integer creatorRating = us.getUserRatingAsInteger(t.getCreator_id());
             if (user != null && !isIndividualTournament && !isParticipant){
                 mav.addObject("userTeams", tms.getUserTeamsBySizeNotInTournament(user.getId(), tournamentId));
@@ -235,6 +236,7 @@ public class TournamentController {
             mav.addObject("editTournamentForm", editTournamentForm);
             mav.addObject("joinTeamForm", joinTournamentTeamForm);
             mav.addObject("creatorRating", creatorRating);
+            mav.addObject("hasRankedTournament", hasRankedTournament);
         }
         return mav;
     }
@@ -445,7 +447,7 @@ public class TournamentController {
             return mav;
         }
         ts.updateTouramentRating(rateTournamentForm.getTournamentId(), rateTournamentForm.getRating());
-        us.updateUserRating(rateTournamentForm.getCreatorId(), rateTournamentForm.getRating());
+        ps.updateCreatorRating(rateTournamentForm.getTournamentId(), rateTournamentForm.getCreatorId(), currentUser.get().getPawUser().getId(), rateTournamentForm.getRating());
         return new ModelAndView("redirect:/tournament?tournamentId=" + rateTournamentForm.getTournamentId());
     }
 }
