@@ -382,8 +382,8 @@
                    cssClass="form">
             <input type="hidden" name="creatorId" value="${creator.id}"/>
             <input type="hidden" name="tournamentId" value="${tournament.id}"/>
-            <div class="row">
-                <paw:input inputType="decimalNumber" path="rating" label="tournament.ratings.rating" hasConstraint="true"/>
+            <div class="row center">
+                <paw:star-rating path="rating" required="true"/>
             </div>
             <div class="row">
                 <paw:input inputType="textarea" path="feedback" label="tournament.ratings.feedback" hasConstraint="true"/>

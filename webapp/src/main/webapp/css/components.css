@@ -1692,3 +1692,78 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     border-radius: 15px;
     margin: 20px 0;
 }
+
+/* ------- STAR RATING ------- */
+
+.star-rating {
+    --star-size: 32px;
+    --star-gap: 6px;
+    display: inline-flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    gap: var(--star-gap);
+}
+
+.star-rating__input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    border: 0;
+}
+
+.star-rating__label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--star-size);
+    height: var(--star-size);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.star-rating__label::before {
+    content: "";
+    display: block;
+    width: var(--star-size);
+    height: var(--star-size);
+    background-image: url('../images/roundedStarOff.png');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.star-rating__input:checked + .star-rating__label::before,
+.star-rating__input:checked ~ .star-rating__label::before {
+    background-image: url('../images/roundedStarOn.png');
+}
+
+.star-rating__input:focus-visible + .star-rating__label {
+    outline: 3px solid var(--primary-button);
+    outline-offset: 3px;
+    border-radius: 50%;
+}
+
+.star-rating--disabled .star-rating__label {
+    cursor: default;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    border: 0;
+    white-space: nowrap;
+}
