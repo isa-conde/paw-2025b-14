@@ -10,7 +10,10 @@
 <%@ attribute name="disabled" required="false" type="java.lang.Boolean" %>
 <%@ attribute name="required" required="false" type="java.lang.Boolean" %>
 <%@ attribute name="idPrefix" required="false" %>
+<%@ attribute name="size" required="false" %>
 
+
+<c:set var="sizeClass" value="${size == 'sm' ? 'star-rating--sm' : ''}" />
 <c:set var="maxStars" value="${empty max ? 5 : max}" />
 <c:set var="ratingValue" value="${empty value ? 0 : value}" />
 <c:set var="inputName" value="${not empty name ? name : path}" />
@@ -25,9 +28,9 @@
 <c:set var="isDisabled" value="${disabled == true}" />
 <c:set var="isRequired" value="${required == true}" />
 
-<div class="star-rating ${isDisabled ? 'star-rating--disabled' : ''}" role="radiogroup">
+<div class="star-rating ${sizeClass} ${isDisabled ? 'star-rating--disabled' : ''}" role="radiogroup">
     <c:forEach var="starValue" begin="1" end="${maxStars}" varStatus="loop">
-        <c:set var="currentValue" value="${maxStars - loop.index}" />
+        <c:set var="currentValue" value="${maxStars - loop.count + 1}" />
         <c:set var="inputId" value="${sanitizedIdBase}-${currentValue}" />
         <input
                 type="radio"
@@ -39,6 +42,6 @@
                 <c:if test="${isDisabled}">disabled</c:if>
                 <c:if test="${isRequired and currentValue == 1}">required</c:if>
         />
-        <label for="${inputId}"></label>
+        <label class="star-rating__label" for="${inputId}"></label>
     </c:forEach>
 </div>

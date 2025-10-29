@@ -1698,10 +1698,30 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .star-rating {
     --star-size: 32px;
     --star-gap: 6px;
+    --star-highlight-color: color-mix(in srgb, var(--background, var(--background)) 50%, var(--primary-text) 50%);
+    --star-container-padding-block: 8px;
+    --star-container-padding-inline: 14px;
+    --star-container-radius: 15px;
+    --star-container-background: var(--primary-button);
     display: inline-flex;
     flex-direction: row-reverse;
     align-items: center;
     gap: var(--star-gap);
+}
+
+.star-rating__container {
+    padding: var(--star-container-padding-block, 8px) var(--star-container-padding-inline, 14px);
+    border-radius: var(--star-container-radius, 15px);
+    background-color: var(--star-container-background, var(--primary-button));
+    display: inline-flex;
+}
+
+.star-rating--sm {
+    --star-size: 22px;
+    --star-gap: 4px;
+    --star-container-padding-block: 6px;
+    --star-container-padding-inline: 10px;
+    --star-container-radius: 12px;
 }
 
 .star-rating__input {
@@ -1723,6 +1743,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     width: var(--star-size);
     height: var(--star-size);
     cursor: pointer;
+    position: relative;
     transition: transform 0.2s ease;
 }
 
@@ -1738,9 +1759,26 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     transition: transform 0.2s ease, filter 0.2s ease;
 }
 
+.star-rating__label::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: var(--star-highlight-color, #737F86);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    mask: url('../images/roundedStarOn.png') center / contain no-repeat;
+    -webkit-mask: url('../images/roundedStarOn.png') center / contain no-repeat;
+}
+
 .star-rating__input:checked + .star-rating__label::before,
 .star-rating__input:checked ~ .star-rating__label::before {
     background-image: url('../images/roundedStarOn.png');
+}
+
+.star-rating:not(.star-rating--disabled) .star-rating__label:hover::after,
+.star-rating:not(.star-rating--disabled) .star-rating__label:hover ~ .star-rating__label::after {
+    opacity: 0.65;
 }
 
 .star-rating__input:focus-visible + .star-rating__label {

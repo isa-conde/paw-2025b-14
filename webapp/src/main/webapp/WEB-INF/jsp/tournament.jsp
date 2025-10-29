@@ -55,6 +55,9 @@
             <paw:text size="s"><spring:message code="tournament.organizedBy"/></paw:text>
             <c:url value="/profile/${creator.id}" var="profileurl"/>
             <paw:profileButton imageId="${creator.pfp_id}" text="${creator.username}" onclick="window.location.href='${profileurl}'" size="xs" isNotSafe="true"/>
+            <div class="star-rating__container">
+                <paw:star-rating size="sm" disabled="true" value="${creatorRating}"/>
+            </div>
         </div>
     </paw:banner>
     <spring:message code="tournament.overview" var="overview"/>
