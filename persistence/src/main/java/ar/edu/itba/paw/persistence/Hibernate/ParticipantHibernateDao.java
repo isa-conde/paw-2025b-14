@@ -248,7 +248,7 @@ public class ParticipantHibernateDao implements ParticipantDao{
     public PointsPair getTournamentMaxPointsPairGroup(Long tournamentId, Integer group) {
         String jpql = "SELECT p.points, p.score_difference " +
                 "FROM Participant p " +
-                "WHERE p.tournament.id = :tournamentId";
+                "WHERE p.tournament.id = :tournamentId AND p.points IS NOT NULL AND p.score_difference IS NOT NULL";
 
         if (group != null) {
             jpql += " AND p.groupNumber = :groupNumber";
@@ -262,7 +262,6 @@ public class ParticipantHibernateDao implements ParticipantDao{
             query.setParameter("groupNumber", group);
         }
 
-        query.setMaxResults(1);
         List<Object[]> results = query.getResultList();
 
         if (results.isEmpty()) {
