@@ -1,7 +1,7 @@
 package ar.edu.itba.paw.persistence.Hibernate;
 
 import ar.edu.itba.paw.interfaces.persistence.MatchDao;
-import ar.edu.itba.paw.model.Match;
+import ar.edu.itba.paw.model.Match.Match;
 import ar.edu.itba.paw.model.Participant;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.ids.MatchId;
@@ -13,7 +13,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -65,14 +65,17 @@ public class MatchHibernateDao implements MatchDao {
     }
 
     @Override
-    public void setMatchWinner(Long matchId, Long tournamentId, Integer winner) {
+    public void setMatchResults(Long matchId, Long tournamentId, Integer localScore, Integer visitorScore, Integer winner, LocalDate date) {
         MatchId id = new MatchId(matchId, tournamentId);
         Match match = em.find(Match.class, id);
         if (match == null) {
             LOGGER.warn("Match not found for tournamentId={} matchId={}", tournamentId, matchId);
             return;
         }
+        match.setLocalScore(localScore);
+        match.setVisitorScore(visitorScore);
         match.setWinner(winner);
+        match.setDate(date);
     }
 
     @Override
@@ -89,7 +92,7 @@ public class MatchHibernateDao implements MatchDao {
 
     @Override
     public Long getMaxMatchId(Long tournamentId) {
-        TypedQuery<Long> query = em.createQuery("SELECT MAX(m.id) FROM Match m WHERE m.tournament = :tournament", Long.class);
+        TypedQuery<Long> query = em.createQuery("SELECT MAX(m.id.id) FROM Match m WHERE m.tournament = :tournament", Long.class);
         query.setParameter("tournament", em.getReference(Tournament.class, tournamentId));
         return query.getSingleResult();
     }

@@ -8,6 +8,7 @@ import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.*;
 import ar.edu.itba.paw.model.Game.GameFormat;
+import ar.edu.itba.paw.model.Match.PointsPair;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
@@ -103,7 +104,7 @@ public class TournamentServiceImpl implements TournamentService {
                     LOGGER.debug("Top positions list for league format is empty");
                 }
                 if (tops.size() > 1) {
-                    createMatchesLeague(t, tops, lastMatchId + 1, matchDao.getTournamentMaxStage(tournament_id) + 1, null);
+                    createMatchesLeague(t, tops, matchDao.getMaxMatchId(tournament_id) + 1, matchDao.getTournamentMaxStage(tournament_id) + 1, null);
                     return;
                 }
                 winner = tops.getFirst().getId();
@@ -148,9 +149,9 @@ public class TournamentServiceImpl implements TournamentService {
 
     private List<Participant> getLeagueTournamentTopPositions(Long tournamentId){
         Optional<Tournament> t = tournamentDao.findById(tournamentId);
-        Integer maxPoints = participantDao.getTournamentMaxPointsGroup(tournamentId, null);
+        PointsPair maxPoints = participantDao.getTournamentMaxPointsPairGroup(tournamentId, null);
         if (maxPoints == null) return java.util.Collections.emptyList();
-        return participantDao.getTournamentParticipantsByPoints(tournamentId, null, maxPoints,  gameFormatDao.getFormatById(t.get().getFormat_id()).get().getPlayers_per_team());
+        return participantDao.getTournamentParticipantsByPointsPair(tournamentId, null, maxPoints,  gameFormatDao.getFormatById(t.get().getFormat_id()).get().getPlayers_per_team());
     }
 
     @Transactional
@@ -392,19 +393,19 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Transactional
     @Override
-    public void createBracketFromGroups(Long tournamentId, Long lastMatchId) { // TODO: error handling here?
+    public void createBracketFromGroups(Long tournamentId) { // TODO: error handling here?
         Integer groups = participantDao.getTournamentGroups(tournamentId);
         Tournament t = findById(tournamentId).orElse(null);
         List<Participant> classified = new ArrayList<>(groups * 2);
         for(int i = 1; i <= groups; i++){
-
             Map<Integer, List<Participant>> topPositions = getGroupTopPositions(tournamentId, i);
+            Long maxMatchId = matchDao.getMaxMatchId(tournamentId);
             if(topPositions.get(1).size() > 1){
-                createMatchesLeague(t, topPositions.get(1), lastMatchId + 1, matchDao.getTournamentGroupMaxStage(tournamentId, i) + 1, true);
+                createMatchesLeague(t, topPositions.get(1), maxMatchId + 1, matchDao.getTournamentGroupMaxStage(tournamentId, i) + 1, true);
                 return;
             }else if(topPositions.get(2).size() > 1){
-                participantDao.sumPoints(tournamentId, topPositions.get(1).getFirst().getId(), 3 * (topPositions.get(2).size() / 2), getPlayersPerTeam(tournamentId));
-                createMatchesLeague(t, topPositions.get(2), lastMatchId + 1, matchDao.getTournamentGroupMaxStage(tournamentId, i) + 1, true);
+                participantDao.sumPoints(tournamentId, topPositions.get(1).getFirst().getId(), 3 * (topPositions.get(2).size() / 2) + 1, 0, getPlayersPerTeam(tournamentId));
+                createMatchesLeague(t, topPositions.get(2), maxMatchId + 1, matchDao.getTournamentGroupMaxStage(tournamentId, i) + 1, true);
                 return;
             }
             if(topPositions.get(1).isEmpty() || topPositions.get(2).isEmpty()){
@@ -433,8 +434,8 @@ public class TournamentServiceImpl implements TournamentService {
         }else{
             teamSize = 1;
         }
-        out.put(1, participantDao.getTournamentParticipantsByPoints(tournament_id, group_number, participantDao.getTournamentMaxPointsGroup(tournament_id, group_number), teamSize));
-        out.put(2, participantDao.getTournamentParticipantsByPoints(tournament_id, group_number, participantDao.getTournamentSecondMaxPointsGroup(tournament_id, group_number), teamSize));
+        out.put(1, participantDao.getTournamentParticipantsByPointsPair(tournament_id, group_number, participantDao.getTournamentMaxPointsPairGroup(tournament_id, group_number), teamSize));
+        out.put(2, participantDao.getTournamentParticipantsByPointsPair(tournament_id, group_number, participantDao.getTournamentSecondMaxPointsPairGroup(tournament_id, group_number), teamSize));
         return out;
     }
 

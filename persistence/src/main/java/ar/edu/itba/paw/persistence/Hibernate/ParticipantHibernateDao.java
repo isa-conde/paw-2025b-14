@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.persistence.Hibernate;
 
 import ar.edu.itba.paw.interfaces.persistence.ParticipantDao;
+import ar.edu.itba.paw.model.Match.PointsPair;
 import ar.edu.itba.paw.model.Participant;
 import ar.edu.itba.paw.model.Team;
 import ar.edu.itba.paw.model.Tournament.Tournament;
@@ -25,6 +26,7 @@ public class ParticipantHibernateDao implements ParticipantDao{
         Participant participant = new Participant(em.getReference(Tournament.class, tournament_id));
         participant.setUser(em.getReference(User.class, user_id));
         participant.setPoints(0);
+        participant.setScore_difference(0);
         em.persist(participant);
     }
 
@@ -40,6 +42,8 @@ public class ParticipantHibernateDao implements ParticipantDao{
     public void joinTournamentTeam(Long tournamentId, Long teamId) {
         Participant participant = new Participant(em.getReference(Tournament.class, tournamentId));
         participant.setTeam(em.getReference(Team.class, teamId));
+        participant.setPoints(0);
+        participant.setScore_difference(0);
         em.persist(participant);
     }
 
@@ -173,24 +177,25 @@ public class ParticipantHibernateDao implements ParticipantDao{
     }
 
     @Override
-    public List<Participant> getTournamentParticipantsByPoints(
-            Long tournamentId, Integer groupNumber, Integer points, Integer teamSize) {
+    public List<Participant> getTournamentParticipantsByPointsPair(
+            Long tournamentId, Integer groupNumber, PointsPair pointsPair, Integer teamSize) {
 
         if (teamSize != null && teamSize > 1) {
-            return getTournamentParticipantsByPointsTeam(tournamentId, groupNumber, points);
+            return getTournamentParticipantsByPointsPairTeam(tournamentId, groupNumber, pointsPair);
         } else {
-            return getTournamentParticipantsByPointsUser(tournamentId, groupNumber, points);
+            return getTournamentParticipantsByPointsPairUser(tournamentId, groupNumber, pointsPair);
         }
     }
 
-    private List<Participant> getTournamentParticipantsByPointsUser(
-            Long tournamentId, Integer groupNumber, Integer points) {
+    private List<Participant> getTournamentParticipantsByPointsPairUser(
+            Long tournamentId, Integer groupNumber, PointsPair pointsPair) {
 
         String jpql = """
         SELECT p FROM Participant p
         JOIN FETCH p.user u
         WHERE p.tournament.id = :tournamentId
           AND p.points = :points
+          AND p.score_difference = :scoreDifference
     """;
 
         if (groupNumber != null) {
@@ -199,7 +204,8 @@ public class ParticipantHibernateDao implements ParticipantDao{
 
         TypedQuery<Participant> query = em.createQuery(jpql, Participant.class);
         query.setParameter("tournamentId", tournamentId);
-        query.setParameter("points", points);
+        query.setParameter("points", pointsPair.getPoints());
+        query.setParameter("scoreDifference", pointsPair.getScoreDifference());
 
         if (groupNumber != null) {
             query.setParameter("groupNumber", groupNumber);
@@ -210,14 +216,15 @@ public class ParticipantHibernateDao implements ParticipantDao{
         return toReturn;
     }
 
-    private List<Participant> getTournamentParticipantsByPointsTeam(
-            Long tournamentId, Integer groupNumber, Integer points) {
+    private List<Participant> getTournamentParticipantsByPointsPairTeam(
+            Long tournamentId, Integer groupNumber, PointsPair pointsPair) {
 
         String jpql = """
         SELECT p FROM Participant p
         JOIN FETCH p.team t
         WHERE p.tournament.id = :tournamentId
           AND p.points = :points
+          AND p.score_difference = :scoreDifference
     """;
 
         if (groupNumber != null) {
@@ -226,7 +233,8 @@ public class ParticipantHibernateDao implements ParticipantDao{
 
         TypedQuery<Participant> query = em.createQuery(jpql, Participant.class);
         query.setParameter("tournamentId", tournamentId);
-        query.setParameter("points", points);
+        query.setParameter("points", pointsPair.getPoints());
+        query.setParameter("scoreDifference", pointsPair.getScoreDifference());
 
         if (groupNumber != null) {
             query.setParameter("groupNumber", groupNumber);
@@ -238,51 +246,70 @@ public class ParticipantHibernateDao implements ParticipantDao{
 
 
     @Override
-    public Integer getTournamentMaxPointsGroup(Long tournamentId, Integer group) {
-        String jpql = "SELECT MAX(p.points) FROM Participant p WHERE p.tournament.id = :tournamentId";
+    public PointsPair getTournamentMaxPointsPairGroup(Long tournamentId, Integer group) {
+        String jpql = "SELECT p.points, p.score_difference " +
+                "FROM Participant p " +
+                "WHERE p.tournament.id = :tournamentId";
 
         if (group != null) {
             jpql += " AND p.groupNumber = :groupNumber";
         }
 
-        TypedQuery<Integer> query = em.createQuery(jpql, Integer.class);
-        query.setParameter("tournamentId", tournamentId);
+        jpql += " ORDER BY p.points DESC, p.score_difference DESC";
 
+        TypedQuery<Object[]> query = em.createQuery(jpql, Object[].class);
+        query.setParameter("tournamentId", tournamentId);
         if (group != null) {
             query.setParameter("groupNumber", group);
         }
 
-        Integer result = query.getSingleResult();
-        return result != null ? result : 0;
+        query.setMaxResults(1);
+        List<Object[]> results = query.getResultList();
+
+        if (results.isEmpty()) {
+            return null;
+        }
+
+        Object[] row = results.get(0);
+        Integer points = row[0] == null ? 0 : ((Number) row[0]).intValue();
+        Integer scoreDiff = row[1] == null ? 0 : ((Number) row[1]).intValue();
+
+        return new PointsPair(points, scoreDiff);
     }
 
 
     @Override
-    public Integer getTournamentSecondMaxPointsGroup(Long tournamentId, Integer group) {
-        Integer maxPoints = getTournamentMaxPointsGroup(tournamentId, group);
-
-        String jpql = """
-        SELECT MAX(p.points)
-        FROM Participant p
-        WHERE p.tournament.id = :tournamentId
-          AND p.points < :maxPoints
-    """;
+    public PointsPair getTournamentSecondMaxPointsPairGroup(Long tournamentId, Integer group) {
+        String jpql = "SELECT p.points, p.score_difference " +
+                "FROM Participant p " +
+                "WHERE p.tournament.id = :tournamentId";
 
         if (group != null) {
             jpql += " AND p.groupNumber = :groupNumber";
         }
 
-        TypedQuery<Integer> query = em.createQuery(jpql, Integer.class);
-        query.setParameter("tournamentId", tournamentId);
-        query.setParameter("maxPoints", maxPoints);
+        jpql += " ORDER BY p.points DESC, p.scoreDifference DESC";
 
+        TypedQuery<Object[]> query = em.createQuery(jpql, Object[].class);
+        query.setParameter("tournamentId", tournamentId);
         if (group != null) {
             query.setParameter("groupNumber", group);
         }
 
-        return query.getSingleResult();
-    }
+        query.setFirstResult(1);
+        query.setMaxResults(1);
 
+        List<Object[]> results = query.getResultList();
+        if (results.isEmpty()) {
+            return new PointsPair(0, 0);
+        }
+
+        Object[] row = results.get(0);
+        Integer points = row[0] == null ? 0 : ((Number) row[0]).intValue();
+        Integer scoreDiff = row[1] == null ? 0 : ((Number) row[1]).intValue();
+
+        return new PointsPair(points, scoreDiff);
+    }
 
     @Override
     public Integer getTournamentGroups(Long tournamentId) {
@@ -314,13 +341,13 @@ public class ParticipantHibernateDao implements ParticipantDao{
     }
 
     @Override
-    public void sumPoints(Long tournamentId, Long userId, Integer points, Integer teamSize) {
+    public void sumPoints(Long tournamentId, Long userId, Integer points, Integer scoreDifference, Integer teamSize) {
         String jpql;
 
         if (teamSize != null && teamSize > 1) {
             jpql = """
             UPDATE Participant p
-            SET p.points = p.points + :points
+            SET p.points = p.points + :points , p.score_difference = p.score_difference + :scoreDifference
             WHERE p.id = :id
               AND p.tournament.id = :tournamentId
               AND p.user IS NULL
@@ -328,7 +355,7 @@ public class ParticipantHibernateDao implements ParticipantDao{
         } else {
             jpql = """
             UPDATE Participant p
-            SET p.points = p.points + :points
+            SET p.points = p.points + :points , p.score_difference = p.score_difference + :scoreDifference
             WHERE p.id = :id
               AND p.tournament.id = :tournamentId
               AND p.team IS NULL
@@ -337,6 +364,7 @@ public class ParticipantHibernateDao implements ParticipantDao{
 
         em.createQuery(jpql)
                 .setParameter("points", points)
+                .setParameter("scoreDifference", scoreDifference)
                 .setParameter("id", userId)
                 .setParameter("tournamentId", tournamentId)
                 .executeUpdate();
@@ -344,7 +372,7 @@ public class ParticipantHibernateDao implements ParticipantDao{
 
     @Override
     public List<Participant> getTournamentParticipantTeams(Long tournament_id) {
-        TypedQuery<Participant> query = em.createQuery("SELECT p FROM Participant p JOIN FETCH p.team t WHERE p.tournament.id = :tournamentId", Participant.class);
+        TypedQuery<Participant> query = em.createQuery("SELECT p FROM Participant p JOIN FETCH p.team t WHERE p.tournament.id = :tournamentId AND p.user IS NULL", Participant.class);
         query.setParameter("tournamentId", tournament_id);
         List<Participant> toReturn = query.getResultList();
 

@@ -1,7 +1,7 @@
 //package ar.edu.itba.paw.persistence.Jdbc;
 //
 //import ar.edu.itba.paw.interfaces.persistence.MatchDao;
-//import ar.edu.itba.paw.model.Match;
+//import ar.edu.itba.paw.model.Match.Match;
 //import ar.edu.itba.paw.model.MatchInfo;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.jdbc.core.JdbcTemplate;

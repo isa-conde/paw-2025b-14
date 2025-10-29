@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.model;
 
+import ar.edu.itba.paw.model.Match.Match;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 
 import javax.persistence.*;
@@ -16,6 +17,9 @@ public class Participant {
 
     @Column(name = "points", nullable = false)
     private Integer points;
+
+    @Column(name = "score_difference")
+    private Integer score_difference;
 
     @Column(name = "group_number")
     private Integer group_number;
@@ -44,10 +48,11 @@ public class Participant {
     private List<Match> visitorMatch;
 
 
-    public Participant(final Long id, final String name, Integer points, Integer group_number, Long pfp_id) {
+    public Participant(final Long id, final String name, Integer points, Integer score_difference, Integer group_number, Long pfp_id) {
         this.id = id;
         this.name = name;
         this.points = points;
+        this.score_difference = score_difference;
         this.group_number = group_number;
         this.pfp_id = pfp_id;
     }
@@ -140,6 +145,14 @@ public class Participant {
 
     public void setVisitorMatch(List<Match> visitorMatch) {
         this.visitorMatch = visitorMatch;
+    }
+
+    public Integer getScore_difference() {
+        return score_difference;
+    }
+
+    public void setScore_difference(Integer score_difference) {
+        this.score_difference = score_difference;
     }
 
     @Override

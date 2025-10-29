@@ -42,7 +42,7 @@ public interface TournamentService {
 
     int getTournamentParticipantsCount(Long tournamentId);
 
-    void createBracketFromGroups(Long tournamentId, Long lastMatchId);
+    void createBracketFromGroups(Long tournamentId);
 
     List<Tournament> getCreatedAndFinishedTournaments(Long userId, Long page);
 
