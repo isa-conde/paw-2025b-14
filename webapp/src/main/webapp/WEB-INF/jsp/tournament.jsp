@@ -36,11 +36,21 @@
     <spring:message code="tournament.overview" var="overview"/>
     <spring:message code="tournament.matches" var="matchesTab"/>
     <spring:message code="tournament.participants.title" var="participantsTab"/>
+    <spring:message code="tournament.rules" var="rulesTab"/>
     <c:set var="showMatches" value="${tournament.tournamentStarted}"/>
+    <c:set var="showRules" value="${not empty tournament.rules}"/>
     <c:choose>
+        <c:when test="${showRules && showMatches}">
+            <c:set var="sections" value="${['overview','matchesTab', 'participantsTab', 'rulesTab']}"/>
+            <c:set var="labels"   value="${[overview, matchesTab, participantsTab, rulesTab]}"/>
+        </c:when>
         <c:when test="${showMatches}">
             <c:set var="sections" value="${['overview','matchesTab', 'participantsTab']}"/>
             <c:set var="labels"   value="${[overview, matchesTab, participantsTab]}"/>
+        </c:when>
+        <c:when test="${showRules}">
+            <c:set var="sections" value="${['overview', 'participantsTab', 'rulesTab']}"/>
+            <c:set var="labels"   value="${[overview, participantsTab, rulesTab]}"/>
         </c:when>
         <c:otherwise>
             <c:set var="sections" value="${['overview', 'participantsTab']}"/>
@@ -302,6 +312,12 @@
                     </div>
                 </c:if>
             </c:when>
+            <c:when test="${activeSection == 'rulesTab'}">
+                <c:url var="rulesUrl" value="/rules/${tournament.rules.id}"/>
+                <div class="rules-card-container">
+                    <paw:button-card title="tournament.rules.title" text="tournament.rules.text" onclick="window.location.href='${rulesUrl}'" butText="tournament.rules.download"/>
+                </div>
+            </c:when>
         </c:choose>
     </div>
     <c:url var="tournamentUrl" value="/tournament">
@@ -319,20 +335,25 @@
                    enctype="multipart/form-data" cssClass="form">
             <input type="hidden" name="tournamentId" value="${tournament.id}"/>
             <div class="row">
-                <paw:input path="name" label="home.createTournament.name" hasConstraint="true"/>
+                <paw:input path="name" label="createTournament.name" hasConstraint="true"/>
             </div>
             <c:if test="${!tournament.finished}">
                 <div class="row">
                     <c:if test="${!tournament.tournamentStarted}">
-                        <paw:input path="start_date" label="home.createTournament.startDate" inputType="date" hasConstraint="true" arg="${playersPerTeam}"/>
+                        <paw:input path="start_date" label="createTournament.startDate" inputType="date" hasConstraint="true" arg="${playersPerTeam}"/>
                     </c:if>
-                    <paw:input path="end_date" label="home.createTournament.endDate" inputType="date" hasConstraint="true"/>
+                    <paw:input path="end_date" label="createTournament.endDate" inputType="date" hasConstraint="true"/>
                 </div>
                 <c:if test="${tournament.openInscriptions}">
-                    <paw:input path="max_participants" label="home.createTournament.maxParticipants" inputType="number" hasConstraint="true"/>
+                    <paw:input path="max_participants" label="createTournament.maxParticipants" inputType="number" hasConstraint="true"/>
                 </c:if>
             </c:if>
-            <paw:input path="image" label="home.createTournament.image" inputType="file"/>
+            <div class="row">
+                <paw:input path="image" label="createTournament.image" fileText="input.uploadImage" inputType="file"/>
+            </div>
+            <div class="row">
+                <paw:input path="rules" label="tournament.rules" inputType="file" fileText="input.uploadPdf"/>
+            </div>
             <div class="row center">
                 <paw:input path="" label="tournament.edit.saveChanges" containerType="half" inputType="submit"/>
             </div>

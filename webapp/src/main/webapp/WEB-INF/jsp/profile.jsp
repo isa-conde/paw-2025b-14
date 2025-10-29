@@ -101,10 +101,10 @@
             <paw:input path="bio" label="profile.edit.modal.bio" hasConstraint="true" value="${profile.bio}"/>
         </div>
         <div class="row">
-            <paw:input path="profilePicture" label="profile.edit.modal.profilePicture" inputType="file" hasConstraint="true"/>
+            <paw:input path="profilePicture" label="profile.edit.modal.profilePicture" fileText="input.uploadImage" inputType="file" hasConstraint="true"/>
         </div>
         <div class="row">
-            <paw:input path="bannerPicture" label="profile.edit.modal.bannerImage" inputType="file"/>
+            <paw:input path="bannerPicture" label="profile.edit.modal.bannerImage" fileText="input.uploadImage" inputType="file"/>
         </div>
         <div class="row center">
             <paw:input path="" label="tournament.edit.saveChanges" containerType="half" inputType="submit"/>

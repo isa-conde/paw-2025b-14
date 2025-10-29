@@ -4,6 +4,7 @@ import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.Game.GameFormat;
 import ar.edu.itba.paw.model.Participant;
+import ar.edu.itba.paw.model.Rules;
 import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Elo;
@@ -112,10 +113,13 @@ public class TournamentHibernateDao implements TournamentDao {
     }
 
     @Override
-    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Long image_id, Boolean openInscriptions, Boolean isFinished, Long format_id) {
+    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Long image_id, Boolean openInscriptions, Boolean isFinished, Long format_id, Long rules_id) {
         Tournament t = new Tournament(em.getReference(User.class, creator_id), name, em.getReference(Game.class,  game_id), region, start_date, end_date, format, structure, max_participants, image_id, openInscriptions, isFinished, em.getReference(GameFormat.class, format_id));
         t.setTournament_started(false);
         t.setElo(elo);
+        if (rules_id != null){
+            t.setRules(em.getReference(Rules.class, rules_id));
+        }
         em.persist(t);
         return t;
     }
@@ -262,12 +266,23 @@ public class TournamentHibernateDao implements TournamentDao {
         fullQuery.setParameter("ids", tournamentIds.stream().map(Number::longValue).toList());
 
         List<Tournament> tournaments = fullQuery.getResultList();
-        return tournaments.stream()
+
+        Map<Long, List<Tournament>> grouped = tournaments.stream()
                 .collect(Collectors.groupingBy(
                         t -> t.getGame().getId(),
                         LinkedHashMap::new,
                         Collectors.toList()
                 ));
+
+        Map<Long, List<Tournament>> orderedMap = new LinkedHashMap<>();
+        for (Number gameId : topGameIds) {
+            Long gid = gameId.longValue();
+            if (grouped.containsKey(gid)) {
+                orderedMap.put(gid, grouped.get(gid));
+            }
+        }
+
+        return orderedMap;
     }
 
     @Override

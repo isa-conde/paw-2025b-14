@@ -2,7 +2,7 @@
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
-<spring:message code="home.createTournament.emptyOption" var="emptyOption"/>
+<spring:message code="createTournament.emptyOption" var="emptyOption"/>
 
 <paw:layout user="${user != null ? user : null}" function="${openModal}">
     <c:set var="createTournamentFunction" value="window.location.href='${pageContext.request.contextPath}/tournaments/new/step1'"/>
@@ -19,8 +19,8 @@
     <div class="content-container">
         <div class="cards-container">
             <paw:button-card
-                    title="home.createTournament.title"
-                    butText="home.createTournament.butText"
+                    title="createTournament.title"
+                    butText="createTournament.butText"
                     onclick="${createTournamentFunction}"
                     texture="true"/>
             <paw:button-card

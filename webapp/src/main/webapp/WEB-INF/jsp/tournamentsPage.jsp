@@ -20,7 +20,7 @@
         <div class="tournament-buttons-container">
             <c:set var="createTournamentFunction" value="window.location.href='${pageContext.request.contextPath}/tournaments/new/step1'"/>
             <c:set var="createTeamFunction" value="window.location.href='${pageContext.request.contextPath}/team/create'"/>
-            <paw:button onclick="${createTournamentFunction}" text="home.createTournament.butText" size="l"/>
+            <paw:button onclick="${createTournamentFunction}" text="createTournament.butText" size="l"/>
             <paw:button onclick="${createTeamFunction}" text="tournaments.team.butText" size="l"/>
         </div>
       <form:form cssClass="form" modelAttribute="filterForm" method="get">

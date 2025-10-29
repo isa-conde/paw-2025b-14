@@ -17,17 +17,18 @@ import java.time.LocalDate;
 public class EditTournamentForm implements HasDates{
     @NotNull
     private Long tournamentId;
-    @NotBlank(message = "{home.createTournament.notNull}")
+    @NotBlank(message = "{createTournament.notNull}")
     @Size(max = 100)
     private String name;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate start_date;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate end_date;
-    @Min(value = 4, message = "{home.createTournament.minParticipants}")
-    @Max(value = 32, message = "{home.createTournament.maxParticipantsError}")
+    @Min(value = 4, message = "{createTournament.minParticipants}")
+    @Max(value = 32, message = "{createTournament.maxParticipantsError}")
     private Integer max_participants;
     private MultipartFile image;
+    private MultipartFile rules;
 
     public String getName() {
         return name;
@@ -66,4 +67,11 @@ public class EditTournamentForm implements HasDates{
 
     public Long getTournamentId(){ return tournamentId; }
     public void setTournamentId(Long id){ this.tournamentId = id; }
+
+    public MultipartFile getRules() {
+        return rules;
+    }
+    public void setRules(MultipartFile rules) {
+        this.rules = rules;
+    }
 }

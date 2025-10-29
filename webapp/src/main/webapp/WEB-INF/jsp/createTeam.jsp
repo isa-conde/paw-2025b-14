@@ -17,10 +17,10 @@
                         <paw:input path="name" label="team.create.name" hasConstraint="true"/>
                     </div>
                     <div class="row center">
-                        <paw:input path="pfp" label="team.create.teamImage" inputType="file" hasConstraint="true"/>
+                        <paw:input path="pfp" label="team.create.teamImage" fileText="input.uploadImage" inputType="file" hasConstraint="true"/>
                     </div>
                     <div class="row center">
-                        <paw:input path="banner" label="team.create.teamBanner" inputType="file" hasConstraint="true"/>
+                        <paw:input path="banner" label="team.create.teamBanner" fileText="input.uploadImage" inputType="file" hasConstraint="true"/>
                     </div>
                     <div class="row center">
                         <label for="memberInput" class="input-label"><spring:message code="team.create.members"/></label>

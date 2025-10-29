@@ -37,8 +37,9 @@ public class TournamentServiceImpl implements TournamentService {
     private final UserDao userDao;
     private final MailService ms;
     private final GameFormatDao gameFormatDao;
+    private final RulesDao rulesDao;
 
-    public TournamentServiceImpl(TournamentDao tournamentDao, ImageDao imageDao, ParticipantDao participantDao, MatchDao matchDao, GameDao gameDao, UserDao userDao, MailService ms, GameFormatDao gameFormatDao) {
+    public TournamentServiceImpl(TournamentDao tournamentDao, ImageDao imageDao, ParticipantDao participantDao, MatchDao matchDao, GameDao gameDao, UserDao userDao, MailService ms, GameFormatDao gameFormatDao, RulesDao rulesDao) {
         this.tournamentDao = tournamentDao;
         this.imageDao = imageDao;
         this.participantDao = participantDao;
@@ -47,6 +48,7 @@ public class TournamentServiceImpl implements TournamentService {
         this.userDao = userDao;
         this.ms = ms;
         this.gameFormatDao = gameFormatDao;
+        this.rulesDao = rulesDao;
     }
 
     @Override
@@ -71,9 +73,13 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Transactional
     @Override
-    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, byte[] image, Boolean openInscriptions, Boolean isFinished, Long format_id) {
+    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, byte[] image, Boolean openInscriptions, Boolean isFinished, Long format_id, byte[] rules) {
         Long image_id = imageDao.insertImage(image);
-        Tournament toReturn = tournamentDao.create(creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, openInscriptions, isFinished, format_id);
+        Long rules_id = null;
+        if (rules != null){
+            rules_id = rulesDao.insertRules(rules);
+        }
+        Tournament toReturn = tournamentDao.create(creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, openInscriptions, isFinished, format_id, rules_id);
         User creator = userDao.findById(creator_id).get();
         ms.sendTournamentCreatedEmail(toReturn.getId(), creator.getUsername(), name, creator.getEmail());
         LOGGER.info("Tournament {} has been successfully created", name);

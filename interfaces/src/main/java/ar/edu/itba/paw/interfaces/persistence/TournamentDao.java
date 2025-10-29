@@ -17,7 +17,7 @@ public interface TournamentDao {
 
     List<Tournament> findTournaments(TournamentFilter tournamentFilter, Long page);
 
-    Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Long image_id, Boolean openInscriptions, Boolean isFinished, Long format_id);
+    Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Long image_id, Boolean openInscriptions, Boolean isFinished, Long format_id, Long rules_id);
 
     Structure getTournamentStructure(Long tournament_id);
 

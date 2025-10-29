@@ -47,17 +47,19 @@ public class TournamentController {
     private final MatchService ms;
     private final ParticipantService ps;
     private final TeamService tms;
+    private final RulesService rs;
 
     @Autowired
     MessageSource messageSource;
 
-    public TournamentController(final UserService us, final GameService gs, final TournamentService ts, final MatchService ms, final ParticipantService ps, final TeamService tms, MessageSource messageSource) {
+    public TournamentController(final UserService us, final GameService gs, final TournamentService ts, final MatchService ms, final ParticipantService ps, final TeamService tms, MessageSource messageSource, final RulesService rs) {
         this.us = us;
         this.gs = gs;
         this.ts = ts;
         this.ms = ms;
         this.ps = ps;
         this.tms = tms;
+        this.rs = rs;
     }
 
     @ModelAttribute("tournamentForm")
@@ -164,6 +166,16 @@ public class TournamentController {
                 imageBytes = form.getImage().getBytes();
             }
             ts.updateTournamentInfo(tournamentId, form.getName(), form.getStart_date(), form.getEnd_date(), form.getMax_participants(), imageBytes);
+        } catch (IOException e) {
+            result.rejectValue("image", "error.tournamentForm.invalidImage");
+        }
+
+        byte[] rulesBytes = null;
+        try {
+            if (form.getRules() != null && !form.getRules().isEmpty()) {
+                rulesBytes = form.getRules().getBytes();
+            }
+            rs.updateRules(tournamentId, rulesBytes);
         } catch (IOException e) {
             result.rejectValue("image", "error.tournamentForm.invalidImage");
         }
@@ -374,7 +386,7 @@ public class TournamentController {
         }
         User user = currentUser.get().getPawUser();
 
-        byte[] imageBytes;
+        byte[] imageBytes = null;
         try {
             if (form.getImage() != null && !form.getImage().isEmpty()) {
                 imageBytes = form.getImage().getBytes();
@@ -387,9 +399,19 @@ public class TournamentController {
             return newTournamentFormStep2(currentUser, form);
         }
 
+        byte[] rulesBytes = null;
+        try {
+            if (form.getRules() != null && !form.getRules().isEmpty()) {
+                rulesBytes = form.getRules().getBytes();
+            }
+        } catch (IOException e) {
+            result.rejectValue("rules", "error.tournamentForm.invalidRules", e.getMessage());
+            return newTournamentFormStep2(currentUser, form);
+        }
+
         final Tournament t = ts.create(user.getId(), form.getName(), form.getGame_id(),
                 form.getRegion(), form.getElo(), form.getStart_date(), form.getEnd_date(),
-                null, form.getStructure(), form.getMax_participants(), imageBytes, true, false, form.getFormat_id());
+                null, form.getStructure(), form.getMax_participants(), imageBytes, true, false, form.getFormat_id(), rulesBytes);
         status.setComplete();
         return new ModelAndView("redirect:/tournament?tournamentId=" + t.getId());
     }

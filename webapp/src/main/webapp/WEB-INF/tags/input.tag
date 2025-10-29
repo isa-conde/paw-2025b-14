@@ -18,6 +18,8 @@
 <%@ attribute name="secondary" required="false"%>
 <%@ attribute name="arg" required="false" type="java.lang.Integer" %>
 <%@ attribute name="hasConstraint" required="false" type="java.lang.Boolean" %>
+<%@ attribute name="accept" required="false" type="java.lang.String" %>
+<%@attribute name="fileText" required="false" type="java.lang.String" %>
 
 <c:set var="secondaryClass" value="${not empty secondary && secondary == 'true' ? 'secondary' : ''}"/>
 
@@ -79,10 +81,10 @@
                 </c:when>
                 <c:when test="${inputType == 'file'}">
                     <div class="file-input-container">
-                        <form:input path="${path}" type="file" class="file-input" id="file-${path}" accept="image/*" onchange="updateFileName('file-${path}', 'file-text-${path}')"/>
+                        <form:input path="${path}" type="file" class="file-input" id="file-${path}" accept="${accept}" onchange="updateFileName('file-${path}', 'file-text-${path}')"/>
                         <label for="file-${path}" class="file-input-label">
                             <img src="${pageContext.request.contextPath}/images/upload.png" alt="Upload" class="file-input-icon"/>
-                            <span class="file-input-text" id="file-text-${path}"><spring:message code="input.uploadImage"/></span>
+                            <span class="file-input-text" id="file-text-${path}"><spring:message code="${fileText}"/></span>
                         </label>
                     </div>
                 </c:when>
