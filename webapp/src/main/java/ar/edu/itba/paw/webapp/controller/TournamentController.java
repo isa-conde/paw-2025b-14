@@ -1,13 +1,11 @@
 package ar.edu.itba.paw.webapp.controller;
 
-import ar.edu.itba.paw.interfaces.exception.TournamentNotFoundException;
 import ar.edu.itba.paw.interfaces.services.*;
 import ar.edu.itba.paw.model.*;
 import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.Game.GameFormat;
-import ar.edu.itba.paw.model.Tournament.Tournament;
+import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.enums.Elo;
-import ar.edu.itba.paw.model.enums.Genre;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.webapp.auth.PawUserDetails;
@@ -17,7 +15,6 @@ import ar.edu.itba.paw.webapp.form.SetWinnerForm;
 import ar.edu.itba.paw.webapp.form.TournamentForm;
 import ar.edu.itba.paw.webapp.form.*;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -66,6 +63,11 @@ public class TournamentController {
     @ModelAttribute("contactOwnerForm")
     public ContactOwnerForm getContactOwnerForm() {
         return new ContactOwnerForm();
+    }
+
+    @ModelAttribute("rateTournamentForm")
+    public RateTournamentForm getRateTournamentForm() {
+        return new RateTournamentForm();
     }
 
     @ModelAttribute("gameForm")
@@ -372,6 +374,20 @@ public class TournamentController {
         }
         User user = currentUser.get().getPawUser();
         ts.contactOwner(contactOwnerForm.getTournamentId(), user, contactOwnerForm.getSubject(), contactOwnerForm.getBody(), contactOwnerForm.getCreatorId());
+        return mav;
+    }
+
+    @RequestMapping(value = "/tournament/rate", method = { RequestMethod.POST })
+    public ModelAndView rateTournamentOwner(@Valid @ModelAttribute("rateTournamentForm") final RateTournamentForm rateTournamentForm,
+                                            BindingResult result,
+                                            @ModelAttribute("user") Optional<PawUserDetails> currentUser) {
+        ModelAndView mav = tournamentPage(currentUser, rateTournamentForm.getTournamentId(), getEditTournamentForm(), getJoinTournamentTeamForm());
+        if(result.hasErrors()) {
+            mav.addObject("openModal", "'rateTournamentModal'");
+            return mav;
+        }
+        ts.updateTouramentRating(rateTournamentForm.getTournamentId(), rateTournamentForm.getRating());
+        us.updateUserRating(rateTournamentForm.getCreatorId(), rateTournamentForm.getRating());
         return mav;
     }
 }

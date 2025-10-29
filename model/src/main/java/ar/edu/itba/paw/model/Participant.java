@@ -1,7 +1,5 @@
 package ar.edu.itba.paw.model;
 
-import ar.edu.itba.paw.model.Tournament.Tournament;
-
 import javax.persistence.*;
 import java.util.List;
 

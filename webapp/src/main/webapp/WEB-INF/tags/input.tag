@@ -16,7 +16,9 @@
 <%@ attribute name="value" required="false"%>
 <%@ attribute name="secondary" required="false"%>
 <%@ attribute name="arg" required="false" type="java.lang.Integer" %>
-<%@ attribute name="hasConstraint" required="false" type="java.lang.Boolean" %>
+<%@ attribute name="hasConstraint" required="false" type="java.lang.Boolean"%>
+<%@ attribute name="disabled" required="false" type="java.lang.Boolean"%>
+<%@ attribute name="rating" required="false" type="java.lang.Integer"%>
 
 <c:set var="secondaryClass" value="${not empty secondary && secondary == 'true' ? 'secondary' : ''}"/>
 
@@ -61,6 +63,17 @@
                                 onkeydown="return onlyUnsignedIntKeydown(event)"
                                 onpaste="return onlyUnsignedIntPaste(event)"
                                 oninput="this.value = this.value.replace(/\D+/g,'')" />
+                </c:when>
+                <c:when test="${inputType == 'decimalNumber'}">
+                    <form:input path="${path}"
+                                type="number"
+                                class="input"
+                                min="1"
+                                step="0.5"
+                                inputmode="decimal"
+                                onkeydown="return onlyUnsignedDecimalKeydown(event)"
+                                onpaste="return onlyUnsignedDecimalPaste(event)"
+                                oninput="clampDecimalInput(this, 1, 5, 0.5)"/>
                 </c:when>
                 <c:when test="${inputType == 'email'}">
                     <form:input path="${path}" type="email" class="input"/>

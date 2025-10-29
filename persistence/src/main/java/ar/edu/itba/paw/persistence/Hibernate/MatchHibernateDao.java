@@ -3,7 +3,7 @@ package ar.edu.itba.paw.persistence.Hibernate;
 import ar.edu.itba.paw.interfaces.persistence.MatchDao;
 import ar.edu.itba.paw.model.Match;
 import ar.edu.itba.paw.model.Participant;
-import ar.edu.itba.paw.model.Tournament.Tournament;
+import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.ids.MatchId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +13,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
-import java.util.ArrayList;
 import java.util.List;
 
 @Repository

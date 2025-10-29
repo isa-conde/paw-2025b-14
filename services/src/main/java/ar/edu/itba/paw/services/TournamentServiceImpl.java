@@ -6,7 +6,7 @@ import ar.edu.itba.paw.interfaces.services.MailService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.*;
-import ar.edu.itba.paw.model.Tournament.Tournament;
+import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
@@ -492,4 +492,15 @@ public class TournamentServiceImpl implements TournamentService {
         ms.sendContactOwnerEmail(tournament, currentUser, subject, body, creator);
     }
 
+    @Transactional
+    @Override
+    public void updateTouramentRating(Long tournamentId, Float userRating) {
+        Tournament tournament = findById(tournamentId).get();
+        Float currentRating = tournament.getRating();
+
+        Float newRating = (currentRating == null) ? userRating : (currentRating + userRating) / 2;
+
+        tournamentDao.updateTournamentRating(tournamentId, newRating);
+        LOGGER.debug("Tournament {} rating updated to {}", tournament.getName(), newRating);
+    }
 }

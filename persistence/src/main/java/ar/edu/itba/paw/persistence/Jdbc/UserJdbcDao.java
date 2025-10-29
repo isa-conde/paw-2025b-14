@@ -112,4 +112,8 @@ public class UserJdbcDao implements UserDao {
         jdbcTemplate.update("UPDATE users SET locale = ? WHERE id = ?", locale, userId);
     }
 
+    @Override
+    public void updateUserRating(Long userId, Float rating) {
+        return;
+    }
 }

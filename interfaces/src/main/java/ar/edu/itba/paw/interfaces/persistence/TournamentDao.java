@@ -1,9 +1,8 @@
 package ar.edu.itba.paw.interfaces.persistence;
 
-import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
-import ar.edu.itba.paw.model.Tournament.Tournament;
+import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 
@@ -66,4 +65,6 @@ public interface TournamentDao {
 
     Integer getCreatedAndFinishedTournamentsPages(Long userId);
 
-    }
+    void updateTournamentRating(Long tournamentId, Float userRating);
+
+}

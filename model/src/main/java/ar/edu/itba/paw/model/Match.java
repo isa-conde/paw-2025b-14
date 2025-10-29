@@ -1,6 +1,5 @@
 package ar.edu.itba.paw.model;
 
-import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.ids.MatchId;
 
 import javax.persistence.*;

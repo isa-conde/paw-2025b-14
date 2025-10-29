@@ -48,6 +48,9 @@ public class User {
     )
     private List<Game> favouriteGames = new ArrayList<>();
 
+    @Column(name = "rating")
+    private Float rating;
+
     @OneToMany(mappedBy = "owner")
     private List<Team> ownedTeams = new ArrayList<>();
 
@@ -132,6 +135,14 @@ public class User {
 
     public void setLocale(String locale) {
         this.locale = locale;
+    }
+
+    public Float getRating() {
+        return rating;
+    }
+
+    public void setRating(Float rating) {
+        this.rating = rating;
     }
 
     public void setUsername(String username) {

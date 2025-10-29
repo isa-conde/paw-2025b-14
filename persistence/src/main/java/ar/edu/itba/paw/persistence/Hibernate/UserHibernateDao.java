@@ -120,4 +120,12 @@ public class UserHibernateDao implements UserDao {
             em.merge(user);
         }
     }
+
+    @Override
+    public void updateUserRating(Long userId, Float rating) {
+        em.createQuery("UPDATE User u SET u.rating = :rating WHERE u.id = :userId")
+                .setParameter("rating", rating)
+                .setParameter("userId", userId)
+                .executeUpdate();
+    }
 }

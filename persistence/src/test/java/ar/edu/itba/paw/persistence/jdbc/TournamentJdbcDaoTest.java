@@ -1,6 +1,6 @@
 //package ar.edu.itba.paw.persistence.jdbc;
 //
-//import ar.edu.itba.paw.model.Tournament.Tournament;
+//import ar.edu.itba.paw.model.Tournament;
 //import ar.edu.itba.paw.model.enums.Genre;
 //import ar.edu.itba.paw.model.filters.TournamentFilter;
 //import ar.edu.itba.paw.model.enums.Elo;

@@ -4,13 +4,14 @@ import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.Game.GameFormat;
 import ar.edu.itba.paw.model.Participant;
-import ar.edu.itba.paw.model.Tournament.Tournament;
+import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -426,4 +427,12 @@ public class TournamentHibernateDao implements TournamentDao {
         return query.getSingleResult().intValue();
     }
 
+    @Transactional
+    @Override
+    public void updateTournamentRating(Long tournamentId, Float userRating) {
+        em.createQuery("UPDATE Tournament t SET t.rating = :userRating WHERE t.id = :tournamentId")
+                .setParameter("userRating", userRating)
+                .setParameter("tournamentId", tournamentId)
+                .executeUpdate();
+    }
 }

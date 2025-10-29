@@ -4,7 +4,7 @@ import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
-import ar.edu.itba.paw.model.Tournament.Tournament;
+import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 
@@ -54,6 +54,8 @@ public interface TournamentService {
     Integer getPagesBySection(Long userId, String section);
 
     void contactOwner(Long tournamentId, User currentUser, String subject, String body, Long creatorId);
+
+    void updateTouramentRating(Long tournamentId, Float userRating);
 
 }
 

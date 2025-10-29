@@ -8,14 +8,34 @@
 <c:url value="/tournament/leave" var="leaveUrl"/>
 <c:url value="/tournament/update?tournamentId=${tournament.id}" var="tournamentUpdateUrl"/>
 <c:url value="/tournament/contactOwner" var="contactOwnerUrl"/>
+<c:url value="/tournament/rate" var="rateTournamentUrl"/>
+<c:url value="/images/pencil.png" var="pencilUrl"/>
 
 <c:set var="isCreator" value="${user.id == tournament.creator_id}"/>
 <c:set var="editMode" value="${param.edit eq 'true' && isCreator}"/>
-<c:url value="/images/pencil.png" var="pencilUrl"/>
-<c:set var="cornerIcon" value="${isCreator ? pencilUrl : null}"/>
-<c:set var="cornerText" value="${!isCreator && isParticipant ? 'tournament.contactOwner.buttonLabel' : null}"/>
-<c:set var="cornerModal" value="${isCreator ? 'editTournamentModal' : (isParticipant ? 'contactOwnerModal' : null)}"/>
+<c:set var="cornerModal" value="${null}"/>
+<c:set var="cornerIcon" value="${null}"/>
+<c:set var="cornerText" value="${null}"/>
 <c:set var="playersPerTeam" value="${empty format.players_per_team ? 1 : format.players_per_team}"/>
+
+<c:choose>
+    <c:when test="${isCreator && !tournament.tournament_started}">
+        <c:set var="cornerModal" value="editTournamentModal"/>
+        <c:set var="cornerIcon" value="${pencilUrl}"/>
+    </c:when>
+    <c:when test="${isParticipant && !isCreator}">
+        <c:choose>
+            <c:when test="${!tournament.is_finished}">
+                <c:set var="cornerModal" value="contactOwnerModal"/>
+                <c:set var="cornerText" value="tournament.contactOwner.buttonLabel"/>
+            </c:when>
+            <c:otherwise>
+                <c:set var="cornerModal" value="rateTournamentModal"/>
+                <c:set var="cornerText" value="tournament.ratings.buttonLabel"/>
+            </c:otherwise>
+        </c:choose>
+    </c:when>
+</c:choose>
 
 <paw:layout user="${user}" pageTitle="${tournament.name}" function="${openModal}">
     <paw:banner
@@ -353,6 +373,23 @@
             </div>
             <div class="row center">
                 <paw:input path="" label="tournament.contactOwner.send" containerType="half" inputType="submit"/>
+            </div>
+        </form:form>
+    </paw:modal>
+    <paw:modal title="tournament.ratings.modalTitle" id="rateTournamentModal" returnUrl="${tournamentUrl}">
+        <form:form method="post" modelAttribute="rateTournamentForm"
+                   action="${rateTournamentUrl}"
+                   cssClass="form">
+            <input type="hidden" name="creatorId" value="${creator.id}"/>
+            <input type="hidden" name="tournamentId" value="${tournament.id}"/>
+            <div class="row">
+                <paw:input inputType="decimalNumber" path="rating" label="tournament.ratings.rating" hasConstraint="true"/>
+            </div>
+            <div class="row">
+                <paw:input inputType="textarea" path="feedback" label="tournament.ratings.feedback" hasConstraint="true"/>
+            </div>
+            <div class="row center">
+                <paw:input path="" label="tournament.ratings.rate" containerType="half" inputType="submit"/>
             </div>
         </form:form>
     </paw:modal>
