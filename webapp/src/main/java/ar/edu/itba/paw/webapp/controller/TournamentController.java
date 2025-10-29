@@ -388,6 +388,6 @@ public class TournamentController {
         }
         ts.updateTouramentRating(rateTournamentForm.getTournamentId(), rateTournamentForm.getRating());
         us.updateUserRating(rateTournamentForm.getCreatorId(), rateTournamentForm.getRating());
-        return mav;
+        return new ModelAndView("redirect:/tournament?tournamentId=" + rateTournamentForm.getTournamentId());
     }
 }
