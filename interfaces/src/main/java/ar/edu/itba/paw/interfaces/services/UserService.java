@@ -41,4 +41,6 @@ public interface UserService {
 
     void updateUserLocale(Locale locale, Long userId);
 
+    List<User> findAll();
+
 }

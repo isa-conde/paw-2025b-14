@@ -1,8 +1,23 @@
 document.addEventListener("DOMContentLoaded", () => {
     const memberInput = document.getElementById("memberInput");
+    const datalist = document.getElementById("userSuggestions");
     const addMemberBtn = document.getElementById("addMemberBtn");
     const chipContainer = document.getElementById("chipContainer");
     const form = document.getElementById("teamForm");
+
+     memberInput.addEventListener("input", () => {
+        const query = memberInput.value.trim().toLowerCase();
+        datalist.innerHTML = "";
+        if (query.length < 3) return;
+
+        const matches = allUsers.filter(u => u.toLowerCase().includes(query));
+        matches.forEach(name => {
+            const option = document.createElement("option");
+            option.value = name;
+            datalist.appendChild(option);
+        });
+    });
+
     function addMember(name) {
         if (!name.trim()) return;
 
@@ -21,9 +36,14 @@ document.addEventListener("DOMContentLoaded", () => {
         chip.appendChild(closeBtn);
         chipContainer.appendChild(chip);
 
+        const index = allUsers.indexOf(newMember);
+        if (index !== -1) {
+            allUsers.splice(index, 1);
+        }
+
         const hiddenInput = document.createElement("input");
         hiddenInput.type = "hidden";
-        hiddenInput.name = "members"; // 👈 este name es la clave
+        hiddenInput.name = "members";
         hiddenInput.value = name;
 
         form.appendChild(hiddenInput);
@@ -39,6 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
             e.preventDefault();
             addMember(memberInput.value);
             memberInput.value = "";
+            datalist.innerHTML = "";
         }
     });
 });

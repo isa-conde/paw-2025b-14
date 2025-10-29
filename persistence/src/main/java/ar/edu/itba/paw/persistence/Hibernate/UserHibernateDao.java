@@ -120,4 +120,9 @@ public class UserHibernateDao implements UserDao {
             em.merge(user);
         }
     }
+
+    @Override
+    public List<User> findAll() {
+        return em.createQuery("SELECT u FROM User u", User.class).getResultList();
+    }
 }

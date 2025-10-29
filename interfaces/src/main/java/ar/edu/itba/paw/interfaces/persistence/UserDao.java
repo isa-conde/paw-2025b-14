@@ -30,4 +30,6 @@ public interface UserDao {
 
     void updateUserLocale(String locale, Long userId);
 
+    List<User> findAll();
+
 }
