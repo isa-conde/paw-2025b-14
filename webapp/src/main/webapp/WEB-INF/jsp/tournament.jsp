@@ -342,7 +342,7 @@
             <c:when test="${activeSection == 'rulesTab'}">
                 <c:url var="rulesUrl" value="/rules/${tournament.rules.id}"/>
                 <div class="rules-card-container">
-                    <paw:button-card title="tournament.rules.title" text="tournament.rules.text" onclick="window.location.href='${rulesUrl}'" butText="tournament.rules.download"/>
+                    <paw:button-card texture="true" title="tournament.rules.title" text="tournament.rules.text" onclick="window.location.href='${rulesUrl}'" butText="tournament.rules.download"/>
                 </div>
             </c:when>
         </c:choose>

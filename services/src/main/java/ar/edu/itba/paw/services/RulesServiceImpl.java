@@ -3,6 +3,8 @@ package ar.edu.itba.paw.services;
 import ar.edu.itba.paw.interfaces.persistence.RulesDao;
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.interfaces.services.RulesService;
+import ar.edu.itba.paw.model.Rules;
+import ar.edu.itba.paw.model.Tournament;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,20 +22,27 @@ public class RulesServiceImpl implements RulesService {
     }
 
     @Override
-    public Optional<byte[]> findById(Long id) {
+    public Optional<Rules> findById(Long id) {
         return rulesDao.findById(id);
     }
 
     @Override
     @Transactional
-    public Long insertRules(byte[] file) {
+    public Rules insertRules(byte[] file) {
         return rulesDao.insertRules(file);
     }
 
     @Transactional
     @Override
     public void updateRules(Long tournament_id, byte[] file) {
-        Long id = tournamentDao.findById(tournament_id).get().getRules().getId();
-        rulesDao.updateRules(id, file);
+        Tournament t = tournamentDao.findById(tournament_id).get();
+        Rules r = t.getRules();
+        if (r != null){
+            rulesDao.updateRules(r.getId(), file);
+        }else {
+            r = insertRules(file);
+            t.setRules(r);
+        }
+
     }
 }

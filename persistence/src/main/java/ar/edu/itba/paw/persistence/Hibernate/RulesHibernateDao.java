@@ -17,15 +17,15 @@ public class RulesHibernateDao implements RulesDao {
     private EntityManager em;
 
     @Override
-    public Optional<byte[]> findById(Long id) {
-        return Optional.ofNullable(em.find(Rules.class, id).getFile());
+    public Optional<Rules> findById(Long id) {
+        return Optional.ofNullable(em.find(Rules.class, id));
     }
 
     @Override
-    public Long insertRules(byte[] file) {
+    public Rules insertRules(byte[] file) {
         Rules r = new Rules(file);
         em.persist(r);
-        return r.getId();
+        return r;
     }
 
     @Override

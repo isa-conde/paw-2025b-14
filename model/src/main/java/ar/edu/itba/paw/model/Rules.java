@@ -22,6 +22,10 @@ public class Rules {
         this.file = file;
     }
 
+    public Rules(Long id){
+        this.id = id;
+    }
+
     public Long getId() {
         return id;
     }
