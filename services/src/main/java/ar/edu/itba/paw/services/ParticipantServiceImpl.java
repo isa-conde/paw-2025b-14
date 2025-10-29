@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.exception.UserAlreadyJoinedException;
+import ar.edu.itba.paw.interfaces.exception.UserNotFoundException;
 import ar.edu.itba.paw.interfaces.persistence.*;
 import ar.edu.itba.paw.interfaces.services.MailService;
 import ar.edu.itba.paw.interfaces.services.ParticipantService;
@@ -14,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +24,8 @@ import java.util.Optional;
 public class ParticipantServiceImpl implements ParticipantService {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ParticipantServiceImpl.class);
+
+    private final static int SINGLE_USER = 1;
 
     private final ParticipantDao participantDao;
     private final TournamentDao tournamentDao;
@@ -161,5 +163,20 @@ public class ParticipantServiceImpl implements ParticipantService {
             ts.closeInscriptions(tournamentId);
             LOGGER.info("Max participant count has been reached. The inscriptions for tournament with ID {} have been closed", tournamentId);
         }
+    }
+
+    @Override
+    public Boolean participantHasRatedTournament(Long tournamentId, Long userId) {
+        return participantDao.hasRated(tournamentId, userId);
+    }
+
+    @Transactional
+    @Override
+    public void updateCreatorRating(Long tournamentId, Long creatorId, Long reviewerId, Float rating) {
+        if(participantDao.hasRated(tournamentId, reviewerId)) {
+            throw new UserNotFoundException();
+        }
+        participantDao.updateHasRated(reviewerId, tournamentId);
+        userDao.updateUserRating(creatorId, rating);
     }
 }

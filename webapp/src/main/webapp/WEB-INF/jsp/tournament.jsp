@@ -29,10 +29,10 @@
                 <c:set var="cornerModal" value="contactOwnerModal"/>
                 <c:set var="cornerText" value="tournament.contactOwner.buttonLabel"/>
             </c:when>
-            <c:otherwise>
+            <c:when test="${!hasRankedTournament}">
                 <c:set var="cornerModal" value="rateTournamentModal"/>
                 <c:set var="cornerText" value="tournament.ratings.buttonLabel"/>
-            </c:otherwise>
+            </c:when>
         </c:choose>
     </c:when>
 </c:choose>
@@ -413,9 +413,6 @@
             <input type="hidden" name="tournamentId" value="${tournament.id}"/>
             <div class="row center">
                 <paw:star-rating path="rating" required="true"/>
-            </div>
-            <div class="row">
-                <paw:input inputType="textarea" path="feedback" label="tournament.ratings.feedback" hasConstraint="true"/>
             </div>
             <div class="row center">
                 <paw:input path="" label="tournament.ratings.rate" containerType="half" inputType="submit"/>
