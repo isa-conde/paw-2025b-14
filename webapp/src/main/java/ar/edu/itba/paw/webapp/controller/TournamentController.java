@@ -213,6 +213,7 @@ public class TournamentController {
             Optional<User> optionalUser = us.findById(t.getCreator_id());
             Boolean isIndividualTournament = optionalGameFormat.isEmpty() || optionalGameFormat.get().getPlayers_per_team() == 1;
             Boolean isParticipant = user != null && ps.hasJoined(user.getId(), tournamentId);
+            Integer creatorRating = us.getUserRatingAsInteger(t.getCreator_id());
             if (user != null && !isIndividualTournament && !isParticipant){
                 mav.addObject("userTeams", tms.getUserTeamsBySizeNotInTournament(user.getId(), tournamentId));
             }
@@ -233,6 +234,7 @@ public class TournamentController {
             mav.addObject("maxStage", maxStage);
             mav.addObject("editTournamentForm", editTournamentForm);
             mav.addObject("joinTeamForm", joinTournamentTeamForm);
+            mav.addObject("creatorRating", creatorRating);
         }
         return mav;
     }
@@ -423,7 +425,7 @@ public class TournamentController {
     public ModelAndView contactTournamentOwner(@Valid @ModelAttribute("contactOwnerForm") final ContactOwnerForm contactOwnerForm,
                                                BindingResult result,
                                                @ModelAttribute("user") Optional<PawUserDetails> currentUser) {
-        ModelAndView mav = tournamentPage(currentUser, contactOwnerForm.getTournamentId(), getEditTournamentForm(), getJoinTournamentTeamForm());
+        ModelAndView mav = tournamentPage(currentUser, contactOwnerForm.getTournamentId(), getEditTournamentForm(), getJoinTournamentTeamForm(), getSetMatchResultsForm());
         if(result.hasErrors()) {
             mav.addObject("openModal", "'contactOwnerModal'");
             return mav;
@@ -437,7 +439,7 @@ public class TournamentController {
     public ModelAndView rateTournamentOwner(@Valid @ModelAttribute("rateTournamentForm") final RateTournamentForm rateTournamentForm,
                                             BindingResult result,
                                             @ModelAttribute("user") Optional<PawUserDetails> currentUser) {
-        ModelAndView mav = tournamentPage(currentUser, rateTournamentForm.getTournamentId(), getEditTournamentForm(), getJoinTournamentTeamForm());
+        ModelAndView mav = tournamentPage(currentUser, rateTournamentForm.getTournamentId(), getEditTournamentForm(), getJoinTournamentTeamForm(), getSetMatchResultsForm());
         if(result.hasErrors()) {
             mav.addObject("openModal", "'rateTournamentModal'");
             return mav;

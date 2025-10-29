@@ -250,4 +250,14 @@ public class UserServiceImpl implements UserService {
         userDao.updateUserRating(userId, newRating);
         LOGGER.debug("User {} rating updated to {}", user.getUsername(), newRating);
     }
+
+    @Override
+    public Integer getUserRatingAsInteger(Long userId) {
+        User user = findById(userId).get();
+        Float userRating = user.getRating();
+        if(userRating == null) {
+            return 0;
+        }
+        return Math.round(userRating);
+    }
 }

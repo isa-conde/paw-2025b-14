@@ -45,4 +45,5 @@ public interface UserService {
 
     List<User> findAll();
 
+    Integer getUserRatingAsInteger(Long userId);
 }

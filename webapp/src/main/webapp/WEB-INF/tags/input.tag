@@ -20,7 +20,6 @@
 <%@ attribute name="hasConstraint" required="false" type="java.lang.Boolean"%>
 <%@ attribute name="disabled" required="false" type="java.lang.Boolean"%>
 <%@ attribute name="rating" required="false" type="java.lang.Integer"%>
-<%@ attribute name="hasConstraint" required="false" type="java.lang.Boolean" %>
 <%@ attribute name="accept" required="false" type="java.lang.String" %>
 <%@attribute name="fileText" required="false" type="java.lang.String" %>
 
