@@ -1,7 +1,11 @@
 package ar.edu.itba.paw.webapp.form;
 
+import ar.edu.itba.paw.webapp.constraints.NoTieOnEliminationConstraint;
+
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
+@NoTieOnEliminationConstraint
 public class SetMatchResultsForm {
     
     @NotNull
@@ -9,11 +13,13 @@ public class SetMatchResultsForm {
     
     @NotNull
     private Long tournamentId;
-    
-    @NotNull
+
+    @NotNull(message = "{setMatchResultsForm.localScore.notNull}")
+    @Min(value = 0, message = "{setMatchResultsForm.localScore.min}")
     private Integer localScore;
 
-    @NotNull
+    @NotNull(message = "{setMatchResultsForm.visitorScore.notNull}")
+    @Min(value = 0, message = "{setMatchResultsForm.visitorScore.min}")
     private Integer visitorScore;
 
     private Integer group;

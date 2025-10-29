@@ -72,6 +72,7 @@ public class MatchServiceImpl implements MatchService {
         if (matches.isEmpty()) {
             return Collections.emptyMap();
         }
+        matches.sort(Comparator.comparingLong(Match::getId));
         Integer teamSize = ts.getPlayersPerTeam(tournamentId);
         if(teamSize == null){
             teamSize = 1;
@@ -136,7 +137,7 @@ public class MatchServiceImpl implements MatchService {
             }
         }
         if (structure.equals(Structure.HYBRID) && isGroupStage && isFinished) {
-            ts.createBracketFromGroups(tournamentId, matchId);
+            ts.createBracketFromGroups(tournamentId);
             isFinished = matchDao.allMatchesPlayed(tournamentId);
         }
         if (isFinished) {

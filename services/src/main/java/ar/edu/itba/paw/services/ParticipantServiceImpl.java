@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -79,8 +80,8 @@ public class ParticipantServiceImpl implements ParticipantService {
         }else {
             participants = participantDao.getTournamentParticipantUsers(tournamentId);
         }
-        participants.sort((a, b) -> b.getPoints().compareTo(a.getPoints()));
-        return participants;
+        participants.sort(Comparator.comparingInt(Participant::getPoints).thenComparingInt(Participant::getScore_difference));
+        return participants.reversed();
     }
 
     @Override
@@ -145,17 +146,18 @@ public class ParticipantServiceImpl implements ParticipantService {
                 LOGGER.warn("User with ID {} has already joined tournament with ID {}", p, tournamentId);
                 throw new UserAlreadyJoinedException();
             }
+        }
+        List<Participant> currentParticipants = getTournamentParticipants(tournamentId, ts.getPlayersPerTeam(tournamentId));
+        for(Long p : participants){
             participantDao.joinTournamentUserWithTeam(p, tournamentId, teamId);
             User user = userDao.findById(p).get();
             ms.sendTournamentJoinedEmail(tournamentId, user.getUsername(), t.getName(), user.getEmail(), creator.getEmail());
             LOGGER.info("Tournament joined email correctly sent to the address {}", user.getEmail());
         }
-
         ms.sendTournamentTeamJoinedOwnerEmail(tournamentId, creator.getUsername(), team.getName(), t.getName(), creator.getEmail());
         LOGGER.info("Tournament joined notification email correctly sent to tournament owner with address {}", creator.getEmail());
         participantDao.joinTournamentTeam(tournamentId, teamId);
-        List<Participant> currentParticipants = getTournamentParticipants(tournamentId, ts.getPlayersPerTeam(tournamentId));
-        if (currentParticipants.size() == t.getMax_participants()) {
+        if (currentParticipants.size() + 1 == t.getMax_participants()) {
             ts.closeInscriptions(tournamentId);
             LOGGER.info("Max participant count has been reached. The inscriptions for tournament with ID {} have been closed", tournamentId);
         }

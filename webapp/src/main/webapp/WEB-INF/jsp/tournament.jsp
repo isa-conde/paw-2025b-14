@@ -321,12 +321,12 @@
             <c:if test="${!tournament.finished}">
                 <div class="row">
                     <c:if test="${!tournament.tournamentStarted}">
-                        <paw:input path="start_date" label="home.createTournament.startDate" inputType="date" hasConstraint="true" arg="${playersPerTeam}"/>
+                        <paw:input path="start_date" label="home.createTournament.startDate" inputType="date" hasConstraint="true"/>
                     </c:if>
                     <paw:input path="end_date" label="home.createTournament.endDate" inputType="date" hasConstraint="true"/>
                 </div>
                 <c:if test="${tournament.openInscriptions}">
-                    <paw:input path="max_participants" label="home.createTournament.maxParticipants" inputType="number" hasConstraint="true"/>
+                    <paw:input path="max_participants" label="home.createTournament.maxParticipants" arg="${playersPerTeam}" inputType="number" hasConstraint="true"/>
                 </c:if>
             </c:if>
             <paw:input path="image" label="home.createTournament.image" inputType="file"/>
@@ -381,5 +381,26 @@
         </div>
     </form:form>
 </paw:modal>
+<c:url value="/tournament/setMatchResults" var="actionUrl"/>
+<paw:modal title="tournament.setMatchResults.title" id="setMatchResultsModal" returnUrl="${tournamentUrl}">
+    <form:form method="post" modelAttribute="setMatchResultsForm" action="${actionUrl}" cssClass="form">
+        <input type="hidden" id="modalMatchId" name="matchId" value=""/>
+        <input type="hidden" name="tournamentId" value="${tournament.id}"/>
+        <div class="row">
+            <paw:input path="localScore" label="tournament.setMatchResults.localScore" hasConstraint="true" inputType="number"/>
+            <paw:input path="visitorScore" label="tournament.setMatchResults.visitorScore" hasConstraint="true" inputType="number"/>
+        </div>
+        <div class="row center">
+            <paw:input path="" label="tournament.setMatchResults.set" containerType="half" inputType="submit"/>
+        </div>
+    </form:form>
+</paw:modal>
+
+<script>
+    function openSetMatchModal(matchId) {
+        document.getElementById('modalMatchId').value = matchId;
+        openModal('setMatchResultsModal');
+    }
+</script>
 
 <script src="${pageContext.request.contextPath}/js/swap.js"></script>

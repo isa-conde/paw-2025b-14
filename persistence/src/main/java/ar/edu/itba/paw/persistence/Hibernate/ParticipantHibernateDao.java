@@ -255,7 +255,7 @@ public class ParticipantHibernateDao implements ParticipantDao{
             jpql += " AND p.groupNumber = :groupNumber";
         }
 
-        jpql += " ORDER BY p.points DESC, p.scoreDifference DESC";
+        jpql += " ORDER BY p.points DESC, p.score_difference DESC";
 
         TypedQuery<Object[]> query = em.createQuery(jpql, Object[].class);
         query.setParameter("tournamentId", tournamentId);
@@ -372,7 +372,7 @@ public class ParticipantHibernateDao implements ParticipantDao{
 
     @Override
     public List<Participant> getTournamentParticipantTeams(Long tournament_id) {
-        TypedQuery<Participant> query = em.createQuery("SELECT p FROM Participant p JOIN FETCH p.team t WHERE p.tournament.id = :tournamentId", Participant.class);
+        TypedQuery<Participant> query = em.createQuery("SELECT p FROM Participant p JOIN FETCH p.team t WHERE p.tournament.id = :tournamentId AND p.user IS NULL", Participant.class);
         query.setParameter("tournamentId", tournament_id);
         List<Participant> toReturn = query.getResultList();
 

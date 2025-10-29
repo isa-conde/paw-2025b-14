@@ -18,7 +18,7 @@ public class Participant {
     @Column(name = "points", nullable = false)
     private Integer points;
 
-    @Column(name = "score_difference", nullable = false)
+    @Column(name = "score_difference")
     private Integer score_difference;
 
     @Column(name = "group_number")

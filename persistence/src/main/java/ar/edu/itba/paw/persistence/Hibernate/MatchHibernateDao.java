@@ -92,7 +92,7 @@ public class MatchHibernateDao implements MatchDao {
 
     @Override
     public Long getMaxMatchId(Long tournamentId) {
-        TypedQuery<Long> query = em.createQuery("SELECT MAX(m.id) FROM Match m WHERE m.tournament = :tournament", Long.class);
+        TypedQuery<Long> query = em.createQuery("SELECT MAX(m.id.id) FROM Match m WHERE m.tournament = :tournament", Long.class);
         query.setParameter("tournament", em.getReference(Tournament.class, tournamentId));
         return query.getSingleResult();
     }
