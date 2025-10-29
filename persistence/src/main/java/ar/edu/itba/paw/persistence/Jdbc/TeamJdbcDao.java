@@ -131,8 +131,8 @@ public class TeamJdbcDao implements TeamDao {
     }
 
     @Override
-    public List<Team> getUserTeamsBySizeNotInTournament(Long userId, Long tournamentId, Integer minSize) {
-        final int required = (minSize == null ? 1 : minSize);
+    public List<Team> getUserTeamsBySizeNotInTournament(Long userId, Long tournamentId, Long minSize) {
+        final long required = (minSize == null ? 1 : minSize);
         String sql = """
         SELECT t.*
         FROM team t

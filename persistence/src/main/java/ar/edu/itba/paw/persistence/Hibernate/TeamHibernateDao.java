@@ -125,7 +125,7 @@ public class TeamHibernateDao implements TeamDao {
     }
 
     @Override
-    public List<Team> getUserTeamsBySizeNotInTournament(Long userId, Long tournamentId, Integer minSize) {
+    public List<Team> getUserTeamsBySizeNotInTournament(Long userId, Long tournamentId, Long minSize) {
         String jpql = """
         SELECT DISTINCT t
         FROM Team t

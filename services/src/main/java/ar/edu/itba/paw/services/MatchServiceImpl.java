@@ -1,12 +1,13 @@
 package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.exception.MatchWinnerAlreadySetException;
-import ar.edu.itba.paw.interfaces.persistence.GameDao;
 import ar.edu.itba.paw.interfaces.persistence.MatchDao;
 import ar.edu.itba.paw.interfaces.persistence.ParticipantDao;
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.interfaces.services.MatchService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
+import ar.edu.itba.paw.model.Match.Match;
+import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.Match;
 import ar.edu.itba.paw.model.Tournament;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Transactional(readOnly = true)
@@ -27,17 +29,13 @@ public class MatchServiceImpl implements MatchService {
     private final MatchDao matchDao;
     private final ParticipantDao participantDao;
     private final TournamentDao tournamentDao;
-    private final GameDao gameDao;
     private final TournamentService ts;
-    private final UserService us;
 
-    public MatchServiceImpl(MatchDao matchDao, ParticipantDao participantDao, TournamentDao tournamentDao, TournamentService tournamentService, UserService userService, GameDao gameDao) {
+    public MatchServiceImpl(MatchDao matchDao, ParticipantDao participantDao, TournamentDao tournamentDao, TournamentService tournamentService) {
         this.matchDao = matchDao;
         this.participantDao = participantDao;
         this.tournamentDao = tournamentDao;
         this.ts = tournamentService;
-        this.gameDao = gameDao;
-        this.us = userService;
     }
 
     @Transactional
@@ -77,6 +75,7 @@ public class MatchServiceImpl implements MatchService {
         if (matches.isEmpty()) {
             return Collections.emptyMap();
         }
+        matches.sort(Comparator.comparingLong(Match::getId));
         Integer teamSize = ts.getPlayersPerTeam(tournamentId);
         if(teamSize == null){
             teamSize = 1;
@@ -97,25 +96,14 @@ public class MatchServiceImpl implements MatchService {
 
     @Transactional
     @Override
-    public void setMatchWinner(Long matchId, Long tournamentId, Integer winner) {
-        if (winner == null || (winner != 1 && winner != 2)) {
-            throw new IllegalArgumentException("winner must be 1 (local) or 2 (visitor)"); // TODO: custom handling
+    public void setMatchResults(Long matchId, Long tournamentId, Integer localScore, Integer visitorScore) {
+        if (localScore == null || visitorScore == null) {
+            throw new IllegalArgumentException("Scores cannot be empty"); // TODO: custom handling
         }
         if(hasWinner(matchId, tournamentId)) {
             LOGGER.warn("Match with ID {} already has a winner", matchId);
             throw new MatchWinnerAlreadySetException();
         }
-        matchDao.setMatchWinner(matchId, tournamentId, winner);
-        Match match = matchDao.getMatch(tournamentId, matchId);
-
-        Long localId = match.getLocalId();
-        Long visitorId = match.getVisitorId();
-        if (localId == null || visitorId == null) {
-            throw new IllegalStateException("Cannot set winner for TBD matches"); // TODO: custom handling
-        }
-        Long winnerId = (winner == 1) ? localId : visitorId;
-
-        boolean isFinished = matchDao.allMatchesPlayed(tournamentId);
 
         Tournament t = ts.findById(tournamentId).orElse(null);
         if (t == null) {
@@ -123,14 +111,36 @@ public class MatchServiceImpl implements MatchService {
         }
         Structure structure = t.getStructure();
         boolean isGroupStage = Boolean.TRUE.equals(t.getIs_group_stage());
+        boolean isElimination = structure.equals(Structure.ELIMINATION) || ( structure.equals(Structure.HYBRID) && !isGroupStage);
 
-        if(!isFinished && (structure.equals(Structure.ELIMINATION) || ( structure.equals(Structure.HYBRID) && !isGroupStage))) {
+        if(isElimination && localScore.equals(visitorScore)){
+            throw new IllegalArgumentException("Cannot draw in Elimination match"); // TODO: custom handling
+        }
+        Match match = matchDao.getMatch(tournamentId, matchId);
+        Long localId = match.getLocalId();
+        Long visitorId = match.getVisitorId();
+        if (localId == null || visitorId == null) {
+            throw new IllegalStateException("Cannot set winner for TBD matches"); // TODO: custom handling
+        }
+
+        int winner = (localScore > visitorScore) ? 1 : (localScore < visitorScore ? 2 : -1);
+        matchDao.setMatchResults(matchId, tournamentId, localScore, visitorScore, winner, LocalDate.now());
+        Long winnerId = (winner == 1) ? localId : (winner == 2 ? visitorId : null);
+        Integer scoreDifference = (winner == 1) ? localScore - visitorScore : (winner == 2 ? visitorScore - localScore : 0);
+
+        boolean isFinished = matchDao.allMatchesPlayed(tournamentId);
+        if(!isFinished && isElimination) {
             setNextMatchInfo(matchId, tournamentId, winnerId);
         }else if(structure.equals(Structure.LEAGUE) || ( structure.equals(Structure.HYBRID) && isGroupStage)){
-            participantDao.sumPoints(tournamentId, winnerId, 3, ts.getPlayersPerTeam(tournamentId));
+            if(winner == -1) {
+                participantDao.sumPoints(tournamentId, localId, 1, scoreDifference, ts.getPlayersPerTeam(tournamentId));
+                participantDao.sumPoints(tournamentId, visitorId, 1, scoreDifference, ts.getPlayersPerTeam(tournamentId));
+            }else {
+                participantDao.sumPoints(tournamentId, winnerId, 3, scoreDifference, ts.getPlayersPerTeam(tournamentId));
+            }
         }
         if (structure.equals(Structure.HYBRID) && isGroupStage && isFinished) {
-            ts.createBracketFromGroups(tournamentId, matchId);
+            ts.createBracketFromGroups(tournamentId);
             isFinished = matchDao.allMatchesPlayed(tournamentId);
         }
         if (isFinished) {

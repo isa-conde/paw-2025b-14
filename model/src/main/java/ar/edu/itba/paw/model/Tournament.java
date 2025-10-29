@@ -2,6 +2,10 @@ package ar.edu.itba.paw.model;
 
 import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.Game.GameFormat;
+import ar.edu.itba.paw.model.Match.Match;
+import ar.edu.itba.paw.model.Participant;
+import ar.edu.itba.paw.model.Rules;
+import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
@@ -94,6 +98,10 @@ public class Tournament {
 
     @OneToMany(mappedBy = "tournament", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Match> matches = new ArrayList<>();
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "rules_id", referencedColumnName = "id")
+    private Rules rules;
 
     public Tournament(User creator, String name, Game game, Region region, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Long image_id, Boolean openInscriptions, Boolean isFinished, GameFormat formatEntity){
         this.creator = creator;
@@ -330,6 +338,14 @@ public class Tournament {
 
     public void setMatches(List<Match> matches) {
         this.matches = matches;
+    }
+
+    public Rules getRules() {
+        return rules;
+    }
+
+    public void setRules(Rules rules) {
+        this.rules = rules;
     }
 }
 

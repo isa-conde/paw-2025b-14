@@ -116,4 +116,9 @@ public class UserJdbcDao implements UserDao {
     public void updateUserRating(Long userId, Float rating) {
         return;
     }
+    @Override
+    public List<User> findAll() {
+        return List.of();
+    }
+
 }

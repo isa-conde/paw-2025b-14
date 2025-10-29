@@ -23,23 +23,9 @@
             </div>
         </div>
     </paw:banner>
-
+    <paw:profile-navbar user="${profile}" activeSection="overview"/>
         <div class="content-container">
             <div class="profile-main">
-                <div class="carrousel-title">
-                    <paw:text type="title"><spring:message code="profile.upcomingTournaments.title"/></paw:text>
-                </div>
-                <c:choose>
-                    <c:when test="${activeTournaments.size() > 0}">
-                        <paw:carrousel id="activeTournaments" elements="${activeTournaments}"/>
-                    </c:when>
-                    <c:otherwise>
-                        <div class="no-cards-container">
-                            <paw:text weight="thin"><spring:message code="profile.activeTournaments.empty" arguments="${profile.username}"/></paw:text>
-                        </div>
-                    </c:otherwise>
-                </c:choose>
-
                 <div class="carrousel-title">
                     <paw:text type="title"><spring:message code="profile.favouriteGames.title"/></paw:text>
                 </div>
@@ -50,6 +36,20 @@
                     <c:otherwise>
                         <div class="no-cards-container">
                             <paw:text weight="thin"><spring:message code="profile.favouriteGames.empty" arguments="${profile.username}"/></paw:text>
+                        </div>
+                    </c:otherwise>
+                </c:choose>
+
+                <div class="carrousel-title">
+                    <paw:text type="title"><spring:message code="profile.upcomingTournaments.title"/></paw:text>
+                </div>
+                <c:choose>
+                    <c:when test="${activeTournaments.size() > 0}">
+                        <paw:carrousel id="activeTournaments" elements="${activeTournaments}"/>
+                    </c:when>
+                    <c:otherwise>
+                        <div class="no-cards-container">
+                            <paw:text weight="thin"><spring:message code="profile.activeTournaments.empty" arguments="${profile.username}"/></paw:text>
                         </div>
                     </c:otherwise>
                 </c:choose>
@@ -101,10 +101,10 @@
             <paw:input path="bio" label="profile.edit.modal.bio" hasConstraint="true" value="${profile.bio}"/>
         </div>
         <div class="row">
-            <paw:input path="profilePicture" label="profile.edit.modal.profilePicture" inputType="file" hasConstraint="true"/>
+            <paw:input path="profilePicture" label="profile.edit.modal.profilePicture" fileText="input.uploadImage" inputType="file" hasConstraint="true"/>
         </div>
         <div class="row">
-            <paw:input path="bannerPicture" label="profile.edit.modal.bannerImage" inputType="file"/>
+            <paw:input path="bannerPicture" label="profile.edit.modal.bannerImage" fileText="input.uploadImage" inputType="file"/>
         </div>
         <div class="row center">
             <paw:input path="" label="tournament.edit.saveChanges" containerType="half" inputType="submit"/>

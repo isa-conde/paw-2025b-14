@@ -1,7 +1,8 @@
 package ar.edu.itba.paw.interfaces.persistence;
 
-import ar.edu.itba.paw.model.Match;
+import ar.edu.itba.paw.model.Match.Match;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface MatchDao {
@@ -10,7 +11,7 @@ public interface MatchDao {
 
     Long getMatchWinner(Long tournamentId, Long matchId);
 
-    void setMatchWinner(Long matchId, Long tournamentId, Integer winner);
+    void setMatchResults(Long matchId, Long tournamentId, Integer localScore, Integer visitorScore, Integer winner, LocalDate date);
 
     List<Match> getTournamentMatches(Long tournament_id, Integer teamSize);
 

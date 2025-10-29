@@ -43,4 +43,6 @@ public interface UserService {
 
     void updateUserRating(Long userId, Float rating);
 
+    List<User> findAll();
+
 }

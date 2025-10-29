@@ -27,5 +27,5 @@ public interface TeamDao {
 
     List<Team> searchByName(String name);
 
-    List<Team> getUserTeamsBySizeNotInTournament(Long userId, Long tournamentId, Integer minSize);
+    List<Team> getUserTeamsBySizeNotInTournament(Long userId, Long tournamentId, Long minSize);
 }

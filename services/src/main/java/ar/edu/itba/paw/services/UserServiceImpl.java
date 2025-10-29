@@ -236,6 +236,11 @@ public class UserServiceImpl implements UserService {
         userDao.updateUserLocale(language, userId);
     }
 
+    @Override
+    public List<User> findAll() {
+        return userDao.findAll();
+    }
+
     @Transactional
     @Override
     public void updateUserRating(Long userId, Float rating) {

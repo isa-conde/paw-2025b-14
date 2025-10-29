@@ -9,6 +9,7 @@
 <%@ attribute name="containerType" required="false"%>
 <%@ attribute name="inputType" required="false"%>
 <%@ attribute name="items" type="java.util.List" required="false"%>
+<%@attribute name="itemMap" type="java.util.LinkedHashMap" required="false" %>
 <%@ attribute name="itemValue" required="false"%>
 <%@ attribute name="itemLabel" required="false"%>
 <%@ attribute name="emptyOption" required="false"%>
@@ -19,6 +20,9 @@
 <%@ attribute name="hasConstraint" required="false" type="java.lang.Boolean"%>
 <%@ attribute name="disabled" required="false" type="java.lang.Boolean"%>
 <%@ attribute name="rating" required="false" type="java.lang.Integer"%>
+<%@ attribute name="hasConstraint" required="false" type="java.lang.Boolean" %>
+<%@ attribute name="accept" required="false" type="java.lang.String" %>
+<%@attribute name="fileText" required="false" type="java.lang.String" %>
 
 <c:set var="secondaryClass" value="${not empty secondary && secondary == 'true' ? 'secondary' : ''}"/>
 
@@ -32,12 +36,20 @@
                 </c:when>
                 <c:when test="${inputType == 'select'}">
                     <c:choose>
-                        <c:when test="${itemLabel != null && itemValue != null}">
+                        <c:when test="${(itemLabel != null && itemValue != null)}">
                             <form:select path="${path}" cssClass="input">
                                 <c:if test="${emptyOption != null}">
                                     <form:option value="" label="${emptyOption}"/>
                                 </c:if>
                                 <form:options items="${items}" itemLabel="${itemLabel}" itemValue="${itemValue}"/>
+                            </form:select>
+                        </c:when>
+                        <c:when test="${itemMap != null}">
+                            <form:select path="${path}" cssClass="input">
+                                <c:if test="${emptyOption != null}">
+                                    <form:option value="" label="${emptyOption}"/>
+                                </c:if>
+                                <form:options items="${itemMap}"/>
                             </form:select>
                         </c:when>
                         <c:otherwise>
@@ -83,10 +95,10 @@
                 </c:when>
                 <c:when test="${inputType == 'file'}">
                     <div class="file-input-container">
-                        <form:input path="${path}" type="file" class="file-input" id="file-${path}" accept="image/*" onchange="updateFileName('file-${path}', 'file-text-${path}')"/>
+                        <form:input path="${path}" type="file" class="file-input" id="file-${path}" accept="${accept}" onchange="updateFileName('file-${path}', 'file-text-${path}')"/>
                         <label for="file-${path}" class="file-input-label">
                             <img src="${pageContext.request.contextPath}/images/upload.png" alt="Upload" class="file-input-icon"/>
-                            <span class="file-input-text" id="file-text-${path}"><spring:message code="input.uploadImage"/></span>
+                            <span class="file-input-text" id="file-text-${path}"><spring:message code="${fileText}"/></span>
                         </label>
                     </div>
                 </c:when>

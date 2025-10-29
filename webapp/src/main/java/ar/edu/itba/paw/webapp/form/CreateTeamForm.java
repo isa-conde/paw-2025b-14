@@ -11,7 +11,7 @@ import java.util.List;
 
 public class CreateTeamForm {
 
-    @NotBlank(message = "{home.createTournament.notNull}")
+    @NotBlank(message = "{createTournament.notNull}")
     @Size(max = 100)
     @TeamNameNotTakenConstraint(message = "{team.create.error.nameTaken}")
     private String name;

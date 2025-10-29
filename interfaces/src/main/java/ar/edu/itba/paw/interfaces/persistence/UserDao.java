@@ -32,4 +32,6 @@ public interface UserDao {
 
     void updateUserRating(Long userId, Float rating);
 
+    List<User> findAll();
+
 }

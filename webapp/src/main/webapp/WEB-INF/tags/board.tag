@@ -13,7 +13,8 @@
 <div class="board">
     <div class="board-header">
         <div class="board-header-cell ${headerSize} participant-cell"><paw:text size="${headerSize}"><spring:message code="tournament.participants.title"/></paw:text></div>
-        <div class="board-header-cell ${headerSize}"><paw:text size="${headerSize}">Points</paw:text></div>
+        <div class="board-header-cell ${headerSize}"><paw:text size="${headerSize}">+/-</paw:text></div>
+        <div class="board-header-cell ${headerSize}"><paw:text size="${headerSize}"><spring:message code="tournament.participants.points"/></paw:text></div>
     </div>
     
     <div class="board-body">
@@ -32,6 +33,9 @@
                                    data-user="${participant.id}"/>
                         </c:if>
                         <paw:text weight="thin"><c:out value="${participant.name}"/></paw:text>
+                    </div>
+                    <div class="board-cell">
+                        <paw:text weight="thin"><c:out value="${participant.score_difference}"/></paw:text>
                     </div>
                     <div class="board-cell">
                         <paw:text weight="semi-bold"><c:out value="${participant.points}"/></paw:text>

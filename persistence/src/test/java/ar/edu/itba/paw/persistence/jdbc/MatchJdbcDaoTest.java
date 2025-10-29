@@ -1,6 +1,6 @@
 //package ar.edu.itba.paw.persistence.jdbc;
 //
-//import ar.edu.itba.paw.model.Match;
+//import ar.edu.itba.paw.model.Match.Match;
 //import ar.edu.itba.paw.model.MatchInfo;
 //import ar.edu.itba.paw.persistence.Jdbc.MatchJdbcDao;
 //import org.junit.Assert;

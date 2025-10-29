@@ -107,7 +107,7 @@ public class UserHibernateDao implements UserDao {
 
     @Override
     public List<User> searchByName(String name) {
-        final TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE u.username LIKE CONCAT('%', LOWER(:username), '%')", User.class);
+        final TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE LOWER(u.username) LIKE CONCAT('%', LOWER(:username), '%')", User.class);
         query.setParameter("username", name);
         return query.getResultList();
     }
@@ -127,5 +127,10 @@ public class UserHibernateDao implements UserDao {
                 .setParameter("rating", rating)
                 .setParameter("userId", userId)
                 .executeUpdate();
+    }
+
+    @Override
+    public List<User> findAll() {
+        return em.createQuery("SELECT u FROM User u", User.class).getResultList();
     }
 }

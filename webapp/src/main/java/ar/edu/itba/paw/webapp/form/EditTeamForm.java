@@ -14,7 +14,7 @@ public class EditTeamForm {
 
     @NotNull
     private Long teamId;
-    @NotBlank(message = "{home.createTournament.notNull}")
+    @NotBlank(message = "{createTournament.notNull}")
     @Size(max = 100)
     private String name;
     @ExistingUsersContraint

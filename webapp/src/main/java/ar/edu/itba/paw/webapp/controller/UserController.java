@@ -17,6 +17,8 @@ import ar.edu.itba.paw.webapp.auth.PawUserDetails;
 import ar.edu.itba.paw.webapp.form.EditProfileForm;
 import ar.edu.itba.paw.webapp.form.FilterForm;
 import ar.edu.itba.paw.webapp.form.TournamentForm;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -26,6 +28,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class UserController {
@@ -34,6 +37,9 @@ public class UserController {
     private final UserService us;
     private final TournamentService ts;
     private final TeamService tms;
+
+    @Autowired
+    MessageSource messageSource;
 
     public UserController(GameService gs, UserService us, TournamentService ts, TeamService tms) {
         this.gs = gs;
@@ -87,7 +93,15 @@ public class UserController {
         mav.addObject("games", allGames);
         mav.addObject("structures", Arrays.stream(Structure.values()).toList());
         mav.addObject("regions", Arrays.stream(Region.values()).toList());
-        mav.addObject("elos", Arrays.stream(Elo.values()).toList());
+        Map<Elo, String> elosMap = Arrays.stream(Elo.values())
+                .collect(Collectors.toMap(
+                        elo -> elo,  // clave: el enum (valor del select)
+                        elo -> messageSource.getMessage("elo." + elo.name(), null, LocaleContextHolder.getLocale()),
+                        (a, b) -> a,
+                        LinkedHashMap::new
+                ));
+
+        mav.addObject("elos", elosMap);
         mav.addObject("genres", Arrays.stream(Genre.values()).toList());
         mav.addObject("teamSizes", List.of(1,2,3,4,5));
         mav.addObject("currentPage", page);
@@ -188,10 +202,16 @@ public class UserController {
 
             case "finished" -> {
                 totalPages1 = ts.getPagesBySection(profile.getId(), "finished");
+                totalPages2 = ts.getUserWonTournamentPages(profile.getId());
+
                 page1 = adjustPage(page1, totalPages1);
+                page2 = adjustPage(page2, totalPages2);
 
                 List<Tournament> pastTournaments = ts.findUserPastTournaments(profile.getId(), page1);
+                List<Tournament> wonTournaments = ts.getUserWonTournament(profile.getId(), page2);
+
                 mav.addObject("pastTournaments", pastTournaments);
+                mav.addObject("wonTournaments", wonTournaments);
             }
 
             case "active" -> {
