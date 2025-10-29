@@ -23,7 +23,7 @@ public class RulesController {
 
     @RequestMapping("/rules/{id}")
     public ResponseEntity<byte[]> getRules(@PathVariable Long id){
-        Optional<byte[]> rulesOpt = rs.findById(id);
+        Optional<Rules> rulesOpt = rs.findById(id);
 
         if (rulesOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -33,7 +33,7 @@ public class RulesController {
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
         headers.setContentDispositionFormData("attachment", "rules.pdf");
 
-        return new ResponseEntity<>(rulesOpt.get(), headers, HttpStatus.OK);
+        return new ResponseEntity<>(rulesOpt.get().getFile(), headers, HttpStatus.OK);
     }
 
 }

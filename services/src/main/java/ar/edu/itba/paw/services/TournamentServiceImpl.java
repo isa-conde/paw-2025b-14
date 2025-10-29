@@ -77,7 +77,7 @@ public class TournamentServiceImpl implements TournamentService {
         Long image_id = imageDao.insertImage(image);
         Long rules_id = null;
         if (rules != null){
-            rules_id = rulesDao.insertRules(rules);
+            rules_id = rulesDao.insertRules(rules).getId();
         }
         Tournament toReturn = tournamentDao.create(creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, openInscriptions, isFinished, format_id, rules_id);
         User creator = userDao.findById(creator_id).get();
