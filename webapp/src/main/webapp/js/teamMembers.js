@@ -4,13 +4,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const addMemberBtn = document.getElementById("addMemberBtn");
     const chipContainer = document.getElementById("chipContainer");
     const form = document.getElementById("teamForm");
-
     let timeoutId;
 
     async function fetchSuggestions(query) {
-        if (query.length < 1) return;
+        if (query.length < 3) return;
         try {
-            const res = await fetch(`/users/search?name=${encodeURIComponent(query)}`);
+            const res = await fetch(`${contextPath}/users/search?name=${encodeURIComponent(query)}`);
             const users = await res.json();
             updateDatalist(users);
         } catch (err) {

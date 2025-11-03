@@ -120,4 +120,7 @@
     </form:form>
 </paw:modal>
 
+<script>
+    const contextPath = "${pageContext.request.contextPath}";
+</script>
 <script src="${pageContext.request.contextPath}/js/teamMembers.js"></script>
