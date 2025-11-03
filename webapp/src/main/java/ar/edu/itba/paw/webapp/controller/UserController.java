@@ -157,7 +157,6 @@ public class UserController {
         mav.addObject("favouriteGames", gs.getFavourites(id));
         mav.addObject("activeTournaments", ts.findUserActiveTournaments(id, 0L));
         mav.addObject("lastTournaments", ts.findUserPastTournaments(id, 0L));
-        mav.addObject("teams", tms.getUserTeams(id));
         mav.addObject("EditProfileForm", editProfileForm);
         mav.addObject("userRating", userRating);
 
@@ -233,6 +232,37 @@ public class UserController {
         return mav;
     }
 
+    @RequestMapping("/profile/{id}/teams")
+    public ModelAndView profileTeams(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @PathVariable Long id, @ModelAttribute("editProfileForm") EditProfileForm editProfileForm){
+        final ModelAndView mav = new ModelAndView("profileTeams");
+
+        Optional<User> profileOpt = us.findById(id);
+        if (profileOpt.isEmpty()){
+            throw new UserNotFoundException();
+        }
+        User profile = profileOpt.get();
+        Integer userRating = us.getUserRatingAsInteger(profile.getId());
+        mav.addObject("user", currentUser.isPresent() ? currentUser.get().getPawUser() : null);
+        mav.addObject("isMyProfile", profile.getId() == currentUser.get().getPawUser().getId());
+        mav.addObject("profile", profileOpt.get());
+        mav.addObject("teams", tms.getUserTeams(id));
+        mav.addObject("EditProfileForm", editProfileForm);
+        mav.addObject("userRating", userRating);
+
+        editProfileForm.setUsername(profileOpt.get().getUsername());
+        editProfileForm.setBio(profileOpt.get().getBio());
+        boolean hasFormErrors = mav.getModel().containsKey(
+                BindingResult.MODEL_KEY_PREFIX + "editProfileForm"
+        );
+        if (!hasFormErrors) {
+            editProfileForm.setUsername(profile.getUsername());
+            editProfileForm.setBio(profile.getBio());
+        }
+
+        return mav;
+    }
+
+
     private long adjustPage(long page, int totalPages) {
         if (totalPages <= 0) return 0;
         if (page < 0) return 0;
@@ -270,5 +300,15 @@ public class UserController {
         us.updateProfileInfo(userId, form.getUsername(), form.getBio(), pfpBytes, bannerBytes);
 
         return mav;
+    }
+
+    @GetMapping(value = "/users/search", produces = "application/json")
+    @ResponseBody
+    public List<String> searchUsers(@RequestParam String name) {
+        System.out.println(us.searchByName(name));
+        return us.searchByName(name)
+                .stream()
+                .map(User::getUsername)
+                .collect(Collectors.toList());
     }
 }

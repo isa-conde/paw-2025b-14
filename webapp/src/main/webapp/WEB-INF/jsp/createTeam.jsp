@@ -49,13 +49,5 @@
     </div>
 </paw:layout>
 
-<script>
-    const allUsers = [
-        <c:forEach var="u" items="${allUsers}" varStatus="status">
-        "${u.username}"<c:if test="${!status.last}">,</c:if>
-        </c:forEach>
-    ];
-</script>
-
 <script src="${pageContext.request.contextPath}/js/teamMembers.js"></script>
 

@@ -1235,6 +1235,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     border-bottom: 2px solid transparent;
     max-width: 200px;
     display: flex;
+    text-underline-color: transparent;
 }
 
 .navbar-section:hover {

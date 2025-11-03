@@ -5,18 +5,27 @@ document.addEventListener("DOMContentLoaded", () => {
     const chipContainer = document.getElementById("chipContainer");
     const form = document.getElementById("teamForm");
 
-     memberInput.addEventListener("input", () => {
-        const query = memberInput.value.trim().toLowerCase();
-        datalist.innerHTML = "";
-        if (query.length < 3) return;
+    let timeoutId;
 
-        const matches = allUsers.filter(u => u.toLowerCase().includes(query));
-        matches.forEach(name => {
+    async function fetchSuggestions(query) {
+        if (query.length < 1) return;
+        try {
+            const res = await fetch(`/users/search?name=${encodeURIComponent(query)}`);
+            const users = await res.json();
+            updateDatalist(users);
+        } catch (err) {
+            console.error("Error al obtener sugerencias:", err);
+        }
+    }
+
+    function updateDatalist(users) {
+        datalist.innerHTML = "";
+        users.forEach(user => {
             const option = document.createElement("option");
-            option.value = name;
+            option.value = user;
             datalist.appendChild(option);
         });
-    });
+    }
 
     function addMember(name) {
         if (!name.trim()) return;
@@ -36,11 +45,6 @@ document.addEventListener("DOMContentLoaded", () => {
         chip.appendChild(closeBtn);
         chipContainer.appendChild(chip);
 
-        const index = allUsers.indexOf(newMember);
-        if (index !== -1) {
-            allUsers.splice(index, 1);
-        }
-
         const hiddenInput = document.createElement("input");
         hiddenInput.type = "hidden";
         hiddenInput.name = "members";
@@ -52,6 +56,13 @@ document.addEventListener("DOMContentLoaded", () => {
     addMemberBtn.addEventListener("click", () => {
         addMember(memberInput.value);
         memberInput.value = "";
+    });
+
+    memberInput.addEventListener("input", (e) => {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            fetchSuggestions(e.target.value.trim());
+        }, 300);
     });
 
     memberInput.addEventListener("keydown", (e) => {
