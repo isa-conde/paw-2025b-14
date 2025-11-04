@@ -7,6 +7,7 @@
 <%@ attribute name="fill" required="false" description="Fill: [true] or false" type="java.lang.Boolean"%>
 <%@ attribute name="disabled" required="false" description="Whether button is disabled" type="java.lang.Boolean"%>
 <%@ attribute name="isNotSafe" required="false" type="java.lang.Boolean" %>
+<%@ attribute name="rating" required="false" type="java.lang.Float"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 
@@ -22,4 +23,5 @@
         size="${btnSize}"
         fill="${fill}"
         isNotSafe="${isNotSafe}"
+        rating="${rating}"
 />

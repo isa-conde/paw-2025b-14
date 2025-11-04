@@ -214,7 +214,7 @@ public class TournamentController {
             Boolean isIndividualTournament = optionalGameFormat.isEmpty() || optionalGameFormat.get().getPlayers_per_team() == 1;
             Boolean isParticipant = user != null && ps.hasJoined(user.getId(), tournamentId);
             Boolean hasRankedTournament = user != null && ps.participantHasRatedTournament(user.getId(), tournamentId);
-            Integer creatorRating = us.getUserRatingAsInteger(t.getCreator_id());
+            Float creatorRating = us.getUserRating(t.getCreator_id());
             if (user != null && !isIndividualTournament && !isParticipant){
                 mav.addObject("userTeams", tms.getUserTeamsBySizeNotInTournament(user.getId(), tournamentId));
             }

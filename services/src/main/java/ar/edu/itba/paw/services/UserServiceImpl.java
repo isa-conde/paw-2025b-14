@@ -252,12 +252,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Integer getUserRatingAsInteger(Long userId) {
+    public Float getUserRating(Long userId) {
         User user = findById(userId).get();
         Float userRating = user.getRating();
-        if(userRating == null) {
+        if (userRating == null) {
             return null;
         }
-        return Math.round(userRating);
+        return Math.round(userRating * 10f) / 10f;
     }
 }

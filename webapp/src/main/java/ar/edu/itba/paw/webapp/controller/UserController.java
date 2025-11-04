@@ -150,7 +150,7 @@ public class UserController {
             throw new UserNotFoundException();
         }
         User profile = profileOpt.get();
-        Integer userRating = us.getUserRatingAsInteger(profile.getId());
+        Float userRating = us.getUserRating(profile.getId());
         mav.addObject("user", currentUser.isPresent() ? currentUser.get().getPawUser() : null);
         mav.addObject("isMyProfile", profile.getId() == currentUser.get().getPawUser().getId());
         mav.addObject("profile", profileOpt.get());
@@ -241,7 +241,7 @@ public class UserController {
             throw new UserNotFoundException();
         }
         User profile = profileOpt.get();
-        Integer userRating = us.getUserRatingAsInteger(profile.getId());
+        Float userRating = us.getUserRating(profile.getId());
         mav.addObject("user", currentUser.isPresent() ? currentUser.get().getPawUser() : null);
         mav.addObject("isMyProfile", profile.getId() == currentUser.get().getPawUser().getId());
         mav.addObject("profile", profileOpt.get());

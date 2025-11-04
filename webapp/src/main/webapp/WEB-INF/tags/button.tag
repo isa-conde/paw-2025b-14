@@ -7,6 +7,7 @@
 <%@ attribute name="disabled" required="false" description="Whether button is disabled" type="java.lang.Boolean"%>
 <%@ attribute name="isNotSafe" required="false" type="java.lang.Boolean" %>
 <%@ attribute name="secondary" required="false"%>
+<%@ attribute name="rating" required="false" type="java.lang.Float"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
@@ -18,6 +19,8 @@
 <c:set var="imgClass" value="${(hasImage ? 'image' : '')}${!hasText ? ' no-text' : ''}" />
 <c:set var="emptyClass" value="${fill == 'false'? 'empty' : ''}" />
 <c:set var="secondaryClass" value="${secondary == 'true'? 'secondary' : ''}"/>
+
+<c:url var="starUrl" value="/images/roundedStarOn.png"/>
 
 <button class="btn ${imgClass} ${emptyClass} ${secondaryClass}"
         onclick="${onclick}"
@@ -36,5 +39,11 @@
                 </c:otherwise>
             </c:choose>
         </paw:text>
+    </c:if>
+    <c:if test="${rating != null && rating != 0}">
+        <div class="rating-container">
+            <img src="${starUrl}" class="banner-star" alt="tournament.rating.imgLabel"/>
+            <paw:text weight="thin" size="s"> ${rating} </paw:text>
+        </div>
     </c:if>
 </button>

@@ -54,10 +54,7 @@
         <div class="organizer-container">
             <paw:text size="s"><spring:message code="tournament.organizedBy"/></paw:text>
             <c:url value="/profile/${creator.id}" var="profileurl"/>
-            <paw:profileButton imageId="${creator.pfp_id}" text="${creator.username}" onclick="window.location.href='${profileurl}'" size="xs" isNotSafe="true"/>
-            <c:if test="${creatorRating != null}">
-                <paw:text stroke=""/>
-            </c:if>
+            <paw:profileButton imageId="${creator.pfp_id}" text="${creator.username}" onclick="window.location.href='${profileurl}'" size="xs" isNotSafe="true" rating="${creatorRating}"/>
         </div>
     </paw:banner>
     <spring:message code="tournament.overview" var="overview"/>
