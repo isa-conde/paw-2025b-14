@@ -37,6 +37,8 @@ import java.util.Optional;
 @Controller
 public class AuthController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthController.class);
+
     private final UserService us;
     private final PawUserDetailsService userDetailsService;
 
@@ -144,9 +146,14 @@ public class AuthController {
     }
 
     @RequestMapping(value = "/forgotPassword/reset", method = RequestMethod.POST)
-    public ModelAndView resetPassword(@RequestParam("token") Long token, @RequestParam("userId") long userId, @Valid @ModelAttribute("resetPasswordForm") ResetPasswordForm resetPasswordForm, HttpServletRequest request,
-                                      HttpServletResponse response, BindingResult result) {
+    public ModelAndView resetPassword(@RequestParam("token") Long token,
+                                      @RequestParam("userId") long userId,
+                                      @Valid @ModelAttribute("resetPasswordForm") ResetPasswordForm resetPasswordForm,
+                                      BindingResult result,
+                                      HttpServletRequest request,
+                                      HttpServletResponse response) {
         if(result.hasErrors()) {
+            LOGGER.debug("The password pair {} and {} is not valid", resetPasswordForm.getNewPassword(), resetPasswordForm.getConfirmNewPassword());
             return resetPasswordPage(token, userId, resetPasswordForm);
         }
         resetPasswordForm.setUserId(userId);

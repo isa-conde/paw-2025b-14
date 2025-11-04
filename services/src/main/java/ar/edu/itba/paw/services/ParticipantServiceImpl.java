@@ -177,6 +177,9 @@ public class ParticipantServiceImpl implements ParticipantService {
             throw new UserNotFoundException();
         }
         participantDao.updateHasRated(reviewerId, tournamentId);
-        userDao.updateUserRating(creatorId, rating);
+        User user = userDao.findById(creatorId).get();
+        Float currentRating = user.getRating();
+        Float newRating = (currentRating == null) ? rating : (currentRating + rating) / 2;
+        userDao.updateUserRating(creatorId, newRating);
     }
 }
