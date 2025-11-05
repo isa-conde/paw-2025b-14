@@ -16,16 +16,16 @@ public class MaxParticipantsValidator implements ConstraintValidator<MaxParticip
 
     @Override
     public boolean isValid(EditTournamentForm form, ConstraintValidatorContext ctx) {
-        if (form == null || form.getTournamentId() == null || form.getMax_participants() == null) return true;
+        if (form == null || form.getTournamentId() == null || form.getMaxParticipants() == null) return true;
 
         int current = ts.getTournamentParticipantsCount(form.getTournamentId());
-        if (form.getMax_participants() < current) {
+        if (form.getMaxParticipants() < current) {
             ctx.disableDefaultConstraintViolation();
 
             HibernateConstraintValidatorContext hctx = ctx.unwrap(HibernateConstraintValidatorContext.class);
             hctx.addMessageParameter("current", current)
                     .buildConstraintViolationWithTemplate("{tournament.maxParticipants.belowCurrent}")
-                    .addPropertyNode("max_participants")
+                    .addPropertyNode("maxParticipants")
                     .addConstraintViolation();
 
             return false;

@@ -30,10 +30,10 @@
                         <c:otherwise>
                             <div class="carrousel-item">
                             <paw:element-card
-                                    image="${pageContext.request.contextPath}/image/${e.image_id}"
+                                    image="${pageContext.request.contextPath}/image/${e.imageId}"
                                     title="${isGame? e.name : e.name}"
-                                    start_date="${isGame? '' : e.start_date}"
-                                    end_date="${isGame? '' : e.end_date}"
+                                    startDate="${isGame? '' : e.startDate}"
+                                    endDate="${isGame? '' : e.endDate}"
                                     id="${isGame? e.id : e.id}"
                                     isGame="${isGame}"/>
                             </div>

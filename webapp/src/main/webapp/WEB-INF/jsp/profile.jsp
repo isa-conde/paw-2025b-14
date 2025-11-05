@@ -11,11 +11,11 @@
     <c:set var="isMyProfile" value="${user.id == profile.id}"/>
     <c:url value="/images/pencil.png" var="pencilUrl"/>
     <c:set var="icon" value="${isMyProfile ? pencilUrl : null }"/>
-    <c:url value="/banner/${profile.banner_id}" var="bannerUrl"/>
+    <c:url value="/banner/${profile.bannerId}" var="bannerUrl"/>
     <paw:banner cornerIcon="${icon}" cornerOnClick="openModal('editProfileModal')" image="${bannerUrl}">
         <div class="profile-sidebar">
             <div class="profile-picture">
-                <img src="${pageContext.request.contextPath}/pfp/${profile.pfp_id}" alt="${profile.username}">
+                <img src="${pageContext.request.contextPath}/pfp/${profile.pfpId}" alt="${profile.username}">
             </div>
             <div class="profile-info">
                 <paw:text size="xl"><c:out value="${profile.username}"/></paw:text>

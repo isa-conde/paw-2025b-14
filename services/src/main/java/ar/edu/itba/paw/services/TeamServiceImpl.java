@@ -40,29 +40,29 @@ public class TeamServiceImpl implements TeamService {
 
     @Transactional
     @Override
-    public Team create(String name, byte[] pfp, byte[] banner, Long owner_id, List<String> members) {
-        Long pfp_id = null;
-        Long banner_id = null;
+    public Team create(String name, byte[] pfp, byte[] banner, Long ownerId, List<String> members) {
+        Long pfpId = null;
+        Long bannerId = null;
         if (pfp != null){
-            pfp_id = imageDao.insertImage(pfp);
+            pfpId = imageDao.insertImage(pfp);
         }
         if (banner != null){
-            banner_id = imageDao.insertImage(banner);
+            bannerId = imageDao.insertImage(banner);
         }
 
-        Team team = teamDao.create(name, pfp_id, banner_id, owner_id);
+        Team team = teamDao.create(name, pfpId, bannerId, ownerId);
         LOGGER.info("The team {} has been successfully created", name);
 
         if (members != null){
             for (String s : members){
                 teamMemberDao.addMember(team.getId(), userDao.findByUsername(s).get().getId());
             }
-            User owner = userDao.findById(owner_id).get();
+            User owner = userDao.findById(ownerId).get();
             if (!members.contains(owner.getUsername())) {
-                teamMemberDao.addMember(team.getId(), owner_id);
+                teamMemberDao.addMember(team.getId(), ownerId);
             }
         }else{
-            teamMemberDao.addMember(team.getId(), owner_id);
+            teamMemberDao.addMember(team.getId(), ownerId);
         }
 
         return team;
@@ -74,41 +74,41 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public List<Tournament> getActiveTournaments(Long team_id, Integer page) {
-        return getTournamentsFromIds(teamDao.getActiveTournaments(team_id, page));
+    public List<Tournament> getActiveTournaments(Long teamId, Integer page) {
+        return getTournamentsFromIds(teamDao.getActiveTournaments(teamId, page));
     }
 
     @Override
-    public List<Tournament> getPastTournaments(Long team_id, Integer page) {
-        return getTournamentsFromIds(teamDao.getPastTournaments(team_id, page));
+    public List<Tournament> getPastTournaments(Long teamId, Integer page) {
+        return getTournamentsFromIds(teamDao.getPastTournaments(teamId, page));
     }
 
     @Override
-    public Long getActivePages(Long team_id) {
-        return teamDao.getActivePages(team_id);
+    public Long getActivePages(Long teamId) {
+        return teamDao.getActivePages(teamId);
     }
 
     @Override
-    public Long getPastPages(Long team_id) {
-        return teamDao.getPastPages(team_id);
+    public Long getPastPages(Long teamId) {
+        return teamDao.getPastPages(teamId);
     }
 
     @Override
-    public List<Team> getUserTeams(Long user_id) {
-        return teamDao.getUserTeams(user_id);
+    public List<Team> getUserTeams(Long userId) {
+        return teamDao.getUserTeams(userId);
     }
 
     @Transactional
     @Override
     public void updateTeam(Long teamId, String name, byte[] pfp, byte[] banner, List<String> members) {
         Optional<Team> optionalTeam = teamDao.getById(teamId);
-        Long pfp_id = null;
-        Long banner_id = null;
+        Long pfpId = null;
+        Long bannerId = null;
         if (pfp != null){
-            pfp_id = imageDao.insertImage(pfp);
+            pfpId = imageDao.insertImage(pfp);
         }
         if (banner != null){
-            banner_id = imageDao.insertImage(banner);
+            bannerId = imageDao.insertImage(banner);
         }
 
         if (members != null){
@@ -120,20 +120,20 @@ public class TeamServiceImpl implements TeamService {
             }
         }
 
-        teamDao.updateTeam(teamId, name, pfp_id, banner_id);
+        teamDao.updateTeam(teamId, name, pfpId, bannerId);
     }
 
     @Override
-    public Boolean isMember(Long team_id, Long user_id) {
-        return teamMemberDao.isMember(team_id, user_id);
+    public Boolean isMember(Long teamId, Long userId) {
+        return teamMemberDao.isMember(teamId, userId);
     }
 
     @Transactional
     @Override
-    public List<User> getTeamMembers(Long team_id) {
-        Optional<Team> t = teamDao.getById(team_id);
+    public List<User> getTeamMembers(Long teamId) {
+        Optional<Team> t = teamDao.getById(teamId);
         if (t.isEmpty()){
-            LOGGER.warn("Team not found for teamId={} ",team_id);
+            LOGGER.warn("Team not found for teamId={} ",teamId);
             throw new IllegalArgumentException();
         }
         return t.get().getMembers();

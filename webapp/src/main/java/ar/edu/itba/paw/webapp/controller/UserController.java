@@ -106,7 +106,7 @@ public class UserController {
         mav.addObject("teamSizes", List.of(1,2,3,4,5));
         mav.addObject("currentPage", page);
 
-        tf.setGame_id(filterForm.getGame_id());
+        tf.setGameId(filterForm.getGameId());
         tf.setRegion(filterForm.getRegion());
         tf.setElo(filterForm.getElo());
         tf.setPlayersPerTeam(filterForm.getPlayersPerTeam());

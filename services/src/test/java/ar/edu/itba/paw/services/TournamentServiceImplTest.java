@@ -72,23 +72,23 @@ public class TournamentServiceImplTest {
 
         Assert.assertNotNull(ans);
         Assert.assertEquals(ID,ans.getId());
-        Assert.assertEquals(ID,ans.getCreator_id());
+        Assert.assertEquals(ID,ans.getCreatorId());
         Assert.assertEquals(NAME,ans.getName());
-        Assert.assertEquals(ID,ans.getGame_id());
+        Assert.assertEquals(ID,ans.getGameId());
         Assert.assertEquals(REGION,ans.getRegion());
         Assert.assertEquals(ELO,ans.getElo());
-        Assert.assertEquals(START_DATE,ans.getStart_date());
-        Assert.assertEquals(END_DATE,ans.getEnd_date());
+        Assert.assertEquals(START_DATE,ans.getStartDate());
+        Assert.assertEquals(END_DATE,ans.getEndDate());
         Assert.assertEquals(FORMAT,ans.getFormat());
         Assert.assertEquals(STRUCTURE,ans.getStructure());
-        Assert.assertEquals(MAX_PARTICIPANTS,ans.getMax_participants());
-        Assert.assertEquals(ID,ans.getImage_id());
+        Assert.assertEquals(MAX_PARTICIPANTS,ans.getMaxParticipants());
+        Assert.assertEquals(ID,ans.getImageId());
         Assert.assertTrue(ans.getOpenInscriptions());
         Assert.assertFalse(ans.getFinished());
         Assert.assertNull(ans.getTournament_winner());
-        Assert.assertNull(ans.getIs_group_stage());
+        Assert.assertNull(ans.getIsGroupStage());
         Assert.assertFalse(ans.getTournamentStarted());
-        Assert.assertEquals(ID,ans.getFormat_id());
+        Assert.assertEquals(ID,ans.getFormatId());
     }
 
     private Tournament createFakeTournament(User fakeUser){
@@ -99,7 +99,7 @@ public class TournamentServiceImplTest {
         fakeTournament.setCreator(fakeUser);
         fakeTournament.setId(ID);
         fakeTournament.setElo(ELO);
-        fakeTournament.setTournament_started(false);
+        fakeTournament.setTournamentStarted(false);
         return fakeTournament;
     }
 }

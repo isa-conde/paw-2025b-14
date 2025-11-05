@@ -11,10 +11,10 @@
     <c:set var="isMyTeam" value="${user.id == team.owner.id}"/>
     <c:url value="/images/pencil.png" var="pencilUrl"/>
     <c:set var="icon" value="${isMyTeam ? pencilUrl : null }"/>
-    <paw:banner cornerIcon="${icon}" cornerOnClick="openModal('editProfileModal')" image="${pageContext.request.contextPath}/banner/${team.banner_id}">
+    <paw:banner cornerIcon="${icon}" cornerOnClick="openModal('editProfileModal')" image="${pageContext.request.contextPath}/banner/${team.bannerId}">
         <div class="profile-sidebar">
             <div class="profile-picture">
-                <img src="${pageContext.request.contextPath}/pfp/${team.pfp_id}" alt="${team.name}">
+                <img src="${pageContext.request.contextPath}/pfp/${team.pfpId}" alt="${team.name}">
             </div>
             <div class="profile-info">
                 <paw:text size="xl"><c:out value="${team.name}"/></paw:text>
@@ -22,7 +22,7 @@
             <div class="organizer-container">
                 <paw:text size="s"><spring:message code="team.profile.createdBy"/></paw:text>
                 <c:url value="/profile/${owner.id}" var="ownerUrl"/>
-                <paw:profileButton imageId="${owner.pfp_id}" text="${owner.username}" onclick="window.location.href='${ownerUrl}'" size="xs" isNotSafe="true"/>
+                <paw:profileButton imageId="${owner.pfpId}" text="${owner.username}" onclick="window.location.href='${ownerUrl}'" size="xs" isNotSafe="true"/>
             </div>
         </div>
     </paw:banner>

@@ -15,12 +15,12 @@
 
 <c:set var="localName" value="${localPlayer == null ? 'TBD' : localPlayer.name}"/>
 <c:set var="visitorName" value="${visitorPlayer == null ? 'TBD' : visitorPlayer.name}"/>
-<c:set var="localPfpDir" value="${localPlayer == null ? '/images/empty_user.png' : 'pfp/${localPlayer.pfp_id}'}"/>
-<c:set var="visitorPfpDir" value="${visitorPlayer == null ? '/images/empty_user.png' : 'pfp/${visitorPlayer.pfp_id}'}"/>
+<c:set var="localPfpDir" value="${localPlayer == null ? '/images/empty_user.png' : 'pfp/${localPlayer.pfpId}'}"/>
+<c:set var="visitorPfpDir" value="${visitorPlayer == null ? '/images/empty_user.png' : 'pfp/${visitorPlayer.pfpId}'}"/>
 
 <c:set var="contextPath" value="${pageContext.request.contextPath}"/>
-<c:set var="localPfp" value="${localPlayer == null ? contextPath.concat('/images/empty_user.png') : contextPath.concat('/pfp/').concat(localPlayer.pfp_id)}"/>
-<c:set var="visitorPfp" value="${visitorPlayer == null ? contextPath.concat('/images/empty_user.png') : contextPath.concat('/pfp/').concat(visitorPlayer.pfp_id)}"/>
+<c:set var="localPfp" value="${localPlayer == null ? contextPath.concat('/images/empty_user.png') : contextPath.concat('/pfp/').concat(localPlayer.pfpId)}"/>
+<c:set var="visitorPfp" value="${visitorPlayer == null ? contextPath.concat('/images/empty_user.png') : contextPath.concat('/pfp/').concat(visitorPlayer.pfpId)}"/>
 
 <div class="match-card">
     <div class="player local-player ${winner == 1 ? 'winner' : ''}">

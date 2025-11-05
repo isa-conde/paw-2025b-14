@@ -23,14 +23,14 @@
                             </div>
                             <div class="row">
                                 <paw:input path="region" label="createTournament.region" inputType="select" items="${regions}" hasConstraint="true" emptyOption="${emptyOption}" itemValue=""/>
-                                <paw:input path="game_id" label="createTournament.game"  inputType="select" items="${games}" itemValue="id" itemLabel="name" hasConstraint="true" emptyOption="${emptyOption}"/>
+                                <paw:input path="gameId" label="createTournament.game"  inputType="select" items="${games}" itemValue="id" itemLabel="name" hasConstraint="true" emptyOption="${emptyOption}"/>
                             </div>
                             <div class="row">
                                 <paw:input path="structure" label="createTournament.structure" inputType="select" items="${structures}" emptyOption="${emptyOption}" hasConstraint="true"/>
                             </div>
                             <div class="row">
-                                <paw:input path="start_date" label="createTournament.startDate"  inputType="date" hasConstraint="true"/>
-                                <paw:input path="end_date" label="createTournament.endDate" inputType="date" hasConstraint="true"/>
+                                <paw:input path="startDate" label="createTournament.startDate"  inputType="date" hasConstraint="true"/>
+                                <paw:input path="endDate" label="createTournament.endDate" inputType="date" hasConstraint="true"/>
                             </div>
                             <div class="row center">
                                 <paw:input path="" label="createTournament.next" containerType="half" inputType="submit"/>
@@ -43,8 +43,8 @@
                         <div>
                             <paw:text type="title" size="xl"><spring:message code="createTournament.Step2"/></paw:text>
                             <div class="row">
-                                <paw:input path="max_participants" label="createTournament.maxParticipants" inputType="number" hasConstraint="true" arg="${playersPerTeamMax}"/>
-                                <paw:input path="format_id" label="createTournament.format" hasConstraint="true" inputType="select" items="${formats}" itemLabel="name" itemValue="id"/>
+                                <paw:input path="maxParticipants" label="createTournament.maxParticipants" inputType="number" hasConstraint="true" arg="${playersPerTeamMax}"/>
+                                <paw:input path="formatId" label="createTournament.format" hasConstraint="true" inputType="select" items="${formats}" itemLabel="name" itemValue="id"/>
                             </div>
                             <div class="row">
                                 <paw:input path="elo" label="createTournament.skillLevel" inputType="select" itemMap="${elos}" hasConstraint="true" emptyOption="${emptyOption}" itemValue="a"/>

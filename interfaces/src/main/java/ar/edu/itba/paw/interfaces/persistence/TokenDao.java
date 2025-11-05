@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface TokenDao {
 
-    Token create(Long user_id, Long token, LocalDate expiry_date);
+    Token create(Long userId, Long token, LocalDate expiryDate);
 
     Optional<Token> findByToken(Long token);
 

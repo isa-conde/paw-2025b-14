@@ -25,7 +25,7 @@
         </div>
       <form:form cssClass="form" modelAttribute="filterForm" method="get">
         <div class="filter-container">
-          <paw:input path="game_id" label="tournaments.game" inputType="select" items="${games}" itemValue="id" itemLabel="name" emptyOption="${allGames}" inline="true"/>
+          <paw:input path="gameId" label="tournaments.game" inputType="select" items="${games}" itemValue="id" itemLabel="name" emptyOption="${allGames}" inline="true"/>
           <paw:input path="region" label="tournaments.region" inputType="select" items="${regions}" emptyOption="${allRegions}" inline="true"/>
           <paw:input path="elo" label="tournaments.skillLevel" inputType="select" itemMap="${elos}" emptyOption="${allLevels}" inline="true"/>
           <paw:input path="genre" label="tournaments.genre" inputType="select" items="${genres}" emptyOption="${allGenres}" inline="true"/>
@@ -43,7 +43,7 @@
         <c:forEach var="game" items="${gameTournaments.keySet()}" varStatus="status">
             <c:if test="${not empty gameTournaments[game]}">
                 <div class="carrousel-title">
-                    <c:url value="tournamentsPage?game_id=${game.id}"  var="gameurl"/>
+                    <c:url value="tournamentsPage?gameId=${game.id}"  var="gameurl"/>
                     <a href="${gameurl}" class="title-link">
                         <paw:text type="title" size="s"><c:out value="${game.name}"/></paw:text>
                     </a>

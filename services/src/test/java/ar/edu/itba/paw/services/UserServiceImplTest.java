@@ -132,7 +132,7 @@ public class UserServiceImplTest{
         Optional<Token> ans = userService.checkTokenValidity(1L,1L);
 
         Assert.assertTrue(ans.isPresent());
-        Assert.assertEquals(Long.valueOf(1L), ans.get().getUser_id());
+        Assert.assertEquals(Long.valueOf(1L), ans.get().getUserId());
     }
 
     @Test

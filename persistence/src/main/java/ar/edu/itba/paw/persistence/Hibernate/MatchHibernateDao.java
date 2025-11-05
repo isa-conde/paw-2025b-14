@@ -79,8 +79,8 @@ public class MatchHibernateDao implements MatchDao {
     }
 
     @Override
-    public List<Match> getTournamentMatches(Long tournament_id, Integer teamSize) {
-        Tournament tournament = em.find(Tournament.class, tournament_id);
+    public List<Match> getTournamentMatches(Long tournamentId, Integer teamSize) {
+        Tournament tournament = em.find(Tournament.class, tournamentId);
         return tournament.getMatches();
     }
 

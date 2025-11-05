@@ -4,14 +4,14 @@
 <%@ attribute name="image" required="true" rtexprvalue="true" %>
 <%@ attribute name="game" required="false" rtexprvalue="true" %>
 <%@ attribute name="title" required="true" rtexprvalue="true" %>
-<%@ attribute name="start_date" required="false" type="java.time.LocalDate" %>
-<%@attribute name="end_date" required="false" type="java.time.LocalDate" %>
+<%@ attribute name="startDate" required="false" type="java.time.LocalDate" %>
+<%@attribute name="endDate" required="false" type="java.time.LocalDate" %>
 <%@ attribute name="tags" required="false" rtexprvalue="true" type="java.util.List" %>
 <%@ attribute name="id" required="true" rtexprvalue="true" %>
 <%@ attribute name="isGame" required="false" rtexprvalue="true" %>
 
-<c:set var="hasDate" value="${not empty start_date && not empty end_date}"/>
-<c:set var="url" value="${pageContext.request.contextPath}/${isGame == 'true' ? 'tournamentsPage?game_id=' : 'tournament?tournamentId='}${id}"/>
+<c:set var="hasDate" value="${not empty startDate && not empty endDate}"/>
+<c:set var="url" value="${pageContext.request.contextPath}/${isGame == 'true' ? 'tournamentsPage?gameId=' : 'tournament?tournamentId='}${id}"/>
 
 <a href="${url}" class="element-card">
     <img src="${image}" alt="Background" class="element-card-image">
@@ -22,9 +22,9 @@
         <paw:text type="title" size="s" stroke="true"><c:out value="${title}"/></paw:text>
         <c:if test="${hasDate}">
             <div class="element-card-date">
-                <paw:datetime date="${start_date}" size="s" weight="semi-bold"/>
+                <paw:datetime date="${startDate}" size="s" weight="semi-bold"/>
                 <paw:text size="s" weight="semi-bold"> - </paw:text>
-                <paw:datetime date="${end_date}" size="s" weight="semi-bold"/>
+                <paw:datetime date="${endDate}" size="s" weight="semi-bold"/>
             </div>
         </c:if>
     </div>

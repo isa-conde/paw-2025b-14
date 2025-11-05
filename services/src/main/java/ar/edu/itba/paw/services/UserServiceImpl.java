@@ -96,13 +96,12 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public Optional<Token> resetPassword(Long token, Long userId, String newPassword) {
+    public void resetPassword(Long token, Long userId, String newPassword) {
         Optional<Token> optToken = checkTokenValidity(token, userId);
         if(optToken.isPresent()) {
             userDao.changePassword(userId, passwordEncoder.encode(newPassword));
             LOGGER.info("User {} has successfully changed their password", findById(userId).get().getUsername());
         }
-        return optToken;
     }
 
     @Override
@@ -176,8 +175,8 @@ public class UserServiceImpl implements UserService {
         }
         if(optToken.isPresent()) {
             Token foundToken = optToken.get();
-            if(foundToken.getUser_id().equals(userId)) {
-                if(foundToken.getExpiry_date().isAfter(LocalDate.now())) {
+            if(foundToken.getUserId().equals(userId)) {
+                if(foundToken.getExpiryDate().isAfter(LocalDate.now())) {
                     tokenDao.markAsUsed(foundToken.getId());
                     return optToken;
                 } else {

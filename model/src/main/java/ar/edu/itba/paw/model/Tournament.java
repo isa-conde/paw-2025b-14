@@ -51,10 +51,10 @@ public class Tournament {
     private Elo elo;
 
     @Column(name = "start_date")
-    private LocalDate start_date;
+    private LocalDate startDate;
 
     @Column(name = "end_date")
-    private LocalDate end_date;
+    private LocalDate endDate;
 
     @Column(name = "format")
     private String format;
@@ -65,26 +65,26 @@ public class Tournament {
     private Structure structure;
 
     @Column(name = "max_participants", nullable = false)
-    private Integer max_participants;
+    private Integer maxParticipants;
 
     @Column(name = "image_id")
-    private Long image_id;
+    private Long imageId;
 
     @Column(name = "open_inscriptions")
-    private Boolean open_inscriptions;
+    private Boolean openInscriptions;
 
     @Column(name = "is_finished")
-    private Boolean is_finished;
+    private Boolean isFinished;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tournament_winner")
     private Participant winner;
 
     @Column(name = "is_group_stage")
-    private Boolean is_group_stage;
+    private Boolean isGroupStage;
 
     @Column(name = "tournament_started")
-    private Boolean tournament_started;
+    private Boolean tournamentStarted;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "format_id", nullable = false)
@@ -103,39 +103,39 @@ public class Tournament {
     @JoinColumn(name = "rules_id", referencedColumnName = "id")
     private Rules rules;
 
-    public Tournament(User creator, String name, Game game, Region region, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Long image_id, Boolean openInscriptions, Boolean isFinished, GameFormat formatEntity){
+    public Tournament(User creator, String name, Game game, Region region, LocalDate startDate, LocalDate endDate, String format, Structure structure, Integer maxParticipants, Long imageId, Boolean openInscriptions, Boolean isFinished, GameFormat formatEntity){
         this.creator = creator;
         this.name = name;
         this.game = game;
         this.gameId = game.getId();
         this.region = region;
-        this.start_date = start_date;
-        this.end_date = end_date;
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.format = format;
         this.structure = structure;
-        this.max_participants = max_participants;
-        this.image_id = image_id;
-        this.open_inscriptions = openInscriptions;
-        this.is_finished = isFinished;
+        this.maxParticipants = maxParticipants;
+        this.imageId = imageId;
+        this.openInscriptions = openInscriptions;
+        this.isFinished = isFinished;
         this.formatEntity = formatEntity;
     }
 
-    public Tournament(Long id, Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Long imageId, Boolean openInscriptions, Boolean isFinished, Long tournamentWinner, Boolean isGroupStage, Boolean tournamentStarted, Long format_id) {
+    public Tournament(Long id, Long creatorId, String name, Long gameId, Region region, Elo elo, LocalDate startDate, LocalDate endDate, String format, Structure structure, Integer maxParticipants, Long imageId, Boolean openInscriptions, Boolean isFinished, Long tournamentWinner, Boolean isGroupStage, Boolean tournamentStarted, Long formatId) {
         this.id = id;
         this.name = name;
         this.region = region;
         this.elo = elo;
-        this.start_date = start_date;
-        this.end_date = end_date;
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.format = format;
         this.structure = structure;
-        this.max_participants = max_participants;
-        this.image_id = imageId;
-        this.open_inscriptions = openInscriptions;
-        this.is_finished = isFinished;
-        this.is_group_stage = isGroupStage;
-        this.tournament_started = tournamentStarted;
-        this.gameId = game_id;
+        this.maxParticipants = maxParticipants;
+        this.imageId = imageId;
+        this.openInscriptions = openInscriptions;
+        this.isFinished = isFinished;
+        this.isGroupStage = isGroupStage;
+        this.tournamentStarted = tournamentStarted;
+        this.gameId = gameId;
     }
 
     public Tournament() {}
@@ -144,7 +144,7 @@ public class Tournament {
         return id;
     }
 
-    public Long getCreator_id() {
+    public Long getCreatorId() {
         return creator.getId();
     }
 
@@ -152,7 +152,7 @@ public class Tournament {
         return name;
     }
 
-    public Long getGame_id() {
+    public Long getGameId() {
         return gameId;
     }
 
@@ -164,12 +164,12 @@ public class Tournament {
         return elo;
     }
 
-    public LocalDate getStart_date() {
-        return start_date;
+    public LocalDate getStartDate() {
+        return startDate;
     }
 
-    public LocalDate getEnd_date() {
-        return end_date;
+    public LocalDate getEndDate() {
+        return endDate;
     }
 
     public String getFormat() {
@@ -184,20 +184,20 @@ public class Tournament {
         return structure;
     }
 
-    public Integer getMax_participants() {
-        return max_participants;
+    public Integer getMaxParticipants() {
+        return maxParticipants;
     }
 
-    public Long getImage_id() {
-        return image_id;
+    public Long getImageId() {
+        return imageId;
     }
 
     public Boolean getOpenInscriptions() {
-        return open_inscriptions;
+        return openInscriptions;
     }
 
     public Boolean getFinished() {
-        return is_finished;
+        return isFinished;
     }
 
     public Long getTournament_winner() {
@@ -206,15 +206,15 @@ public class Tournament {
         return winner.getId();
     }
 
-    public Boolean getIs_group_stage() {
-        return is_group_stage;
+    public Boolean getIsGroupStage() {
+        return isGroupStage;
     }
 
     public Boolean getTournamentStarted() {
-        return tournament_started;
+        return tournamentStarted;
     }
 
-    public Long getFormat_id(){
+    public Long getFormatId(){
         if (formatEntity == null)
             return null;
         return formatEntity.getId();
@@ -240,16 +240,8 @@ public class Tournament {
         return game;
     }
 
-    public Boolean getIs_finished() {
-        return is_finished;
-    }
-
-    public Boolean getOpen_inscriptions() {
-        return open_inscriptions;
-    }
-
-    public Boolean getTournament_started() {
-        return tournament_started;
+    public Boolean getIsFinished() {
+        return isFinished;
     }
 
     public User getCreator() {
@@ -272,44 +264,44 @@ public class Tournament {
         this.winner = winner;
     }
 
-    public void setImage_id(Long image_id) {
-        this.image_id = image_id;
+    public void setImageId(Long imageId) {
+        this.imageId = imageId;
     }
 
-    public void setMax_participants(Integer max_participants) {
-        this.max_participants = max_participants;
+    public void setMaxParticipants(Integer maxParticipants) {
+        this.maxParticipants = maxParticipants;
     }
 
     public void setStructure(Structure structure) {
         this.structure = structure;
     }
 
-    public void setEnd_date(LocalDate end_date) {
-        this.end_date = end_date;
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
-    public void setStart_date(LocalDate start_date) {
-        this.start_date = start_date;
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
     }
 
     public void setFormatEntity(GameFormat formatEntity) {
         this.formatEntity = formatEntity;
     }
 
-    public void setIs_finished(Boolean is_finished) {
-        this.is_finished = is_finished;
+    public void setIsFinished(Boolean isFinished) {
+        this.isFinished = isFinished;
     }
 
-    public void setIs_group_stage(Boolean is_group_stage) {
-        this.is_group_stage = is_group_stage;
+    public void setIsGroupStage(Boolean isGroupStage) {
+        this.isGroupStage = isGroupStage;
     }
 
-    public void setOpen_inscriptions(Boolean open_inscriptions) {
-        this.open_inscriptions = open_inscriptions;
+    public void setOpenInscriptions(Boolean openInscriptions) {
+        this.openInscriptions = openInscriptions;
     }
 
-    public void setTournament_started(Boolean tournament_started) {
-        this.tournament_started = tournament_started;
+    public void setTournamentStarted(Boolean tournamentStarted) {
+        this.tournamentStarted = tournamentStarted;
     }
 
     public List<Participant> getParticipants() {

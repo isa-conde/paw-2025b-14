@@ -36,6 +36,6 @@ public class GameFormatHibernateDao implements GameFormatDao {
     @Override
     public Integer getPlayersPerTeam(Long id) {
         GameFormat gameFormat = em.find(GameFormat.class, id);
-        return gameFormat.getPlayers_per_team();
+        return gameFormat.getPlayersPerTeam();
     }
 }

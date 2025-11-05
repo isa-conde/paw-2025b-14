@@ -6,13 +6,13 @@ import java.util.List;
 
 public interface ParticipantService {
 
-    public void joinTournamentUser(Long user_id, Long tournament_id);
+    void joinTournamentUser(Long userId, Long tournamentId);
 
     Boolean hasJoined(Long userId, Long tournamentId);
 
-    public void leaveTournament(Long user_id, Long tournament_id);
+    void leaveTournament(Long userId, Long tournamentId);
 
-    void swapGroups(Long tournament_id, Long user1, Long user2);
+    void swapGroups(Long tournamentId, Long user1, Long user2);
 
     List<Participant> getTournamentParticipants(Long tournamentId, Integer teamSize);
 

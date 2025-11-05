@@ -15,10 +15,10 @@
     <div onclick="window.location.href='${url}'" >
         <c:choose>
             <c:when test="${isUser}">
-                <img class="profile-avatar" src="${pageContext.request.contextPath}/pfp/${userProfile.pfp_id}" alt="${userProfile.username}"/>
+                <img class="profile-avatar" src="${pageContext.request.contextPath}/pfp/${userProfile.pfpId}" alt="${userProfile.username}"/>
             </c:when>
             <c:otherwise>
-                <img  class="profile-avatar" src="${pageContext.request.contextPath}/pfp/${teamProfile.pfp_id}" alt="${teamProfile.name}"/>
+                <img  class="profile-avatar" src="${pageContext.request.contextPath}/pfp/${teamProfile.pfpId}" alt="${teamProfile.name}"/>
             </c:otherwise>
         </c:choose>
     </div>

@@ -21,28 +21,28 @@ public class TournamentForm implements HasDates{
     @Size(max = 100, groups = StepOne.class)
     private String name;
     @NotNull(message = "{createTournament.notNull}", groups = StepOne.class)
-    private Long game_id;
+    private Long gameId;
     @NotNull(message = "{createTournament.notNull}", groups = StepOne.class)
     private Region region;
     @NotNull(message = "{createTournament.notNull}", groups = StepTwo.class)
     private Elo elo;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @NotNull(message = "{createTournament.notNull}", groups = StepOne.class)
-    private LocalDate start_date;
+    private LocalDate startDate;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     @NotNull(message = "{createTournament.notNull}", groups = StepOne.class)
-    private LocalDate end_date;
+    private LocalDate endDate;
     @NotNull(message = "{createTournament.notNull}", groups = StepOne.class)
     private Structure structure;
     @NotNull(message = "{createTournament.notNull}", groups = StepTwo.class)
     @Min(value = 4, message = "{createTournament.minParticipants}", groups = StepTwo.class)
     @Max(value = 32, message = "{createTournament.maxParticipantsError}", groups = StepTwo.class)
-    private Integer max_participants;
+    private Integer maxParticipants;
     @ImageConstraint(groups = StepTwo.class)
     @NotNull(message = "{createTournament.notNull}", groups = StepTwo.class)
     private MultipartFile image;
     @NotNull(message = "{createTournament.notNull}", groups = StepTwo.class)
-    private Long format_id;
+    private Long formatId;
 
     private MultipartFile rules;
 
@@ -53,11 +53,11 @@ public class TournamentForm implements HasDates{
         this.name = name;
     }
 
-    public Long getGame_id() {
-        return game_id;
+    public Long getGameId() {
+        return gameId;
     }
-    public void setGame_id(Long game_id) {
-        this.game_id = game_id;
+    public void setGameId(Long gameId) {
+        this.gameId = gameId;
     }
 
     public Region getRegion() {
@@ -74,18 +74,18 @@ public class TournamentForm implements HasDates{
         this.elo = elo;
     }
 
-    public LocalDate getStart_date() {
-        return start_date;
+    public LocalDate getStartDate() {
+        return startDate;
     }
-    public void setStart_date(LocalDate start_date) {
-        this.start_date = start_date;
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
     }
 
-    public LocalDate getEnd_date() {
-        return end_date;
+    public LocalDate getEndDate() {
+        return endDate;
     }
-    public void setEnd_date(LocalDate end_date) {
-        this.end_date = end_date;
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     public Structure getStructure() {
@@ -95,11 +95,11 @@ public class TournamentForm implements HasDates{
         this.structure = structure;
     }
 
-    public Integer getMax_participants() {
-        return max_participants;
+    public Integer getMaxParticipants() {
+        return maxParticipants;
     }
-    public void setMax_participants(Integer max_participants) {
-        this.max_participants = max_participants;
+    public void setMaxParticipants(Integer maxParticipants) {
+        this.maxParticipants = maxParticipants;
     }
 
     public MultipartFile getImage() {
@@ -109,11 +109,11 @@ public class TournamentForm implements HasDates{
         this.image = image;
     }
 
-    public Long getFormat_id() {
-        return format_id;
+    public Long getFormatId() {
+        return formatId;
     }
-    public void setFormat_id(Long format_id) {
-        this.format_id = format_id;
+    public void setFormatId(Long formatId) {
+        this.formatId = formatId;
     }
 
     public MultipartFile getRules() {

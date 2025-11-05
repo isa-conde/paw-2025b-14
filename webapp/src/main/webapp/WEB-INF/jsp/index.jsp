@@ -48,7 +48,7 @@
             <c:set var="gameTournaments" value="${requestScope['tournaments' += gameId]}"/>
             <c:set var="gameObject" value="${requestScope['game' += gameId]}"/>
                 <div class="carrousel-title">
-                    <c:url value="tournamentsPage?game_id=${gameObject.id}"  var="gameurl"/>
+                    <c:url value="tournamentsPage?gameId=${gameObject.id}"  var="gameurl"/>
                     <a href="${gameurl}" class="title-link">
                         <paw:text type="title" size="s">${gameObject.name}</paw:text>
                     </a>

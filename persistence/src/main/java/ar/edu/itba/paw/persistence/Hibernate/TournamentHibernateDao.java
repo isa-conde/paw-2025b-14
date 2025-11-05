@@ -59,7 +59,7 @@ public class TournamentHibernateDao implements TournamentDao {
         TypedQuery<Tournament> query = em.createQuery(
                 "SELECT DISTINCT t FROM Tournament t " +
                         "WHERE t.id IN :ids " +
-                        "ORDER BY t.start_date ASC", Tournament.class
+                        "ORDER BY t.startDate ASC", Tournament.class
         );
         query.setParameter("ids", tournamentIds);
 
@@ -67,15 +67,15 @@ public class TournamentHibernateDao implements TournamentDao {
     }
 
     private String buildTournamentFilterJpql(TournamentFilter filter, Map<String, Object> params) {
-        StringBuilder jpql = new StringBuilder(" WHERE t.open_inscriptions = true");
+        StringBuilder jpql = new StringBuilder(" WHERE t.openInscriptions = true");
 
         if (filter.getName() != null) {
             jpql.append(" AND LOWER(t.name) LIKE LOWER(:name)");
             params.put("name", "%" + filter.getName() + "%");
         }
-        if (filter.getGame_id() != null) {
+        if (filter.getGameId() != null) {
             jpql.append(" AND t.game.id = :gameId");
-            params.put("gameId", filter.getGame_id());
+            params.put("gameId", filter.getGameId());
         }
         if (filter.getElo() != null) {
             jpql.append(" AND t.elo = :elo");
@@ -93,16 +93,16 @@ public class TournamentHibernateDao implements TournamentDao {
             jpql.append(" AND t.structure = :structure");
             params.put("structure", filter.getStructure());
         }
-        if (filter.getStart_date() != null) {
+        if (filter.getStartDate() != null) {
             jpql.append(" AND t.startDate <= :startDate");
-            params.put("startDate", filter.getStart_date());
+            params.put("startDate", filter.getStartDate());
         }
-        if (filter.getEnd_date() != null) {
+        if (filter.getEndDate() != null) {
             jpql.append(" AND t.endDate <= :endDate");
-            params.put("endDate", filter.getEnd_date());
+            params.put("endDate", filter.getEndDate());
         }
         if (filter.getPlayersPerTeam() != null) {
-            jpql.append(" AND t.formatEntity.players_per_team = :playersPerTeam");
+            jpql.append(" AND t.formatEntity.playersPerTeam = :playersPerTeam");
             params.put("playersPerTeam", filter.getPlayersPerTeam());
         }
         if (filter.getGenre() != null) {
@@ -114,29 +114,29 @@ public class TournamentHibernateDao implements TournamentDao {
     }
 
     @Override
-    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Long image_id, Boolean openInscriptions, Boolean isFinished, Long format_id, Long rules_id) {
-        Tournament t = new Tournament(em.getReference(User.class, creator_id), name, em.getReference(Game.class,  game_id), region, start_date, end_date, format, structure, max_participants, image_id, openInscriptions, isFinished, em.getReference(GameFormat.class, format_id));
-        t.setTournament_started(false);
+    public Tournament create(Long creatorId, String name, Long gameId, Region region, Elo elo, LocalDate startDate, LocalDate endDate, String format, Structure structure, Integer maxParticipants, Long imageId, Boolean openInscriptions, Boolean isFinished, Long formatId, Long rulesId) {
+        Tournament t = new Tournament(em.getReference(User.class, creatorId), name, em.getReference(Game.class,  gameId), region, startDate, endDate, format, structure, maxParticipants, imageId, openInscriptions, isFinished, em.getReference(GameFormat.class, formatId));
+        t.setTournamentStarted(false);
         t.setElo(elo);
-        if (rules_id != null){
-            t.setRules(em.getReference(Rules.class, rules_id));
+        if (rulesId != null){
+            t.setRules(em.getReference(Rules.class, rulesId));
         }
         em.persist(t);
         return t;
     }
 
     @Override
-    public Structure getTournamentStructure(Long tournament_id) {
-        Tournament t = em.find(Tournament.class, tournament_id);
+    public Structure getTournamentStructure(Long tournamentId) {
+        Tournament t = em.find(Tournament.class, tournamentId);
         return t.getStructure();
     }
 
     @Override
-    public List<Tournament> findByCreator(Long creator_id, Long page, Boolean isFinished) {
+    public List<Tournament> findByCreator(Long creatorId, Long page, Boolean isFinished) {
         Query idQuery = em.createNativeQuery(
-                "SELECT t.id FROM Tournament t WHERE t.creator_id = ?1 AND t.is_finished = ?2 ORDER BY t.start_date ASC"
+                "SELECT t.id FROM Tournament t WHERE t.creatorId = ?1 AND t.isFinished = ?2 ORDER BY t.startDate ASC"
         );
-        idQuery.setParameter(1, creator_id);
+        idQuery.setParameter(1, creatorId);
         idQuery.setParameter(2, isFinished);
         idQuery.setFirstResult((int) (page * PAGE_SIZE));
         idQuery.setMaxResults(PAGE_SIZE);
@@ -149,7 +149,7 @@ public class TournamentHibernateDao implements TournamentDao {
         TypedQuery<Tournament> fullQuery = em.createQuery(
                 "SELECT DISTINCT t FROM Tournament t " +
                         "WHERE t.id IN :ids " +
-                        "ORDER BY t.start_date ASC",
+                        "ORDER BY t.startDate ASC",
                 Tournament.class
         );
         fullQuery.setParameter("ids", tournamentIds.stream().map(Number::longValue).toList());
@@ -158,9 +158,9 @@ public class TournamentHibernateDao implements TournamentDao {
     }
 
     @Override
-    public void setFinished(Long tournament_id) {
-        Tournament t = em.find(Tournament.class, tournament_id);
-        t.setIs_finished(true);
+    public void setFinished(Long tournamentId) {
+        Tournament t = em.find(Tournament.class, tournamentId);
+        t.setIsFinished(true);
         em.persist(t);
     }
 
@@ -178,13 +178,13 @@ public class TournamentHibernateDao implements TournamentDao {
         Query idQuery = em.createNativeQuery(
                 "SELECT t.id " +
                     "FROM Tournament t " +
-                    "WHERE t.is_finished = ?1 " +
+                    "WHERE t.isFinished = ?1 " +
                     "  AND t.id IN ( " +
-                        "    SELECT p.tournament_id " +
+                        "    SELECT p.tournamentId " +
                         "    FROM Participant p " +
-                        "    WHERE p.user_id = ?2 " +
+                        "    WHERE p.userId = ?2 " +
                     ") " +
-                    "ORDER BY t.start_date ASC"
+                    "ORDER BY t.startDate ASC"
 
         );
         idQuery.setParameter(1, isFinished);
@@ -199,7 +199,7 @@ public class TournamentHibernateDao implements TournamentDao {
         TypedQuery<Tournament> fullQuery = em.createQuery(
                 "SELECT DISTINCT t FROM Tournament t " +
                         "WHERE t.id IN :ids " +
-                        "ORDER BY t.start_date ASC",
+                        "ORDER BY t.startDate ASC",
                 Tournament.class
         );
         fullQuery.setParameter("ids", tournamentIds.stream().map(Number::longValue).toList());
@@ -208,9 +208,9 @@ public class TournamentHibernateDao implements TournamentDao {
     }
 
     @Override
-    public void closeInscriptions(Long tournament_id) {
-        Tournament t = em.find(Tournament.class, tournament_id);
-        t.setOpen_inscriptions(false);
+    public void closeInscriptions(Long tournamentId) {
+        Tournament t = em.find(Tournament.class, tournamentId);
+        t.setOpenInscriptions(false);
         em.persist(t);
     }
 
@@ -222,18 +222,18 @@ public class TournamentHibernateDao implements TournamentDao {
     }
 
     @Override
-    public void startTournament(Long tournament_id) {
-        Tournament t = em.find(Tournament.class, tournament_id);
-        t.setTournament_started(true);
+    public void startTournament(Long tournamentId) {
+        Tournament t = em.find(Tournament.class, tournamentId);
+        t.setTournamentStarted(true);
         em.persist(t);
     }
 
     @Override
     public Map<Long, List<Tournament>> getUnfilteredTournamentPages(Long page) {
         Query topGamesQuery = em.createNativeQuery(
-                "SELECT game_id " +
+                "SELECT gameId " +
                         "FROM tournament " +
-                        "GROUP BY game_id " +
+                        "GROUP BY gameId " +
                         "ORDER BY COUNT(*) DESC"
         );
         topGamesQuery.setFirstResult((int)(page * TOP_GAMES_LIMIT));
@@ -247,9 +247,9 @@ public class TournamentHibernateDao implements TournamentDao {
         Query tournamentIdsQuery = em.createNativeQuery(
                 "SELECT t.id " +
                         "FROM Tournament t " +
-                        "WHERE t.game_id IN ?1 " +
-                        "AND t.open_inscriptions = true " +
-                        "ORDER BY t.game_id, t.start_date ASC ");
+                        "WHERE t.gameId IN ?1 " +
+                        "AND t.openInscriptions = true " +
+                        "ORDER BY t.gameId, t.startDate ASC ");
         tournamentIdsQuery.setParameter(1, topGameIds.stream().map(Number::longValue).toList());
         tournamentIdsQuery.setMaxResults(TOURNAMENTS_PER_GAME);
 
@@ -261,7 +261,7 @@ public class TournamentHibernateDao implements TournamentDao {
                 "SELECT DISTINCT t FROM Tournament t " +
                         "LEFT JOIN FETCH t.game g " +
                         "WHERE t.id IN :ids " +
-                        "ORDER BY t.game.id, t.start_date ASC",
+                        "ORDER BY t.game.id, t.startDate ASC",
                 Tournament.class
         );
         fullQuery.setParameter("ids", tournamentIds.stream().map(Number::longValue).toList());
@@ -306,16 +306,16 @@ public class TournamentHibernateDao implements TournamentDao {
     }
 
     @Override
-    public void updateTournamentInfo(Long tournament_id, String name, LocalDate start_date, LocalDate end_date, Integer max_participants) {
-        Tournament t = em.find(Tournament.class, tournament_id);
+    public void updateTournamentInfo(Long tournamentId, String name, LocalDate startDate, LocalDate endDate, Integer maxParticipants) {
+        Tournament t = em.find(Tournament.class, tournamentId);
         if (name != null){
             t.setName(name);
-        }if (start_date != null){
-            t.setStart_date(start_date);
-        }if (end_date != null){
-            t.setEnd_date(end_date);
-        }if (max_participants != null){
-            t.setMax_participants(max_participants);
+        }if (startDate != null){
+            t.setStartDate(startDate);
+        }if (endDate != null){
+            t.setEndDate(endDate);
+        }if (maxParticipants != null){
+            t.setMaxParticipants(maxParticipants);
         }
         em.persist(t);
     }
@@ -338,26 +338,26 @@ public class TournamentHibernateDao implements TournamentDao {
     @Override
     public void setIsGroupStage(Long tournamentId, Boolean bool) {
         Tournament t = em.find(Tournament.class, tournamentId);
-        t.setIs_group_stage(bool);
+        t.setIsGroupStage(bool);
         em.persist(t);
     }
 
     @Override
     public Boolean getIsGroupStage(Long tournamentId) {
         Tournament t = em.find(Tournament.class, tournamentId);
-        return t.getIs_group_stage();
+        return t.getIsGroupStage();
     }
 
     @Override
-    public void setTournamentWinner(Long tournament_id, Long winner_id) {
-        Tournament t = em.find(Tournament.class, tournament_id);
+    public void setTournamentWinner(Long tournamentId, Long winner_id) {
+        Tournament t = em.find(Tournament.class, tournamentId);
         t.setWinner(em.getReference(Participant.class, winner_id));
         em.persist(t);
     }
 
     @Override
-    public Boolean isTournamentStarted(Long tournament_id) {
-        Tournament t = em.find(Tournament.class, tournament_id);
+    public Boolean isTournamentStarted(Long tournamentId) {
+        Tournament t = em.find(Tournament.class, tournamentId);
         return t.getTournamentStarted();
     }
 
@@ -365,9 +365,9 @@ public class TournamentHibernateDao implements TournamentDao {
     public void updateAllStartDates() {
         em.createQuery("""
         UPDATE Tournament t
-        SET t.start_date = CURRENT_DATE
-        WHERE t.start_date < CURRENT_DATE
-          AND COALESCE(t.tournament_started, false) = false
+        SET t.startDate = CURRENT_DATE
+        WHERE t.startDate < CURRENT_DATE
+          AND COALESCE(t.tournamentStarted, false) = false
     """).executeUpdate();
     }
 
@@ -375,9 +375,9 @@ public class TournamentHibernateDao implements TournamentDao {
     public void updateAllEndDates() {
         em.createQuery("""
         UPDATE Tournament t
-        SET t.end_date = CURRENT_DATE
-        WHERE t.end_date < CURRENT_DATE
-          AND COALESCE(t.is_finished, false) = false
+        SET t.endDate = CURRENT_DATE
+        WHERE t.endDate < CURRENT_DATE
+          AND COALESCE(t.isFinished, false) = false
     """).executeUpdate();
     }
 
@@ -395,7 +395,7 @@ public class TournamentHibernateDao implements TournamentDao {
                         "AND p.tournament IN (" +
                         "SELECT t " +
                         "FROM Tournament t " +
-                        "WHERE t.is_finished = :isFinished" +
+                        "WHERE t.isFinished = :isFinished" +
                         ")",
                 Long.class
         );
@@ -426,7 +426,7 @@ public class TournamentHibernateDao implements TournamentDao {
 
     @Override
     public List<Tournament> getUserWonTournament(Long userId, Long page) {
-        Query nativeQuery = em.createNativeQuery("SELECT t.id FROM tournament t WHERE tournament_winner = (SELECT p.id FROM participant p WHERE p.user_id = ?1 AND p.tournament_id = t.id)");
+        Query nativeQuery = em.createNativeQuery("SELECT t.id FROM tournament t WHERE tournament_winner = (SELECT p.id FROM participant p WHERE p.userId = ?1 AND p.tournamentId = t.id)");
         nativeQuery.setParameter(1, userId);
         nativeQuery.setMaxResults(PAGE_SIZE);
         nativeQuery.setFirstResult((int) (page * PAGE_SIZE));
@@ -442,7 +442,7 @@ public class TournamentHibernateDao implements TournamentDao {
 
     @Override
     public Integer getUserWonTournamentPages(Long userId) {
-        Query nativeQuery = em.createNativeQuery("SELECT COUNT(t.id) FROM tournament t WHERE tournament_winner = (SELECT p.id FROM participant p WHERE p.user_id = ?1 AND p.tournament_id = t.id)", Long.class);
+        Query nativeQuery = em.createNativeQuery("SELECT COUNT(t.id) FROM tournament t WHERE tournament_winner = (SELECT p.id FROM participant p WHERE p.userId = ?1 AND p.tournamentId = t.id)", Long.class);
         nativeQuery.setParameter(1, userId);
         return nativeQuery.getFirstResult();
     }
@@ -455,7 +455,7 @@ public class TournamentHibernateDao implements TournamentDao {
 
     private int countCreatedTournaments(Long userId, boolean isFinished) {
         TypedQuery<Long> query = em.createQuery(
-                "SELECT COUNT(t) FROM Tournament t WHERE t.creator = :creator AND t.is_finished = :isFinished",
+                "SELECT COUNT(t) FROM Tournament t WHERE t.creator = :creator AND t.isFinished = :isFinished",
                 Long.class
         );
         query.setParameter("creator", em.getReference(User.class, userId));

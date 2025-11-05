@@ -35,7 +35,7 @@
                         <paw:text weight="thin"><c:out value="${participant.name}"/></paw:text>
                     </div>
                     <div class="board-cell">
-                        <paw:text weight="thin"><c:out value="${participant.score_difference}"/></paw:text>
+                        <paw:text weight="thin"><c:out value="${participant.scoreDifference}"/></paw:text>
                     </div>
                     <div class="board-cell">
                         <paw:text weight="semi-bold"><c:out value="${participant.points}"/></paw:text>

@@ -34,8 +34,8 @@ public class RulesServiceImpl implements RulesService {
 
     @Transactional
     @Override
-    public void updateRules(Long tournament_id, byte[] file) {
-        Tournament t = tournamentDao.findById(tournament_id).get();
+    public void updateRules(Long tournamentId, byte[] file) {
+        Tournament t = tournamentDao.findById(tournamentId).get();
         Rules r = t.getRules();
         if (r != null){
             rulesDao.updateRules(r.getId(), file);

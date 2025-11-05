@@ -41,6 +41,6 @@ public class TournamentSecurity {
         Optional<User> u = userService.findByUsername(authentication.getName());
         Optional<Tournament> t = tournamentService.findById(tid);
 
-        return u.isPresent() && t.isPresent() && Objects.equals(t.get().getCreator_id(), u.get().getId());
+        return u.isPresent() && t.isPresent() && Objects.equals(t.get().getCreatorId(), u.get().getId());
     }
 }

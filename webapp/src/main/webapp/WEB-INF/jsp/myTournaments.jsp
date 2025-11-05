@@ -4,10 +4,10 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
 <paw:layout user="${user}" pageTitle="${profile.username} Tournaments">
-<paw:banner image="${pageContext.request.contextPath}/banner/${profile.banner_id}">
+<paw:banner image="${pageContext.request.contextPath}/banner/${profile.bannerId}">
     <div class="profile-sidebar">
         <div class="profile-picture">
-            <img src="${pageContext.request.contextPath}/pfp/${profile.pfp_id}" alt="${profile.username}">
+            <img src="${pageContext.request.contextPath}/pfp/${profile.pfpId}" alt="${profile.username}">
         </div>
         <div class="profile-info">
             <paw:text size="xl"><c:out value="${profile.username}"/></paw:text>

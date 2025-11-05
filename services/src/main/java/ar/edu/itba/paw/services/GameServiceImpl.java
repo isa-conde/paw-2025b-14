@@ -51,11 +51,11 @@ public class GameServiceImpl implements GameService {
 
     @Transactional
     @Override
-    public Game create(String name, Genre genre, Integer image_id) {
+    public Game create(String name, Genre genre, Integer imageId) {
         if(gameDao.checkNameExists(name)){
             throw new NameAlreadyUsedException(name);
         }
-        return gameDao.create(name, genre, image_id);
+        return gameDao.create(name, genre, imageId);
     }
 
     @Transactional
@@ -76,8 +76,8 @@ public class GameServiceImpl implements GameService {
 
     @Transactional
     @Override
-    public List<Game> getFavourites(Long user_id) {
-        return gameDao.getFavourites(user_id);
+    public List<Game> getFavourites(Long userId) {
+        return gameDao.getFavourites(userId);
     }
 
     @Override

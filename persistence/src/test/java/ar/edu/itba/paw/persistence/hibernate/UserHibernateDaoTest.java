@@ -211,7 +211,7 @@ public class UserHibernateDaoTest {
         em.flush();
 
         Assert.assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"users",
-                "id = " + usedId + " and profile_picture_id = "+ usedId + " and banner_id = " + usedId
+                "id = " + usedId + " and profile_picture_id = "+ usedId + " and bannerId = " + usedId
                         + " and username = '" + USED_USERNAME + "a' and bio = '" + USERNAME + "'"));
     }
 

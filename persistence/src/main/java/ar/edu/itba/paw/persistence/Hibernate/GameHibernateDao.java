@@ -50,8 +50,8 @@ public class GameHibernateDao implements GameDao {
     }
 
     @Override
-    public Game create(String name, Genre genre, Integer image_id) {
-        Game game = new Game(name, genre, image_id);
+    public Game create(String name, Genre genre, Integer imageId) {
+        Game game = new Game(name, genre, imageId);
         em.persist(game);
         return game;
     }

@@ -2,11 +2,11 @@ package ar.edu.itba.paw.model.Match;
 
 public class PointsPair {
     private final Integer points;
-    private final Integer score_difference;
+    private final Integer scoreDifference;
 
-    public PointsPair(Integer points, Integer score_difference) {
+    public PointsPair(Integer points, Integer scoreDifference) {
         this.points = points;
-        this.score_difference = score_difference;
+        this.scoreDifference = scoreDifference;
     }
 
     public Integer getPoints() {
@@ -14,7 +14,7 @@ public class PointsPair {
     }
 
     public Integer getScoreDifference() {
-        return score_difference;
+        return scoreDifference;
     }
 
 }

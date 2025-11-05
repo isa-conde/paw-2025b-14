@@ -27,7 +27,7 @@ public class Game {
     private Genre genre;
 
     @Column(name = "image_id")
-    private Integer image_id;
+    private Integer imageId;
 
     @ManyToMany(mappedBy = "favouriteGames", fetch = FetchType.LAZY)
     private List<User> likedByUsers = new ArrayList<>();
@@ -37,17 +37,17 @@ public class Game {
 
     public Game(){}
 
-    public Game(String name, Genre genre, Integer image_id){
+    public Game(String name, Genre genre, Integer imageId){
         this.name = name;
         this.genre = genre;
-        this.image_id = image_id;
+        this.imageId = imageId;
     }
 
     public Game(Long id, String name, Genre genre, Integer imageId){
         this.id = id;
         this.name = name;
         this.genre = genre;
-        image_id = imageId;
+        this.imageId = imageId;
     }
 
     public String getName() {
@@ -62,8 +62,8 @@ public class Game {
         return id;
     }
 
-    public Integer getImage_id() {
-        return image_id;
+    public Integer getImageId() {
+        return imageId;
     }
 
     public void setId(Long id) {
@@ -78,8 +78,8 @@ public class Game {
         this.genre = genre;
     }
 
-    public void setImage_id(Integer image_id) {
-        this.image_id = image_id;
+    public void setImageId(Integer imageId) {
+        this.imageId = imageId;
     }
 
     public List<User> getLikedByUsers() {

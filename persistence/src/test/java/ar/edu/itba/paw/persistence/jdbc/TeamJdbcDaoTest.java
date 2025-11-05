@@ -58,7 +58,7 @@
 //        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
 //                .withTableName("team")
 //                .usingGeneratedKeyColumns("id");
-//        used_id = jdbcInsert.executeAndReturnKey(Map.of("name",OTHER_TEAM,"profile_picture_id",OTHER_ID,"banner_id",OTHER_ID,"owner_id",OTHER_ID)).longValue();
+//        used_id = jdbcInsert.executeAndReturnKey(Map.of("name",OTHER_TEAM,"profile_picture_id",OTHER_ID,"bannerId",OTHER_ID,"owner_id",OTHER_ID)).longValue();
 //        SimpleJdbcInsert tournamentInsert = new SimpleJdbcInsert(jdbcTemplate)
 //                .withTableName("tournament")
 //                .usingGeneratedKeyColumns("id");
@@ -71,11 +71,11 @@
 //                .addValue("game_id",OTHER_ID)
 //                .addValue("region",Region.LAS)
 //                .addValue("elo",Elo.HIGH)
-//                .addValue("start_date",LocalDate.of(2026,2,21))
-//                .addValue("end_date",LocalDate.of(2027,2,21))
+//                .addValue("startDate",LocalDate.of(2026,2,21))
+//                .addValue("endDate",LocalDate.of(2027,2,21))
 //                .addValue("format",OTHER_TEAM)
 //                .addValue("structure",Structure.LEAGUE)
-//                .addValue("max_participants",14)
+//                .addValue("maxParticipants",14)
 //                .addValue("image_id",OTHER_ID)
 //                .addValue("open_inscriptions",true)
 //                .addValue("is_finished",false)
@@ -88,11 +88,11 @@
 //                .addValue("game_id",OTHER_ID)
 //                .addValue("region",Region.LAS)
 //                .addValue("elo",Elo.HIGH)
-//                .addValue("start_date",LocalDate.of(2026,2,21))
-//                .addValue("end_date",LocalDate.of(2027,2,21))
+//                .addValue("startDate",LocalDate.of(2026,2,21))
+//                .addValue("endDate",LocalDate.of(2027,2,21))
 //                .addValue("format",OTHER_TEAM)
 //                .addValue("structure",Structure.LEAGUE)
-//                .addValue("max_participants",14)
+//                .addValue("maxParticipants",14)
 //                .addValue("image_id",OTHER_ID)
 //                .addValue("open_inscriptions",true)
 //                .addValue("is_finished",true)
@@ -115,10 +115,10 @@
 //        Assert.assertEquals(TEAM,retrieved.getName());
 //        Assert.assertEquals(ID,created.getOwner_id());
 //        Assert.assertEquals(ID,retrieved.getOwner_id());
-//        Assert.assertEquals(ID,created.getBanner_id());
-//        Assert.assertEquals(ID,retrieved.getBanner_id());
-//        Assert.assertEquals(ID,created.getPfp_id());
-//        Assert.assertEquals(ID,retrieved.getPfp_id());
+//        Assert.assertEquals(ID,created.getBannerId());
+//        Assert.assertEquals(ID,retrieved.getBannerId());
+//        Assert.assertEquals(ID,created.getPfpId());
+//        Assert.assertEquals(ID,retrieved.getPfpId());
 //        Assert.assertEquals(2, JdbcTestUtils.countRowsInTable(jdbcTemplate,"team"));
 //    }
 //
@@ -139,8 +139,8 @@
 //        Team present = team.get();
 //        Assert.assertEquals(OTHER_TEAM,present.getName());
 //        Assert.assertEquals(OTHER_ID,present.getOwner_id());
-//        Assert.assertEquals(OTHER_ID,present.getBanner_id());
-//        Assert.assertEquals(OTHER_ID,present.getPfp_id());
+//        Assert.assertEquals(OTHER_ID,present.getBannerId());
+//        Assert.assertEquals(OTHER_ID,present.getPfpId());
 //        Assert.assertEquals(used_id,present.getId());
 //    }
 //
@@ -191,9 +191,9 @@
 //        Assert.assertEquals(1,ans.size());
 //        Team present = ans.get(0);
 //        Assert.assertEquals(OTHER_TEAM,present.getName());
-//        Assert.assertEquals(OTHER_ID,present.getOwner_id());
-//        Assert.assertEquals(OTHER_ID,present.getBanner_id());
-//        Assert.assertEquals(OTHER_ID,present.getPfp_id());
+//        Assert.assertEquals(OTHER_ID,present.getOwnerId());
+//        Assert.assertEquals(OTHER_ID,present.getBannerId());
+//        Assert.assertEquals(OTHER_ID,present.getPfpId());
 //        Assert.assertEquals(used_id,present.getId());
 //    }
 //
@@ -207,8 +207,8 @@
 //        Assert.assertEquals(1,list.size());
 //        Team team = list.get(0);
 //        Assert.assertEquals(OTHER_TEAM+"a", team.getName());
-//        Assert.assertEquals(ID, team.getBanner_id());
-//        Assert.assertEquals(ID, team.getPfp_id());
+//        Assert.assertEquals(ID, team.getBannerId());
+//        Assert.assertEquals(ID, team.getPfpId());
 //    }
 //
 //    @Test
@@ -237,8 +237,8 @@
 //        Team found = foundTeams.get(0);
 //        Assert.assertEquals(OTHER_TEAM, found.getName());
 //        Assert.assertEquals(OTHER_ID, found.getOwner_id());
-//        Assert.assertEquals(OTHER_ID, found.getPfp_id());
-//        Assert.assertEquals(OTHER_ID, found.getBanner_id());
+//        Assert.assertEquals(OTHER_ID, found.getPfpId());
+//        Assert.assertEquals(OTHER_ID, found.getBannerId());
 //        Assert.assertEquals(used_id, found.getId());
 //    }
 //
@@ -263,11 +263,11 @@
 //        values.put("game_id", 5L);
 //        values.put("region", "NA");
 //        values.put("elo", "LOW");
-//        values.put("start_date", today);
-//        values.put("end_date", today.plusDays(7));
+//        values.put("startDate", today);
+//        values.put("endDate", today.plusDays(7));
 //        values.put("format", "5vs5");
 //        values.put("structure", "LEAGUE");
-//        values.put("max_participants", 4);
+//        values.put("maxParticipants", 4);
 //        values.put("open_inscriptions", true);
 //        values.put("is_finished", false);
 //        values.put("is_group_stage", false);
@@ -298,8 +298,8 @@
 //        Assert.assertEquals(used_id, team.getId());
 //        Assert.assertEquals(OTHER_TEAM, team.getName());
 //        Assert.assertEquals(OTHER_ID, team.getOwner_id());
-//        Assert.assertEquals(OTHER_ID, team.getPfp_id());
-//        Assert.assertEquals(OTHER_ID, team.getBanner_id());
+//        Assert.assertEquals(OTHER_ID, team.getPfpId());
+//        Assert.assertEquals(OTHER_ID, team.getBannerId());
 //
 //        Integer memberCount = jdbcTemplate.queryForObject(
 //                "SELECT COUNT(*) FROM team_member WHERE team_id = ?",

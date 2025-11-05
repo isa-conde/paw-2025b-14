@@ -54,7 +54,7 @@
 //    private static final Genre GENRE = Genre.MOBA;
 //    private List<Long> USED_IDS;
 //    private int rows;
-//    private static final RowMapper<Game> ROW_MAPPER = (rs, rowNum) -> new Game(rs.getLong("id"), rs.getString("name"), Genre.valueOf(rs.getString("genre")), rs.getInt("image_id"));
+//    private static final RowMapper<Game> ROW_MAPPER = (rs, rowNum) -> new Game(rs.getLong("id"), rs.getString("name"), Genre.valueOf(rs.getString("genre")), rs.getInt("imageId"));
 //
 //    @Before
 //    public void setUp(){
@@ -77,11 +77,11 @@
 //        final Game game = gameHibernateDao.create(NAME, GENRE, 1);
 //        em.flush();
 //
-//        Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"game","name = '" + NAME + "' and genre = '" + GENRE + "' and image_id = 1"));
+//        Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"game","name = '" + NAME + "' and genre = '" + GENRE + "' and imageId = 1"));
 //        Assert.assertNotNull(game);
 //        Assert.assertEquals(NAME, game.getName());
 //        Assert.assertEquals(GENRE, game.getGenre());
-//        Assert.assertEquals(Integer.valueOf(1), game.getImage_id());
+//        Assert.assertEquals(Integer.valueOf(1), game.getImageId());
 //        Assert.assertEquals(rows + 1,JdbcTestUtils.countRowsInTable(jdbcTemplate,"game"));
 //    }
 //
@@ -118,7 +118,7 @@
 //        Assert.assertTrue(ans.isPresent());
 //        Assert.assertEquals(OTHER_NAMES[0] + " " + GENRE, ans.get().getName());
 //        Assert.assertEquals(GENRE, ans.get().getGenre());
-//        Assert.assertEquals(Integer.valueOf(1), ans.get().getImage_id());
+//        Assert.assertEquals(Integer.valueOf(1), ans.get().getImageId());
 //        Assert.assertEquals(1L, ans.get().getId().longValue());
 //    }
 //
@@ -149,7 +149,7 @@
 //            Assert.assertNotNull(games.get(j));
 //            Assert.assertEquals(expected.get(j).getName(), games.get(j).getName());
 //            Assert.assertEquals(expected.get(j).getGenre(), games.get(j).getGenre());
-//            Assert.assertEquals(Integer.valueOf(1),games.get(j).getImage_id());
+//            Assert.assertEquals(Integer.valueOf(1),games.get(j).getImageId());
 //            Assert.assertEquals(expected.get(j).getId(),games.get(j).getId());
 //        }
 //    }
@@ -180,7 +180,7 @@
 //            Assert.assertNotNull(games.get(j));
 //            Assert.assertEquals(expected.get(j).getName(), games.get(j).getName());
 //            Assert.assertEquals(expected.get(j).getGenre(), games.get(j).getGenre());
-//            Assert.assertEquals(Integer.valueOf(1),games.get(j).getImage_id());
+//            Assert.assertEquals(Integer.valueOf(1),games.get(j).getImageId());
 //            Assert.assertEquals(expected.get(j).getId(),games.get(j).getId());
 //        }
 //    }
@@ -215,7 +215,7 @@
 //            Assert.assertNotNull(games.get(i));
 //            Assert.assertEquals(expected.get(i).getName(), games.get(i).getName());
 //            Assert.assertEquals(expected.get(i).getGenre(), games.get(i).getGenre());
-//            Assert.assertEquals(Integer.valueOf(1),games.get(i).getImage_id());
+//            Assert.assertEquals(Integer.valueOf(1),games.get(i).getImageId());
 //            Assert.assertEquals(expected.get(i).getId(),games.get(i).getId());
 //        }
 //    }
@@ -250,7 +250,7 @@
 //            Assert.assertNotNull(games.get(i));
 //            Assert.assertEquals(expected.get(i).getName(), games.get(i).getName());
 //            Assert.assertEquals(expected.get(i).getGenre(), games.get(i).getGenre());
-//            Assert.assertEquals(Integer.valueOf(1),games.get(i).getImage_id());
+//            Assert.assertEquals(Integer.valueOf(1),games.get(i).getImageId());
 //            Assert.assertEquals(expected.get(i).getId(),games.get(i).getId());
 //        }
 //    }
@@ -305,7 +305,7 @@
 //        SimpleJdbcInsert tournamentJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("tournament");
 //        SimpleJdbcInsert participantJdbcInsert = new SimpleJdbcInsert(jdbcTemplate).withTableName("participant");
 //        for (long i = 1; i <= rows; i++) {
-//            tournamentJdbcInsert.execute(Map.of("id",i,"creator_id",1L,"name",NAME+i,"game_id",i,"max_participants",8));
+//            tournamentJdbcInsert.execute(Map.of("id",i,"creator_id",1L,"name",NAME+i,"game_id",i,"maxParticipants",8));
 //            participantJdbcInsert.execute(Map.of("id",i,"user_id",1L,"tournament_id",i,"points",0));
 //            favouritesJdbcInsert.execute(Map.of("user_id",1L,"game_id", i));
 //        }

@@ -24,7 +24,7 @@
                 <c:choose>
                     <c:when test="${isGame}">
                             <paw:element-card
-                                    image="${pageContext.request.contextPath}/image/${e.image_id}"
+                                    image="${pageContext.request.contextPath}/image/${e.imageId}"
                                     title="${e.name}"
                                     id="${e.id}"
                                     isGame="true"/>
@@ -32,16 +32,16 @@
                     <c:otherwise>
                             <c:if test="${hasHeader}">
                                 <c:forEach var="game" items="${headerElements}">
-                                    <c:if test="${game.id == e.game_id}">
+                                    <c:if test="${game.id == e.gameId}">
                                         <c:set var="tournamentGame" value="${game}"/>
                                     </c:if>
                                 </c:forEach>
                             </c:if>
                             <paw:element-card
-                                    image="${pageContext.request.contextPath}/image/${e.image_id}"
+                                    image="${pageContext.request.contextPath}/image/${e.imageId}"
                                     title="${e.name}"
-                                    start_date="${e.start_date}"
-                                    end_date="${e.end_date}"
+                                    startDate="${e.startDate}"
+                                    endDate="${e.endDate}"
                                     game="${hasHeader? tournamentGame.name : ''}"
                                     id="${e.id}"
                                     isGame="false"/>

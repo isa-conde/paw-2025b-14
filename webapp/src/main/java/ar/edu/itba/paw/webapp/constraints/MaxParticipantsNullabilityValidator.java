@@ -28,19 +28,19 @@ public class MaxParticipantsNullabilityValidator
 
         boolean ok;
         if (openInscriptions) {
-            ok = (form.getMax_participants() != null);
+            ok = (form.getMaxParticipants() != null);
             if (!ok) {
                 ctx.disableDefaultConstraintViolation();
                 ctx.buildConstraintViolationWithTemplate("{tournament.maxParticipants.requiredIfOpen}")
-                        .addPropertyNode("max_participants")
+                        .addPropertyNode("maxParticipants")
                         .addConstraintViolation();
             }
         } else {
-            ok = (form.getMax_participants() == null);
+            ok = (form.getMaxParticipants() == null);
             if (!ok) {
                 ctx.disableDefaultConstraintViolation();
                 ctx.buildConstraintViolationWithTemplate("{tournament.maxParticipants.mustBeNullIfClosed}")
-                        .addPropertyNode("max_participants")
+                        .addPropertyNode("maxParticipants")
                         .addConstraintViolation();
             }
         }

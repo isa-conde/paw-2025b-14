@@ -147,7 +147,7 @@ public class TournamentController {
             if (form.getImage() != null && !form.getImage().isEmpty()) {
                 imageBytes = form.getImage().getBytes();
             }
-            ts.updateTournamentInfo(tournamentId, form.getName(), form.getStart_date(), form.getEnd_date(), form.getMax_participants(), imageBytes);
+            ts.updateTournamentInfo(tournamentId, form.getName(), form.getStartDate(), form.getEndDate(), form.getMaxParticipants(), imageBytes);
         } catch (IOException e) {
             result.rejectValue("image", "error.tournamentForm.invalidImage");
         }
@@ -194,27 +194,27 @@ public class TournamentController {
             if (!hasFormErrors) {
                 editTournamentForm.setName(t.getName());
                 if(!t.getTournamentStarted()){
-                    editTournamentForm.setStart_date(t.getStart_date());
-                    editTournamentForm.setMax_participants(t.getMax_participants());
+                    editTournamentForm.setStartDate(t.getStartDate());
+                    editTournamentForm.setMaxParticipants(t.getMaxParticipants());
                 }
                 if(!t.getFinished()) {
-                    editTournamentForm.setEnd_date(t.getEnd_date());
+                    editTournamentForm.setEndDate(t.getEndDate());
                 }
             }
-            Optional<GameFormat> optionalGameFormat = gs.getFormatById(t.getFormat_id());
+            Optional<GameFormat> optionalGameFormat = gs.getFormatById(t.getFormatId());
             if (optionalGameFormat.isPresent()){
                 GameFormat gf = optionalGameFormat.get();
                 mav.addObject("format", gf);
                 t.setFormat(gf.getName());
             }
-            List<Participant> participants = ps.getTournamentParticipants(tournamentId, optionalGameFormat.isPresent() ? optionalGameFormat.get().getPlayers_per_team() : 1);
+            List<Participant> participants = ps.getTournamentParticipants(tournamentId, optionalGameFormat.isPresent() ? optionalGameFormat.get().getPlayersPerTeam() : 1);
             int participantCount = participants.size();
-            Optional<Game> optionalGame = gs.findById(t.getGame_id());
-            Optional<User> optionalUser = us.findById(t.getCreator_id());
-            Boolean isIndividualTournament = optionalGameFormat.isEmpty() || optionalGameFormat.get().getPlayers_per_team() == 1;
+            Optional<Game> optionalGame = gs.findById(t.getGameId());
+            Optional<User> optionalUser = us.findById(t.getCreatorId());
+            Boolean isIndividualTournament = optionalGameFormat.isEmpty() || optionalGameFormat.get().getPlayersPerTeam() == 1;
             Boolean isParticipant = user != null && ps.hasJoined(user.getId(), tournamentId);
             Boolean hasRankedTournament = user != null && ps.participantHasRatedTournament(user.getId(), tournamentId);
-            Float creatorRating = us.getUserRating(t.getCreator_id());
+            Float creatorRating = us.getUserRating(t.getCreatorId());
             if (user != null && !isIndividualTournament && !isParticipant){
                 mav.addObject("userTeams", tms.getUserTeamsBySizeNotInTournament(user.getId(), tournamentId));
             }
@@ -361,9 +361,9 @@ public class TournamentController {
     @RequestMapping(value = "/tournaments/new/step2", method = { RequestMethod.GET })
     public ModelAndView newTournamentFormStep2(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @ModelAttribute("tournamentForm") final TournamentForm form){
         final ModelAndView mav = new ModelAndView("tournamentForm");
-        List<GameFormat> formats = gs.getFormats(form.getGame_id());
+        List<GameFormat> formats = gs.getFormats(form.getGameId());
         Integer playersPerTeamMax = formats.stream()
-        .map(GameFormat::getPlayers_per_team)
+        .map(GameFormat::getPlayersPerTeam)
         .filter(java.util.Objects::nonNull)
         .max(Integer::compareTo)
         .orElse(1);
@@ -416,9 +416,9 @@ public class TournamentController {
             return newTournamentFormStep2(currentUser, form);
         }
 
-        final Tournament t = ts.create(user.getId(), form.getName(), form.getGame_id(),
-                form.getRegion(), form.getElo(), form.getStart_date(), form.getEnd_date(),
-                null, form.getStructure(), form.getMax_participants(), imageBytes, true, false, form.getFormat_id(), rulesBytes);
+        final Tournament t = ts.create(user.getId(), form.getName(), form.getGameId(),
+                form.getRegion(), form.getElo(), form.getStartDate(), form.getEndDate(),
+                null, form.getStructure(), form.getMaxParticipants(), imageBytes, true, false, form.getFormatId(), rulesBytes);
         status.setComplete();
         return new ModelAndView("redirect:/tournament?tournamentId=" + t.getId());
     }

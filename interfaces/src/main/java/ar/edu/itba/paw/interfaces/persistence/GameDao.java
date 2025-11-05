@@ -9,19 +9,19 @@ import java.util.Optional;
 
 public interface GameDao {
 
-    public Optional<Game> findById(long id);
+    Optional<Game> findById(long id);
 
-    public List<Game> searchByName(String name);
+    List<Game> searchByName(String name);
 
-    public List<Game> searchByGenre(Genre genre);
+    List<Game> searchByGenre(Genre genre);
 
-    public List<Game> findAll();
+    List<Game> findAll();
 
-    public Game create(String name, Genre genre, Integer image_id);
+    Game create(String name, Genre genre, Integer imageId);
 
-    public boolean checkNameExists(String name);
+    boolean checkNameExists(String name);
 
-    List<Game> getFavourites(Long user_id);
+    List<Game> getFavourites(Long userId);
 
     List<Game> findAllPaged(Long page);
 
