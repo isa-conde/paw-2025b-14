@@ -115,18 +115,18 @@ public class TournamentServiceImpl implements TournamentService {
             tournamentDao.setFinished(tournamentId);
             LOGGER.info("Tournament with ID {} has successfully ended", tournamentId);
         }
-        List<Participant> participant_users = participantDao.getTournamentParticipantUsers(tournamentId);
+        List<Participant> participantUsers = participantDao.getTournamentParticipantUsers(tournamentId);
         Integer teamSize = getPlayersPerTeam(tournamentId);
         if(teamSize > 1) {
-            List<Participant> participant_teams = participantDao.getTournamentParticipantTeams(tournamentId);
+            List<Participant> participantTeams = participantDao.getTournamentParticipantTeams(tournamentId);
             Long winnerTeam = null;
-            for(Participant team : participant_teams){
+            for(Participant team : participantTeams){
                 if(team.getId().equals(winner)) {
                     winnerTeam = team.getTeam().getId();
                     break;
                 }
             }
-            for(Participant p : participant_users){
+            for(Participant p : participantUsers){
                 User user = userDao.findById(p.getUser().getId()).get();
                 if(p.getTeam().getId().equals(winnerTeam)) {
                     ms.sendTournamentWinnerEmail(tournamentId, user.getUsername(), t.getName(), user.getEmail());
@@ -135,7 +135,7 @@ public class TournamentServiceImpl implements TournamentService {
                 }
             }
         }else {
-            for(Participant p : participant_users){
+            for(Participant p : participantUsers){
                 User user = userDao.findById(p.getUser().getId()).get();
                 if(p.getId().equals(winner)) {
                     ms.sendTournamentWinnerEmail(tournamentId, user.getUsername(), t.getName(), user.getEmail());
