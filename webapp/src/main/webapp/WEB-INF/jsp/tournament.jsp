@@ -7,17 +7,42 @@
 <c:url value="/tournament/join" var="joinUrl"/>
 <c:url value="/tournament/leave" var="leaveUrl"/>
 <c:url value="/tournament/update?tournamentId=${tournament.id}" var="tournamentUpdateUrl"/>
+<c:url value="/tournament/contactOwner" var="contactOwnerUrl"/>
+<c:url value="/tournament/rate" var="rateTournamentUrl"/>
+<c:url value="/images/pencil.png" var="pencilUrl"/>
 
 <c:set var="isCreator" value="${user.id == tournament.creator_id}"/>
 <c:set var="editMode" value="${param.edit eq 'true' && isCreator}"/>
-<c:url value="/images/pencil.png" var="pencilUrl"/>
-<c:set var="cornerIcon" value="${isCreator ? pencilUrl : null}"/>
+<c:set var="cornerModal" value="${null}"/>
+<c:set var="cornerIcon" value="${null}"/>
+<c:set var="cornerText" value="${null}"/>
+<c:set var="playersPerTeam" value="${empty format.players_per_team ? 1 : format.players_per_team}"/>
+
+<c:choose>
+    <c:when test="${isCreator && !tournament.tournament_started}">
+        <c:set var="cornerModal" value="editTournamentModal"/>
+        <c:set var="cornerIcon" value="${pencilUrl}"/>
+    </c:when>
+    <c:when test="${isParticipant && !isCreator}">
+        <c:choose>
+            <c:when test="${!tournament.is_finished}">
+                <c:set var="cornerModal" value="contactOwnerModal"/>
+                <c:set var="cornerText" value="tournament.contactOwner.buttonLabel"/>
+            </c:when>
+            <c:when test="${!hasRankedTournament}">
+                <c:set var="cornerModal" value="rateTournamentModal"/>
+                <c:set var="cornerText" value="tournament.ratings.buttonLabel"/>
+            </c:when>
+        </c:choose>
+    </c:when>
+</c:choose>
 
 <paw:layout user="${user}" pageTitle="${tournament.name}" function="${openModal}">
     <paw:banner
             image="${pageContext.request.contextPath}/image/${tournament.image_id}"
             cornerIcon="${cornerIcon}"
-            cornerOnClick="openModal('editTournamentModal')">
+            cornerText="${cornerText}"
+            cornerOnClick="openModal('${cornerModal}')">
         <paw:text type="title" size="m" stroke="true">${game.name}</paw:text>
         <paw:text type="title" size="xl" stroke="true"><c:out value="${tournament.name}"/></paw:text>
         <div class="date-container">
@@ -29,17 +54,27 @@
         <div class="organizer-container">
             <paw:text size="s"><spring:message code="tournament.organizedBy"/></paw:text>
             <c:url value="/profile/${creator.id}" var="profileurl"/>
-            <paw:profileButton imageId="${creator.pfp_id}" text="${creator.username}" onclick="window.location.href='${profileurl}'" size="xs" isNotSafe="true"/>
+            <paw:profileButton imageId="${creator.pfp_id}" text="${creator.username}" onclick="window.location.href='${profileurl}'" size="xs" isNotSafe="true" rating="${creatorRating}"/>
         </div>
     </paw:banner>
     <spring:message code="tournament.overview" var="overview"/>
     <spring:message code="tournament.matches" var="matchesTab"/>
     <spring:message code="tournament.participants.title" var="participantsTab"/>
+    <spring:message code="tournament.rules" var="rulesTab"/>
     <c:set var="showMatches" value="${tournament.tournamentStarted}"/>
+    <c:set var="showRules" value="${not empty tournament.rules}"/>
     <c:choose>
+        <c:when test="${showRules && showMatches}">
+            <c:set var="sections" value="${['overview','matchesTab', 'participantsTab', 'rulesTab']}"/>
+            <c:set var="labels"   value="${[overview, matchesTab, participantsTab, rulesTab]}"/>
+        </c:when>
         <c:when test="${showMatches}">
             <c:set var="sections" value="${['overview','matchesTab', 'participantsTab']}"/>
             <c:set var="labels"   value="${[overview, matchesTab, participantsTab]}"/>
+        </c:when>
+        <c:when test="${showRules}">
+            <c:set var="sections" value="${['overview', 'participantsTab', 'rulesTab']}"/>
+            <c:set var="labels"   value="${[overview, participantsTab, rulesTab]}"/>
         </c:when>
         <c:otherwise>
             <c:set var="sections" value="${['overview', 'participantsTab']}"/>
@@ -53,12 +88,21 @@
         <c:choose>
             <c:when test="${activeSection == 'overview'}">
                 <div class="icon-card-container">
-                    <c:set var="teamsText" value="${tournament.openInscriptions ? tournament.max_participants : participantCount}"/>
-                    <spring:message code="tournament.participants" var="teams" arguments="${teamsText}"/>
+                    <c:set var="countText" value="${tournament.openInscriptions ? tournament.max_participants : participantCount}"/>
+                    <c:set var="teamSizeNorm" value="${empty format or empty format.players_per_team ? 1 : format.players_per_team}"/>
+
+                    <spring:message code="tournament.participants" var="teams">
+                        <spring:argument value="${countText}"/>
+                        <spring:argument value="${teamSizeNorm}"/>
+                    </spring:message>
+
+                    <spring:message code="elo.${tournament.elo}" var="elo"/>
+                    <spring:message code="elo.text" arguments="${elo}" var="eloText"/>
+
                     <paw:icon-card icon="${pageContext.request.contextPath}/images/map.png" text="${tournament.region}"/>
                     <paw:icon-card icon="${pageContext.request.contextPath}/images/team.png" text="${tournament.format}"/>
-                    <paw:icon-card icon="${pageContext.request.contextPath}/images/level.png" text="${tournament.elo}"/>
-                    <paw:icon-card icon="${pageContext.request.contextPath}/images/members.png" text="${teams}"/>
+                    <paw:icon-card icon="${pageContext.request.contextPath}/images/level.png" text="${eloText}"/>
+                    <paw:icon-card icon="${pageContext.request.contextPath}/images/members.png" text="${teams}" subtext="${participantCount} / "/>
                 </div>
                 <c:if test="${tournamentWinner != null && tournamentWinner > 0}">
                         <c:forEach var="p" items="${participants}">
@@ -292,6 +336,12 @@
                     </div>
                 </c:if>
             </c:when>
+            <c:when test="${activeSection == 'rulesTab'}">
+                <c:url var="rulesUrl" value="/rules/${tournament.rules.id}"/>
+                <div class="rules-card-container">
+                    <paw:button-card texture="true" title="tournament.rules.title" text="tournament.rules.text" onclick="window.location.href='${rulesUrl}'" butText="tournament.rules.download"/>
+                </div>
+            </c:when>
         </c:choose>
     </div>
     <c:url var="tournamentUrl" value="/tournament">
@@ -309,22 +359,58 @@
                    enctype="multipart/form-data" cssClass="form">
             <input type="hidden" name="tournamentId" value="${tournament.id}"/>
             <div class="row">
-                <paw:input path="name" label="home.createTournament.name" hasConstraint="true"/>
+                <paw:input path="name" label="createTournament.name" hasConstraint="true"/>
             </div>
             <c:if test="${!tournament.finished}">
                 <div class="row">
                     <c:if test="${!tournament.tournamentStarted}">
-                        <paw:input path="start_date" label="home.createTournament.startDate" inputType="date" hasConstraint="true"/>
+                        <paw:input path="start_date" label="createTournament.startDate" inputType="date" hasConstraint="true"/>
                     </c:if>
-                    <paw:input path="end_date" label="home.createTournament.endDate" inputType="date" hasConstraint="true"/>
+                    <paw:input path="end_date" label="createTournament.endDate" inputType="date" hasConstraint="true"/>
                 </div>
                 <c:if test="${tournament.openInscriptions}">
-                    <paw:input path="max_participants" label="home.createTournament.maxParticipants" inputType="number" hasConstraint="true"/>
+                    <paw:input path="max_participants" label="createTournament.maxParticipants" arg="${playersPerTeam}" inputType="number" hasConstraint="true"/>
                 </c:if>
             </c:if>
-            <paw:input path="image" label="home.createTournament.image" inputType="file"/>
+            <div class="row">
+                <paw:input path="image" label="createTournament.image" fileText="input.uploadImage" inputType="file"/>
+            </div>
+            <div class="row">
+                <paw:input path="rules" label="tournament.rules" inputType="file" fileText="input.uploadPdf"/>
+            </div>
             <div class="row center">
                 <paw:input path="" label="tournament.edit.saveChanges" containerType="half" inputType="submit"/>
+            </div>
+        </form:form>
+    </paw:modal>
+    <paw:modal title="tournament.contactOwner.modalTitle" id="contactOwnerModal" returnUrl="${tournamentUrl}">
+        <form:form method="post" modelAttribute="contactOwnerForm"
+                   action="${contactOwnerUrl}"
+                   cssClass="form">
+            <input type="hidden" name="creatorId" value="${creator.id}"/>
+            <input type="hidden" name="tournamentId" value="${tournament.id}"/>
+            <div class="row">
+                <paw:input path="subject" label="tournament.contactOwner.subject" hasConstraint="true"/>
+            </div>
+            <div class="row">
+                <paw:input inputType="textarea" path="body" label="tournament.contactOwner.body" hasConstraint="true"/>
+            </div>
+            <div class="row center">
+                <paw:input path="" label="tournament.contactOwner.send" containerType="half" inputType="submit"/>
+            </div>
+        </form:form>
+    </paw:modal>
+    <paw:modal title="tournament.ratings.modalTitle" id="rateTournamentModal" returnUrl="${tournamentUrl}">
+        <form:form method="post" modelAttribute="rateTournamentForm"
+                   action="${rateTournamentUrl}"
+                   cssClass="form">
+            <input type="hidden" name="creatorId" value="${creator.id}"/>
+            <input type="hidden" name="tournamentId" value="${tournament.id}"/>
+            <div class="row center">
+                <paw:star-rating path="rating" required="true"/>
+            </div>
+            <div class="row center">
+                <paw:input path="" label="tournament.ratings.rate" containerType="half" inputType="submit"/>
             </div>
         </form:form>
     </paw:modal>
@@ -374,5 +460,26 @@
         </div>
     </form:form>
 </paw:modal>
+<c:url value="/tournament/setMatchResults" var="actionUrl"/>
+<paw:modal title="tournament.setMatchResults.title" id="setMatchResultsModal" returnUrl="${tournamentUrl}">
+    <form:form method="post" modelAttribute="setMatchResultsForm" action="${actionUrl}" cssClass="form">
+        <input type="hidden" id="modalMatchId" name="matchId" value=""/>
+        <input type="hidden" name="tournamentId" value="${tournament.id}"/>
+        <div class="row">
+            <paw:input path="localScore" label="tournament.setMatchResults.localScore" hasConstraint="true" inputType="number"/>
+            <paw:input path="visitorScore" label="tournament.setMatchResults.visitorScore" hasConstraint="true" inputType="number"/>
+        </div>
+        <div class="row center">
+            <paw:input path="" label="tournament.setMatchResults.set" containerType="half" inputType="submit"/>
+        </div>
+    </form:form>
+</paw:modal>
+
+<script>
+    function openSetMatchModal(matchId) {
+        document.getElementById('modalMatchId').value = matchId;
+        openModal('setMatchResultsModal');
+    }
+</script>
 
 <script src="${pageContext.request.contextPath}/js/swap.js"></script>

@@ -1,23 +1,24 @@
 package ar.edu.itba.paw.webapp.controller;
 
-import ar.edu.itba.paw.interfaces.exception.TournamentNotFoundException;
 import ar.edu.itba.paw.interfaces.services.*;
 import ar.edu.itba.paw.model.*;
 import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.Game.GameFormat;
-import ar.edu.itba.paw.model.Tournament.Tournament;
+import ar.edu.itba.paw.model.Tournament;
+import ar.edu.itba.paw.model.Match.Match;
 import ar.edu.itba.paw.model.enums.Elo;
-import ar.edu.itba.paw.model.enums.Genre;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.webapp.auth.PawUserDetails;
 import ar.edu.itba.paw.webapp.form.EditTournamentForm;
 import ar.edu.itba.paw.webapp.form.GameForm;
-import ar.edu.itba.paw.webapp.form.SetWinnerForm;
+import ar.edu.itba.paw.webapp.form.SetMatchResultsForm;
 import ar.edu.itba.paw.webapp.form.TournamentForm;
 import ar.edu.itba.paw.webapp.form.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @SessionAttributes("tournamentForm")
@@ -43,14 +45,19 @@ public class TournamentController {
     private final MatchService ms;
     private final ParticipantService ps;
     private final TeamService tms;
+    private final RulesService rs;
 
-    public TournamentController(final UserService us, final GameService gs, final TournamentService ts, final MatchService ms, final ParticipantService ps, final TeamService tms) {
+    @Autowired
+    MessageSource messageSource;
+
+    public TournamentController(final UserService us, final GameService gs, final TournamentService ts, final MatchService ms, final ParticipantService ps, final TeamService tms, MessageSource messageSource, final RulesService rs) {
         this.us = us;
         this.gs = gs;
         this.ts = ts;
         this.ms = ms;
         this.ps = ps;
         this.tms = tms;
+        this.rs = rs;
     }
 
     @ModelAttribute("tournamentForm")
@@ -63,45 +70,29 @@ public class TournamentController {
         return new EditTournamentForm();
     }
 
+    @ModelAttribute("contactOwnerForm")
+    public ContactOwnerForm getContactOwnerForm() {
+        return new ContactOwnerForm();
+    }
+
+    @ModelAttribute("rateTournamentForm")
+    public RateTournamentForm getRateTournamentForm() {
+        return new RateTournamentForm();
+    }
+
     @ModelAttribute("gameForm")
     public GameForm getGameForm() {
         return new GameForm();
     }
 
-    @ModelAttribute("setWinnerForm")
-    public SetWinnerForm getSetWinnerForm() {
-        return new SetWinnerForm();
+    @ModelAttribute("setMatchResultsForm")
+    public SetMatchResultsForm getSetMatchResultsForm() {
+        return new SetMatchResultsForm();
     }
 
     @ModelAttribute("joinTournamentTeamForm")
     public JoinTournamentTeamForm getJoinTournamentTeamForm() {
         return new JoinTournamentTeamForm();
-    }
-
-    // TODO: delete this!!!
-    @RequestMapping(value = "/game/create", method = {RequestMethod.GET})
-    public ModelAndView createGameForm(@ModelAttribute("gameForm") final GameForm form){
-        ModelAndView mav = new ModelAndView("addGame");
-        mav.addObject("genres", Genre.values()); // 🔹 paso el enum a la vista
-        return mav;
-    }
-
-    // TODO: this too.......
-    @RequestMapping(value = "/game/create", method = { RequestMethod.POST })
-    public ModelAndView createGame(@Valid @ModelAttribute("gameForm") final GameForm form) {
-
-        byte[] imageBytes = null;
-        try {
-            if (form.getImage() != null && !form.getImage().isEmpty()) {
-                imageBytes = form.getImage().getBytes();
-            }
-        } catch (IOException e) {
-            //TBD
-            return new ModelAndView("index");
-        }
-
-        final Game g = gs.createWithFormats(form.getName(), form.getGenre(), form.getFormats(), imageBytes);
-        return new ModelAndView("redirect:/" + g.getId());
     }
 
     @RequestMapping(value = "/tournament/swap/groups", method = RequestMethod.POST)
@@ -144,7 +135,7 @@ public class TournamentController {
             @Valid @ModelAttribute("editTournamentForm") final EditTournamentForm form,
             final BindingResult result) {
         if (result.hasErrors()) {
-            ModelAndView mav = tournamentPage(currentUser, tournamentId, form, new JoinTournamentTeamForm());
+            ModelAndView mav = tournamentPage(currentUser, tournamentId, form, new JoinTournamentTeamForm(), new SetMatchResultsForm());
             mav.addObject("editTournamentForm", form);
             mav.addObject("joinTeamForm", new JoinTournamentTeamForm());
             mav.addObject("openModal", "'editTournamentModal'");
@@ -160,13 +151,25 @@ public class TournamentController {
         } catch (IOException e) {
             result.rejectValue("image", "error.tournamentForm.invalidImage");
         }
+
+        byte[] rulesBytes = null;
+        try {
+            if (form.getRules() != null && !form.getRules().isEmpty()) {
+                rulesBytes = form.getRules().getBytes();
+            }
+            rs.updateRules(tournamentId, rulesBytes);
+        } catch (IOException e) {
+            result.rejectValue("image", "error.tournamentForm.invalidImage");
+        }
         return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
     }
 
     @RequestMapping(value = "/tournament", method = RequestMethod.GET)
-    public ModelAndView tournamentPage(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam("tournamentId") final long tournamentId,
+    public ModelAndView tournamentPage(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                       @RequestParam("tournamentId") final long tournamentId,
                                        @ModelAttribute("editTournamentForm") final EditTournamentForm editTournamentForm,
-                                       @ModelAttribute("joinTeamForm") JoinTournamentTeamForm joinTournamentTeamForm) {
+                                       @ModelAttribute("joinTeamForm") JoinTournamentTeamForm joinTournamentTeamForm,
+                                       @ModelAttribute("setMatchResultsForm") SetMatchResultsForm setMatchResultsForm) {
 
         final ModelAndView mav = new ModelAndView("tournament");
         User user = null;
@@ -210,6 +213,8 @@ public class TournamentController {
             Optional<User> optionalUser = us.findById(t.getCreator_id());
             Boolean isIndividualTournament = optionalGameFormat.isEmpty() || optionalGameFormat.get().getPlayers_per_team() == 1;
             Boolean isParticipant = user != null && ps.hasJoined(user.getId(), tournamentId);
+            Boolean hasRankedTournament = user != null && ps.participantHasRatedTournament(user.getId(), tournamentId);
+            Float creatorRating = us.getUserRating(t.getCreator_id());
             if (user != null && !isIndividualTournament && !isParticipant){
                 mav.addObject("userTeams", tms.getUserTeamsBySizeNotInTournament(user.getId(), tournamentId));
             }
@@ -228,6 +233,10 @@ public class TournamentController {
             mav.addObject("tournamentWinner", t.getTournament_winner());
             mav.addObject("participantCount", participantCount);
             mav.addObject("maxStage", maxStage);
+            mav.addObject("editTournamentForm", editTournamentForm);
+            mav.addObject("joinTeamForm", joinTournamentTeamForm);
+            mav.addObject("creatorRating", creatorRating);
+            mav.addObject("hasRankedTournament", hasRankedTournament);
         }
         return mav;
     }
@@ -240,7 +249,7 @@ public class TournamentController {
             @RequestParam long tournamentId,
             @ModelAttribute("user") Optional<PawUserDetails> currentUser
         ) {
-        ModelAndView mav = tournamentPage(currentUser, tournamentId, new EditTournamentForm(), form);
+        ModelAndView mav = tournamentPage(currentUser, tournamentId, new EditTournamentForm(), form, new SetMatchResultsForm());
         if (br.hasErrors()) {
             mav.addObject("openModal", "'chooseTeamModal'");
         }else{
@@ -260,7 +269,7 @@ public class TournamentController {
             @ModelAttribute("user") Optional<PawUserDetails> currentUser
         ) {
         if (br.hasErrors()) {
-            ModelAndView mav = tournamentPage(currentUser, tournamentId, new EditTournamentForm(), form);
+            ModelAndView mav = tournamentPage(currentUser, tournamentId, new EditTournamentForm(), form, new SetMatchResultsForm());
             mav.addObject("openModal", "'chooseTeamMembersModal'");
             mav.addObject("teamMembers", tms.getTeamMembers(form.getTeamId()));
             mav.addObject("selectedTeamId", form.getTeamId());
@@ -297,9 +306,26 @@ public class TournamentController {
         return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
     }
 
-    @RequestMapping(value = "/tournament/setWinner", method = { RequestMethod.POST })
-    public ModelAndView setWinner(@ModelAttribute("setWinnerForm") SetWinnerForm form, @RequestParam(value = "group", required = false) Integer group) {
-        ms.setMatchWinner(form.getMatchId(), form.getTournamentId(), form.getWinner());
+    @RequestMapping(value = "/tournament/setMatchResults", method = { RequestMethod.POST })
+    public ModelAndView setMatchResults(@Valid @ModelAttribute("setMatchResultsForm") SetMatchResultsForm form,
+                                        BindingResult br,
+                                        @RequestParam(value = "group", required = false) Integer group,
+                                        @ModelAttribute("user") Optional<PawUserDetails> currentUser) {
+
+        if (br.hasErrors()) {
+            EditTournamentForm editForm = new EditTournamentForm();
+            JoinTournamentTeamForm joinForm = new JoinTournamentTeamForm();
+
+            ModelAndView mav = tournamentPage(currentUser, form.getTournamentId(), editForm, joinForm, form);
+            mav.addObject("editTournamentForm", editForm);
+            mav.addObject("joinTeamForm", joinForm);
+            mav.addObject("openModal", "openSetMatchModal(" + form.getMatchId() + ")");
+
+            return mav;
+        }
+
+        ms.setMatchResults(form.getMatchId(), form.getTournamentId(), form.getLocalScore(), form.getVisitorScore());
+
         String redirect = UriComponentsBuilder.fromPath("/tournament")
                 .queryParam("tournamentId", form.getTournamentId())
                 .queryParam("section", "matchesTab")
@@ -335,12 +361,27 @@ public class TournamentController {
     @RequestMapping(value = "/tournaments/new/step2", method = { RequestMethod.GET })
     public ModelAndView newTournamentFormStep2(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @ModelAttribute("tournamentForm") final TournamentForm form){
         final ModelAndView mav = new ModelAndView("tournamentForm");
+        List<GameFormat> formats = gs.getFormats(form.getGame_id());
+        Integer playersPerTeamMax = formats.stream()
+        .map(GameFormat::getPlayers_per_team)
+        .filter(java.util.Objects::nonNull)
+        .max(Integer::compareTo)
+        .orElse(1);
 
         User user = currentUser.get().getPawUser();
         mav.addObject("user", user);
         mav.addObject("step", 2);
-        mav.addObject("formats", gs.getFormats(form.getGame_id()));
-        mav.addObject("elos", Arrays.stream(Elo.values()).toList());
+        mav.addObject("formats", formats);
+        mav.addObject("playersPerTeamMax", playersPerTeamMax);
+        Map<Elo, String> elosMap = Arrays.stream(Elo.values())
+                .collect(Collectors.toMap(
+                        elo -> elo,  // clave: el enum (valor del select)
+                        elo -> messageSource.getMessage("elo." + elo.name(), null, LocaleContextHolder.getLocale()),
+                        (a, b) -> a,
+                        LinkedHashMap::new
+                ));
+
+        mav.addObject("elos", elosMap);
         return mav;
     }
 
@@ -352,7 +393,7 @@ public class TournamentController {
         }
         User user = currentUser.get().getPawUser();
 
-        byte[] imageBytes;
+        byte[] imageBytes = null;
         try {
             if (form.getImage() != null && !form.getImage().isEmpty()) {
                 imageBytes = form.getImage().getBytes();
@@ -365,10 +406,48 @@ public class TournamentController {
             return newTournamentFormStep2(currentUser, form);
         }
 
+        byte[] rulesBytes = null;
+        try {
+            if (form.getRules() != null && !form.getRules().isEmpty()) {
+                rulesBytes = form.getRules().getBytes();
+            }
+        } catch (IOException e) {
+            result.rejectValue("rules", "error.tournamentForm.invalidRules", e.getMessage());
+            return newTournamentFormStep2(currentUser, form);
+        }
+
         final Tournament t = ts.create(user.getId(), form.getName(), form.getGame_id(),
                 form.getRegion(), form.getElo(), form.getStart_date(), form.getEnd_date(),
-                null, form.getStructure(), form.getMax_participants(), imageBytes, true, false, form.getFormat_id());
+                null, form.getStructure(), form.getMax_participants(), imageBytes, true, false, form.getFormat_id(), rulesBytes);
         status.setComplete();
         return new ModelAndView("redirect:/tournament?tournamentId=" + t.getId());
+    }
+
+    @RequestMapping(value = "/tournament/contactOwner", method = { RequestMethod.POST })
+    public ModelAndView contactTournamentOwner(@Valid @ModelAttribute("contactOwnerForm") final ContactOwnerForm contactOwnerForm,
+                                               BindingResult result,
+                                               @ModelAttribute("user") Optional<PawUserDetails> currentUser) {
+        ModelAndView mav = tournamentPage(currentUser, contactOwnerForm.getTournamentId(), getEditTournamentForm(), getJoinTournamentTeamForm(), getSetMatchResultsForm());
+        if(result.hasErrors()) {
+            mav.addObject("openModal", "'contactOwnerModal'");
+            return mav;
+        }
+        User user = currentUser.get().getPawUser();
+        ts.contactOwner(contactOwnerForm.getTournamentId(), user, contactOwnerForm.getSubject(), contactOwnerForm.getBody(), contactOwnerForm.getCreatorId());
+        return mav;
+    }
+
+    @RequestMapping(value = "/tournament/rate", method = { RequestMethod.POST })
+    public ModelAndView rateTournamentOwner(@Valid @ModelAttribute("rateTournamentForm") final RateTournamentForm rateTournamentForm,
+                                            BindingResult result,
+                                            @ModelAttribute("user") Optional<PawUserDetails> currentUser) {
+        ModelAndView mav = tournamentPage(currentUser, rateTournamentForm.getTournamentId(), getEditTournamentForm(), getJoinTournamentTeamForm(), getSetMatchResultsForm());
+        if(result.hasErrors()) {
+            mav.addObject("openModal", "'rateTournamentModal'");
+            return mav;
+        }
+        ts.updateTouramentRating(rateTournamentForm.getTournamentId(), rateTournamentForm.getRating());
+        ps.updateCreatorRating(rateTournamentForm.getTournamentId(), rateTournamentForm.getCreatorId(), currentUser.get().getPawUser().getId(), rateTournamentForm.getRating());
+        return new ModelAndView("redirect:/tournament?tournamentId=" + rateTournamentForm.getTournamentId());
     }
 }

@@ -13,6 +13,7 @@
         <c:when test="${validToken}">
             <paw:text type="title"><spring:message code="passwordReset.page.title"/></paw:text>
             <form:form cssClass="form-container" modelAttribute="resetPasswordForm" action="${resetPasswordUrl}" method="post">
+                <input type="hidden" name="userId" value="${userId}"/>
                 <div>
                     <paw:input path="newPassword" label="passwordReset.newPassword" inputType="password" hasConstraint="true"/>
                 </div>

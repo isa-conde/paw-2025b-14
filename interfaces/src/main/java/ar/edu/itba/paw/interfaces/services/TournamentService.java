@@ -1,9 +1,10 @@
 package ar.edu.itba.paw.interfaces.services;
 
 import ar.edu.itba.paw.model.Game.Game;
+import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
-import ar.edu.itba.paw.model.Tournament.Tournament;
+import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 
@@ -18,7 +19,7 @@ public interface TournamentService {
 
     List<Tournament> findTournaments(TournamentFilter tournamentFilter, Long page);
 
-    Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, byte[] image_id, Boolean openInscriptions, Boolean isFinished, Long format_id);
+    Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, byte[] image_id, Boolean openInscriptions, Boolean isFinished, Long format_id, byte[] rules_id);
 
     List<Tournament> findByCreator(Long creator_id, Long page, Boolean isFinished);
 
@@ -42,7 +43,7 @@ public interface TournamentService {
 
     int getTournamentParticipantsCount(Long tournamentId);
 
-    void createBracketFromGroups(Long tournamentId, Long lastMatchId);
+    void createBracketFromGroups(Long tournamentId);
 
     List<Tournament> getCreatedAndFinishedTournaments(Long userId, Long page);
 
@@ -51,6 +52,15 @@ public interface TournamentService {
     Integer getPlayersPerTeam(Long tournamentId);
 
     Integer getPagesBySection(Long userId, String section);
+
+    List <Tournament> getUserWonTournament(Long userId, Long page);
+
+    Integer getUserWonTournamentPages(Long userId);
+
+    void contactOwner(Long tournamentId, User currentUser, String subject, String body, Long creatorId);
+
+    void updateTouramentRating(Long tournamentId, Float userRating);
+
 }
 
 

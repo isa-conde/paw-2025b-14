@@ -3,8 +3,8 @@
 <%@ attribute name="tournamentId" required="true" rtexprvalue="true" %>
 <%@ attribute name="localPlayer" required="true" rtexprvalue="true" type="ar.edu.itba.paw.model.Participant" %>
 <%@ attribute name="visitorPlayer" required="true" rtexprvalue="true" type="ar.edu.itba.paw.model.Participant" %>
-<%@ attribute name="localPlayerId" required="true" rtexprvalue="true" %>
-<%@ attribute name="visitorPlayerId" required="true" rtexprvalue="true" %>
+<%@ attribute name="localScore" required="true" rtexprvalue="true" %>
+<%@ attribute name="visitorScore" required="true" rtexprvalue="true" %>
 <%@ attribute name="winner" required="false" rtexprvalue="true" %>
 <%@ attribute name="isCreator" required="false" rtexprvalue="true" %>
 <%@ attribute name="groupNumber" required="false" rtexprvalue="true" %>
@@ -23,43 +23,25 @@
 <c:set var="visitorPfp" value="${visitorPlayer == null ? contextPath.concat('/images/empty_user.png') : contextPath.concat('/pfp/').concat(visitorPlayer.pfp_id)}"/>
 
 <div class="match-card">
-    <div class="match-players">
-        <div class="player local-player ${winner == 1 ? 'winner' : ''}">
-            <img src="${localPfp}" alt="Local Player" class="player-avatar"/>
+    <div class="player local-player ${winner == 1 ? 'winner' : ''}">
+        <img src="${localPfp}" alt="Local Player" class="player-avatar"/>
+        <div class="player-name">
             <paw:text size="s" weight="semi-bold"><c:out value="${localName}"/></paw:text>
         </div>
-        
-        <div class="vs-container">
-            <paw:text size="xs" weight="bold">VS</paw:text>
-        </div>
-        
-        <div class="player visitor-player ${winner == 2 ? 'winner' : ''}">
-            <img src="${visitorPfp}" alt="Visitor Player" class="player-avatar"/>
+    </div>
+
+    <div class="score score-local">
+        <paw:text size="m" weight="semi-bold"><c:out value="${empty localScore ? '-' : localScore}"/></paw:text>
+    </div>
+
+    <div class="score score-visitor">
+        <paw:text size="m" weight="semi-bold"><c:out value="${empty visitorScore ? '-' : visitorScore}"/></paw:text>
+    </div>
+
+    <div class="player visitor-player ${winner == 2 ? 'winner' : ''}">
+        <div class="player-name">
             <paw:text size="s" weight="semi-bold"><c:out value="${visitorName}"/></paw:text>
         </div>
+        <img src="${visitorPfp}" alt="Visitor Player" class="player-avatar"/>
     </div>
-    <spring:message code="tournament.wins" var="wins"/>
-    <c:if test="${isCreator == true && winner == 0 && localPlayerId > 0 && visitorPlayerId > 0}">
-        <div class="match-actions">
-            <form method="post" action="${pageContext.request.contextPath}/tournament/setWinner" style="display: inline;">
-                <input type="hidden" name="matchId" value="${matchId}"/>
-                <input type="hidden" name="tournamentId" value="${tournamentId}"/>
-                <input type="hidden" name="winner" value="1"/>
-                <button type="submit" class="action-button local-win">
-                    <spring:message code="tournament.wins" arguments="${localName}" var="winsMessage"/>
-                    <paw:text size="xs"><c:out value="${winsMessage}"/></paw:text>
-                </button>
-            </form>
-            <form method="post" action="${pageContext.request.contextPath}/tournament/setWinner" style="display: inline;">
-                <input type="hidden" name="matchId" value="${matchId}"/>
-                <input type="hidden" name="tournamentId" value="${tournamentId}"/>
-                <input type="hidden" name="group" value="${groupNumber}"/>
-                <input type="hidden" name="winner" value="2"/>
-                <button type="submit" class="action-button visitor-win">
-                    <spring:message code="tournament.wins" arguments="${visitorName}" var="winsMessage"/>
-                    <paw:text size="xs"><c:out value="${winsMessage}"/></paw:text>
-                </button>
-            </form>
-        </div>
-    </c:if>
 </div>

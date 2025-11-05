@@ -13,7 +13,7 @@ public class EditProfileForm {
 
     @NotNull
     private Long userId;
-    @NotBlank(message = "{home.createTournament.notNull}")
+    @NotBlank(message = "{createTournament.notNull}")
     @Size(max = 100)
     private String username;
     @Size(max = 255)

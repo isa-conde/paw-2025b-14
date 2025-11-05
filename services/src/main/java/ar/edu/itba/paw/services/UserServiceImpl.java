@@ -8,7 +8,6 @@ import ar.edu.itba.paw.interfaces.persistence.UserDao;
 import ar.edu.itba.paw.interfaces.services.MailService;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.Token;
-import ar.edu.itba.paw.model.Tournament.Tournament;
 import ar.edu.itba.paw.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +20,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.InvalidAlgorithmParameterException;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.*;
@@ -220,7 +218,7 @@ public class UserServiceImpl implements UserService {
             pfpId = imageDao.insertImage(pfp);
         }
         if (banner != null){
-            bannerId = imageDao.insertImage(pfp);
+            bannerId = imageDao.insertImage(banner);
         }
         userDao.updateProfileInfo(userId, username, bio, pfpId, bannerId);
         LOGGER.info("Profile of user {} has been correctly updated", username);
@@ -238,4 +236,28 @@ public class UserServiceImpl implements UserService {
         userDao.updateUserLocale(language, userId);
     }
 
+    @Override
+    public List<User> findAll() {
+        return userDao.findAll();
+    }
+
+    @Transactional
+    @Override
+    public void updateUserRating(Long userId, Float rating) {
+        User user = findById(userId).get();
+        Float currentRating = user.getRating();
+        Float newRating = (currentRating == null) ? rating : (currentRating + rating) / 2;
+        userDao.updateUserRating(userId, newRating);
+        LOGGER.debug("User {} rating updated to {}", user.getUsername(), newRating);
+    }
+
+    @Override
+    public Float getUserRating(Long userId) {
+        User user = findById(userId).get();
+        Float userRating = user.getRating();
+        if (userRating == null) {
+            return null;
+        }
+        return Math.round(userRating * 10f) / 10f;
+    }
 }

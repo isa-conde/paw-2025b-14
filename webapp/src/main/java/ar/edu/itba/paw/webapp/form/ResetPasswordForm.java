@@ -11,8 +11,8 @@ import javax.validation.constraints.NotNull;
 @ResetPasswordMatches
 public class ResetPasswordForm {
 
-    @NotNull
     @PasswordValidation
+    @NotNull
     private String newPassword;
 
     @NotNull

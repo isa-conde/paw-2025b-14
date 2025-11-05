@@ -17,32 +17,34 @@ public class TournamentForm implements HasDates{
     public interface StepOne {}
     public interface StepTwo {}
 
-    @NotBlank(message = "{home.createTournament.notNull}", groups = StepOne.class)
+    @NotBlank(message = "{createTournament.notNull}", groups = StepOne.class)
     @Size(max = 100, groups = StepOne.class)
     private String name;
-    @NotNull(message = "{home.createTournament.notNull}", groups = StepOne.class)
+    @NotNull(message = "{createTournament.notNull}", groups = StepOne.class)
     private Long game_id;
-    @NotNull(message = "{home.createTournament.notNull}", groups = StepOne.class)
+    @NotNull(message = "{createTournament.notNull}", groups = StepOne.class)
     private Region region;
-    @NotNull(message = "{home.createTournament.notNull}", groups = StepTwo.class)
+    @NotNull(message = "{createTournament.notNull}", groups = StepTwo.class)
     private Elo elo;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @NotNull(message = "{home.createTournament.notNull}", groups = StepOne.class)
+    @NotNull(message = "{createTournament.notNull}", groups = StepOne.class)
     private LocalDate start_date;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    @NotNull(message = "{home.createTournament.notNull}", groups = StepOne.class)
+    @NotNull(message = "{createTournament.notNull}", groups = StepOne.class)
     private LocalDate end_date;
-    @NotNull(message = "{home.createTournament.notNull}", groups = StepOne.class)
+    @NotNull(message = "{createTournament.notNull}", groups = StepOne.class)
     private Structure structure;
-    @NotNull(message = "{home.createTournament.notNull}", groups = StepTwo.class)
-    @Min(value = 4, message = "{home.createTournament.minParticipants}", groups = StepTwo.class)
-    @Max(value = 32, message = "{home.createTournament.maxParticipantsError}", groups = StepTwo.class)
+    @NotNull(message = "{createTournament.notNull}", groups = StepTwo.class)
+    @Min(value = 4, message = "{createTournament.minParticipants}", groups = StepTwo.class)
+    @Max(value = 32, message = "{createTournament.maxParticipantsError}", groups = StepTwo.class)
     private Integer max_participants;
     @ImageConstraint(groups = StepTwo.class)
-    @NotNull(message = "{home.createTournament.notNull}", groups = StepTwo.class)
+    @NotNull(message = "{createTournament.notNull}", groups = StepTwo.class)
     private MultipartFile image;
-    @NotNull(message = "{home.createTournament.notNull}", groups = StepTwo.class)
+    @NotNull(message = "{createTournament.notNull}", groups = StepTwo.class)
     private Long format_id;
+
+    private MultipartFile rules;
 
     public String getName() {
         return name;
@@ -112,6 +114,13 @@ public class TournamentForm implements HasDates{
     }
     public void setFormat_id(Long format_id) {
         this.format_id = format_id;
+    }
+
+    public MultipartFile getRules() {
+        return rules;
+    }
+    public void setRules(MultipartFile rules) {
+        this.rules = rules;
     }
 }
 

@@ -11,7 +11,7 @@ import java.util.List;
 
 public class CreateTeamForm {
 
-    @NotBlank(message = "{home.createTournament.notNull}")
+    @NotBlank(message = "{createTournament.notNull}")
     @Size(max = 100)
     @TeamNameNotTakenConstraint(message = "{team.create.error.nameTaken}")
     private String name;
@@ -31,7 +31,7 @@ public class CreateTeamForm {
     public MultipartFile getBanner() {
         return banner;
     }
-    public void setBanner_id(MultipartFile banner) {
+    public void setBanner(MultipartFile banner) {
         this.banner = banner;
     }
 

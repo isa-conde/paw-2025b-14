@@ -19,4 +19,8 @@ public interface ParticipantService {
     Integer getTournamentGroups(Long tournamentId);
 
     void joinTournamentTeam(Long tournamentId, Long teamId, List<Long> participants);
+
+    Boolean participantHasRatedTournament(Long tournamentId, Long userId);
+
+    void updateCreatorRating(Long tournamentId, Long creatorId, Long reviewerId, Float rating);
 }

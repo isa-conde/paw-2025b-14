@@ -11,8 +11,8 @@ import java.util.List;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_id_seq")
-    @SequenceGenerator(sequenceName = "users_id_seq", name = "users_id_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_userid_seq")
+    @SequenceGenerator(sequenceName = "users_userid_seq", name = "users_userid_seq", allocationSize = 1)
     @Column(name = "id")
     private long id;
 
@@ -47,6 +47,9 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "game_id")
     )
     private List<Game> favouriteGames = new ArrayList<>();
+
+    @Column(name = "rating")
+    private Float rating;
 
     @OneToMany(mappedBy = "owner")
     private List<Team> ownedTeams = new ArrayList<>();
@@ -132,6 +135,14 @@ public class User {
 
     public void setLocale(String locale) {
         this.locale = locale;
+    }
+
+    public Float getRating() {
+        return rating;
+    }
+
+    public void setRating(Float rating) {
+        this.rating = rating;
     }
 
     public void setUsername(String username) {

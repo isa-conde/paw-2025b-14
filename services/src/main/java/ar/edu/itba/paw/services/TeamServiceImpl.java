@@ -4,7 +4,7 @@ import ar.edu.itba.paw.interfaces.persistence.*;
 import ar.edu.itba.paw.interfaces.services.TeamService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.Team;
-import ar.edu.itba.paw.model.Tournament.Tournament;
+import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,14 +74,23 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public List<Tournament> getActiveTournaments(Long team_id) {
-        return getTournamentsFromIds(teamDao.getActiveTournaments(team_id));
-
+    public List<Tournament> getActiveTournaments(Long team_id, Integer page) {
+        return getTournamentsFromIds(teamDao.getActiveTournaments(team_id, page));
     }
 
     @Override
-    public List<Tournament> getPastTournaments(Long team_id) {
-        return getTournamentsFromIds(teamDao.getPastTournaments(team_id));
+    public List<Tournament> getPastTournaments(Long team_id, Integer page) {
+        return getTournamentsFromIds(teamDao.getPastTournaments(team_id, page));
+    }
+
+    @Override
+    public Long getActivePages(Long team_id) {
+        return teamDao.getActivePages(team_id);
+    }
+
+    @Override
+    public Long getPastPages(Long team_id) {
+        return teamDao.getPastPages(team_id);
     }
 
     @Override
@@ -137,7 +146,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public List<Team> getUserTeamsBySizeNotInTournament(Long userId, Long tournamentId) {
-        return teamDao.getUserTeamsBySizeNotInTournament(userId, tournamentId, ts.getPlayersPerTeam(tournamentId));
+        return teamDao.getUserTeamsBySizeNotInTournament(userId, tournamentId, (long)ts.getPlayersPerTeam(tournamentId));
     }
 
     @Override

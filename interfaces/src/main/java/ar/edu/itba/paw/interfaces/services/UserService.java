@@ -41,4 +41,9 @@ public interface UserService {
 
     void updateUserLocale(Locale locale, Long userId);
 
+    void updateUserRating(Long userId, Float rating);
+
+    List<User> findAll();
+
+    Float getUserRating(Long userId);
 }

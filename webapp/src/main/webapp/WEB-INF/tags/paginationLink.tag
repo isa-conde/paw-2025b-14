@@ -5,10 +5,11 @@
 <c:if test="${empty pageNumber}">
     <c:set var="pageNumber" value="" scope="page"/>
 </c:if>
+<c:set var="pageParamName" value="page${pageNumber}" />
 <c:url var="completeUrl" value="${url}">
-    <c:param name="page${pageNumber}" value="${page}" />
+    <c:param name="${pageParamName}" value="${page}" />
     <c:forEach var="entry" items="${pageContext.request.parameterMap}">
-        <c:if test="${entry.key ne page}">
+        <c:if test="${entry.key ne pageParamName}">
             <c:forEach var="value" items="${entry.value}">
                 <c:param name="${entry.key}" value="${value}" />
             </c:forEach>

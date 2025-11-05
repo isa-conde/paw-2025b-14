@@ -1,8 +1,6 @@
 package ar.edu.itba.paw.interfaces.persistence;
 
 import ar.edu.itba.paw.model.Team;
-import ar.edu.itba.paw.model.Tournament.Tournament;
-import ar.edu.itba.paw.model.User;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,9 +11,13 @@ public interface TeamDao {
 
     Optional<Team> getById(Long id);
 
-    List<Long> getPastTournaments(Long team_id);
+    List<Long> getPastTournaments(Long team_id, Integer page);
 
-    List<Long> getActiveTournaments(Long teamId);
+    List<Long> getActiveTournaments(Long teamId, Integer page);
+
+    Long getActivePages(Long team_id);
+
+    Long getPastPages(Long team_id);
 
     List<Team> getUserTeams(Long user_id);
 
@@ -25,5 +27,5 @@ public interface TeamDao {
 
     List<Team> searchByName(String name);
 
-    List<Team> getUserTeamsBySizeNotInTournament(Long userId, Long tournamentId, Integer minSize);
+    List<Team> getUserTeamsBySizeNotInTournament(Long userId, Long tournamentId, Long minSize);
 }

@@ -39,7 +39,7 @@ public class TeamController {
             User user = currentUser.get().getPawUser();
             mav.addObject("user", user);
         }
-
+        mav.addObject("allUsers", us.findAll());
         return mav;
     }
 
@@ -74,7 +74,7 @@ public class TeamController {
     }
 
     @RequestMapping("/team/profile/{id}")
-    public ModelAndView teamProfile(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @PathVariable Long id, @ModelAttribute("teamForm") EditTeamForm editTeamForm){
+    public ModelAndView teamProfile(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @PathVariable Long id, @ModelAttribute("teamForm") EditTeamForm editTeamForm, @RequestParam(defaultValue = "0") Integer page1, @RequestParam(defaultValue = "0") Integer page2){
         final ModelAndView mav = new ModelAndView("teamProfile");
 
         if (currentUser.isPresent()) {
@@ -90,10 +90,14 @@ public class TeamController {
         Team team = optionalTeam.get();
         mav.addObject("team", team);
         mav.addObject("owner", us.findById(team.getOwner().getId()).get());
-        mav.addObject("pastTournaments", ts.getPastTournaments(id));
-        mav.addObject("activeTournaments", ts.getActiveTournaments(id));
+        mav.addObject("pastTournaments", ts.getPastTournaments(id, page2));
+        mav.addObject("activeTournaments", ts.getActiveTournaments(id, page1));
         mav.addObject("teamForm", editTeamForm);
         mav.addObject("members", ts.getTeamMembers(id));
+        mav.addObject("currentPage1", page1);
+        mav.addObject("currentPage2", page2);
+        mav.addObject("totalPages1", ts.getActivePages(team.getId()));
+        mav.addObject("totalPages2", ts.getPastPages(team.getId()));
         editTeamForm.setName(team.getName());
         return mav;
     }
@@ -101,7 +105,7 @@ public class TeamController {
     @RequestMapping(value = "/team/update", method = { RequestMethod.POST })
     public ModelAndView updateProfile(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam("teamId") final long teamId, @Valid @ModelAttribute("teamForm") final EditTeamForm form, final BindingResult result){
         if (currentUser.isPresent() && result.hasErrors()) {
-            ModelAndView mav = teamProfile(currentUser, teamId, form);
+            ModelAndView mav = teamProfile(currentUser, teamId, form, 0, 0);
             mav.addObject("openModal", "'editProfileModal'");
             return mav;
         }

@@ -4,6 +4,8 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
+<c:url var="teamUrl" value="/team/profile/${team.id}"/>
+
 <paw:layout user="${user}" function="${openModal}">
 
     <c:set var="isMyTeam" value="${user.id == team.owner.id}"/>
@@ -19,7 +21,8 @@
             </div>
             <div class="organizer-container">
                 <paw:text size="s"><spring:message code="team.profile.createdBy"/></paw:text>
-                <paw:profileButton imageId="${owner.pfp_id}" text="${owner.username}" onclick="window.location.href='/profile/${owner.id}'" size="xs" isNotSafe="true"/>
+                <c:url value="/profile/${owner.id}" var="ownerUrl"/>
+                <paw:profileButton imageId="${owner.pfp_id}" text="${owner.username}" onclick="window.location.href='${ownerUrl}'" size="xs" isNotSafe="true"/>
             </div>
         </div>
     </paw:banner>
@@ -29,7 +32,7 @@
     <spring:message code="team.profile.members" var="membersTab"/>
     <c:set var="sections" value="${['overview', 'membersTab']}"/>
     <c:set var="labels"   value="${[overview, membersTab]}"/>
-    <c:set var="activeSection" value="${param.section}"/>
+    <c:set var="activeSection" value="${param.section != null ? param.section : 'overview'}"/>
 
     <paw:navbar sections="${sections}" labels="${labels}" activeSection="${activeSection}"/>
 
@@ -45,7 +48,7 @@
             <c:otherwise>
                 <div class="profile-main">
                     <div class="carrousel-title">
-                        <paw:text size="xl"><spring:message code="team.profile.activeTournaments"/></paw:text>
+                        <paw:text type="title"><spring:message code="profile.upcomingTournaments.title"/></paw:text>
                     </div>
                     <c:choose>
                         <c:when test="${activeTournaments.size() == 0}">
@@ -54,11 +57,12 @@
                             </div>
                         </c:when>
                         <c:otherwise>
-                            <paw:carrousel id="activetourneys" elements="${activeTournaments}"/>
+                            <paw:elements-grid elements="${activeTournaments}" id="active-${team.id}"/>
+                            <paw:pagination currentPage="${currentPage1}" totalPages="${totalPages1}" url="/team/profile/${team.id}"/>
                         </c:otherwise>
                     </c:choose>
                     <div class="carrousel-title">
-                        <paw:text size="xl"><spring:message code="team.profile.pastTournaments"/></paw:text>
+                        <paw:text type="title"><spring:message code="team.profile.pastTournaments"/></paw:text>
                     </div>
                     <c:choose>
                         <c:when test="${pastTournaments.size() == 0}">
@@ -67,19 +71,18 @@
                             </div>
                         </c:when>
                         <c:otherwise>
-                            <paw:carrousel id="pasttourneys" elements="${pastTournaments}"/>
+                            <paw:elements-grid elements="${pastTournaments}" id="past-${team.id}"/>
+                            <paw:pagination currentPage="${currentPage2}" totalPages="${totalPages2}" url="/team/profile/${team.id}"/>
                         </c:otherwise>
                     </c:choose>
                 </div>
             </c:otherwise>
         </c:choose>
-
-
     </div>
 </paw:layout>
 
 
-<paw:modal title="team.profile.edit.title" id="editProfileModal" returnUrl="/team/profile/${team.id}">
+<paw:modal title="team.profile.edit.title" id="editProfileModal" returnUrl="${teamUrl}">
     <form:form method="post" modelAttribute="teamForm"
                action="${pageContext.request.contextPath}/team/update"
                enctype="multipart/form-data" cssClass="form">
@@ -88,15 +91,16 @@
             <paw:input path="name" label="team.profile.edit.name" hasConstraint="true"/>
         </div>
         <div class="row">
-            <paw:input path="profilePicture" label="team.create.teamImage" inputType="file" hasConstraint="true"/>
+            <paw:input path="profilePicture" label="team.create.teamImage" fileText="input.uploadImage" inputType="file" hasConstraint="true"/>
         </div>
         <div class="row">
-            <paw:input path="bannerPicture" label="team.create.teamBanner" inputType="file"/>
+            <paw:input path="bannerPicture" label="team.create.teamBanner" fileText="input.uploadImage" inputType="file"/>
         </div>
         <div class="input-container">
             <label for="memberInput" class="input-label"><spring:message code="team.create.members"/></label>
             <div class="row center member-input-container">
-                <input type="text" id="memberInput" placeholder="<spring:message code="team.create.addMember.placeholder"/>" class="input" />
+                <input type="text" list="userSuggestions" id="memberInput" placeholder="<spring:message code="team.create.addMember.placeholder"/>" class="input" autocomplete="off" />
+                <datalist id="userSuggestions"></datalist>
                 <button type="button" id="addMemberBtn" class="btn submit"><spring:message code="team.create.add"/></button>
             </div>
             <form:errors path="members" cssClass="form-error" element="h1"/>
@@ -116,4 +120,7 @@
     </form:form>
 </paw:modal>
 
+<script>
+    const contextPath = "${pageContext.request.contextPath}";
+</script>
 <script src="${pageContext.request.contextPath}/js/teamMembers.js"></script>

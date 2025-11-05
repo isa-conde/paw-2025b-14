@@ -31,7 +31,7 @@ public class GameHibernateDao implements GameDao {
 
     @Override
     public List<Game> searchByName(String name) {
-        TypedQuery<Game> query = em.createQuery("SELECT g FROM Game g WHERE g.name LIKE CONCAT('%', LOWER(:name), '%')", Game.class);
+        TypedQuery<Game> query = em.createQuery("SELECT g FROM Game g WHERE LOWER(g.name) LIKE CONCAT('%', LOWER(:name), '%')", Game.class);
         query.setParameter("name", name);
         return query.getResultList();
     }
@@ -63,15 +63,6 @@ public class GameHibernateDao implements GameDao {
         return !query.getResultList().isEmpty();
     }
 
-
-    @Override
-    public void addFavourite(Long user_id, Long game_id) {
-        User user = em.find(User.class, user_id);
-        Game game = em.find(Game.class, game_id);
-
-        user.getFavouriteGames().add(game);
-        em.persist(user);
-    }
 
     @Override
     public List<Game> getFavourites(Long userId) {

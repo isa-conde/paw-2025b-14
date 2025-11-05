@@ -4,8 +4,7 @@ import ar.edu.itba.paw.interfaces.persistence.*;
 import ar.edu.itba.paw.interfaces.services.MailService;
 import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.Game.GameFormat;
-import ar.edu.itba.paw.model.Participant;
-import ar.edu.itba.paw.model.Tournament.Tournament;
+import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Genre;
@@ -21,8 +20,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -66,12 +63,12 @@ public class TournamentServiceImplTest {
         User fakeUser = new User(ID,NAME,NAME,NAME,true,null,null,null,"");
         Tournament fakeTournament = createFakeTournament(fakeUser);
         Mockito.when(imageDao.insertImage(IMAGE)).thenReturn(ID);
-        Mockito.when(mockDao.create(ID,NAME,ID,REGION,ELO,START_DATE,END_DATE,FORMAT,STRUCTURE,MAX_PARTICIPANTS,ID,true,false,ID))
+        Mockito.when(mockDao.create(ID,NAME,ID,REGION,ELO,START_DATE,END_DATE,FORMAT,STRUCTURE,MAX_PARTICIPANTS,ID,true,false,ID, null))
                 .thenReturn(fakeTournament);
         Mockito.when(userDao.findById(ID))
                 .thenReturn(Optional.of(fakeUser));
 
-        Tournament ans = tournamentService.create(ID,NAME,ID,REGION,ELO,START_DATE,END_DATE,FORMAT,STRUCTURE,MAX_PARTICIPANTS,IMAGE,true,false,ID);
+        Tournament ans = tournamentService.create(ID,NAME,ID,REGION,ELO,START_DATE,END_DATE,FORMAT,STRUCTURE,MAX_PARTICIPANTS,IMAGE,true,false,ID, null);
 
         Assert.assertNotNull(ans);
         Assert.assertEquals(ID,ans.getId());
