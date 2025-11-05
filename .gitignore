@@ -63,6 +63,6 @@ tmp/
 
 .env
 
-.iml
+*.iml
 
 
