@@ -5,6 +5,7 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
 <c:url var="profileUrl" value="/profile/${profile.id}"/>
+<c:url var="starUrl" value="/images/roundedStarOn.png"/>
 
 <paw:layout user="${user}" pageTitle="${profile.username}" function="${openModal}">
 
@@ -12,7 +13,7 @@
     <c:url value="/images/pencil.png" var="pencilUrl"/>
     <c:set var="icon" value="${isMyProfile ? pencilUrl : null }"/>
     <c:url value="/banner/${profile.banner_id}" var="bannerUrl"/>
-    <paw:banner cornerIcon="${icon}" cornerOnClick="openModal('editProfileModal')" image="${bannerUrl}">
+    <paw:banner cornerIcon="${icon}" cornerOnClick="openModal('editProfileModal')" image="${bannerUrl}" size="profile">
         <div class="profile-sidebar">
             <div class="profile-picture">
                 <img src="${pageContext.request.contextPath}/pfp/${profile.pfp_id}" alt="${profile.username}">
@@ -21,8 +22,9 @@
                 <paw:text size="xl"><c:out value="${profile.username}"/></paw:text>
                 <paw:text size="m"><c:out value="${profile.bio}"/></paw:text>
             </div>
-            <div class="star-rating__container">
-
+            <div class="rating-container-profile">
+                <img src="${starUrl}" class="banner-star" alt="tournament.rating.imgLabel"/>
+                <paw:text weight="thin" size="s"> ${userRating} </paw:text>
             </div>
         </div>
     </paw:banner>

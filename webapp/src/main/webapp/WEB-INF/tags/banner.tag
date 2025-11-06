@@ -1,5 +1,5 @@
 <%@ tag language="java" pageEncoding="UTF-8" %>
-<%@ attribute name="size" required="false" description="Banner height: s, [m] or l" %>
+<%@ attribute name="size" required="false" description="Banner height: s, [m], l or profile (specific for profile page)" %>
 <%@ attribute name="image" required="true" description="Banner image URL" %>
 <%@ attribute name="cornerIcon" required="false" description="Botton-right corner icon"%>
 <%@ attribute name="cornerText" required="false" description="Botton-right corner text"%>

@@ -164,7 +164,7 @@ public class TournamentServiceImpl implements TournamentService {
         List<Participant> participants;
         if (teamSize > 1){
             participants = participantDao.getTournamentParticipantTeams(tournament_id);
-        }else {
+        } else {
             participants = participantDao.getTournamentParticipantUsers(tournament_id);
         }
         createMatches(tournament_id, participants);

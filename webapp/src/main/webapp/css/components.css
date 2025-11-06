@@ -244,6 +244,11 @@ button:disabled {
     padding-bottom: 33px;
 }
 
+.banner.profile {
+    height: 380px;
+    padding-bottom: 20px;
+}
+
 .banner.l {
     height: 500px;
     padding-bottom: 50px;
@@ -1735,13 +1740,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     gap: var(--star-gap);
 }
 
-.star-rating__container {
-    padding: var(--star-container-padding-block, 8px) var(--star-container-padding-inline, 14px);
-    border-radius: var(--star-container-radius, 15px);
-    background-color: var(--star-container-background, var(--primary-button));
-    display: inline-flex;
-}
-
 .star-rating--sm {
     --star-size: 22px;
     --star-gap: 4px;
@@ -1842,4 +1840,18 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+}
+
+.rating-container-profile {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-main), serif;
+    border-radius: 15px;
+    border: none;
+    background-color: var(--primary-button);
+    color: var(--primary-text);
+    padding: 6px 12px;
+    max-width: 350px;
+    margin-top: 14px;
 }
