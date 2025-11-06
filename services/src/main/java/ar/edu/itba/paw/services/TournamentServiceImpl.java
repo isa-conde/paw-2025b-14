@@ -63,7 +63,7 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Override
     public List<Tournament> findTournaments(TournamentFilter tournamentFilter, Long page) {
-        Long gameId = tournamentFilter.getGame_id();
+        Long gameId = tournamentFilter.getGameId();
         if(gameId != null && gameDao.findById(gameId).isEmpty()) {
             LOGGER.error("Game with ID {} does not exist", gameId);
             throw new GameNotFoundException();
@@ -73,74 +73,74 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Transactional
     @Override
-    public Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, byte[] image, Boolean openInscriptions, Boolean isFinished, Long format_id, byte[] rules) {
-        Long image_id = imageDao.insertImage(image);
-        Long rules_id = null;
+    public Tournament create(Long creatorId, String name, Long gameId, Region region, Elo elo, LocalDate startDate, LocalDate endDate, String format, Structure structure, Integer maxParticipants, byte[] image, Boolean openInscriptions, Boolean isFinished, Long formatId, byte[] rules) {
+        Long imageId = imageDao.insertImage(image);
+        Long rulesId = null;
         if (rules != null){
-            rules_id = rulesDao.insertRules(rules).getId();
+            rulesId = rulesDao.insertRules(rules).getId();
         }
-        Tournament toReturn = tournamentDao.create(creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, openInscriptions, isFinished, format_id, rules_id);
-        User creator = userDao.findById(creator_id).get();
+        Tournament toReturn = tournamentDao.create(creatorId, name, gameId, region, elo, startDate, endDate, format, structure, maxParticipants, imageId, openInscriptions, isFinished, formatId, rulesId);
+        User creator = userDao.findById(creatorId).get();
         ms.sendTournamentCreatedEmail(toReturn.getId(), creator.getUsername(), name, creator.getEmail());
         LOGGER.info("Tournament {} has been successfully created", name);
         return toReturn;
     }
 
     @Override
-    public List<Tournament> findByCreator(Long creator_id, Long page, Boolean isFinished) {
-        return tournamentDao.findByCreator(creator_id, page, isFinished);
+    public List<Tournament> findByCreator(Long creatorId, Long page, Boolean isFinished) {
+        return tournamentDao.findByCreator(creatorId, page, isFinished);
     }
 
     @Transactional
     @Override
-    public void setFinished(Long tournament_id, Long lastMatchId) { // TODO: check for possible error handling
-        Tournament t = findById(tournament_id).orElse(null);
+    public void setFinished(Long tournamentId, Long lastMatchId) { // TODO: check for possible error handling
+        Tournament t = findById(tournamentId).orElse(null);
         Long winner = null;
         if (t != null) {
             if (t.getStructure() == Structure.LEAGUE) {
-                List<Participant> tops = getLeagueTournamentTopPositions(tournament_id);
+                List<Participant> tops = getLeagueTournamentTopPositions(tournamentId);
                 if(tops.isEmpty()) {
                     LOGGER.debug("Top positions list for league format is empty");
                 }
                 if (tops.size() > 1) {
-                    createMatchesLeague(t, tops, matchDao.getMaxMatchId(tournament_id) + 1, matchDao.getTournamentMaxStage(tournament_id) + 1, null);
+                    createMatchesLeague(t, tops, matchDao.getMaxMatchId(tournamentId) + 1, matchDao.getTournamentMaxStage(tournamentId) + 1, null);
                     return;
                 }
                 winner = tops.getFirst().getId();
             } else {
-                winner = matchDao.getMatchWinner(tournament_id, lastMatchId);
+                winner = matchDao.getMatchWinner(tournamentId, lastMatchId);
             }
-            tournamentDao.setTournamentWinner(tournament_id, winner);
-            LOGGER.info("User with ID {} has won the tournament with ID {}", winner, tournament_id);
-            tournamentDao.setFinished(tournament_id);
-            LOGGER.info("Tournament with ID {} has successfully ended", tournament_id);
+            tournamentDao.setTournamentWinner(tournamentId, winner);
+            LOGGER.info("User with ID {} has won the tournament with ID {}", winner, tournamentId);
+            tournamentDao.setFinished(tournamentId);
+            LOGGER.info("Tournament with ID {} has successfully ended", tournamentId);
         }
-        List<Participant> participant_users = participantDao.getTournamentParticipantUsers(tournament_id);
-        Integer teamSize = getPlayersPerTeam(tournament_id);
+        List<Participant> participantUsers = participantDao.getTournamentParticipantUsers(tournamentId);
+        Integer teamSize = getPlayersPerTeam(tournamentId);
         if(teamSize > 1) {
-            List<Participant> participant_teams = participantDao.getTournamentParticipantTeams(tournament_id);
+            List<Participant> participantTeams = participantDao.getTournamentParticipantTeams(tournamentId);
             Long winnerTeam = null;
-            for(Participant team : participant_teams){
+            for(Participant team : participantTeams){
                 if(team.getId().equals(winner)) {
                     winnerTeam = team.getTeam().getId();
                     break;
                 }
             }
-            for(Participant p : participant_users){
+            for(Participant p : participantUsers){
                 User user = userDao.findById(p.getUser().getId()).get();
                 if(p.getTeam().getId().equals(winnerTeam)) {
-                    ms.sendTournamentWinnerEmail(tournament_id, user.getUsername(), t.getName(), user.getEmail());
+                    ms.sendTournamentWinnerEmail(tournamentId, user.getUsername(), t.getName(), user.getEmail());
                 } else {
-                    ms.sendTournamentEndedEmail(tournament_id, user.getUsername(), t.getName(), user.getEmail());
+                    ms.sendTournamentEndedEmail(tournamentId, user.getUsername(), t.getName(), user.getEmail());
                 }
             }
         }else {
-            for(Participant p : participant_users){
+            for(Participant p : participantUsers){
                 User user = userDao.findById(p.getUser().getId()).get();
                 if(p.getId().equals(winner)) {
-                    ms.sendTournamentWinnerEmail(tournament_id, user.getUsername(), t.getName(), user.getEmail());
+                    ms.sendTournamentWinnerEmail(tournamentId, user.getUsername(), t.getName(), user.getEmail());
                 } else {
-                    ms.sendTournamentEndedEmail(tournament_id, user.getUsername(), t.getName(), user.getEmail());
+                    ms.sendTournamentEndedEmail(tournamentId, user.getUsername(), t.getName(), user.getEmail());
                 }
             }
         }
@@ -150,26 +150,26 @@ public class TournamentServiceImpl implements TournamentService {
         Optional<Tournament> t = tournamentDao.findById(tournamentId);
         PointsPair maxPoints = participantDao.getTournamentMaxPointsPairGroup(tournamentId, null);
         if (maxPoints == null) return java.util.Collections.emptyList();
-        return participantDao.getTournamentParticipantsByPointsPair(tournamentId, null, maxPoints,  gameFormatDao.getFormatById(t.get().getFormat_id()).get().getPlayers_per_team());
+        return participantDao.getTournamentParticipantsByPointsPair(tournamentId, null, maxPoints,  gameFormatDao.getFormatById(t.get().getFormatId()).get().getPlayersPerTeam());
     }
 
     @Transactional
     @Override
-    public void closeInscriptions(Long tournament_id){
-        if(tournamentDao.isClosed(tournament_id)) {
-            LOGGER.warn("The inscriptions for the tournament with ID {} have already been closed", tournament_id);
+    public void closeInscriptions(Long tournamentId){
+        if(tournamentDao.isClosed(tournamentId)) {
+            LOGGER.warn("The inscriptions for the tournament with ID {} have already been closed", tournamentId);
             throw new TournamentAlreadyClosedException();
         }
-        Integer teamSize = getPlayersPerTeam(tournament_id);
+        Integer teamSize = getPlayersPerTeam(tournamentId);
         List<Participant> participants;
         if (teamSize > 1){
-            participants = participantDao.getTournamentParticipantTeams(tournament_id);
+            participants = participantDao.getTournamentParticipantTeams(tournamentId);
         } else {
-            participants = participantDao.getTournamentParticipantUsers(tournament_id);
+            participants = participantDao.getTournamentParticipantUsers(tournamentId);
         }
-        createMatches(tournament_id, participants);
-        tournamentDao.closeInscriptions(tournament_id);
-        LOGGER.info("The inscriptions for the tournament with ID {} have been successfully closed", tournament_id);
+        createMatches(tournamentId, participants);
+        tournamentDao.closeInscriptions(tournamentId);
+        LOGGER.info("The inscriptions for the tournament with ID {} have been successfully closed", tournamentId);
     }
 
     @Override
@@ -189,32 +189,32 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Transactional
     @Override
-    public void startTournament(Long tournament_id){
-        Optional<Tournament> optTournament = findById(tournament_id);
+    public void startTournament(Long tournamentId){
+        Optional<Tournament> optTournament = findById(tournamentId);
         if(optTournament.isEmpty()) {
-            LOGGER.error("Tournament with ID {} does not exist", tournament_id);
+            LOGGER.error("Tournament with ID {} does not exist", tournamentId);
             throw new TournamentNotFoundException();
         }
         Tournament t = optTournament.get();
         if(t.getTournamentStarted()) {
-            LOGGER.warn("The tournament with ID {} has already started", tournament_id);
+            LOGGER.warn("The tournament with ID {} has already started", tournamentId);
             throw new TournamentAlreadyStartedException();
         }
-        tournamentDao.startTournament(tournament_id);
-        LOGGER.info("The tournament with ID {} has successfully been started", tournament_id);
-        if(t.getStructure().equals(Structure.HYBRID) && t.getIs_group_stage()){
+        tournamentDao.startTournament(tournamentId);
+        LOGGER.info("The tournament with ID {} has successfully been started", tournamentId);
+        if(t.getStructure().equals(Structure.HYBRID) && t.getIsGroupStage()){
             createGroupStageMatches(t);
         }
-        List<Participant> participants = participantDao.getTournamentParticipantUsers(tournament_id);
-        Optional<User> optCreator = userDao.findById(t.getCreator_id());
+        List<Participant> participants = participantDao.getTournamentParticipantUsers(tournamentId);
+        Optional<User> optCreator = userDao.findById(t.getCreatorId());
         if(optCreator.isEmpty()) {
-            LOGGER.error("User with ID {} does not exist", t.getCreator_id());
+            LOGGER.error("User with ID {} does not exist", t.getCreatorId());
             throw new UserNotFoundException();
         }
         User creator = optCreator.get();
         for(Participant p : participants) {
             User participant = userDao.findById(p.getUser().getId()).get();
-            ms.sendTournamentStartedEmail(tournament_id, participant.getUsername(), t.getName(), creator.getEmail(), participant.getEmail());
+            ms.sendTournamentStartedEmail(tournamentId, participant.getUsername(), t.getName(), creator.getEmail(), participant.getEmail());
         }
     }
 
@@ -236,14 +236,14 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Transactional
     @Override
-    public void updateTournamentInfo(Long tournament_id, String name, LocalDate start_date, LocalDate end_date, Integer max_participants, byte[] image){
-        Tournament t = findById(tournament_id).orElse(null);
+    public void updateTournamentInfo(Long tournamentId, String name, LocalDate startDate, LocalDate endDate, Integer maxParticipants, byte[] image){
+        Tournament t = findById(tournamentId).orElse(null);
         if(t != null){
             if(image != null){
-                imageDao.updateImage(t.getImage_id(), image);
+                imageDao.updateImage(t.getImageId(), image);
             }
-            tournamentDao.updateTournamentInfo(tournament_id, name, start_date, end_date, max_participants);
-            LOGGER.info("The tournament with ID {} has successfully been updated", tournament_id);
+            tournamentDao.updateTournamentInfo(tournamentId, name, startDate, endDate, maxParticipants);
+            LOGGER.info("The tournament with ID {} has successfully been updated", tournamentId);
         }
     }
 
@@ -346,7 +346,7 @@ public class TournamentServiceImpl implements TournamentService {
 
     private void createMatchesHybrid(Tournament t, List<Participant> participants) {
         int n = participants.size();
-        Integer teamSize = gameFormatDao.getFormatById(t.getFormat_id()).get().getPlayers_per_team();
+        Integer teamSize = gameFormatDao.getFormatById(t.getFormatId()).get().getPlayersPerTeam();
         if (n > 8){
             tournamentDao.setIsGroupStage(t.getId(), true);
             int groupsCount = calculateGroups(n);
@@ -420,21 +420,21 @@ public class TournamentServiceImpl implements TournamentService {
         createMatchesBracket(findById(tournamentId).orElse(null), classified, matchDao.getMaxMatchId(tournamentId) + 1, false);
     }
 
-    private Map<Integer, List<Participant>> getGroupTopPositions(Long tournament_id, Integer group_number){
+    private Map<Integer, List<Participant>> getGroupTopPositions(Long tournamentId, Integer groupNumber){
         Map<Integer, List<Participant>> out = new HashMap<>();
-        Optional<Tournament> t = tournamentDao.findById(tournament_id);
+        Optional<Tournament> t = tournamentDao.findById(tournamentId);
         if(t.isEmpty()) {
             return out;
         }
         Tournament tournament = t.get();
         Integer teamSize;
-        if(tournament.getFormat_id() != null){
-            teamSize = gameFormatDao.getFormatById(t.get().getFormat_id()).get().getPlayers_per_team();
+        if(tournament.getFormatId() != null){
+            teamSize = gameFormatDao.getFormatById(t.get().getFormatId()).get().getPlayersPerTeam();
         }else{
             teamSize = 1;
         }
-        out.put(1, participantDao.getTournamentParticipantsByPointsPair(tournament_id, group_number, participantDao.getTournamentMaxPointsPairGroup(tournament_id, group_number), teamSize));
-        out.put(2, participantDao.getTournamentParticipantsByPointsPair(tournament_id, group_number, participantDao.getTournamentSecondMaxPointsPairGroup(tournament_id, group_number), teamSize));
+        out.put(1, participantDao.getTournamentParticipantsByPointsPair(tournamentId, groupNumber, participantDao.getTournamentMaxPointsPairGroup(tournamentId, groupNumber), teamSize));
+        out.put(2, participantDao.getTournamentParticipantsByPointsPair(tournamentId, groupNumber, participantDao.getTournamentSecondMaxPointsPairGroup(tournamentId, groupNumber), teamSize));
         return out;
     }
 
@@ -463,8 +463,8 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public Integer getPlayersPerTeam(Long tournamentId){
         Tournament t = findById(tournamentId).orElse(null);
-        if(t != null && t.getFormat_id() != null){
-            return gameFormatDao.getPlayersPerTeam(t.getFormat_id());
+        if(t != null && t.getFormatId() != null){
+            return gameFormatDao.getPlayersPerTeam(t.getFormatId());
         }
         return null;
     }

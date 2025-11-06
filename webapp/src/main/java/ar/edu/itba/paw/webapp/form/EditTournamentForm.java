@@ -21,12 +21,12 @@ public class EditTournamentForm implements HasDates{
     @Size(max = 100)
     private String name;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate start_date;
+    private LocalDate startDate;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate end_date;
+    private LocalDate endDate;
     @Min(value = 4, message = "{createTournament.minParticipants}")
     @Max(value = 32, message = "{createTournament.maxParticipantsError}")
-    private Integer max_participants;
+    private Integer maxParticipants;
     private MultipartFile image;
     private MultipartFile rules;
 
@@ -37,25 +37,25 @@ public class EditTournamentForm implements HasDates{
         this.name = name;
     }
 
-    public LocalDate getStart_date() {
-        return start_date;
+    public LocalDate getStartDate() {
+        return startDate;
     }
-    public void setStart_date(LocalDate start_date) {
-        this.start_date = start_date;
-    }
-
-    public LocalDate getEnd_date() {
-        return end_date;
-    }
-    public void setEnd_date(LocalDate end_date) {
-        this.end_date = end_date;
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
     }
 
-    public Integer getMax_participants() {
-        return max_participants;
+    public LocalDate getEndDate() {
+        return endDate;
     }
-    public void setMax_participants(Integer max_participants) {
-        this.max_participants = max_participants;
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
+    }
+
+    public Integer getMaxParticipants() {
+        return maxParticipants;
+    }
+    public void setMaxParticipants(Integer maxParticipants) {
+        this.maxParticipants = maxParticipants;
     }
 
     public MultipartFile getImage() {

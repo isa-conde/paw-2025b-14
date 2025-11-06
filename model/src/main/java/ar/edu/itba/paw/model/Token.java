@@ -20,23 +20,23 @@ public class Token {
     private Long token;
 
     @Column(name = "expiry_date", nullable = false)
-    private LocalDate expiry_date;
+    private LocalDate expiryDate;
 
     @Column(name = "used", nullable = false)
     private boolean used;
 
     public Token(){}
 
-    public Token(User user, Long token, LocalDate expiry_date){
+    public Token(User user, Long token, LocalDate expiryDate){
         this.user = user;
         this.token = token;
-        this.expiry_date = expiry_date;
+        this.expiryDate = expiryDate;
     }
 
-    public Token(final Long id, final Long user_id, final Long token, final LocalDate expiry_date) {
+    public Token(final Long id, final Long userId, final Long token, final LocalDate expiryDate) {
         this.id = id;
         this.token = token;
-        this.expiry_date = expiry_date;
+        this.expiryDate = expiryDate;
         this.used = false;
     }
 
@@ -44,7 +44,7 @@ public class Token {
         return id;
     }
 
-    public Long getUser_id() {
+    public Long getUserId() {
         return user.getId();
     }
 
@@ -52,8 +52,8 @@ public class Token {
         return token;
     }
 
-    public LocalDate getExpiry_date() {
-        return expiry_date;
+    public LocalDate getExpiryDate() {
+        return expiryDate;
     }
 
     public boolean isUsed() {
@@ -68,8 +68,8 @@ public class Token {
         this.id = id;
     }
 
-    public void setExpiry_date(LocalDate expiry_date) {
-        this.expiry_date = expiry_date;
+    public void setExpiryDate(LocalDate expiryDate) {
+        this.expiryDate = expiryDate;
     }
 
     public void setToken(Long token) {

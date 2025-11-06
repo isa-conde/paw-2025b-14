@@ -16,13 +16,13 @@ public interface UserDao {
 
     User create(String username, String email, String password);
 
-    void changePassword(long user_id, String newPassword);
+    void changePassword(long userId, String newPassword);
 
     Boolean checkUsernameExists(String username);
 
     Boolean checkEmailExists(String email);
 
-    void verifyUser(long user_id);
+    void verifyUser(long userId);
 
     void updateProfileInfo(Long userId, String username, String bio, Long pfp, Long banner);
 

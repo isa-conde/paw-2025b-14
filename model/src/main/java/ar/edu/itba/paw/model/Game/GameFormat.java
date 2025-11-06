@@ -14,7 +14,7 @@ public class GameFormat {
     @Column(name = "name", nullable = false)
     private String name;
     @Column(name = "players_per_team", nullable = false)
-    private Integer players_per_team;
+    private Integer playersPerTeam;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "game_id", nullable = false)
@@ -25,7 +25,7 @@ public class GameFormat {
     public GameFormat(Long id, String name, Integer playersPerTeam) {
         this.id = id;
         this.name = name;
-        players_per_team = playersPerTeam;
+        this.playersPerTeam = playersPerTeam;
     }
 
     public Long getId() {
@@ -42,14 +42,14 @@ public class GameFormat {
         this.name = name;
     }
 
-    public Integer getPlayers_per_team() {
-        return players_per_team;
+    public Integer getPlayersPerTeam() {
+        return playersPerTeam;
     }
-    public void setPlayers_per_team(Integer players_per_team) {
-        this.players_per_team = players_per_team;
+    public void setPlayersPerTeam(Integer playersPerTeam) {
+        this.playersPerTeam = playersPerTeam;
     }
 
-    public Long getGame_id() {
+    public Long getGameId() {
         return game.getId();
     }
 

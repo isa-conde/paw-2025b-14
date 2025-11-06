@@ -39,7 +39,7 @@
                     <c:when test="${isLoggedIn}">
                         <div class="header-buttons">
                             <c:url value="/profile/${user.id}" var="profileurl"/>
-                            <paw:profileButton text="${user.username}" imageId="${user.pfp_id}" onclick="window.location.href='${profileurl}'" isNotSafe="true" size="m"/>
+                            <paw:profileButton text="${user.username}" imageId="${user.pfpId}" onclick="window.location.href='${profileurl}'" isNotSafe="true" size="m"/>
                             <paw:logoutButton/>
                         </div>
                     </c:when>

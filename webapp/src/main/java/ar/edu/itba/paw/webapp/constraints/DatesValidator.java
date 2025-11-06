@@ -16,8 +16,8 @@ public class DatesValidator implements ConstraintValidator<DatesConstraint, HasD
 
         LocalDate today = LocalDate.now();
 
-        LocalDate start = form.getStart_date();
-        LocalDate end = form.getEnd_date();
+        LocalDate start = form.getStartDate();
+        LocalDate end = form.getEndDate();
 
         boolean valid = true;
 
@@ -26,7 +26,7 @@ public class DatesValidator implements ConstraintValidator<DatesConstraint, HasD
         if (start.isBefore(today)){
             context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate("{error.tournamentForm.invalidStartDate}")
-                    .addPropertyNode("start_date")
+                    .addPropertyNode("startDate")
                     .addConstraintViolation();
             valid = false;
         }
@@ -34,7 +34,7 @@ public class DatesValidator implements ConstraintValidator<DatesConstraint, HasD
         if (end.isBefore(today)){
             context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate("{error.tournamentForm.invalidEndDate}")
-                    .addPropertyNode("end_date")
+                    .addPropertyNode("endDate")
                     .addConstraintViolation();
             valid = false;
         }
@@ -42,7 +42,7 @@ public class DatesValidator implements ConstraintValidator<DatesConstraint, HasD
         if (start.isAfter(end)) {
             context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate("{error.tournamentForm.invalidDates}")
-                    .addPropertyNode("end_date")
+                    .addPropertyNode("endDate")
                     .addConstraintViolation();
             valid = false;
         }

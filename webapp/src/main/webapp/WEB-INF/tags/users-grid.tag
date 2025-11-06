@@ -15,7 +15,7 @@
                 <c:url value="/team/profile/${p.team.id}" var="url"/>
             </c:otherwise>
         </c:choose>
-        <paw:profileButton text="${p.name}" imageId="${p.pfp_id}" onclick="window.location.href='${url}'" isNotSafe="true" size="l" fill="false"/>
+        <paw:profileButton text="${p.name}" imageId="${p.pfpId}" onclick="window.location.href='${url}'" isNotSafe="true" size="l" fill="false"/>
     </c:forEach>
 </div>
 

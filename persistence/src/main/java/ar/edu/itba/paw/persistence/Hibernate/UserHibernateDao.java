@@ -56,8 +56,8 @@ public class UserHibernateDao implements UserDao {
     }
 
     @Override
-    public void changePassword(long user_id, String newPassword) {
-        User user = em.find(User.class, user_id);
+    public void changePassword(long userId, String newPassword) {
+        User user = em.find(User.class, userId);
         if (user != null) {
             user.setPassword(newPassword);
             em.merge(user);
@@ -79,8 +79,8 @@ public class UserHibernateDao implements UserDao {
     }
 
     @Override
-    public void verifyUser(long user_id) {
-        User user = em.find(User.class, user_id);
+    public void verifyUser(long userId) {
+        User user = em.find(User.class, userId);
         if (user != null){
             user.setVerified(true);
             em.merge(user);
@@ -97,9 +97,9 @@ public class UserHibernateDao implements UserDao {
             }if (bio != null){
                 user.setBio(bio);
             }if (pfp != null){
-                user.setPfp_id(pfp);
+                user.setPfpId(pfp);
             }if (banner != null){
-                user.setBanner_id(banner);
+                user.setBannerId(banner);
             }
             em.merge(user);
         }

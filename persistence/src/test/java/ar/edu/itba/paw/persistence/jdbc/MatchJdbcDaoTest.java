@@ -80,7 +80,7 @@
 //        insertUser.execute(Map.of("id",OTHER_ID,"email",OTHER_EMAIL,"username",OTHER_USERNAME,"password",PASSWORD,"verified",true));
 //        SimpleJdbcInsert insertParticipant = new SimpleJdbcInsert(jdbcTemplate).withTableName("participant");
 //        for (int i = 0; i < 2; i++) {
-//            insertParticipant.execute(Map.of("id",ID+i*2,"user_id",ID+i,"tournament_id",OTHER_ID,"points",(i==0)?4:5,"group_number",1));
+//            insertParticipant.execute(Map.of("id",ID+i*2,"user_id",ID+i,"tournament_id",OTHER_ID,"points",(i==0)?4:5,"groupNumber",1));
 //            insertParticipant.execute(Map.of("id",ID+1+i*2,"user_id",ID+i,"tournament_id",OTHER_ID+1,"points",0));
 //        }
 //    }

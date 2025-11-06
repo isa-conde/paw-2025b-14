@@ -37,9 +37,9 @@ public class MatchServiceImpl implements MatchService {
 
     @Transactional
     @Override
-    public void swapMatchesMembers(Long tournament_id, Long match1, Long match2, Long user1, Long user2){
-        Match m1 = matchDao.getMatch(tournament_id, match1);
-        Match m2 = matchDao.getMatch(tournament_id, match2);
+    public void swapMatchesMembers(Long tournamentId, Long match1, Long match2, Long user1, Long user2){
+        Match m1 = matchDao.getMatch(tournamentId, match1);
+        Match m2 = matchDao.getMatch(tournamentId, match2);
         if (m1 == null || m2 == null) {
             throw new IllegalArgumentException("Both matches must exist in the tournament"); // TODO: custom handling
         }
@@ -53,14 +53,14 @@ public class MatchServiceImpl implements MatchService {
             throw new IllegalArgumentException("user1 must be in match1 and user2 must be in match2"); // TODO: custom handling
         }
         if (u1IsLocalM1) {
-            matchDao.updateMatchLocal(tournament_id, match1, user2);
+            matchDao.updateMatchLocal(tournamentId, match1, user2);
         } else {
-            matchDao.updateMatchVisitor(tournament_id, match1, user2);
+            matchDao.updateMatchVisitor(tournamentId, match1, user2);
         }
         if (u2IsLocalM2) {
-            matchDao.updateMatchLocal(tournament_id, match2, user1);
+            matchDao.updateMatchLocal(tournamentId, match2, user1);
         } else {
-            matchDao.updateMatchVisitor(tournament_id, match2, user1);
+            matchDao.updateMatchVisitor(tournamentId, match2, user1);
         }
         LOGGER.info("User {} and {} have been successfully swapped matches", user1, user2);
     }
@@ -107,7 +107,7 @@ public class MatchServiceImpl implements MatchService {
             return;
         }
         Structure structure = t.getStructure();
-        boolean isGroupStage = Boolean.TRUE.equals(t.getIs_group_stage());
+        boolean isGroupStage = Boolean.TRUE.equals(t.getIsGroupStage());
         boolean isElimination = structure.equals(Structure.ELIMINATION) || ( structure.equals(Structure.HYBRID) && !isGroupStage);
 
         if(isElimination && localScore.equals(visitorScore)){

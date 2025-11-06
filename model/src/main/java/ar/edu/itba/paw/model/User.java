@@ -32,10 +32,10 @@ public class User {
     private String bio;
 
     @Column(name = "profile_picture_id")
-    private Long pfp_id;
+    private Long pfpId;
 
     @Column(name = "banner_id")
-    private Long banner_id;
+    private Long bannerId;
 
     @Column(name = "locale", nullable = false, length = 10)
     private String locale;
@@ -59,15 +59,15 @@ public class User {
 
     public User(){}
 
-    public User(final long id, final String username, final String email, String password, boolean verified, String bio, Long pfp_id, Long banner_id, String locale) {
+    public User(final long id, final String username, final String email, String password, boolean verified, String bio, Long pfpId, Long bannerId, String locale) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
         this.verified = verified;
         this.bio = bio;
-        this.pfp_id = pfp_id;
-        this.banner_id = banner_id;
+        this.pfpId = pfpId;
+        this.bannerId = bannerId;
         this.locale = locale;
     }
 
@@ -101,9 +101,9 @@ public class User {
 
     public String getBio(){ return bio; }
 
-    public Long getPfp_id() {return pfp_id;}
+    public Long getPfpId() {return pfpId;}
 
-    public Long getBanner_id() { return banner_id; }
+    public Long getBannerId() { return bannerId; }
 
     public boolean isVerified() {
         return verified;
@@ -121,12 +121,12 @@ public class User {
         this.bio = bio;
     }
 
-    public void setPfp_id(Long id){
-        this.pfp_id = id;
+    public void setPfpId(Long id){
+        this.pfpId = id;
     }
 
-    public void setBanner_id(Long id){
-        this.banner_id=id;
+    public void setBannerId(Long id){
+        this.bannerId=id;
     }
 
     public String getLocale() {

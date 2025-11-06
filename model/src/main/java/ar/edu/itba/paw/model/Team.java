@@ -16,9 +16,9 @@ public class Team {
     @Column(name = "name", length = 100, nullable = false, unique = true)
     private String name;
     @Column(name = "pfp_id")
-    private Long pfp_id;
+    private Long pfpId;
     @Column(name = "banner_id")
-    private Long banner_id;
+    private Long bannerId;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "owner_id", nullable = false)
@@ -27,17 +27,17 @@ public class Team {
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TeamMember> teamMembers = new ArrayList<>();
 
-    public Team(String name, Long pfp_id, Long banner_id) {
+    public Team(String name, Long pfpId, Long bannerId) {
         this.name = name;
-        this.pfp_id = pfp_id;
-        this.banner_id = banner_id;
+        this.pfpId = pfpId;
+        this.bannerId = bannerId;
     }
 
-    public Team(Long id, String name, Long pfp_id, Long banner_id) {
+    public Team(Long id, String name, Long pfpId, Long bannerId) {
         this.id = id;
         this.name = name;
-        this.pfp_id = pfp_id;
-        this.banner_id = banner_id;
+        this.pfpId = pfpId;
+        this.bannerId = bannerId;
     }
 
     public Team() {}
@@ -58,20 +58,20 @@ public class Team {
         this.name = name;
     }
 
-    public Long getPfp_id() {
-        return pfp_id;
+    public Long getPfpId() {
+        return pfpId;
     }
 
-    public void setPfp_id(Long pfp_id) {
-        this.pfp_id = pfp_id;
+    public void setPfpId(Long pfpId) {
+        this.pfpId = pfpId;
     }
 
-    public void setBanner_id(Long banner_id) {
-        this.banner_id = banner_id;
+    public void setBannerId(Long bannerId) {
+        this.bannerId = bannerId;
     }
 
-    public Long getBanner_id() {
-        return banner_id;
+    public Long getBannerId() {
+        return bannerId;
     }
 
     public User getOwner() {

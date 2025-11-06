@@ -18,13 +18,13 @@ public class TeamHibernateDao implements TeamDao {
     private EntityManager em;
 
     @Override
-    public Team create(String name, Long pfp_id, Long banner_id, Long owner_id) {
-        User owner = em.find(User.class, owner_id);
+    public Team create(String name, Long pfpId, Long bannerId, Long ownerId) {
+        User owner = em.find(User.class, ownerId);
         if (owner == null) {
             throw new IllegalArgumentException();
         }
 
-        Team team = new Team(name, pfp_id, banner_id);
+        Team team = new Team(name, pfpId, bannerId);
         team.setOwner(owner);
         em.persist(team);
         return team;
@@ -36,8 +36,8 @@ public class TeamHibernateDao implements TeamDao {
     }
 
     @Override
-    public List<Long> getPastTournaments(Long team_id, Integer page) {
-        return findTeamTournamentIds(team_id, true, page);
+    public List<Long> getPastTournaments(Long teamId, Integer page) {
+        return findTeamTournamentIds(teamId, true, page);
     }
 
     @Override
@@ -50,7 +50,7 @@ public class TeamHibernateDao implements TeamDao {
             SELECT DISTINCT p.tournament.id
             FROM Participant p
             WHERE p.team.id = :teamId
-            AND p.tournament.is_finished = :isFinished
+            AND p.tournament.isFinished = :isFinished
             AND p.user IS NULL
         """;
 
@@ -63,33 +63,33 @@ public class TeamHibernateDao implements TeamDao {
     }
 
     @Override
-    public Long getActivePages(Long team_id) {
-        return getTeamTournamentsPages(team_id, false);
+    public Long getActivePages(Long teamId) {
+        return getTeamTournamentsPages(teamId, false);
     }
 
     @Override
-    public Long getPastPages(Long team_id) {
-        return getTeamTournamentsPages(team_id, true);
+    public Long getPastPages(Long teamId) {
+        return getTeamTournamentsPages(teamId, true);
     }
 
-    private Long getTeamTournamentsPages(Long team_id, Boolean isFinished){
+    private Long getTeamTournamentsPages(Long teamId, Boolean isFinished){
         String jpql = """
             SELECT DISTINCT COUNT (DISTINCT (p.tournament.id))
             FROM Participant p
             WHERE p.team.id = :teamId
-            AND p.tournament.is_finished = :isFinished
+            AND p.tournament.isFinished = :isFinished
             AND p.user IS NULL
         """;
 
         return (long) em.createQuery(jpql, Long.class)
-                .setParameter("teamId", team_id)
+                .setParameter("teamId", teamId)
                 .setParameter("isFinished", isFinished)
                 .getFirstResult();
     }
 
     @Override
-    public List<Team> getUserTeams(Long user_id) {
-        return em.find(User.class, user_id).getTeams();
+    public List<Team> getUserTeams(Long userId) {
+        return em.find(User.class, userId).getTeams();
     }
 
     @Override
@@ -98,9 +98,9 @@ public class TeamHibernateDao implements TeamDao {
         if (name != null){
             team.setName(name);
         }if (pfpId != null){
-            team.setPfp_id(pfpId);
+            team.setPfpId(pfpId);
         }if (bannerId != null){
-            team.setBanner_id(bannerId);
+            team.setBannerId(bannerId);
         }
         em.persist(team);
     }

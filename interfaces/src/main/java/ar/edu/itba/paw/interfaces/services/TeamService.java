@@ -9,25 +9,25 @@ import java.util.Optional;
 
 public interface TeamService {
 
-    Team create(String name, byte[] pfp, byte[] banner, Long owner_id, List<String> members);
+    Team create(String name, byte[] pfp, byte[] banner, Long ownerId, List<String> members);
 
     Optional<Team> getById(Long id);
 
-    List<Tournament> getActiveTournaments(Long team_id, Integer page);
+    List<Tournament> getActiveTournaments(Long teamId, Integer page);
 
-    List<Tournament> getPastTournaments(Long team_id, Integer page);
+    List<Tournament> getPastTournaments(Long teamId, Integer page);
 
-    Long getActivePages(Long team_id);
+    Long getActivePages(Long teamId);
 
-    Long getPastPages(Long team_id);
+    Long getPastPages(Long teamId);
 
-    List<Team> getUserTeams(Long user_id);
+    List<Team> getUserTeams(Long userId);
 
     void updateTeam(Long teamId, String name, byte[] pfp, byte[] banner, List<String> members);
 
-    Boolean isMember(Long team_id, Long user_id);
+    Boolean isMember(Long teamId, Long userId);
 
-    List<User> getTeamMembers(Long team_id);
+    List<User> getTeamMembers(Long teamId);
 
     Boolean teamNameTaken(String name);
 

@@ -17,7 +17,7 @@ public class CreateTeamForm {
     private String name;
     private MultipartFile banner;
     private MultipartFile pfp;
-    private Long owner_id;
+    private Long ownerId;
     @ExistingUsersContraint
     private List<String> members;
 
@@ -42,11 +42,11 @@ public class CreateTeamForm {
         this.pfp = pfp;
     }
 
-    public Long getOwner_id() {
-        return owner_id;
+    public Long getOwnerId() {
+        return ownerId;
     }
-    public void setOwner_id(Long owner_id) {
-        this.owner_id = owner_id;
+    public void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
     }
 
     public List<String> getMembers() {

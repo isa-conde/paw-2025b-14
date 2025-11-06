@@ -23,8 +23,8 @@ public class TokenHibernateDao implements TokenDao {
     private EntityManager em;
 
     @Override
-    public Token create(Long user_id, Long token, LocalDate expiry_date) {
-        Token t = new Token(em.getReference(User.class, user_id), token, expiry_date);
+    public Token create(Long userId, Long token, LocalDate expiryDate) {
+        Token t = new Token(em.getReference(User.class, userId), token, expiryDate);
         em.persist(t);
         return t;
     }
@@ -53,7 +53,7 @@ public class TokenHibernateDao implements TokenDao {
     public void deleteExpiredTokens() {
         em.createQuery("""
         DELETE FROM Token t
-        WHERE t.expiry_date < :today OR t.used = true
+        WHERE t.expiryDate < :today OR t.used = true
         """)
                 .setParameter("today", LocalDate.now())
                 .executeUpdate();

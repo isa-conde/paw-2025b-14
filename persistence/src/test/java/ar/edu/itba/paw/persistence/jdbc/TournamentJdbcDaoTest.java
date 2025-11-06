@@ -52,11 +52,11 @@
 //            rs.getLong("game_id"),
 //            Region.valueOf(rs.getString("region")),
 //            Elo.valueOf(rs.getString("elo")),
-//            rs.getDate("start_date").toLocalDate(),
-//            rs.getDate("end_date").toLocalDate(),
+//            rs.getDate("startDate").toLocalDate(),
+//            rs.getDate("endDate").toLocalDate(),
 //            rs.getString("format"),
 //            Structure.valueOf(rs.getString("structure")),
-//            rs.getInt("max_participants"),
+//            rs.getInt("maxParticipants"),
 //            rs.getLong("image_id"),
 //            rs.getBoolean("open_inscriptions"),
 //            rs.getBoolean("is_finished"),
@@ -85,11 +85,11 @@
 //                .addValue("game_id",ID)
 //                .addValue("region", REGION)
 //                .addValue("elo", ELO)
-//                .addValue("start_date", START_DATE)
-//                .addValue("end_date", END_DATE)
+//                .addValue("startDate", START_DATE)
+//                .addValue("endDate", END_DATE)
 //                .addValue("format", FORMAT)
 //                .addValue("structure", STRUCTURE)
-//                .addValue("max_participants", MAX_PARTICIPANTS)
+//                .addValue("maxParticipants", MAX_PARTICIPANTS)
 //                .addValue("image_id", ID)
 //                .addValue("open_inscriptions", true)
 //                .addValue("is_finished", false)
@@ -132,32 +132,32 @@
 //        Assert.assertNotNull(tournament);
 //        Assert.assertEquals(ID,tournament.getCreator_id());
 //        Assert.assertEquals(NAME, tournament.getName());
-//        Assert.assertEquals(ID,tournament.getGame_id());
+//        Assert.assertEquals(ID,tournament.getGameId());
 //        Assert.assertEquals(REGION, tournament.getRegion());
 //        Assert.assertEquals(ELO, tournament.getElo());
-//        Assert.assertEquals(START_DATE, tournament.getStart_date());
-//        Assert.assertEquals(END_DATE, tournament.getEnd_date());
+//        Assert.assertEquals(START_DATE, tournament.getStartDate());
+//        Assert.assertEquals(END_DATE, tournament.getEndDate());
 //        Assert.assertEquals(FORMAT, tournament.getFormat());
 //        Assert.assertEquals(STRUCTURE, tournament.getStructure());
-//        Assert.assertEquals(MAX_PARTICIPANTS, tournament.getMax_participants());
-//        Assert.assertEquals(ID,tournament.getImage_id());
+//        Assert.assertEquals(MAX_PARTICIPANTS, tournament.getMaxParticipants());
+//        Assert.assertEquals(ID,tournament.getImageId());
 //        Assert.assertTrue(tournament.getOpenInscriptions());
 //        Assert.assertFalse(tournament.getFinished());
-//        Assert.assertEquals(ID,tournament.getFormat_id());
-//        Assert.assertEquals(ID,inserted.getCreator_id());
+//        Assert.assertEquals(ID,tournament.getFormatId());
+//        Assert.assertEquals(ID,inserted.getCreatorId());
 //        Assert.assertEquals(NAME, inserted.getName());
-//        Assert.assertEquals(ID,inserted.getGame_id());
+//        Assert.assertEquals(ID,inserted.getGameId());
 //        Assert.assertEquals(REGION, inserted.getRegion());
 //        Assert.assertEquals(ELO, inserted.getElo());
-//        Assert.assertEquals(START_DATE, inserted.getStart_date());
-//        Assert.assertEquals(END_DATE, inserted.getEnd_date());
+//        Assert.assertEquals(START_DATE, inserted.getStartDate());
+//        Assert.assertEquals(END_DATE, inserted.getEndDate());
 //        Assert.assertEquals(FORMAT, inserted.getFormat());
 //        Assert.assertEquals(STRUCTURE, inserted.getStructure());
-//        Assert.assertEquals(MAX_PARTICIPANTS, inserted.getMax_participants());
-//        Assert.assertEquals(ID,inserted.getImage_id());
+//        Assert.assertEquals(MAX_PARTICIPANTS, inserted.getMaxParticipants());
+//        Assert.assertEquals(ID,inserted.getImageId());
 //        Assert.assertTrue(inserted.getOpenInscriptions());
 //        Assert.assertFalse(inserted.getFinished());
-//        Assert.assertEquals(ID,inserted.getFormat_id());
+//        Assert.assertEquals(ID,inserted.getFormatId());
 //        Assert.assertEquals(2,JdbcTestUtils.countRowsInTable(jdbcTemplate,"tournament"));
 //    }
 //
@@ -173,11 +173,11 @@
 //        Assert.assertEquals(ID, tournament.getGame_id());
 //        Assert.assertEquals(REGION, tournament.getRegion());
 //        Assert.assertEquals(ELO, tournament.getElo());
-//        Assert.assertEquals(START_DATE, tournament.getStart_date());
-//        Assert.assertEquals(END_DATE, tournament.getEnd_date());
+//        Assert.assertEquals(START_DATE, tournament.getStartDate());
+//        Assert.assertEquals(END_DATE, tournament.getEndDate());
 //        Assert.assertEquals(FORMAT, tournament.getFormat());
 //        Assert.assertEquals(STRUCTURE, tournament.getStructure());
-//        Assert.assertEquals(MAX_PARTICIPANTS, tournament.getMax_participants());
+//        Assert.assertEquals(MAX_PARTICIPANTS, tournament.getMaxParticipants());
 //        Assert.assertEquals(ID, tournament.getImage_id());
 //        Assert.assertTrue(tournament.getOpenInscriptions());
 //        Assert.assertFalse(tournament.getFinished());
@@ -202,11 +202,11 @@
 //                .addValue("game_id",OTHER_ID)
 //                .addValue("region", REGION)
 //                .addValue("elo", ELO)
-//                .addValue("start_date", START_DATE)
-//                .addValue("end_date", END_DATE)
+//                .addValue("startDate", START_DATE)
+//                .addValue("endDate", END_DATE)
 //                .addValue("format", FORMAT)
 //                .addValue("structure", STRUCTURE)
-//                .addValue("max_participants", MAX_PARTICIPANTS)
+//                .addValue("maxParticipants", MAX_PARTICIPANTS)
 //                .addValue("image_id", ID)
 //                .addValue("open_inscriptions", true)
 //                .addValue("is_finished", false)
@@ -220,11 +220,11 @@
 //                .addValue("game_id",ID)
 //                .addValue("region", REGION)
 //                .addValue("elo", ELO)
-//                .addValue("start_date", START_DATE)
-//                .addValue("end_date", END_DATE)
+//                .addValue("startDate", START_DATE)
+//                .addValue("endDate", END_DATE)
 //                .addValue("format", FORMAT)
 //                .addValue("structure", STRUCTURE)
-//                .addValue("max_participants", MAX_PARTICIPANTS)
+//                .addValue("maxParticipants", MAX_PARTICIPANTS)
 //                .addValue("image_id", ID)
 //                .addValue("open_inscriptions", true)
 //                .addValue("is_finished", false)
@@ -304,7 +304,7 @@
 //
 //        Boolean isFinished = jdbcTemplate.queryForObject("SELECT is_finished FROM tournament WHERE id = ?", Boolean.class, OTHER_ID);
 //        Assert.assertTrue(isFinished);
-//        LocalDate endDate = jdbcTemplate.queryForObject("SELECT end_date FROM tournament WHERE id = ?", LocalDate.class, OTHER_ID);
+//        LocalDate endDate = jdbcTemplate.queryForObject("SELECT endDate FROM tournament WHERE id = ?", LocalDate.class, OTHER_ID);
 //        Assert.assertEquals(LocalDate.now(), endDate);
 //    }
 //
@@ -363,12 +363,12 @@
 //        Assert.assertNotNull(updated);
 //        Assert.assertEquals(newName, updated.getName());
 //        Assert.assertNotEquals(NAME,updated.getName());
-//        Assert.assertEquals(newStartDate, updated.getStart_date());
-//        Assert.assertNotEquals(START_DATE,updated.getStart_date());
-//        Assert.assertEquals(newEndDate, updated.getEnd_date());
-//        Assert.assertNotEquals(END_DATE,updated.getEnd_date());
-//        Assert.assertEquals(newMaxParticipants, updated.getMax_participants());
-//        Assert.assertNotEquals(MAX_PARTICIPANTS,updated.getMax_participants());
+//        Assert.assertEquals(newStartDate, updated.getStartDate());
+//        Assert.assertNotEquals(START_DATE,updated.getStartDate());
+//        Assert.assertEquals(newEndDate, updated.getEndDate());
+//        Assert.assertNotEquals(END_DATE,updated.getEndDate());
+//        Assert.assertEquals(newMaxParticipants, updated.getMaxParticipants());
+//        Assert.assertNotEquals(MAX_PARTICIPANTS,updated.getMaxParticipants());
 //    }
 //
 //    @Test
@@ -383,11 +383,11 @@
 //                    .addValue("game_id",ID)
 //                    .addValue("region", REGION)
 //                    .addValue("elo", ELO)
-//                    .addValue("start_date", START_DATE)
-//                    .addValue("end_date", END_DATE)
+//                    .addValue("startDate", START_DATE)
+//                    .addValue("endDate", END_DATE)
 //                    .addValue("format", FORMAT)
 //                    .addValue("structure", STRUCTURE)
-//                    .addValue("max_participants", MAX_PARTICIPANTS)
+//                    .addValue("maxParticipants", MAX_PARTICIPANTS)
 //                    .addValue("image_id", ID)
 //                    .addValue("open_inscriptions", true)
 //                    .addValue("is_finished", false)
@@ -415,11 +415,11 @@
 //                .addValue("game_id",OTHER_ID)
 //                .addValue("region", REGION)
 //                .addValue("elo", ELO)
-//                .addValue("start_date", START_DATE)
-//                .addValue("end_date", END_DATE)
+//                .addValue("startDate", START_DATE)
+//                .addValue("endDate", END_DATE)
 //                .addValue("format", FORMAT)
 //                .addValue("structure", STRUCTURE)
-//                .addValue("max_participants", MAX_PARTICIPANTS)
+//                .addValue("maxParticipants", MAX_PARTICIPANTS)
 //                .addValue("image_id", ID)
 //                .addValue("open_inscriptions", true)
 //                .addValue("is_finished", false)
@@ -433,11 +433,11 @@
 //                .addValue("game_id",ID)
 //                .addValue("region", REGION)
 //                .addValue("elo", ELO)
-//                .addValue("start_date", START_DATE)
-//                .addValue("end_date", END_DATE)
+//                .addValue("startDate", START_DATE)
+//                .addValue("endDate", END_DATE)
 //                .addValue("format", FORMAT)
 //                .addValue("structure", STRUCTURE)
-//                .addValue("max_participants", MAX_PARTICIPANTS)
+//                .addValue("maxParticipants", MAX_PARTICIPANTS)
 //                .addValue("image_id", ID)
 //                .addValue("open_inscriptions", true)
 //                .addValue("is_finished", false)
@@ -472,11 +472,11 @@
 //                    .addValue("game_id",ID)
 //                    .addValue("region", REGION)
 //                    .addValue("elo", ELO)
-//                    .addValue("start_date", START_DATE.plusDays(i))
-//                    .addValue("end_date", END_DATE.plusDays(i))
+//                    .addValue("startDate", START_DATE.plusDays(i))
+//                    .addValue("endDate", END_DATE.plusDays(i))
 //                    .addValue("format", FORMAT)
 //                    .addValue("structure", STRUCTURE)
-//                    .addValue("max_participants", MAX_PARTICIPANTS)
+//                    .addValue("maxParticipants", MAX_PARTICIPANTS)
 //                    .addValue("image_id", ID)
 //                    .addValue("open_inscriptions", true)
 //                    .addValue("is_finished", false)
@@ -492,11 +492,11 @@
 //                    .addValue("game_id",OTHER_ID)
 //                    .addValue("region", REGION)
 //                    .addValue("elo", ELO)
-//                    .addValue("start_date", START_DATE.plusDays(i))
-//                    .addValue("end_date", END_DATE.plusDays(i))
+//                    .addValue("startDate", START_DATE.plusDays(i))
+//                    .addValue("endDate", END_DATE.plusDays(i))
 //                    .addValue("format", FORMAT)
 //                    .addValue("structure", STRUCTURE)
-//                    .addValue("max_participants", MAX_PARTICIPANTS)
+//                    .addValue("maxParticipants", MAX_PARTICIPANTS)
 //                    .addValue("image_id", ID)
 //                    .addValue("open_inscriptions", true)
 //                    .addValue("is_finished", false)
@@ -524,11 +524,11 @@
 //                .addValue("game_id",OTHER_ID)
 //                .addValue("region", REGION)
 //                .addValue("elo", ELO)
-//                .addValue("start_date", START_DATE)
-//                .addValue("end_date", END_DATE)
+//                .addValue("startDate", START_DATE)
+//                .addValue("endDate", END_DATE)
 //                .addValue("format", FORMAT)
 //                .addValue("structure", STRUCTURE)
-//                .addValue("max_participants", MAX_PARTICIPANTS)
+//                .addValue("maxParticipants", MAX_PARTICIPANTS)
 //                .addValue("image_id", ID)
 //                .addValue("open_inscriptions", true)
 //                .addValue("is_finished", false)
@@ -542,11 +542,11 @@
 //                .addValue("game_id",ID)
 //                .addValue("region", REGION)
 //                .addValue("elo", ELO)
-//                .addValue("start_date", LocalDate.now().plusDays(1))
-//                .addValue("end_date", END_DATE)
+//                .addValue("startDate", LocalDate.now().plusDays(1))
+//                .addValue("endDate", END_DATE)
 //                .addValue("format", FORMAT)
 //                .addValue("structure", STRUCTURE)
-//                .addValue("max_participants", MAX_PARTICIPANTS)
+//                .addValue("maxParticipants", MAX_PARTICIPANTS)
 //                .addValue("image_id", ID)
 //                .addValue("open_inscriptions", true)
 //                .addValue("is_finished", false)
@@ -555,7 +555,7 @@
 //        jdbcInsert.execute(values);
 //        tournamentJdbcDao.updateAllStartDates();
 //
-//        List<LocalDate> startDates = jdbcTemplate.queryForList("SELECT start_date FROM tournament ORDER BY name", LocalDate.class);
+//        List<LocalDate> startDates = jdbcTemplate.queryForList("SELECT startDate FROM tournament ORDER BY name", LocalDate.class);
 //        Assert.assertEquals(LocalDate.now(), startDates.get(0));
 //        Assert.assertNotEquals(START_DATE,startDates.get(0));
 //        Assert.assertEquals(LocalDate.now(), startDates.get(1));
@@ -574,11 +574,11 @@
 //                .addValue("game_id",OTHER_ID)
 //                .addValue("region", REGION)
 //                .addValue("elo", ELO)
-//                .addValue("start_date", START_DATE)
+//                .addValue("startDate", START_DATE)
 //                .addValue("end_date", LocalDate.now().minusDays(1))
 //                .addValue("format", FORMAT)
 //                .addValue("structure", STRUCTURE)
-//                .addValue("max_participants", MAX_PARTICIPANTS)
+//                .addValue("maxParticipants", MAX_PARTICIPANTS)
 //                .addValue("image_id", ID)
 //                .addValue("open_inscriptions", true)
 //                .addValue("is_finished", false)
@@ -592,11 +592,11 @@
 //                .addValue("game_id",ID)
 //                .addValue("region", REGION)
 //                .addValue("elo", ELO)
-//                .addValue("start_date", START_DATE)
-//                .addValue("end_date", LocalDate.now().minusDays(1))
+//                .addValue("startDate", START_DATE)
+//                .addValue("endDate", LocalDate.now().minusDays(1))
 //                .addValue("format", FORMAT)
 //                .addValue("structure", STRUCTURE)
-//                .addValue("max_participants", MAX_PARTICIPANTS)
+//                .addValue("maxParticipants", MAX_PARTICIPANTS)
 //                .addValue("image_id", ID)
 //                .addValue("open_inscriptions", true)
 //                .addValue("is_finished", false)
@@ -605,7 +605,7 @@
 //        jdbcInsert.execute(values);
 //        tournamentJdbcDao.updateAllEndDates();
 //
-//        List<LocalDate> endDates = jdbcTemplate.queryForList("SELECT end_date FROM tournament ORDER BY name", LocalDate.class);
+//        List<LocalDate> endDates = jdbcTemplate.queryForList("SELECT endDate FROM tournament ORDER BY name", LocalDate.class);
 //        Assert.assertEquals(LocalDate.now(), endDates.get(1));
 //        Assert.assertNotEquals(LocalDate.now().minusDays(1),endDates.get(1));
 //        Assert.assertEquals(LocalDate.now(), endDates.get(2));
@@ -639,11 +639,11 @@
 //                .addValue("game_id", ID)
 //                .addValue("region", REGION)
 //                .addValue("elo", ELO)
-//                .addValue("start_date", START_DATE)
-//                .addValue("end_date", END_DATE)
+//                .addValue("startDate", START_DATE)
+//                .addValue("endDate", END_DATE)
 //                .addValue("format", FORMAT)
 //                .addValue("structure", STRUCTURE)
-//                .addValue("max_participants", MAX_PARTICIPANTS)
+//                .addValue("maxParticipants", MAX_PARTICIPANTS)
 //                .addValue("image_id", ID)
 //                .addValue("open_inscriptions", true)
 //                .addValue("is_finished", false)
@@ -657,11 +657,11 @@
 //                .addValue("game_id", ID)
 //                .addValue("region", REGION)
 //                .addValue("elo", ELO)
-//                .addValue("start_date", START_DATE)
-//                .addValue("end_date", END_DATE)
+//                .addValue("startDate", START_DATE)
+//                .addValue("endDate", END_DATE)
 //                .addValue("format", "otro")
 //                .addValue("structure", STRUCTURE)
-//                .addValue("max_participants", MAX_PARTICIPANTS)
+//                .addValue("maxParticipants", MAX_PARTICIPANTS)
 //                .addValue("image_id", ID)
 //                .addValue("open_inscriptions", true)
 //                .addValue("is_finished", false)
@@ -691,11 +691,11 @@
 //                .addValue("game_id", OTHER_ID)
 //                .addValue("region", REGION)
 //                .addValue("elo", ELO)
-//                .addValue("start_date", START_DATE)
-//                .addValue("end_date", END_DATE)
+//                .addValue("startDate", START_DATE)
+//                .addValue("endDate", END_DATE)
 //                .addValue("format", FORMAT)
 //                .addValue("structure", STRUCTURE)
-//                .addValue("max_participants", MAX_PARTICIPANTS)
+//                .addValue("maxParticipants", MAX_PARTICIPANTS)
 //                .addValue("image_id", ID)
 //                .addValue("open_inscriptions", true)
 //                .addValue("is_finished", false)
@@ -709,11 +709,11 @@
 //                .addValue("game_id", ID)
 //                .addValue("region", REGION)
 //                .addValue("elo", Elo.HIGH)
-//                .addValue("start_date", START_DATE)
-//                .addValue("end_date", END_DATE)
+//                .addValue("startDate", START_DATE)
+//                .addValue("endDate", END_DATE)
 //                .addValue("format", FORMAT)
 //                .addValue("structure", STRUCTURE)
-//                .addValue("max_participants", MAX_PARTICIPANTS)
+//                .addValue("maxParticipants", MAX_PARTICIPANTS)
 //                .addValue("image_id", ID)
 //                .addValue("open_inscriptions", true)
 //                .addValue("is_finished", false)
@@ -743,11 +743,11 @@
 //                .addValue("game_id", ID)
 //                .addValue("region", Region.LAN)
 //                .addValue("elo", ELO)
-//                .addValue("start_date", START_DATE)
-//                .addValue("end_date", END_DATE)
+//                .addValue("startDate", START_DATE)
+//                .addValue("endDate", END_DATE)
 //                .addValue("format", FORMAT)
 //                .addValue("structure", STRUCTURE)
-//                .addValue("max_participants", MAX_PARTICIPANTS)
+//                .addValue("maxParticipants", MAX_PARTICIPANTS)
 //                .addValue("image_id", ID)
 //                .addValue("open_inscriptions", true)
 //                .addValue("is_finished", false)
@@ -761,11 +761,11 @@
 //                .addValue("game_id", ID)
 //                .addValue("region", REGION)
 //                .addValue("elo", ELO)
-//                .addValue("start_date", START_DATE)
-//                .addValue("end_date", END_DATE)
+//                .addValue("startDate", START_DATE)
+//                .addValue("endDate", END_DATE)
 //                .addValue("format", FORMAT)
 //                .addValue("structure", Structure.HYBRID)
-//                .addValue("max_participants", MAX_PARTICIPANTS)
+//                .addValue("maxParticipants", MAX_PARTICIPANTS)
 //                .addValue("image_id", ID)
 //                .addValue("open_inscriptions", true)
 //                .addValue("is_finished", false)
@@ -803,11 +803,11 @@
 //                .addValue("game_id", OTHER_ID+1)
 //                .addValue("region", REGION)
 //                .addValue("elo", ELO)
-//                .addValue("start_date", START_DATE)
-//                .addValue("end_date", END_DATE)
+//                .addValue("startDate", START_DATE)
+//                .addValue("endDate", END_DATE)
 //                .addValue("format", FORMAT)
 //                .addValue("structure", STRUCTURE)
-//                .addValue("max_participants", MAX_PARTICIPANTS)
+//                .addValue("maxParticipants", MAX_PARTICIPANTS)
 //                .addValue("image_id", ID)
 //                .addValue("open_inscriptions", true)
 //                .addValue("is_finished", false)
@@ -821,11 +821,11 @@
 //                .addValue("game_id", OTHER_ID+1)
 //                .addValue("region", REGION)
 //                .addValue("elo", ELO)
-//                .addValue("start_date", START_DATE)
-//                .addValue("end_date", END_DATE)
+//                .addValue("startDate", START_DATE)
+//                .addValue("endDate", END_DATE)
 //                .addValue("format", FORMAT)
 //                .addValue("structure", STRUCTURE)
-//                .addValue("max_participants", MAX_PARTICIPANTS)
+//                .addValue("maxParticipants", MAX_PARTICIPANTS)
 //                .addValue("image_id", ID)
 //                .addValue("open_inscriptions", true)
 //                .addValue("is_finished", false)
@@ -855,11 +855,11 @@
 //                .addValue("game_id", ID)
 //                .addValue("region", REGION)
 //                .addValue("elo", ELO)
-//                .addValue("start_date", START_DATE.plusDays(1))
-//                .addValue("end_date", END_DATE)
+//                .addValue("startDate", START_DATE.plusDays(1))
+//                .addValue("endDate", END_DATE)
 //                .addValue("format", FORMAT)
 //                .addValue("structure", STRUCTURE)
-//                .addValue("max_participants", MAX_PARTICIPANTS)
+//                .addValue("maxParticipants", MAX_PARTICIPANTS)
 //                .addValue("image_id", ID)
 //                .addValue("open_inscriptions", true)
 //                .addValue("is_finished", false)
@@ -873,11 +873,11 @@
 //                .addValue("game_id", ID)
 //                .addValue("region", REGION)
 //                .addValue("elo", ELO)
-//                .addValue("start_date", START_DATE)
-//                .addValue("end_date", END_DATE.plusDays(1))
+//                .addValue("startDate", START_DATE)
+//                .addValue("endDate", END_DATE.plusDays(1))
 //                .addValue("format", FORMAT)
 //                .addValue("structure", STRUCTURE)
-//                .addValue("max_participants", MAX_PARTICIPANTS)
+//                .addValue("maxParticipants", MAX_PARTICIPANTS)
 //                .addValue("image_id", ID)
 //                .addValue("open_inscriptions", true)
 //                .addValue("is_finished", false)
@@ -886,13 +886,13 @@
 //        jdbcInsert.execute(values);
 //
 //        TournamentFilter filter = new TournamentFilter();
-//        filter.setStart_date(START_DATE);
-//        filter.setEnd_date(END_DATE);
+//        filter.setStartDate(START_DATE);
+//        filter.setEndDate(END_DATE);
 //        List<Tournament> tournaments = tournamentJdbcDao.findTournaments(filter, 0L);
 //
 //        Assert.assertNotNull(tournaments);
 //        Assert.assertEquals(1, tournaments.size());
-//        Assert.assertEquals(START_DATE, tournaments.get(0).getStart_date());
+//        Assert.assertEquals(START_DATE, tournaments.get(0).getStartDate());
 //    }
 //
 //    @Test
@@ -907,11 +907,11 @@
 //                    .addValue("game_id", ID)
 //                    .addValue("region", REGION)
 //                    .addValue("elo", ELO)
-//                    .addValue("start_date", START_DATE)
-//                    .addValue("end_date", END_DATE)
+//                    .addValue("startDate", START_DATE)
+//                    .addValue("endDate", END_DATE)
 //                    .addValue("format", FORMAT)
 //                    .addValue("structure", STRUCTURE)
-//                    .addValue("max_participants", MAX_PARTICIPANTS)
+//                    .addValue("maxParticipants", MAX_PARTICIPANTS)
 //                    .addValue("image_id", ID)
 //                    .addValue("open_inscriptions", true)
 //                    .addValue("is_finished", false)
@@ -970,11 +970,11 @@
 //                .addValue("game_id", OTHER_ID + 1)
 //                .addValue("region", Region.NA)
 //                .addValue("elo", Elo.HIGH)
-//                .addValue("start_date", START_DATE.minusDays(1))
-//                .addValue("end_date", END_DATE.minusDays(1))
+//                .addValue("startDate", START_DATE.minusDays(1))
+//                .addValue("endDate", END_DATE.minusDays(1))
 //                .addValue("format", "other format")
 //                .addValue("structure", Structure.HYBRID)
-//                .addValue("max_participants", MAX_PARTICIPANTS)
+//                .addValue("maxParticipants", MAX_PARTICIPANTS)
 //                .addValue("image_id", ID)
 //                .addValue("open_inscriptions", true)
 //                .addValue("is_finished", false)
@@ -989,8 +989,8 @@
 //        filter.setRegion(Region.NA);
 //        filter.setFormat("other format");
 //        filter.setStructure(Structure.HYBRID);
-//        filter.setStart_date(START_DATE.minusDays(1));
-//        filter.setEnd_date(END_DATE.minusDays(1));
+//        filter.setStartDate(START_DATE.minusDays(1));
+//        filter.setEndDate(END_DATE.minusDays(1));
 //        filter.setPlayersPerTeam(4);
 //        filter.setGenre(Genre.FPS);
 //        List<Tournament> tournaments = tournamentJdbcDao.findTournaments(filter, 0L);

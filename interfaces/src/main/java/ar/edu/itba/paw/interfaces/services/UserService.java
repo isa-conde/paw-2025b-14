@@ -23,7 +23,7 @@ public interface UserService {
 
     Optional<Token> checkTokenValidity(Long token, Long userId);
 
-    Optional<Token> resetPassword(Long token, Long userId, String newPassword);
+    void resetPassword(Long token, Long userId, String newPassword);
 
     boolean sameAsOldPassword(String newPassword, Long userId);
 

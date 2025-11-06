@@ -37,7 +37,7 @@ public class GameServiceImplTest {
         Assert.assertNotNull(maybeGame);
         Assert.assertEquals(NAME, maybeGame.getName());
         Assert.assertEquals(GENRE, maybeGame.getGenre());
-        Assert.assertEquals(Integer.valueOf(1), maybeGame.getImage_id());
+        Assert.assertEquals(Integer.valueOf(1), maybeGame.getImageId());
         Assert.assertEquals(Long.valueOf(1), maybeGame.getId());
     }
 

@@ -17,29 +17,29 @@ public interface TournamentDao {
 
     List<Tournament> findTournaments(TournamentFilter tournamentFilter, Long page);
 
-    Tournament create(Long creator_id, String name, Long game_id, Region region, Elo elo, LocalDate start_date, LocalDate end_date, String format, Structure structure, Integer max_participants, Long image_id, Boolean openInscriptions, Boolean isFinished, Long format_id, Long rules_id);
+    Tournament create(Long creatorId, String name, Long gameId, Region region, Elo elo, LocalDate startDate, LocalDate endDate, String format, Structure structure, Integer maxParticipants, Long imageId, Boolean openInscriptions, Boolean isFinished, Long formatId, Long rulesId);
 
-    Structure getTournamentStructure(Long tournament_id);
+    Structure getTournamentStructure(Long tournamentId);
 
-    List<Tournament> findByCreator(Long creator_id, Long page, Boolean isFinished);
+    List<Tournament> findByCreator(Long creatorId, Long page, Boolean isFinished);
 
-    void setFinished(Long tournament_id);
+    void setFinished(Long tournamentId);
 
     List<Tournament> findUserActiveTournaments(Long userId, Long page);
 
     List<Tournament> findUserPastTournaments(Long userId, Long page);
 
-    void closeInscriptions(Long tournament_id);
+    void closeInscriptions(Long tournamentId);
 
     List<Tournament> searchByName(String name);
 
-    void startTournament(Long tournament_id);
+    void startTournament(Long tournamentId);
 
     Map<Long,List<Tournament>> getUnfilteredTournamentPages(Long page);
 
     Integer getPageAmount(Integer pageSize, TournamentFilter tf);
 
-    void updateTournamentInfo(Long tournament_id, String name, LocalDate start_date, LocalDate end_date, Integer max_participants);
+    void updateTournamentInfo(Long tournamentId, String name, LocalDate startDate, LocalDate endDate, Integer maxParticipants);
 
     int getTournamentParticipantsCount(Long tournamentId);
 
@@ -47,9 +47,9 @@ public interface TournamentDao {
 
     Boolean getIsGroupStage(Long tournamentId);
 
-    void setTournamentWinner(Long tournament_id, Long winner_id);
+    void setTournamentWinner(Long tournamentId, Long winnerId);
 
-    Boolean isTournamentStarted(Long tournament_id);
+    Boolean isTournamentStarted(Long tournamentId);
 
     void updateAllStartDates();
 

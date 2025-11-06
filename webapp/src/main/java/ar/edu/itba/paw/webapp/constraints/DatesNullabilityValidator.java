@@ -34,23 +34,23 @@ public class DatesNullabilityValidator implements ConstraintValidator<DatesNulla
 
         boolean valid = true;
 
-        if (started && form.getStart_date() != null) {
+        if (started && form.getStartDate() != null) {
             ctx.buildConstraintViolationWithTemplate("{tournament.start.mustBeNullIfStarted}")
-                    .addPropertyNode("start_date").addConstraintViolation();
+                    .addPropertyNode("startDate").addConstraintViolation();
             valid = false;
-        } else if (!started && form.getStart_date() == null) {
+        } else if (!started && form.getStartDate() == null) {
             ctx.buildConstraintViolationWithTemplate("{tournament.start.requiredIfNotStarted}")
-                    .addPropertyNode("start_date").addConstraintViolation();
+                    .addPropertyNode("startDate").addConstraintViolation();
             valid = false;
         }
 
-        if (finished && form.getEnd_date() != null) {
+        if (finished && form.getEndDate() != null) {
             ctx.buildConstraintViolationWithTemplate("{tournament.end.mustBeNullIfFinished}")
-                    .addPropertyNode("end_date").addConstraintViolation();
+                    .addPropertyNode("endDate").addConstraintViolation();
             valid = false;
-        } else if (!finished && form.getEnd_date() == null) {
+        } else if (!finished && form.getEndDate() == null) {
             ctx.buildConstraintViolationWithTemplate("{tournament.end.requiredIfNotFinished}")
-                    .addPropertyNode("end_date").addConstraintViolation();
+                    .addPropertyNode("endDate").addConstraintViolation();
             valid = false;
         }
 

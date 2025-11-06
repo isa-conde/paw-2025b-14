@@ -33,7 +33,7 @@
 //    private static final Genre GENRE = Genre.MOBA;
 //    private List<Long> USED_IDS;
 //    private int rows;
-//    private static final RowMapper<Game> ROW_MAPPER = (rs, rowNum) -> new Game(rs.getLong("id"), rs.getString("name"), Genre.valueOf(rs.getString("genre")), rs.getInt("image_id"));
+//    private static final RowMapper<Game> ROW_MAPPER = (rs, rowNum) -> new Game(rs.getLong("id"), rs.getString("name"), Genre.valueOf(rs.getString("genre")), rs.getInt("imageId"));
 //
 //    @Autowired
 //    private DataSource ds;

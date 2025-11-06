@@ -63,7 +63,7 @@
     <c:url value="/images/pencil.png" var="pencilUrl"/>
     <div class="matches-grid">
         <c:forEach var="match" items="${matches}">
-            <c:if test="${empty groupNumber or match.local.group_number eq groupNumber}">
+            <c:if test="${empty groupNumber or match.local.groupNumber eq groupNumber}">
                 <div class="match-row">
                     <div class="left">
                         <paw:match-card

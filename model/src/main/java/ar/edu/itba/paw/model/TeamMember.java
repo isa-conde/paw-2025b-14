@@ -18,7 +18,7 @@ public class TeamMember {
     private Team team;
 
     @ManyToOne
-    @MapsId("userId")
+    @MapsId("user_id")
     @JoinColumn(name = "user_id")
     private User user;
 
@@ -32,11 +32,11 @@ public class TeamMember {
         this.user = user;
     }
 
-    public Long getUser_id() {
+    public Long getUserId() {
         return user.getId();
     }
 
-    public Long getTeam_id() {
+    public Long getTeamId() {
         return team.getId();
     }
 

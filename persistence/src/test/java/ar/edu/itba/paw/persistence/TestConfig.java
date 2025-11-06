@@ -28,11 +28,11 @@ import java.util.Properties;
 @ComponentScan({"ar.edu.itba.paw.persistence",})
 public class TestConfig {
 
-//    @Value("classpath:db/initdb/init.sql")
-//    private Resource initSql;
-//
-//    @Value("classpath:db/initdb/schema.sql")
-//    private Resource schemaSql;
+    @Value("classpath:db/init.sql")
+    private Resource initSql;
+
+    @Value("classpath:db/schema.sql")
+    private Resource schemaSql;
 
     @Bean
     public DataSource dataSource() {
@@ -71,19 +71,19 @@ public class TestConfig {
         return factoryBean;
     }
 
-//    @Bean
-//    public DataSourceInitializer dsi() {
-//        final DataSourceInitializer dsi = new DataSourceInitializer();
-//        dsi.setDataSource(dataSource());
-//        dsi.setDatabasePopulator(dataSourcePopulator());
-//        return dsi;
-//    }
-//
-//    private DatabasePopulator dataSourcePopulator() {
-//        final ResourceDatabasePopulator dbp = new ResourceDatabasePopulator();
-//        dbp.addScript(initSql);
-//        dbp.addScript(schemaSql);
-//        return dbp;
-//    }
+    @Bean
+    public DataSourceInitializer dsi() {
+        final DataSourceInitializer dsi = new DataSourceInitializer();
+        dsi.setDataSource(dataSource());
+        dsi.setDatabasePopulator(dataSourcePopulator());
+        return dsi;
+    }
+
+    private DatabasePopulator dataSourcePopulator() {
+        final ResourceDatabasePopulator dbp = new ResourceDatabasePopulator();
+        dbp.addScript(initSql);
+        dbp.addScript(schemaSql);
+        return dbp;
+    }
 
 }

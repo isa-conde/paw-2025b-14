@@ -25,24 +25,24 @@
         <div>
             <form:label path="formats[0].name">Nombre:</form:label>
             <form:input path="formats[0].name"/>
-            <form:label path="formats[0].players_per_team">Jugadores por equipo:</form:label>
-            <form:input type="number" path="formats[0].players_per_team"/>
+            <form:label path="formats[0].playersPerTeam">Jugadores por equipo:</form:label>
+            <form:input type="number" path="formats[0].playersPerTeam"/>
         </div>
 
         <!-- Formato 2 -->
         <div>
             <form:label path="formats[1].name">Nombre:</form:label>
             <form:input path="formats[1].name"/>
-            <form:label path="formats[1].players_per_team">Jugadores por equipo:</form:label>
-            <form:input type="number" path="formats[1].players_per_team"/>
+            <form:label path="formats[1].playersPerTeam">Jugadores por equipo:</form:label>
+            <form:input type="number" path="formats[1].playersPerTeam"/>
         </div>
 
         <!-- Formato 3 -->
         <div>
             <form:label path="formats[2].name">Nombre:</form:label>
             <form:input path="formats[2].name"/>
-            <form:label path="formats[2].players_per_team">Jugadores por equipo:</form:label>
-            <form:input type="number" path="formats[2].players_per_team"/>
+            <form:label path="formats[2].playersPerTeam">Jugadores por equipo:</form:label>
+            <form:input type="number" path="formats[2].playersPerTeam"/>
         </div>
 
         <div>

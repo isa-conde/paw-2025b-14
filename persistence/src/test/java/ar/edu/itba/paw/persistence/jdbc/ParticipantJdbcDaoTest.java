@@ -37,7 +37,7 @@
 //            rs.getLong("user_id"),
 //            rs.getString("username"),
 //            rs.getInt("points"),
-//            rs.getInt("group_number"),
+//            rs.getInt("groupNumber"),
 //            rs.getLong("profile_picture_id")
 //    );
 //
@@ -45,7 +45,7 @@
 //            rs.getLong("team_id"),
 //            rs.getString("name"),
 //            rs.getInt("points"),
-//            rs.getInt("group_number"),
+//            rs.getInt("groupNumber"),
 //            rs.getLong("profile_picture_id")
 //    );
 //
@@ -63,10 +63,10 @@
 //        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
 //                .withTableName("participant")
 //                .usingGeneratedKeyColumns("id");
-//        jdbcInsert.execute(Map.of("user_id",ID,"tournament_id",ID,"points",21,"group_number",1));
-//        jdbcInsert.execute(Map.of("user_id",ID+1,"tournament_id",ID,"points",2,"group_number",2));
-//        jdbcInsert.execute(Map.of("team_id",ID,"tournament_id",ID+1,"points",21,"group_number",1));
-//        jdbcInsert.execute(Map.of("team_id",ID+1,"tournament_id",ID+1,"points",2,"group_number",2));
+//        jdbcInsert.execute(Map.of("user_id",ID,"tournament_id",ID,"points",21,"groupNumber",1));
+//        jdbcInsert.execute(Map.of("user_id",ID+1,"tournament_id",ID,"points",2,"groupNumber",2));
+//        jdbcInsert.execute(Map.of("team_id",ID,"tournament_id",ID+1,"points",21,"groupNumber",1));
+//        jdbcInsert.execute(Map.of("team_id",ID+1,"tournament_id",ID+1,"points",2,"groupNumber",2));
 //        SimpleJdbcInsert userJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
 //                .withTableName("users");
 //        userJdbcInsert.execute(Map.of("id",ID,"email",EMAIL,"username",USERNAME,
@@ -209,11 +209,11 @@
 //        participantJdbcDao.updateGroupNumberForUsers(ID,3,List.of(ID,ID+1),1);
 //
 //        Assert.assertEquals(2,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
-//                "group_number = 3 and user_id is not null"));
+//                "groupNumber = 3 and user_id is not null"));
 //        Assert.assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
-//                "group_number <> 3 and user_id is not null"));
+//                "groupNumber <> 3 and user_id is not null"));
 //        Assert.assertEquals(0, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "participant",
-//                "group_number = 3 and team_id is not null"));
+//                "groupNumber = 3 and team_id is not null"));
 //    }
 //
 //    @Test
@@ -221,11 +221,11 @@
 //        participantJdbcDao.updateGroupNumberForUsers(ID+1, 3, List.of(ID, ID + 1), 2);
 //
 //        Assert.assertEquals(2, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "participant",
-//                "group_number = 3 and team_id is not null"));
+//                "groupNumber = 3 and team_id is not null"));
 //        Assert.assertEquals(0, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "participant",
-//                "group_number <> 3 and team_id is not null"));
+//                "groupNumber <> 3 and team_id is not null"));
 //        Assert.assertEquals(0, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "participant",
-//                "group_number = 3 and user_id is not null"));
+//                "groupNumber = 3 and user_id is not null"));
 //    }
 //
 //    @Test
@@ -233,11 +233,11 @@
 //        participantJdbcDao.swapGroups(ID,ID,ID+1,1,2,1);
 //
 //        Assert.assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
-//                "group_number = user_id"));
+//                "groupNumber = user_id"));
 //        Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
-//                "group_number = 1 and user_id = 2"));
+//                "groupNumber = 1 and user_id = 2"));
 //        Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
-//                "group_number = 2 and user_id = 1"));
+//                "groupNumber = 2 and user_id = 1"));
 //    }
 //
 //    @Test
@@ -252,7 +252,7 @@
 //        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
 //                .withTableName("participant")
 //                .usingGeneratedKeyColumns("id");
-//        jdbcInsert.execute(Map.of("user_id",ID+2,"tournament_id",ID,"points",14,"group_number",1));
+//        jdbcInsert.execute(Map.of("user_id",ID+2,"tournament_id",ID,"points",14,"groupNumber",1));
 //        int ans = participantJdbcDao.getTournamentSecondMaxPointsGroup(ID, 1);
 //
 //        Assert.assertEquals(14,ans);
@@ -267,7 +267,7 @@
 //
 //    @Test
 //    public void testGetNoGroupNumberUser(){
-//        jdbcTemplate.update("update participant set group_number = null");
+//        jdbcTemplate.update("update participant set groupNumber = null");
 //        int ans = participantJdbcDao.getGroupNumber(ID,ID,1);
 //
 //        Assert.assertEquals(0,ans);
@@ -282,7 +282,7 @@
 //
 //    @Test
 //    public void testGetNoGroupNumberTeam(){
-//        jdbcTemplate.update("update participant set group_number = null");
+//        jdbcTemplate.update("update participant set groupNumber = null");
 //        int ans = participantJdbcDao.getGroupNumber(ID+1,ID,2);
 //
 //        Assert.assertEquals(0,ans);
@@ -303,7 +303,7 @@
 //
 //    @Test
 //    public void testGetUserByPointsInGroup(){
-//        jdbcTemplate.update("update participant set points = 21 where group_number = 2");
+//        jdbcTemplate.update("update participant set points = 21 where groupNumber = 2");
 //        List<Participant> ans = participantJdbcDao.getTournamentParticipantsByPoints(ID,1,21,1);
 //
 //        Assert.assertNotNull(ans);
@@ -330,7 +330,7 @@
 //
 //    @Test
 //    public void testGetTeamByPointsInGroup(){
-//        jdbcTemplate.update("update participant set points = 21 where group_number = 2");
+//        jdbcTemplate.update("update participant set points = 21 where groupNumber = 2");
 //        List<Participant> ans = participantJdbcDao.getTournamentParticipantsByPoints(ID+1,1,21,2);
 //
 //        Assert.assertNotNull(ans);

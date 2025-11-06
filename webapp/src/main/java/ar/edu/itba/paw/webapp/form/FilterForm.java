@@ -5,18 +5,18 @@ import ar.edu.itba.paw.model.enums.Genre;
 import ar.edu.itba.paw.model.enums.Region;
 
 public class FilterForm {
-    private Long game_id;
+    private Long gameId;
     private Region region;
     private Elo elo;
     private Genre genre;
     private Integer playersPerTeam;
 
 
-    public Long getGame_id() {
-        return game_id;
+    public Long getGameId() {
+        return gameId;
     }
-    public void setGame_id(Long game_id) {
-        this.game_id = game_id;
+    public void setGameId(Long gameId) {
+        this.gameId = gameId;
     }
 
     public Region getRegion() {

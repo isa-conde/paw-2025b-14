@@ -10,6 +10,6 @@ public interface RulesService {
 
     Rules insertRules(byte[] file);
 
-    void updateRules(Long tournament_id, byte[] file);
+    void updateRules(Long tournamentId, byte[] file);
 
 }

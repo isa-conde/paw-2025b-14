@@ -106,3 +106,8 @@ create table if not exists match(
     is_group_stage boolean,
     primary key (id,tournament_id)
 );
+
+CREATE SEQUENCE if not exists users_id_seq START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE if not exists game_id_seq START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE if not exists tournament_id_seq START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE if not exists image_id_seq START WITH 1 INCREMENT BY 1;
