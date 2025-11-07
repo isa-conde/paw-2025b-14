@@ -230,7 +230,7 @@ public class TournamentController {
             mav.addObject("LEAGUE", Structure.LEAGUE);
             mav.addObject("ELIMINATION", Structure.ELIMINATION);
             mav.addObject("HYBRID", Structure.HYBRID);
-            mav.addObject("tournamentWinner", t.getTournament_winner());
+            mav.addObject("tournamentWinner", t.getTournamentWinner());
             mav.addObject("participantCount", participantCount);
             mav.addObject("maxStage", maxStage);
             mav.addObject("editTournamentForm", editTournamentForm);

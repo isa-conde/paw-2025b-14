@@ -85,7 +85,7 @@ public class TournamentServiceImplTest {
         Assert.assertEquals(ID,ans.getImageId());
         Assert.assertTrue(ans.getOpenInscriptions());
         Assert.assertFalse(ans.getFinished());
-        Assert.assertNull(ans.getTournament_winner());
+        Assert.assertNull(ans.getTournamentWinner());
         Assert.assertNull(ans.getIsGroupStage());
         Assert.assertFalse(ans.getTournamentStarted());
         Assert.assertEquals(ID,ans.getFormatId());

@@ -200,7 +200,7 @@ public class Tournament {
         return isFinished;
     }
 
-    public Long getTournament_winner() {
+    public Long getTournamentWinner() {
         if (winner == null)
             return null;
         return winner.getId();
