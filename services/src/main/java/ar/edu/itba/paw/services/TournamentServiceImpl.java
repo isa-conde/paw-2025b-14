@@ -162,13 +162,14 @@ public class TournamentServiceImpl implements TournamentService {
         }
         Integer teamSize = getPlayersPerTeam(tournamentId);
         List<Participant> participants;
-        if (teamSize > 1){
-            participants = participantDao.getTournamentParticipantTeams(tournamentId);
-        } else {
-            participants = participantDao.getTournamentParticipantUsers(tournamentId);
+        List<Participant> teams = new ArrayList<>();
+        participants = participantDao.getTournamentParticipantUsers(tournamentId);
+        if (teamSize > 1) {
+            teams = participantDao.getTournamentParticipantTeams(tournamentId);
         }
-        createMatches(tournamentId, participants);
+        createMatches(tournamentId, teams.isEmpty() ? participants : teams);
         tournamentDao.closeInscriptions(tournamentId);
+        ms.sendListEmail(tournamentId, participants);
         LOGGER.info("The inscriptions for the tournament with ID {} have been successfully closed", tournamentId);
     }
 

@@ -134,7 +134,7 @@ public class TournamentHibernateDao implements TournamentDao {
     @Override
     public List<Tournament> findByCreator(Long creatorId, Long page, Boolean isFinished) {
         Query idQuery = em.createNativeQuery(
-                "SELECT t.id FROM Tournament t WHERE t.creatorId = ?1 AND t.isFinished = ?2 ORDER BY t.startDate ASC"
+                "SELECT t.id FROM Tournament t WHERE t.creator_id = ?1 AND t.is_finished = ?2 ORDER BY t.start_date ASC"
         );
         idQuery.setParameter(1, creatorId);
         idQuery.setParameter(2, isFinished);
@@ -178,13 +178,13 @@ public class TournamentHibernateDao implements TournamentDao {
         Query idQuery = em.createNativeQuery(
                 "SELECT t.id " +
                     "FROM Tournament t " +
-                    "WHERE t.isFinished = ?1 " +
+                    "WHERE t.is_finished = ?1 " +
                     "  AND t.id IN ( " +
-                        "    SELECT p.tournamentId " +
+                        "    SELECT p.tournament_id " +
                         "    FROM Participant p " +
-                        "    WHERE p.userId = ?2 " +
+                        "    WHERE p.user_id = ?2 " +
                     ") " +
-                    "ORDER BY t.startDate ASC"
+                    "ORDER BY t.start_date ASC"
 
         );
         idQuery.setParameter(1, isFinished);
@@ -231,9 +231,9 @@ public class TournamentHibernateDao implements TournamentDao {
     @Override
     public Map<Long, List<Tournament>> getUnfilteredTournamentPages(Long page) {
         Query topGamesQuery = em.createNativeQuery(
-                "SELECT gameId " +
+                "SELECT game_id " +
                         "FROM tournament " +
-                        "GROUP BY gameId " +
+                        "GROUP BY game_id " +
                         "ORDER BY COUNT(*) DESC"
         );
         topGamesQuery.setFirstResult((int)(page * TOP_GAMES_LIMIT));
@@ -247,9 +247,9 @@ public class TournamentHibernateDao implements TournamentDao {
         Query tournamentIdsQuery = em.createNativeQuery(
                 "SELECT t.id " +
                         "FROM Tournament t " +
-                        "WHERE t.gameId IN ?1 " +
-                        "AND t.openInscriptions = true " +
-                        "ORDER BY t.gameId, t.startDate ASC ");
+                        "WHERE t.game_id IN ?1 " +
+                        "AND t.open_inscriptions = true " +
+                        "ORDER BY t.game_id, t.start_date ASC ");
         tournamentIdsQuery.setParameter(1, topGameIds.stream().map(Number::longValue).toList());
         tournamentIdsQuery.setMaxResults(TOURNAMENTS_PER_GAME);
 
@@ -426,7 +426,7 @@ public class TournamentHibernateDao implements TournamentDao {
 
     @Override
     public List<Tournament> getUserWonTournament(Long userId, Long page) {
-        Query nativeQuery = em.createNativeQuery("SELECT t.id FROM tournament t WHERE tournament_winner = (SELECT p.id FROM participant p WHERE p.userId = ?1 AND p.tournamentId = t.id)");
+        Query nativeQuery = em.createNativeQuery("SELECT t.id FROM tournament t WHERE tournament_winner = (SELECT p.id FROM participant p WHERE p.user_id = ?1 AND p.tournament_id = t.id)");
         nativeQuery.setParameter(1, userId);
         nativeQuery.setMaxResults(PAGE_SIZE);
         nativeQuery.setFirstResult((int) (page * PAGE_SIZE));
@@ -442,7 +442,7 @@ public class TournamentHibernateDao implements TournamentDao {
 
     @Override
     public Integer getUserWonTournamentPages(Long userId) {
-        Query nativeQuery = em.createNativeQuery("SELECT COUNT(t.id) FROM tournament t WHERE tournament_winner = (SELECT p.id FROM participant p WHERE p.userId = ?1 AND p.tournamentId = t.id)", Long.class);
+        Query nativeQuery = em.createNativeQuery("SELECT COUNT(t.id) FROM tournament t WHERE tournament_winner = (SELECT p.id FROM participant p WHERE p.user_id = ?1 AND p.tournament_id = t.id)", Long.class);
         nativeQuery.setParameter(1, userId);
         return nativeQuery.getFirstResult();
     }

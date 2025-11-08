@@ -1,7 +1,10 @@
 package ar.edu.itba.paw.services;
 
+import ar.edu.itba.paw.interfaces.persistence.ParticipantDao;
+import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.interfaces.persistence.UserDao;
 import ar.edu.itba.paw.interfaces.services.MailService;
+import ar.edu.itba.paw.model.Participant;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.User;
 import org.slf4j.Logger;
@@ -21,7 +24,10 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 @Component
 @Service
@@ -43,6 +49,12 @@ public class MailServiceImpl implements MailService {
 
     @Autowired
     private UserDao userDao;
+
+    @Autowired
+    private TournamentDao tournamentDao;
+
+    @Autowired
+    private ParticipantDao participantDao;
 
     private static final String CROWN_CID = "crown";
     private static final String CROWN_CLASSPATH = "images/crown.png";
@@ -268,6 +280,31 @@ public class MailServiceImpl implements MailService {
 
         String subject = messageSource.getMessage(
                 "email.contactOwner.subject",
+                new Object[]{tournament.getName()},
+                locale);
+
+        sendEmail(creator.getEmail(), subject, body);
+    }
+
+    @Async
+    @Override
+    public void sendListEmail(Long tournamentId, List<Participant> participantList) {
+        Tournament tournament = tournamentDao.findById(tournamentId).get();
+        User creator = userDao.findById(tournament.getCreatorId()).get();
+        Locale locale = toLocale(creator.getLocale());
+        Context ctx = new Context(locale);
+        ctx.setVariable("tournament", tournament);
+        ctx.setVariable("participantList", participantList);
+        String tournamentLink = baseUrl + "/tournament?tournamentId=" + tournament.getId();
+        ctx.setVariable("tournamentLink", tournamentLink);
+        ctx.setVariable("crownCid", "cid:" + CROWN_CID);
+
+        String mailTemplate = participantList.getFirst().getTeam() == null ? "participant-list" : "participant-list-with-teams";
+
+        String body = templateEngine.process(mailTemplate, ctx);
+
+        String subject = messageSource.getMessage(
+                "email.participantList.subject",
                 new Object[]{tournament.getName()},
                 locale);
 
