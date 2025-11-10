@@ -10,7 +10,6 @@ import ar.edu.itba.paw.webapp.form.UserForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -151,11 +150,11 @@ public class AuthController {
                                       HttpServletRequest request,
                                       HttpServletResponse response) {
         if(result.hasErrors()) {
-            LOGGER.debug("The password pair {} and {} is not valid", resetPasswordForm.getNewPassword(), resetPasswordForm.getConfirmNewPassword());
+            LOGGER.debug("The password pair {} and {} is not valid", resetPasswordForm.getPassword(), resetPasswordForm.getRepeatPassword());
             return resetPasswordPage(token, resetPasswordForm);
         }
         long userId = us.findUserByToken(token).getId();
-        boolean resetPasswordSuccess = us.resetPassword(token, resetPasswordForm.getNewPassword());
+        boolean resetPasswordSuccess = us.resetPassword(token, resetPasswordForm.getPassword());
         if(resetPasswordSuccess) {
             authenticateUser(userId, request, response);
         }

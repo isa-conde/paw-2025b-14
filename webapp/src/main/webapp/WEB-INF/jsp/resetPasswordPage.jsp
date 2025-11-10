@@ -15,10 +15,10 @@
             <form:form cssClass="form-container" modelAttribute="resetPasswordForm" action="${resetPasswordUrl}" method="post">
                 <input type="hidden" name="userId" value="${userId}"/>
                 <div>
-                    <paw:input path="newPassword" label="passwordReset.newPassword" inputType="password" hasConstraint="true"/>
+                    <paw:input path="password" label="passwordReset.newPassword" inputType="password" hasConstraint="true"/>
                 </div>
                 <div>
-                    <paw:input path="confirmNewPassword" label="passwordReset.confirmNewPassword" inputType="password" hasConstraint="true"/>
+                    <paw:input path="repeatPassword" label="passwordReset.confirmNewPassword" inputType="password" hasConstraint="true"/>
                 </div>
                 <div>
                     <paw:input path="" label="passwordReset.submit" inputType="submit"/>

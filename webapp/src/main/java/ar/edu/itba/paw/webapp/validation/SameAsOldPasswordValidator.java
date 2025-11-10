@@ -14,9 +14,9 @@ public class SameAsOldPasswordValidator implements ConstraintValidator<SameAsOld
 
     @Override
     public boolean isValid(ResetPasswordForm form, ConstraintValidatorContext context) {
-        if(form.getNewPassword() == null || form.getUserId() == null) return true;
+        if(form.getPassword() == null || form.getUserId() == null) return true;
 
-        boolean isSameAsOld = userService.sameAsOldPassword(form.getNewPassword(), form.getUserId());
+        boolean isSameAsOld = userService.sameAsOldPassword(form.getPassword(), form.getUserId());
 
         if (isSameAsOld) {
             context.disableDefaultConstraintViolation();
