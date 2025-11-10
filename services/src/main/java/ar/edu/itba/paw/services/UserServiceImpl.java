@@ -3,7 +3,6 @@ package ar.edu.itba.paw.services;
 import ar.edu.itba.paw.interfaces.exception.*;
 import ar.edu.itba.paw.interfaces.persistence.ImageDao;
 import ar.edu.itba.paw.interfaces.persistence.TokenDao;
-import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.interfaces.persistence.UserDao;
 import ar.edu.itba.paw.interfaces.services.MailService;
 import ar.edu.itba.paw.interfaces.services.UserService;
@@ -36,18 +35,16 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final MailService ms;
     private final ImageDao imageDao;
-    private final TournamentDao tournamentDao;
 
     private final static int RESET_PASSWORD_DAYS_DURATION = 1;
     private final static int VERIFICATION_DAYS_DURATION = 2;
-    private final static String ID_USER_UNEXISTANT = "User with ID {} does not exist";
+    private final static String ID_USER_INEXISTENT = "User with ID {} does not exist";
 
 
-    public UserServiceImpl(final UserDao userDao, final TokenDao tokenDao, final PasswordEncoder passwordEncoder, final TournamentDao tournamentDao, final MailService ms, final ImageDao imageDao) {
+    public UserServiceImpl(final UserDao userDao, final TokenDao tokenDao, final PasswordEncoder passwordEncoder, final MailService ms, final ImageDao imageDao) {
         this.userDao = userDao;
         this.tokenDao = tokenDao;
         this.passwordEncoder = passwordEncoder;
-        this.tournamentDao = tournamentDao;
         this.ms = ms;
         this.imageDao = imageDao;
     }
@@ -96,12 +93,14 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void resetPassword(Long token, Long userId, String newPassword) {
-        Optional<Token> optToken = checkTokenValidity(token, userId);
+    public boolean resetPassword(Long token, String newPassword) {
+        Optional<Token> optToken = checkTokenValidity(token);
         if(optToken.isPresent()) {
-            userDao.changePassword(userId, passwordEncoder.encode(newPassword));
-            LOGGER.info("User {} has successfully changed their password", findById(userId).get().getUsername());
-        }
+            User user = optToken.get().getUser();
+            userDao.changePassword(user.getId(), passwordEncoder.encode(newPassword));
+            LOGGER.info("User {} has successfully changed their password", user.getUsername());
+            return true;
+        } else return false;
     }
 
     @Override
@@ -131,19 +130,19 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public Optional<Token> verifyEmail(Long token, Long userId) {
-        Optional<Token> optToken = checkTokenValidity(token, userId);
+    public boolean verifyEmail(Long token, Long userId) {
+        Optional<Token> optToken = checkTokenValidity(token);
         Optional<User> user = findById(userId);
         if(user.isPresent()) {
             if(optToken.isPresent()) {
                 userDao.verifyUser(userId);
+                return true;
             }
         } else {
-            LOGGER.error(ID_USER_UNEXISTANT, userId);
+            LOGGER.error(ID_USER_INEXISTENT, userId);
             throw new UserNotFoundException();
         }
-
-        return optToken;
+        return false;
     }
 
     @Override
@@ -160,35 +159,28 @@ public class UserServiceImpl implements UserService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             LOGGER.debug("User has been verified and authenticated");
         } else {
-            LOGGER.error(ID_USER_UNEXISTANT, userId);
+            LOGGER.error(ID_USER_INEXISTENT, userId);
             throw new UserNotFoundException();
         }
     }
 
     @Transactional
     @Override
-    public Optional<Token> checkTokenValidity(Long token, Long userId) {
+    public Optional<Token> checkTokenValidity(Long token) {
         Optional<Token> optToken = tokenDao.findByToken(token);
-        if(findById(userId).isEmpty()) {
-            LOGGER.error(ID_USER_UNEXISTANT, userId);
-            throw new UserNotFoundException();
-        }
         if(optToken.isPresent()) {
             Token foundToken = optToken.get();
-            if(foundToken.getUserId().equals(userId)) {
-                if(foundToken.getExpiryDate().isAfter(LocalDate.now())) {
-                    tokenDao.markAsUsed(foundToken.getId());
-                    return optToken;
-                } else {
-                    LOGGER.warn("User with ID {} attempted to use an expired token", userId);
-                    // TODO: make new exception for expired token
-                }
+            if(foundToken.getExpiryDate().isAfter(LocalDate.now())) {
+                tokenDao.markAsUsed(foundToken.getId());
+                return optToken;
             } else {
-                LOGGER.warn("User with ID {} attempted to use another user's token", userId);
-                // TODO: make new exception for token not belonging to user
+                LOGGER.warn("Attempted to use an expired token");
+                throw new ExpiredTokenException();
             }
+        } else {
+            LOGGER.warn("Attempted to use an inexistent token");
+            throw new TokenNotFoundException();
         }
-        return Optional.empty();
     }
 
     private Token generateToken(Long userId, int validityDays) {
@@ -258,5 +250,13 @@ public class UserServiceImpl implements UserService {
             return null;
         }
         return Math.round(userRating * 10f) / 10f;
+    }
+
+    @Override
+    public User findUserByToken(Long token) {
+        Optional<Token> optToken = tokenDao.findByToken(token);
+        if(optToken.isPresent()) {
+            return optToken.get().getUser();
+        } else throw new TokenNotFoundException();
     }
 }

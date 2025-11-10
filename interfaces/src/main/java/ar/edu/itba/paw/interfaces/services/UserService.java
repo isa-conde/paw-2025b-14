@@ -21,9 +21,9 @@ public interface UserService {
 
     void resendVerification(User user);
 
-    Optional<Token> checkTokenValidity(Long token, Long userId);
+    Optional<Token> checkTokenValidity(Long token);
 
-    void resetPassword(Long token, Long userId, String newPassword);
+    boolean resetPassword(Long token, String newPassword);
 
     boolean sameAsOldPassword(String newPassword, Long userId);
 
@@ -31,7 +31,7 @@ public interface UserService {
 
     boolean emailIsTaken(String email);
 
-    Optional<Token> verifyEmail(Long token, Long userId);
+    boolean verifyEmail(Long token, Long userId);
 
     void authenticateVerifiedUser(Long userId);
 
@@ -46,4 +46,6 @@ public interface UserService {
     List<User> findAll();
 
     Float getUserRating(Long userId);
+
+    User findUserByToken(Long token);
 }

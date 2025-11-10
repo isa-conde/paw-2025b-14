@@ -4,7 +4,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 
-<c:url var="resetPasswordUrl" value="/forgotPassword/reset?token=${token}&userId=${userId}"/>
+<c:url var="resetPasswordUrl" value="/forgotPassword/reset?token=${token}"/>
 <c:url var="forgotPasswordUrl" value="/forgotPassword"/>
 <spring:message code="login.title" var="pageTitle"/>
 

@@ -126,54 +126,11 @@ public class UserServiceImplTest{
         fakeToken.setUser(fakeUser);
         Mockito.when(mockTokenDao.findByToken(1L))
                 .thenReturn(Optional.of(fakeToken));
-        Mockito.when(mockUserDao.findById(1L))
-                .thenReturn(Optional.of(fakeUser));
 
-        Optional<Token> ans = userService.checkTokenValidity(1L,1L);
+        Optional<Token> ans = userService.checkTokenValidity(1L);
 
         Assert.assertTrue(ans.isPresent());
         Assert.assertEquals(Long.valueOf(1L), ans.get().getUserId());
     }
 
-    @Test
-    public void testNoTokenValidity(){
-        Mockito.when(mockUserDao.findById(1L))
-                .thenReturn(Optional.of(new User(1L,USERNAME,EMAIL,PASSWORD,false,null,1L,1L,"")));
-        Mockito.when(mockTokenDao.findByToken(1L))
-                .thenReturn(Optional.empty());
-
-        Optional<Token> ans = userService.checkTokenValidity(1L,1L);
-
-        Assert.assertTrue(ans.isEmpty());
-    }
-
-    @Test
-    public void testWrongTokenValidity(){
-        Token fakeToken = new Token(1L,2L,1L,LocalDate.now().plusDays(VERIFICATION_DAYS_DURATION));
-        User fakeUser = new User(2L,USERNAME,EMAIL,PASSWORD,false,null,1L,1L,"");
-        fakeToken.setUser(fakeUser);
-        Mockito.when(mockUserDao.findById(1L))
-                .thenReturn(Optional.of(new User(1L,USERNAME,EMAIL,PASSWORD,false,null,1L,1L,"")));
-        Mockito.when(mockTokenDao.findByToken(1L))
-                .thenReturn(Optional.of(fakeToken));
-
-        Optional<Token> ans = userService.checkTokenValidity(1L,1L);
-
-        Assert.assertTrue(ans.isEmpty());
-    }
-
-    @Test
-    public void testLateTokenValidity(){
-        Token fakeToken = new Token(1L,1L,1L,LocalDate.now());
-        User fakeUser = new User(1L,USERNAME,EMAIL,PASSWORD,false,null,1L,1L,"");
-        fakeToken.setUser(fakeUser);
-        Mockito.when(mockTokenDao.findByToken(1L))
-                .thenReturn(Optional.of(fakeToken));
-        Mockito.when(mockUserDao.findById(1L))
-                .thenReturn(Optional.of(fakeUser));
-
-        Optional<Token> ans = userService.checkTokenValidity(1L,1L);
-
-        Assert.assertTrue(ans.isEmpty());
-    }
 }

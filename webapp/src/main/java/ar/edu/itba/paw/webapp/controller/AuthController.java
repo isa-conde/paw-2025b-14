@@ -3,7 +3,6 @@ package ar.edu.itba.paw.webapp.controller;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.Token;
 import ar.edu.itba.paw.model.User;
-import ar.edu.itba.paw.webapp.auth.PawUserDetails;
 import ar.edu.itba.paw.webapp.auth.PawUserDetailsService;
 import ar.edu.itba.paw.webapp.form.EmailForm;
 import ar.edu.itba.paw.webapp.form.ResetPasswordForm;
@@ -12,8 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,8 +27,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -102,12 +97,12 @@ public class AuthController {
                                                   HttpServletResponse response) {
         ModelAndView mav = new ModelAndView("confirmedVerificationPage");
 
-        Optional<Token> validToken = us.verifyEmail(token, userId);
-        mav.addObject("validToken", validToken.isPresent());
+        boolean validToken = us.verifyEmail(token, userId);
+        mav.addObject("validToken", validToken);
         mav.addObject("userId", userId);
 
-        if (validToken.isPresent()) {
-            verifyUser(userId, request, response);
+        if (validToken) {
+            authenticateUser(userId, request, response);
         }
 
         return mav;
@@ -135,33 +130,34 @@ public class AuthController {
     }
 
     @RequestMapping(value = "/forgotPassword/reset", method = RequestMethod.GET)
-    public ModelAndView resetPasswordPage(@RequestParam("token") Long token, @RequestParam("userId") long userId, @ModelAttribute("resetPasswordForm") ResetPasswordForm resetPasswordForm) {
+    public ModelAndView resetPasswordPage(@RequestParam("token") Long token,
+                                          @ModelAttribute("resetPasswordForm") ResetPasswordForm resetPasswordForm) {
         ModelAndView mav = new ModelAndView("resetPasswordPage");
-        Optional<Token> validToken = us.checkTokenValidity(token, userId);
+        Optional<Token> validToken = us.checkTokenValidity(token);
+        if(validToken.isPresent()) {
+            User user = us.findUserByToken(token);
+            mav.addObject("userId", user.getId());
+        }
         mav.addObject("resetPasswordForm", resetPasswordForm);
         mav.addObject("token", token);
-        mav.addObject("userId", userId);
         mav.addObject("validToken", validToken.isPresent());
         return mav;
     }
 
     @RequestMapping(value = "/forgotPassword/reset", method = RequestMethod.POST)
     public ModelAndView resetPassword(@RequestParam("token") Long token,
-                                      @RequestParam("userId") long userId,
                                       @Valid @ModelAttribute("resetPasswordForm") ResetPasswordForm resetPasswordForm,
                                       BindingResult result,
                                       HttpServletRequest request,
                                       HttpServletResponse response) {
         if(result.hasErrors()) {
             LOGGER.debug("The password pair {} and {} is not valid", resetPasswordForm.getNewPassword(), resetPasswordForm.getConfirmNewPassword());
-            return resetPasswordPage(token, userId, resetPasswordForm);
+            return resetPasswordPage(token, resetPasswordForm);
         }
-        resetPasswordForm.setUserId(userId);
-        us.resetPassword(token, userId, resetPasswordForm.getNewPassword());
-
-        Optional<Token> validToken = us.checkTokenValidity(token, userId);
-        if (validToken.isPresent()) {
-            verifyUser(userId, request, response);
+        long userId = us.findUserByToken(token).getId();
+        boolean resetPasswordSuccess = us.resetPassword(token, resetPasswordForm.getNewPassword());
+        if(resetPasswordSuccess) {
+            authenticateUser(userId, request, response);
         }
         return new ModelAndView("redirect:/forgotPassword/reset/success");
     }
@@ -171,12 +167,12 @@ public class AuthController {
         return new ModelAndView("resetPasswordSuccess");
     }
 
-    private void verifyUser(Long userId, HttpServletRequest request, HttpServletResponse response){
+    private void authenticateUser(Long userId, HttpServletRequest request, HttpServletResponse response){
         us.findById(userId).ifPresent(user -> {
             UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
 
-            Authentication auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-            ((UsernamePasswordAuthenticationToken) auth).setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+            auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
             SecurityContext context = SecurityContextHolder.createEmptyContext();
             context.setAuthentication(auth);
