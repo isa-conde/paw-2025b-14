@@ -156,8 +156,8 @@ public class TournamentController {
         try {
             if (form.getRules() != null && !form.getRules().isEmpty()) {
                 rulesBytes = form.getRules().getBytes();
+                rs.updateRules(tournamentId, rulesBytes);
             }
-            rs.updateRules(tournamentId, rulesBytes);
         } catch (IOException e) {
             result.rejectValue("image", "error.tournamentForm.invalidImage");
         }
