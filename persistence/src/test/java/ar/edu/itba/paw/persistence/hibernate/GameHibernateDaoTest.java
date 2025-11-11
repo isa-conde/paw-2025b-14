@@ -43,6 +43,7 @@ public class GameHibernateDaoTest {
     private static final String[] OTHER_NAMES = {"Grand Theft Walrus", "F-MEGA", "Chimpokomon", "Lee Carvallo's Putting Challenge", "Bonestorm"};
     private static final Genre GENRE = Genre.MOBA;
     private final Long firstUsedId = 100L;
+    private static final int GRID_PAGE_SIZE = 9;
 
     @Before
     public void setUp(){
@@ -241,5 +242,47 @@ public class GameHibernateDaoTest {
         Assert.assertEquals(1, favourites.size());
         Assert.assertNotNull(favourites.get(0));
         Assert.assertEquals(firstUsedId, favourites.get(0).getId());
+    }
+
+    @Test
+    public void testGetPageAmount(){
+        long expected = (long) Math.ceil((double) (OTHER_NAMES.length * Genre.values().length) /GRID_PAGE_SIZE);
+
+        Long ans = gameHibernateDao.getPageAmount();
+
+        Assert.assertEquals(expected,ans.longValue());
+    }
+
+    @Test
+    public void testFindAllPaged(){
+        List<Game> expected = new ArrayList<>();
+        long j=0;
+        for(Genre genre : Genre.values()){
+            expected.add(new Game(firstUsedId + j,OTHER_NAMES[0] + " " + genre, genre, 1));
+            j++;
+        }
+
+        List<Game> games = gameHibernateDao.findAllPaged(0L);
+
+        Assert.assertNotNull(games);
+        Assert.assertFalse(games.isEmpty());
+        Assert.assertEquals(expected.size(), games.size());
+        Comparator<Game> cmp = (a,b)-> Math.toIntExact((a.getId() - b.getId()));
+        expected.sort(cmp);
+        games.sort(cmp);
+        for(int i=0; i < GRID_PAGE_SIZE; i++){
+            Assert.assertNotNull(games.get(i));
+            Assert.assertEquals(expected.get(i).getName(), games.get(i).getName());
+            Assert.assertEquals(expected.get(i).getGenre(), games.get(i).getGenre());
+            Assert.assertEquals(Integer.valueOf(firstUsedId.intValue()),games.get(i).getImageId());
+            Assert.assertEquals(expected.get(i).getId(),games.get(i).getId());
+        }
+    }
+
+    @Test
+    public void testFindEmptyPage(){
+        List<Game> games = gameHibernateDao.findAllPaged(100L);
+
+        Assert.assertTrue(games.isEmpty());
     }
 }
