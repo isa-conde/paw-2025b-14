@@ -54,3 +54,13 @@ insert into tournament (id, creator_id, name, game_id, region, elo, start_date, 
     (100, 100, 'Jerma Rumble', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, true, false,true, false,100,100);
 
 insert into participant (id, user_id, tournament_id) values (100,100,100);
+
+insert into image (id, image) values (100, HEXTORAW(REPEAT('30', 64)));
+insert into image (id, image) values (101, HEXTORAW(REPEAT('31', 64)));
+insert into image (id, image) values (102, HEXTORAW(REPEAT('32', 64)));
+insert into image (id, image) values (103, HEXTORAW(REPEAT('33', 64)));
+insert into image (id, image) values (104, HEXTORAW(REPEAT('34', 64)));
+insert into image (id, image) values (105, HEXTORAW(REPEAT('35', 64)));
+insert into image (id, image) values (106, HEXTORAW(REPEAT('36', 64)));
+insert into image (id, image) values (107, HEXTORAW(REPEAT('37', 64)));
+insert into image (id, image) values (108, HEXTORAW(REPEAT('38', 64)));
