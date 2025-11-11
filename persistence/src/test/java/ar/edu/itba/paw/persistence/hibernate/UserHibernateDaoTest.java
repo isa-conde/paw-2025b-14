@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -22,8 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.sql.DataSource;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -49,18 +46,12 @@ public class UserHibernateDaoTest {
     private static final String EMAIL = "some@mail.com";
     private static final String PASSWORD = "1234567890";
     private static final String LOCALE = "en";
-    private Long usedId = 100L;
+    private final Long usedId = 100L;
     private static final Log log = LogFactory.getLog(UserHibernateDaoTest.class);
-    private User oldUser;
-    private int rows;
 
     @Before
     public void setUp(){
         jdbcTemplate = new JdbcTemplate(ds);
-//        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate).usingGeneratedKeyColumns("id").withTableName("users");
-//        final Map<String,Object> values = Map.of("username",USED_USERNAME, "email", USED_EMAIL, "password", PASSWORD, "verified", false,"locale","es");
-//        usedId = jdbcInsert.executeAndReturnKey(values).longValue();
-        rows = JdbcTestUtils.countRowsInTable(jdbcTemplate,"users");
     }
 
     @Test

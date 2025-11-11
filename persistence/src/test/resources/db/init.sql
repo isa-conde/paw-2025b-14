@@ -14,12 +14,6 @@ CREATE TABLE IF NOT EXISTS users(
     rating float
 );
 
-create table if not exists user_favourites(
-    user_id INTEGER NOT NULL ,
-    game_id INTEGER NOT NULL,
-    primary key (user_id, game_id)
-);
-
 CREATE TABLE IF NOT EXISTS game(
     id INTEGER IDENTITY PRIMARY KEY ,
     name varchar(100) NOT NULL UNIQUE ,
@@ -46,6 +40,8 @@ CREATE TABLE IF NOT EXISTS tournament(
     is_group_stage boolean,
     tournament_started boolean,
     format_id integer,
+    rating float,
+    rules_id integer,
     CONSTRAINT tournament_dates_check
         CHECK  ((start_date IS NULL) OR (end_date IS NULL) OR (start_date < end_date))
 );
