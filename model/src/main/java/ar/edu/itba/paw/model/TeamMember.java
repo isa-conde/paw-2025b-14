@@ -18,7 +18,7 @@ public class TeamMember {
     private Team team;
 
     @ManyToOne
-    @MapsId("user_id")
+    @MapsId("userId")
     @JoinColumn(name = "user_id")
     private User user;
 
