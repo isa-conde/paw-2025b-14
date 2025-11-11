@@ -43,6 +43,11 @@ public class UserController {
     @Autowired
     MessageSource messageSource;
 
+    @ModelAttribute("commentForm")
+    public CommentForm commentForm() {
+        return new CommentForm();
+    }
+
     public UserController(GameService gs, UserService us, TournamentService ts, TeamService tms) {
         this.gs = gs;
         this.us = us;

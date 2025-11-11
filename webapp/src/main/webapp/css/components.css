@@ -1593,6 +1593,94 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     flex: 1;
 }
 
+.profile-comments {
+    margin-top: 80px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.profile-comments-form {
+    display: flex;
+    gap: 16px;
+}
+
+.comment-form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+}
+
+.comment-textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.comment-submit {
+    align-self: flex-end;
+    font-weight: 500;
+    height: 50px;
+    width: 140px;
+    font-size: var(--text-22);
+}
+
+.profile-comments-login {
+    background-color: var(--background-secondary);
+    border: 1px solid var(--secondary-details);
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.profile-comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.profile-comment {
+    background-color: var(--background-secondary);
+    border: 1px solid var(--secondary-details);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.profile-comment-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--text-20);
+    color: var(--secondary-text);
+}
+
+.profile-comment-author {
+    color: var(--primary-text);
+    font-weight: 600;
+    margin-right: 6px;
+    text-decoration: none;
+}
+
+.profile-comment-author:hover {
+    text-decoration: underline;
+}
+
+.profile-comment-body {
+    font-size: var(--text-18);
+    color: var(--primary-text);
+    padding: 10px 15px;
+}
+
+.profile-comment-empty {
+    background-color: var(--background-secondary);
+    border: 1px dashed var(--secondary-details);
+    border-radius: 12px;
+    padding: 20px;
+}
+
 /*Logout Button*/
 .logout-button {
     background-color: var(--secondary-details);

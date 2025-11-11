@@ -50,7 +50,6 @@ public interface UserService {
 
     User findUserByToken(Long token);
 
-    @Transactional
     void commentOnProfile(User commenter, long receiverId, String comment);
 
     List<Comment> getCommentsReceived(long receiverId);

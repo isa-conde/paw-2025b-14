@@ -2,6 +2,8 @@ package ar.edu.itba.paw.model;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 @Entity
 @Table(name = "comments")
@@ -74,5 +76,15 @@ public class Comment {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    @Transient
+    public String getFormattedDate() {
+        return createdAt == null ? "" : createdAt.toLocalDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+    }
+
+    @Transient
+    public String getFormattedTime() {
+        return createdAt == null ? "" : createdAt.toLocalTime().truncatedTo(ChronoUnit.MINUTES).format(DateTimeFormatter.ofPattern("HH:mm"));
     }
 }

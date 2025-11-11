@@ -267,6 +267,9 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void commentOnProfile(User commenter, long receiverId, String comment) {
+        if(receiverId == commenter.getId()) {
+            throw new InvalidCommentException();
+        }
         User receiver = findById(receiverId).get();
         commentDao.create(commenter, receiver, comment);
     }
