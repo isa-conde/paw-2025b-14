@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS users(
     bio varchar(255),
     profile_picture_id integer,
     banner_id integer,
-    locale varchar(100)
+    locale varchar(100) not null ,
+    rating float
 );
 
 create table if not exists user_favourites(
@@ -107,7 +108,7 @@ create table if not exists match(
     primary key (id,tournament_id)
 );
 
-CREATE SEQUENCE if not exists users_id_seq START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE if not exists users_userid_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE if not exists game_id_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE if not exists tournament_id_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE if not exists image_id_seq START WITH 1 INCREMENT BY 1;
