@@ -1,5 +1,7 @@
 package ar.edu.itba.paw.webapp.form;
 
+import ar.edu.itba.paw.webapp.Constants;
+import ar.edu.itba.paw.webapp.constraints.ImageConstraint;
 import ar.edu.itba.paw.webapp.constraints.UpdateUsernameTakenConstraint;
 import ar.edu.itba.paw.webapp.validation.UsernameIsTaken;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,13 +16,14 @@ public class EditProfileForm {
     @NotNull
     private Long userId;
     @NotBlank(message = "{createTournament.notNull}")
-    @Size(max = 100)
+    @Size(max = Constants.MAX_NAME_SIZE)
     private String username;
-    @Size(max = 255)
+    @Size(max = Constants.MAX_BIO_SIZE)
     private String bio;
 
+    @ImageConstraint(maxSize = Constants.MAX_PFP_SIZE)
     private MultipartFile profilePicture;
-
+    @ImageConstraint(maxSize = Constants.MAX_BANNER_SIZE)
     private MultipartFile bannerPicture;
 
     public String getUsername() {
@@ -47,10 +50,10 @@ public class EditProfileForm {
         this.bannerPicture = bannerPicture;
     }
 
-    public @Size(max = 255) String getBio() {
+    public @Size(max = Constants.MAX_BIO_SIZE) String getBio() {
         return bio;
     }
-    public void setBio(@Size(max = 255) String bio) {
+    public void setBio(@Size(max = Constants.MAX_BIO_SIZE) String bio) {
         this.bio = bio;
     }
 }

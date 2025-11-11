@@ -1,20 +1,21 @@
 package ar.edu.itba.paw.webapp.constraints;
 
+import ar.edu.itba.paw.webapp.Constants;
+import ar.edu.itba.paw.webapp.constraints.PDFValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
 import java.lang.annotation.*;
 
 @Documented
-@Constraint(validatedBy = ImageValidator.class)
+@Constraint(validatedBy = PDFValidator.class)
 @Target({ ElementType.FIELD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ImageConstraint {
-    String message() default "error.tournamentForm.invalidImage";
+public @interface ValidPDF {
+    String message() default "Archivo PDF inválido";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 
-    long maxSize() default 2 * 1024 * 1024;
-    String[] allowedExtensions() default { "jpg", "jpeg", "png" };
+    long maxSize() default Constants.MAX_PDF_SIZE;
     boolean optional() default true;
 }
