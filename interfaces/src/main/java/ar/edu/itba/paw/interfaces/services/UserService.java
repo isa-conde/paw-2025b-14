@@ -11,7 +11,7 @@ public interface UserService {
 
     Optional<User> findById(long id);
 
-    User create(String username, String email, String password);
+    User create(String username, String email, String password, Locale locale);
 
     Optional<User> findByUsername(String username);
 

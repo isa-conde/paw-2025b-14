@@ -71,12 +71,12 @@ public class User {
         this.locale = locale;
     }
 
-    public User(final String username, final String email, final String password){
+    public User(final String username, final String email, final String password, final String locale){
         this.username = username;
         this.email = email;
         this.password = password;
         this.verified = false;
-        this.locale = "es";
+        this.locale = locale;
     }
 
     public long getId() {

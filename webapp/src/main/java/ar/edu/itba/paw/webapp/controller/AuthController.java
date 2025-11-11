@@ -9,6 +9,7 @@ import ar.edu.itba.paw.webapp.form.ResetPasswordForm;
 import ar.edu.itba.paw.webapp.form.UserForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -46,7 +47,7 @@ public class AuthController {
         if (result.hasErrors()) {
             return registerPage(form);
         }
-        User user = us.create(form.getUsername(), form.getEmail(), form.getPassword());
+        User user = us.create(form.getUsername(), form.getEmail(), form.getPassword(), LocaleContextHolder.getLocale());
         return new ModelAndView("redirect:/verify?userId=" + user.getId());
     }
 
