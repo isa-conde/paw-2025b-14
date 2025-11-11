@@ -48,6 +48,7 @@ public class UserHibernateDaoTest {
     private static final String USED_EMAIL = "another@mail.com";
     private static final String EMAIL = "some@mail.com";
     private static final String PASSWORD = "1234567890";
+    private static final String LOCALE = "en";
     private Long usedId = 100L;
     private static final Log log = LogFactory.getLog(UserHibernateDaoTest.class);
     private User oldUser;
@@ -64,7 +65,7 @@ public class UserHibernateDaoTest {
 
     @Test
     public void createTest(){
-        final User user = userHibernateDao.create(USERNAME, EMAIL, PASSWORD);
+        final User user = userHibernateDao.create(USERNAME, EMAIL, PASSWORD,LOCALE);
         em.flush();
 
         Assert.assertNotNull(user);
@@ -73,28 +74,31 @@ public class UserHibernateDaoTest {
         Assert.assertEquals(PASSWORD,user.getPassword());
         Assert.assertFalse(user.isVerified());
         Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"users",
-                "username = '" + USERNAME + "' and email = '" + EMAIL + "' and password = '" + PASSWORD +"'"));
+                "username = '" + USERNAME + "' and email = '" + EMAIL + "' and password = '" + PASSWORD +"' and locale = '" + LOCALE +"'"));
     }
 
     @Test(expected = Exception.class)
     public void testNoUsername(){
-        userHibernateDao.create(USERNAME, null,PASSWORD);
+        userHibernateDao.create(USERNAME, null,PASSWORD,LOCALE);
     }
 
     @Test(expected = Exception.class)
     public void testNoEmail(){
-        userHibernateDao.create(null, EMAIL,PASSWORD);
+        userHibernateDao.create(null, EMAIL,PASSWORD,LOCALE);
     }
 
     @Test(expected = Exception.class)
+    public void testNoLocale() { userHibernateDao.create(USERNAME,EMAIL,PASSWORD,null); }
+
+    @Test(expected = Exception.class)
     public void testRepeatUsername(){
-        userHibernateDao.create(USED_USERNAME,EMAIL,PASSWORD);
+        userHibernateDao.create(USED_USERNAME,EMAIL,PASSWORD,LOCALE);
         em.flush();
     }
 
     @Test(expected = Exception.class)
     public void testRepeatMail(){
-        userHibernateDao.create(USERNAME,USED_EMAIL,PASSWORD);
+        userHibernateDao.create(USERNAME,USED_EMAIL,PASSWORD,LOCALE);
         em.flush();
     }
 
@@ -217,10 +221,19 @@ public class UserHibernateDaoTest {
 
     @Test
     public void testUpdateLocale(){
-        userHibernateDao.updateUserLocale("en",usedId);
+        userHibernateDao.updateUserLocale(LOCALE,usedId);
         em.flush();
 
         Assert.assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"users",
-                "id = " + usedId + " and locale = 'en'"));
+                "id = " + usedId + " and locale = '" + LOCALE + "'"));
+    }
+
+    @Test
+    public void testUpdateUserRating(){
+        userHibernateDao.updateUserRating(usedId, 5f);
+        em.flush();
+
+        Assert.assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"users",
+                "id = " + usedId + " and rating = 5"));
     }
 }
