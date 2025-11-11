@@ -5,6 +5,7 @@ import ar.edu.itba.paw.interfaces.services.GameService;
 import ar.edu.itba.paw.interfaces.services.TeamService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.interfaces.services.UserService;
+import ar.edu.itba.paw.model.Comment;
 import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.User;
@@ -14,6 +15,7 @@ import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
 import ar.edu.itba.paw.webapp.auth.PawUserDetails;
+import ar.edu.itba.paw.webapp.form.CommentForm;
 import ar.edu.itba.paw.webapp.form.EditProfileForm;
 import ar.edu.itba.paw.webapp.form.FilterForm;
 import ar.edu.itba.paw.webapp.form.TournamentForm;
@@ -142,15 +144,17 @@ public class UserController {
     }
 
     @RequestMapping("/profile/{id}")
-    public ModelAndView profile(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @PathVariable Long id, @ModelAttribute("editProfileForm") EditProfileForm editProfileForm){
+    public ModelAndView profile(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                @PathVariable Long id,
+                                @ModelAttribute("editProfileForm") EditProfileForm editProfileForm){
         final ModelAndView mav = new ModelAndView("profile");
-
         Optional<User> profileOpt = us.findById(id);
         if (profileOpt.isEmpty()){
             throw new UserNotFoundException();
         }
         User profile = profileOpt.get();
-        Float userRating = us.getUserRating(profile.getId());
+        Float userRating = us.getUserRating(id);
+        List<Comment> comments = us.getCommentsReceived(id);
         mav.addObject("user", currentUser.isPresent() ? currentUser.get().getPawUser() : null);
         mav.addObject("isMyProfile", profile.getId() == currentUser.get().getPawUser().getId());
         mav.addObject("profile", profileOpt.get());
@@ -159,6 +163,7 @@ public class UserController {
         mav.addObject("lastTournaments", ts.findUserPastTournaments(id, 0L));
         mav.addObject("EditProfileForm", editProfileForm);
         mav.addObject("userRating", userRating);
+        mav.addObject("comments", comments);
 
         editProfileForm.setUsername(profileOpt.get().getUsername());
         editProfileForm.setBio(profileOpt.get().getBio());
@@ -262,6 +267,21 @@ public class UserController {
         return mav;
     }
 
+    @RequestMapping(path = "/profile/{id}/comment", method = RequestMethod.POST)
+    public ModelAndView comment(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                @PathVariable long id,
+                                @ModelAttribute("commentForm") CommentForm commentForm,
+                                BindingResult result) {
+        if(result.hasErrors()) {
+            return profile(currentUser, id, new EditProfileForm());
+        }
+        Optional<User> profileOpt = us.findById(id);
+        if(profileOpt.isEmpty()) {
+            throw new UserNotFoundException();
+        }
+        us.commentOnProfile(currentUser.get().getPawUser(), id, commentForm.getComment());
+        return new ModelAndView("redirect:/profile/{id}");
+    }
 
     private long adjustPage(long page, int totalPages) {
         if (totalPages <= 0) return 0;

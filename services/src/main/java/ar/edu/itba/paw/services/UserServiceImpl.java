@@ -1,11 +1,13 @@
 package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.exception.*;
+import ar.edu.itba.paw.interfaces.persistence.CommentDao;
 import ar.edu.itba.paw.interfaces.persistence.ImageDao;
 import ar.edu.itba.paw.interfaces.persistence.TokenDao;
 import ar.edu.itba.paw.interfaces.persistence.UserDao;
 import ar.edu.itba.paw.interfaces.services.MailService;
 import ar.edu.itba.paw.interfaces.services.UserService;
+import ar.edu.itba.paw.model.Comment;
 import ar.edu.itba.paw.model.Token;
 import ar.edu.itba.paw.model.User;
 import org.slf4j.Logger;
@@ -35,18 +37,20 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final MailService ms;
     private final ImageDao imageDao;
+    private final CommentDao commentDao;
 
     private final static int RESET_PASSWORD_DAYS_DURATION = 1;
     private final static int VERIFICATION_DAYS_DURATION = 2;
     private final static String ID_USER_INEXISTENT = "User with ID {} does not exist";
 
 
-    public UserServiceImpl(final UserDao userDao, final TokenDao tokenDao, final PasswordEncoder passwordEncoder, final MailService ms, final ImageDao imageDao) {
+    public UserServiceImpl(final UserDao userDao, final TokenDao tokenDao, final PasswordEncoder passwordEncoder, final MailService ms, final ImageDao imageDao, final CommentDao commentDao) {
         this.userDao = userDao;
         this.tokenDao = tokenDao;
         this.passwordEncoder = passwordEncoder;
         this.ms = ms;
         this.imageDao = imageDao;
+        this.commentDao = commentDao;
     }
 
     @Override
@@ -258,5 +262,18 @@ public class UserServiceImpl implements UserService {
         if(optToken.isPresent()) {
             return optToken.get().getUser();
         } else throw new TokenNotFoundException();
+    }
+
+    @Transactional
+    @Override
+    public void commentOnProfile(User commenter, long receiverId, String comment) {
+        User receiver = findById(receiverId).get();
+        commentDao.create(commenter, receiver, comment);
+    }
+
+    @Override
+    public List<Comment> getCommentsReceived(long receiverId) {
+        User receiver = findById(receiverId).get();
+        return commentDao.getCommentsByReceived(receiver);
     }
 }

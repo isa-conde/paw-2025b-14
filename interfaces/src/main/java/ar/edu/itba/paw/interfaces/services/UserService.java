@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.interfaces.services;
 
+import ar.edu.itba.paw.model.Comment;
 import ar.edu.itba.paw.model.Token;
 import ar.edu.itba.paw.model.User;
 
@@ -48,4 +49,9 @@ public interface UserService {
     Float getUserRating(Long userId);
 
     User findUserByToken(Long token);
+
+    @Transactional
+    void commentOnProfile(User commenter, long receiverId, String comment);
+
+    List<Comment> getCommentsReceived(long receiverId);
 }

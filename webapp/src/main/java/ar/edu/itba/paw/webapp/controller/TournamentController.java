@@ -80,11 +80,6 @@ public class TournamentController {
         return new RateTournamentForm();
     }
 
-    @ModelAttribute("gameForm")
-    public GameForm getGameForm() {
-        return new GameForm();
-    }
-
     @ModelAttribute("setMatchResultsForm")
     public SetMatchResultsForm getSetMatchResultsForm() {
         return new SetMatchResultsForm();
