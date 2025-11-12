@@ -2,6 +2,8 @@ package ar.edu.itba.paw.persistence.Hibernate;
 
 import ar.edu.itba.paw.interfaces.persistence.UserDao;
 import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.model.UserAccount;
+import ar.edu.itba.paw.model.enums.Platform;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -132,5 +134,22 @@ public class UserHibernateDao implements UserDao {
     @Override
     public List<User> findAll() {
         return em.createQuery("SELECT u FROM User u", User.class).getResultList();
+    }
+
+    @Override
+    public void addUserAccount(User user, Platform platform, String username) {
+        UserAccount userAccount = new UserAccount(user, platform, username);
+        user.addAccount(userAccount);
+        em.persist(user);
+    }
+
+    @Override
+    public void deleteUserAccount(User user, Platform platform) {
+        Optional<UserAccount> accountToRemove = user.getAccounts()
+                .stream()
+                .filter(acc -> acc.getPlatform() == platform)
+                .findFirst();
+        accountToRemove.ifPresent(user::removeAccount);
+        em.persist(user);
     }
 }

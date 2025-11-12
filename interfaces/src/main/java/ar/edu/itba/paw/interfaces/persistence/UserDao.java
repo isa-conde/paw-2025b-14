@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.interfaces.persistence;
 
 import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.model.enums.Platform;
 
 import java.util.List;
 import java.util.Locale;
@@ -33,5 +34,9 @@ public interface UserDao {
     void updateUserRating(Long userId, Float rating);
 
     List<User> findAll();
+
+    void addUserAccount(User user, Platform platform, String username);
+
+    void deleteUserAccount(User user, Platform platform);
 
 }

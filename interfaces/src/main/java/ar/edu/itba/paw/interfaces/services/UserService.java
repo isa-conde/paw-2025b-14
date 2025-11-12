@@ -2,6 +2,8 @@ package ar.edu.itba.paw.interfaces.services;
 
 import ar.edu.itba.paw.model.Token;
 import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.model.UserAccount;
+import ar.edu.itba.paw.model.enums.Platform;
 
 import java.util.List;
 import java.util.Locale;
@@ -48,4 +50,10 @@ public interface UserService {
     Float getUserRating(Long userId);
 
     User findUserByToken(Long token);
+
+    List<UserAccount> getUserAccounts(long userId);
+
+    void addUserAccount(long userId, Platform platform, String username);
+
+    void deleteUserAccount(long userId, Platform platform);
 }

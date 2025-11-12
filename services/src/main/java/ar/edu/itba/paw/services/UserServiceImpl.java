@@ -8,6 +8,8 @@ import ar.edu.itba.paw.interfaces.services.MailService;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.Token;
 import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.model.UserAccount;
+import ar.edu.itba.paw.model.enums.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -136,36 +138,26 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean verifyEmail(Long token, Long userId) {
         Optional<Token> optToken = checkTokenValidity(token);
-        Optional<User> user = findById(userId);
-        if(user.isPresent()) {
-            if(optToken.isPresent()) {
-                userDao.verifyUser(userId);
-                return true;
-            }
-        } else {
-            LOGGER.error(ID_USER_INEXISTENT, userId);
-            throw new UserNotFoundException();
+        User user = getUserOrThrow(userId);
+        if(optToken.isPresent()) {
+            userDao.verifyUser(userId);
+            return true;
         }
         return false;
     }
 
     @Override
     public void authenticateVerifiedUser(Long userId) {
-        Optional<User> optUser = findById(userId);
-        if(optUser.isPresent()) {
-            User user = optUser.get();
-            List<GrantedAuthority> authorities = new ArrayList<>();
-            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-            authorities.add(new SimpleGrantedAuthority("ROLE_VERIFIED"));
+        User user = getUserOrThrow(userId);
 
-            Authentication authentication = new UsernamePasswordAuthenticationToken(user.getUsername(), null, authorities);
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+        authorities.add(new SimpleGrantedAuthority("ROLE_VERIFIED"));
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            LOGGER.debug("User has been verified and authenticated");
-        } else {
-            LOGGER.error(ID_USER_INEXISTENT, userId);
-            throw new UserNotFoundException();
-        }
+        Authentication authentication = new UsernamePasswordAuthenticationToken(user.getUsername(), null, authorities);
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        LOGGER.debug("User has been verified and authenticated");
     }
 
     @Transactional
@@ -239,7 +231,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void updateUserRating(Long userId, Float rating) {
-        User user = findById(userId).get();
+        User user = getUserOrThrow(userId);
         Float currentRating = user.getRating();
         Float newRating = (currentRating == null) ? rating : (currentRating + rating) / 2;
         userDao.updateUserRating(userId, newRating);
@@ -263,4 +255,35 @@ public class UserServiceImpl implements UserService {
             return optToken.get().getUser();
         } else throw new TokenNotFoundException();
     }
+
+    @Transactional
+    @Override
+    public List<UserAccount> getUserAccounts(long userId) {
+        User user = getUserOrThrow(userId);
+        return user.getAccounts();
+    }
+
+    @Transactional
+    @Override
+    public void addUserAccount(long userId, Platform platform, String username) {
+        User user = getUserOrThrow(userId);
+        userDao.addUserAccount(user, platform, username);
+    }
+
+    @Transactional
+    @Override
+    public void deleteUserAccount(long userId, Platform platform) {
+        User user = getUserOrThrow(userId);
+        userDao.deleteUserAccount(user, platform);
+    }
+
+    private User getUserOrThrow(Long userId) {
+        return findById(userId)
+                .orElseThrow(() -> {
+                    LOGGER.error(ID_USER_INEXISTENT, userId);
+                    return new UserNotFoundException();
+                });
+    }
+
+
 }

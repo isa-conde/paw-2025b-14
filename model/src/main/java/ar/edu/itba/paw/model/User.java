@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.model;
 
 import ar.edu.itba.paw.model.Game.Game;
+import ar.edu.itba.paw.model.enums.Platform;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -56,6 +57,9 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TeamMember> teamMembers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserAccount> accounts = new ArrayList<>();
 
     public User(){}
 
@@ -175,5 +179,19 @@ public class User {
 
     public List<TeamMember> getTeamMembers() {
         return teamMembers;
+    }
+
+    public List<UserAccount> getAccounts() {
+        return accounts;
+    }
+
+    public void addAccount(UserAccount account) {
+        accounts.add(account);
+        account.setUser(this);
+    }
+
+    public void removeAccount(UserAccount account) {
+        accounts.remove(account);
+        account.setUser(null);
     }
 }
