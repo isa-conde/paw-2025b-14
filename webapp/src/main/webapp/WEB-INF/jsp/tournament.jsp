@@ -376,7 +376,7 @@
                 <paw:input path="image" label="createTournament.image" fileText="input.uploadImage" inputType="file"/>
             </div>
             <div class="row">
-                <paw:input path="rules" label="tournament.rules" inputType="file" fileText="input.uploadPdf"/>
+                <paw:input path="rules" label="tournament.rules" inputType="file" fileText="input.uploadPdf" hasConstraint="true"/>
             </div>
             <div class="row center">
                 <paw:input path="" label="tournament.edit.saveChanges" containerType="half" inputType="submit"/>

@@ -60,8 +60,6 @@ public class UserController {
         final ModelAndView mav = new ModelAndView("index");
         List<Game> games = gs.findAllPaged(0L);
 
-        currentUser.ifPresent(pawUserDetails -> us.updateUserLocale(LocaleContextHolder.getLocale(), pawUserDetails.getPawUser().getId()));
-
         mav.addObject("user", currentUser.isPresent() ? currentUser.get().getPawUser() : null);
         mav.addObject("games", games);
 

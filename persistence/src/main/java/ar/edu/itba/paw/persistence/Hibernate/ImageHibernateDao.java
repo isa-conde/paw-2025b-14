@@ -16,7 +16,11 @@ public class ImageHibernateDao implements ImageDao {
 
     @Override
     public Optional<byte[]> findById(Long id) {
-        return Optional.ofNullable(em.find(Image.class, id).getImage());
+        Image img = em.find(Image.class,id);
+        if(img == null){
+            return Optional.empty();
+        }
+        return Optional.of(img.getImage());
     }
 
     @Override

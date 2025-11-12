@@ -2,8 +2,10 @@ package ar.edu.itba.paw.webapp.form;
 
 
 import ar.edu.itba.paw.webapp.constraints.ExistingUsersContraint;
+import ar.edu.itba.paw.webapp.constraints.ImageConstraint;
 import ar.edu.itba.paw.webapp.constraints.TeamNameNotTakenConstraint;
 import org.springframework.web.multipart.MultipartFile;
+import ar.edu.itba.paw.webapp.Constants;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -15,7 +17,9 @@ public class CreateTeamForm {
     @Size(max = 100)
     @TeamNameNotTakenConstraint(message = "{team.create.error.nameTaken}")
     private String name;
+    @ImageConstraint(maxSize = Constants.MAX_PFP_SIZE)
     private MultipartFile banner;
+    @ImageConstraint(maxSize = Constants.MAX_PFP_SIZE)
     private MultipartFile pfp;
     private Long ownerId;
     @ExistingUsersContraint

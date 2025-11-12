@@ -60,15 +60,19 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public User create(String username, String email, String password) throws BusinessException {
+    public User create(String username, String email, String password, Locale locale) throws BusinessException {
         if (userDao.checkUsernameExists(username)){
             throw new UsernameAlreadyUsedException(username);
         }
         if (userDao.checkEmailExists(email)){
             throw new EmailAlreadyUsedException(email);
         }
+        String finalLocale = locale.getLanguage();
         LOGGER.info("The user {} has been created with email {}", username, email);
-        User toReturn = userDao.create(username, email, passwordEncoder.encode(password));
+        if (!Objects.equals(finalLocale, "es")){
+            finalLocale = "en";
+        }
+        User toReturn = userDao.create(username, email, passwordEncoder.encode(password), finalLocale);
         Token token = generateToken(toReturn.getId(), VERIFICATION_DAYS_DURATION);
         ms.sendVerificationEmail(toReturn.getId(), toReturn.getUsername(), token.getToken(), toReturn.getEmail());
         LOGGER.info("Verification email correctly sent to the address {}", email);

@@ -14,7 +14,7 @@ public interface UserDao {
 
     Optional<User> findByUsername(String username);
 
-    User create(String username, String email, String password);
+    User create(String username, String email, String password, String locale);
 
     void changePassword(long userId, String newPassword);
 
