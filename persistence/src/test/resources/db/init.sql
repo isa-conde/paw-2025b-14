@@ -108,3 +108,4 @@ CREATE SEQUENCE if not exists users_userid_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE if not exists game_id_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE if not exists tournament_id_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE if not exists image_id_seq START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE if not exists tokens_id_seq START WITH 1 INCREMENT BY 1;
