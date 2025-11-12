@@ -67,7 +67,6 @@ public class ImageHibernateDaoTest {
         Assert.assertArrayEquals("0".repeat(64).getBytes(StandardCharsets.UTF_8), ans.get());
     }
 
-    // needs fixing
     @Test
     public void testFindNothing(){
         final Optional<byte[]> ans = imageHibernateDao.findById((long) 0);

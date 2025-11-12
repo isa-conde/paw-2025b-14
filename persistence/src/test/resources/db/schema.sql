@@ -3,6 +3,8 @@ set ignorecase true;
 
 insert into users (id, email, username, password, verified, locale)
     values (100, 'another@mail.com','janedoe','1234567890',false,'es');
+insert into users (id, email, username, password, verified, locale)
+values (101, 'another2@mail.com','janetdoe','1234567890',false,'es');
 
 insert into game (id, name, genre, image_id) values (100, 'Grand Theft Walrus MOBA', 'MOBA', 100);
 insert into game (id, name, genre, image_id) values (101, 'Grand Theft Walrus FPS', 'FPS', 100);
@@ -67,3 +69,10 @@ insert into image (id, image) values (108, HEXTORAW(REPEAT('38', 64)));
 
 insert into tokens (id, user_id, token, expiry_date, used) values (100,100, 100, '2003-02-21', false);
 insert into tokens (id, user_id, token, expiry_date, used) values (101,100, 101, '2077-02-21', true);
+
+insert into team (id, name, owner_id) values (100, 'Grupo 14', 100);
+insert into team (id, name, owner_id) values (101, 'Gruppe 14', 100);
+
+insert into team_member (user_id, team_id) values (100, 100);
+insert into team_member (user_id, team_id) values (101, 100);
+insert into team_member (user_id, team_id) values (100, 101);

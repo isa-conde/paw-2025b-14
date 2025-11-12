@@ -69,13 +69,14 @@ create table if not exists tokens(
 create table if not exists team_member(
     team_id integer not null,
     user_id integer not null,
-    primary key (user_id,team_id)
+    verified boolean,
+    primary key (team_id, user_id)
 );
 
 create table if not exists team(
     id integer identity primary key not null ,
     name varchar(16) not null ,
-    profile_picture_id integer,
+    pfp_id integer,
     banner_id integer,
     owner_id integer not null
 );
@@ -109,3 +110,4 @@ CREATE SEQUENCE if not exists game_id_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE if not exists tournament_id_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE if not exists image_id_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE if not exists tokens_id_seq START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE if not exists team_id_seq START WITH 1 INCREMENT BY 1;
