@@ -25,4 +25,5 @@ public interface MailService {
 
     void sendContactOwnerEmail(Tournament tournament, User user, String emailSubject, String emailBody, User creator);
 
+    void sendRemovedFromTournamentEmail(Long tournamentId, String userName, String tournamentName, String recipient);
 }

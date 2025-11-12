@@ -11,7 +11,7 @@
 <%@ attribute name="isGame" required="false" rtexprvalue="true" %>
 
 <c:set var="hasDate" value="${not empty startDate && not empty endDate}"/>
-<c:set var="url" value="${pageContext.request.contextPath}/${isGame == 'true' ? 'tournamentsPage?gameId=' : 'tournament?tournamentId='}${id}"/>
+<c:set var="url" value="${pageContext.request.contextPath}/${isGame == 'true' ? 'tournamentsPage?gameId=' : 'tournament/'}${id}"/>
 
 <a href="${url}" class="element-card">
     <img src="${image}" alt="Background" class="element-card-image">

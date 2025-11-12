@@ -26,7 +26,7 @@
             </div>
         </div>
     </paw:banner>
-    <paw:profile-navbar user="${profile}" activeSection="overview"/>
+    <paw:profile-navbar user="${profile}" activeSection="teams"/>
     <div class="content-container">
         <div class="profile-main">
             <div class="carrousel-title">

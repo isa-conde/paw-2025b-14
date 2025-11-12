@@ -22,6 +22,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
+import java.util.Optional;
 
 @Component
 @Service
@@ -55,7 +56,7 @@ public class MailServiceImpl implements MailService {
         Context ctx = new Context(locale);
         ctx.setVariable("userName", userName);
         ctx.setVariable("tournamentName", tournamentName);
-        String tournamentLink = baseUrl + "/tournament?tournamentId=" + tournamentId.toString();
+        String tournamentLink = baseUrl + "/tournament/" + tournamentId.toString();
         ctx.setVariable("tournamentLink", tournamentLink);
         ctx.setVariable("crownCid", "cid:" + CROWN_CID);
 
@@ -77,7 +78,7 @@ public class MailServiceImpl implements MailService {
         Context ctx = new Context(locale);
         ctx.setVariable("userName", userName);
         ctx.setVariable("tournamentName", tournamentName);
-        String tournamentLink = baseUrl + "/tournament?tournamentId=" + tournamentId;
+        String tournamentLink = baseUrl + "/tournament/" + tournamentId;
         ctx.setVariable("tournamentLink", tournamentLink);
         ctx.setVariable("creatorMail", creatorMail);
         ctx.setVariable("crownCid", "cid:" + CROWN_CID);
@@ -102,7 +103,7 @@ public class MailServiceImpl implements MailService {
         Context ctx = new Context(locale);
         ctx.setVariable("joinerName", joinerUsername);
         ctx.setVariable("tournamentName", tournamentName);
-        ctx.setVariable("tournamentLink", baseUrl + "/tournament?tournamentId=" + tournamentId);
+        ctx.setVariable("tournamentLink", baseUrl + "/tournament/" + tournamentId);
         ctx.setVariable("crownCid", "cid:" + CROWN_CID);
 
         String body = templateEngine.process("tournament-joined-owner-notification", ctx);
@@ -126,7 +127,7 @@ public class MailServiceImpl implements MailService {
         Context ctx = new Context(locale);
         ctx.setVariable("teamName", teamName);
         ctx.setVariable("tournamentName", tournamentName);
-        ctx.setVariable("tournamentLink", baseUrl + "/tournament?tournamentId=" + tournamentId);
+        ctx.setVariable("tournamentLink", baseUrl + "/tournament/" + tournamentId);
         ctx.setVariable("crownCid", "cid:" + CROWN_CID);
 
         String body = templateEngine.process("tournament-team-joined-owner-notification", ctx);
@@ -190,7 +191,7 @@ public class MailServiceImpl implements MailService {
         Context ctx = new Context(locale);
         ctx.setVariable("userName", username);
         ctx.setVariable("tournamentName", tournamentName);
-        String tournamentLink = baseUrl + "/tournament?tournamentId=" + tournamentId;
+        String tournamentLink = baseUrl + "/tournament/" + tournamentId;
         ctx.setVariable("tournamentLink", tournamentLink);
         ctx.setVariable("creatorMail", creatorMail);
         ctx.setVariable("crownCid", "cid:" + CROWN_CID);
@@ -213,7 +214,7 @@ public class MailServiceImpl implements MailService {
         Context ctx = new Context(locale);
         ctx.setVariable("userName", username);
         ctx.setVariable("tournamentName", tournamentName);
-        String tournamentLink = baseUrl + "/tournament?tournamentId=" + tournamentId;
+        String tournamentLink = baseUrl + "/tournament/" + tournamentId;
         ctx.setVariable("tournamentLink", tournamentLink);
         ctx.setVariable("crownCid", "cid:" + CROWN_CID);
 
@@ -235,7 +236,7 @@ public class MailServiceImpl implements MailService {
         Context ctx = new Context(locale);
         ctx.setVariable("userName", username);
         ctx.setVariable("tournamentName", tournamentName);
-        String tournamentLink = baseUrl + "/tournament?tournamentId=" + tournamentId;
+        String tournamentLink = baseUrl + "/tournament/" + tournamentId;
         ctx.setVariable("tournamentLink", tournamentLink);
         ctx.setVariable("crownCid", "cid:" + CROWN_CID);
 
@@ -260,7 +261,7 @@ public class MailServiceImpl implements MailService {
         ctx.setVariable("tournamentName", tournament.getName());
         ctx.setVariable("subject", emailSubject);
         ctx.setVariable("body", emailBody);
-        String tournamentLink = baseUrl + "/tournament?tournamentId=" + tournament.getId();
+        String tournamentLink = baseUrl + "/tournament/" + tournament.getId();
         ctx.setVariable("tournamentLink", tournamentLink);
         ctx.setVariable("crownCid", "cid:" + CROWN_CID);
 
@@ -273,6 +274,34 @@ public class MailServiceImpl implements MailService {
 
         sendEmail(creator.getEmail(), subject, body);
     }
+
+    @Async
+    @Override
+    public void sendRemovedFromTournamentEmail(Long tournamentId, String userName, String tournamentName, String recipient){
+        Optional<User> optionalUser = userDao.findByUsername(userName);
+        if (optionalUser.isEmpty()){
+            LOGGER.warn("User {} not found", userName);
+            return;
+        }
+        User user = optionalUser.get();
+        Locale locale = toLocale(user.getLocale());
+        Context ctx = new Context(locale);
+        ctx.setVariable("userName", userName);
+        ctx.setVariable("tournamentName", tournamentName);
+        String pageLink = baseUrl;
+        ctx.setVariable("pageLink", pageLink);
+        ctx.setVariable("crownCid", "cid:" + CROWN_CID);
+
+        String body = templateEngine.process("removed-from-tournament", ctx);
+
+        String subject = messageSource.getMessage(
+                "email.removedFromTournament.subject",
+                new Object[]{tournamentName},
+                locale);
+
+        sendEmail(recipient, subject, body);
+    }
+
 
     private void sendEmail(String recipient, String subject, String body) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -308,5 +337,4 @@ public class MailServiceImpl implements MailService {
             LOGGER.warn("Failed to attach crown inline image: {}", e.getMessage());
         }
     }
-
 }

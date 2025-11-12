@@ -6,10 +6,8 @@ import ar.edu.itba.paw.interfaces.persistence.*;
 import ar.edu.itba.paw.interfaces.services.MailService;
 import ar.edu.itba.paw.interfaces.services.ParticipantService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
-import ar.edu.itba.paw.model.Participant;
-import ar.edu.itba.paw.model.Team;
-import ar.edu.itba.paw.model.Tournament;
-import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.model.*;
+import ar.edu.itba.paw.model.Game.GameFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -181,5 +179,44 @@ public class ParticipantServiceImpl implements ParticipantService {
         Float currentRating = user.getRating();
         Float newRating = (currentRating == null) ? rating : (currentRating + rating) / 2;
         userDao.updateUserRating(creatorId, newRating);
+    }
+
+    @Transactional
+    @Override
+    public void removeParticipant(Long tournamentId, Long participantId){
+        Optional<Tournament> optionalTournament = tournamentDao.findById(tournamentId);
+        if(optionalTournament.isEmpty()){
+            return;
+        }
+        Tournament tournament = optionalTournament.get();
+        if(!tournament.getOpenInscriptions()){
+            LOGGER.warn("Cannot remove participant from a closed tournament");
+            return;
+        }
+        GameFormat format = tournament.getFormatEntity();
+        int playersPerTeam;
+        if(format == null){
+            playersPerTeam = 1;
+        }else{
+            playersPerTeam = format.getPlayersPerTeam();
+        }
+        Participant participant = participantDao.getTournamentParticipantById(tournamentId, participantId, playersPerTeam);
+
+        if(participant == null){
+            LOGGER.warn("Participant with ID {} not found in tournament with ID {}", participantId, tournamentId);
+            return;
+        }
+
+        if(playersPerTeam > 1){
+            participantDao.leaveTournamentTeam(participant.getTeam().getId(), tournamentId);
+            for(TeamMember teamMember : participant.getTeam().getTeamMembers()){
+                ms.sendRemovedFromTournamentEmail(tournamentId, teamMember.getUser().getUsername(), tournament.getName(), teamMember.getUser().getEmail());
+                LOGGER.info("Tournament joined email correctly sent to the address {}", teamMember.getUser().getEmail());
+            }
+        }else{
+            participantDao.leaveTournamentUser(participant.getUser().getId(), tournamentId);
+            ms.sendRemovedFromTournamentEmail(tournamentId, participant.getUser().getUsername(), tournament.getName(), participant.getUser().getEmail());
+        }
+        LOGGER.info("Participant with ID {} was successfully removed from tournament with ID {}", participantId, tournamentId);
     }
 }

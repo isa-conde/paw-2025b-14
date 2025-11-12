@@ -90,6 +90,11 @@ public class TournamentController {
         return new SetMatchResultsForm();
     }
 
+    @ModelAttribute("removeParticipantForm")
+    public RemoveParticipantForm getRemoveParticipantForm() {
+        return new RemoveParticipantForm();
+    }
+
     @ModelAttribute("joinTournamentTeamForm")
     public JoinTournamentTeamForm getJoinTournamentTeamForm() {
         return new JoinTournamentTeamForm();
@@ -128,10 +133,10 @@ public class TournamentController {
         return new ModelAndView("redirect:/tournament");
     }
 
-    @RequestMapping(value = "/tournament/update", method = { RequestMethod.POST })
+    @RequestMapping(value = "/tournament/update/{tournamentId}", method = RequestMethod.POST)
     public ModelAndView updateTournament(
             @ModelAttribute("user") Optional<PawUserDetails> currentUser,
-            @RequestParam("tournamentId") final long tournamentId,
+            @PathVariable("tournamentId") final long tournamentId,
             @Valid @ModelAttribute("editTournamentForm") final EditTournamentForm form,
             final BindingResult result) {
         if (result.hasErrors()) {
@@ -161,12 +166,12 @@ public class TournamentController {
         } catch (IOException e) {
             result.rejectValue("image", "error.tournamentForm.invalidImage");
         }
-        return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
+        return new ModelAndView("redirect:/tournament/" + tournamentId);
     }
 
-    @RequestMapping(value = "/tournament", method = RequestMethod.GET)
+    @RequestMapping(value = "/tournament/{tournamentId}", method = RequestMethod.GET)
     public ModelAndView tournamentPage(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
-                                       @RequestParam("tournamentId") final long tournamentId,
+                                       @PathVariable("tournamentId") final long tournamentId,
                                        @ModelAttribute("editTournamentForm") final EditTournamentForm editTournamentForm,
                                        @ModelAttribute("joinTeamForm") JoinTournamentTeamForm joinTournamentTeamForm,
                                        @ModelAttribute("setMatchResultsForm") SetMatchResultsForm setMatchResultsForm) {
@@ -276,14 +281,14 @@ public class TournamentController {
             return mav;
         }
         ps.joinTournamentTeam(form.getTournamentId(), form.getTeamId(), form.getMembers());
-        return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
+        return new ModelAndView("redirect:/tournament/" + tournamentId);
     }
 
     @RequestMapping(value = "/tournament/join", method = { RequestMethod.POST })
     public ModelAndView joinTournament(@ModelAttribute("user") Optional<PawUserDetails> currentUser, HttpServletRequest request, @RequestParam("tournamentId") final long tournamentId) {
         User user = currentUser.get().getPawUser();
         ps.joinTournamentUser(user.getId(), tournamentId);
-        return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
+        return new ModelAndView("redirect:/tournament/" + tournamentId);
     }
 
     @RequestMapping(value = "/tournament/leave", method = { RequestMethod.POST })
@@ -291,19 +296,34 @@ public class TournamentController {
         User user = currentUser.get().getPawUser();
 
         ps.leaveTournament(user.getId(), tournamentId);
-        return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
+        return new ModelAndView("redirect:/tournament/" + tournamentId);
+    }
+
+    @RequestMapping(value = "/tournament/removeParticipant", method = { RequestMethod.POST })
+    public ModelAndView removeTournamentParticipant(@ModelAttribute("removeParticipantForm") RemoveParticipantForm form,
+                                        @ModelAttribute("user") Optional<PawUserDetails> currentUser) {
+
+        ps.removeParticipant(form.getTournamentId(), form.getParticipantId());
+
+        String redirect = UriComponentsBuilder
+                .fromPath("/tournament/{id}")
+                .queryParam("section", "participantsTab")
+                .buildAndExpand(form.getTournamentId())
+                .toUriString();
+
+        return new ModelAndView("redirect:" + redirect);
     }
 
     @RequestMapping(value = "/tournament/closeInscriptions", method = { RequestMethod.POST })
     public ModelAndView closeInscriptions(@RequestParam("tournamentId") final long tournamentId) {
         ts.closeInscriptions(tournamentId);
-        return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
+        return new ModelAndView("redirect:/tournament/" + tournamentId);
     }
 
     @RequestMapping(value = "/tournament/startTournament", method = { RequestMethod.POST })
     public ModelAndView startTournament(@RequestParam("tournamentId") final long tournamentId, HttpServletRequest request) {
         ts.startTournament(tournamentId);
-        return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
+        return new ModelAndView("redirect:/tournament/" + tournamentId);
     }
 
     @RequestMapping(value = "/tournament/setMatchResults", method = { RequestMethod.POST })
@@ -326,10 +346,11 @@ public class TournamentController {
 
         ms.setMatchResults(form.getMatchId(), form.getTournamentId(), form.getLocalScore(), form.getVisitorScore());
 
-        String redirect = UriComponentsBuilder.fromPath("/tournament")
-                .queryParam("tournamentId", form.getTournamentId())
+        String redirect = UriComponentsBuilder
+                .fromPath("/tournament/{id}")
                 .queryParam("section", "matchesTab")
-                .queryParamIfPresent("group", java.util.Optional.ofNullable(group))
+                .queryParamIfPresent("group", Optional.ofNullable(group))
+                .buildAndExpand(form.getTournamentId())
                 .toUriString();
 
         return new ModelAndView("redirect:" + redirect);
@@ -420,7 +441,7 @@ public class TournamentController {
                 form.getRegion(), form.getElo(), form.getStartDate(), form.getEndDate(),
                 null, form.getStructure(), form.getMaxParticipants(), imageBytes, true, false, form.getFormatId(), rulesBytes);
         status.setComplete();
-        return new ModelAndView("redirect:/tournament?tournamentId=" + t.getId());
+        return new ModelAndView("redirect:/tournament/" + t.getId());
     }
 
     @RequestMapping(value = "/tournament/contactOwner", method = { RequestMethod.POST })
@@ -448,6 +469,6 @@ public class TournamentController {
         }
         ts.updateTouramentRating(rateTournamentForm.getTournamentId(), rateTournamentForm.getRating());
         ps.updateCreatorRating(rateTournamentForm.getTournamentId(), rateTournamentForm.getCreatorId(), currentUser.get().getPawUser().getId(), rateTournamentForm.getRating());
-        return new ModelAndView("redirect:/tournament?tournamentId=" + rateTournamentForm.getTournamentId());
+        return new ModelAndView("redirect:/tournament/" + rateTournamentForm.getTournamentId());
     }
 }

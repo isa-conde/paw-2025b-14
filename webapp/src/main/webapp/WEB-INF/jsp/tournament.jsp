@@ -6,7 +6,7 @@
 
 <c:url value="/tournament/join" var="joinUrl"/>
 <c:url value="/tournament/leave" var="leaveUrl"/>
-<c:url value="/tournament/update?tournamentId=${tournament.id}" var="tournamentUpdateUrl"/>
+<c:url value="/tournament/update/${tournament.id}" var="tournamentUpdateUrl"/>
 <c:url value="/tournament/contactOwner" var="contactOwnerUrl"/>
 <c:url value="/tournament/rate" var="rateTournamentUrl"/>
 <c:url value="/images/pencil.png" var="pencilUrl"/>
@@ -214,7 +214,7 @@
                             <c:if test="${tournament.structure eq ELIMINATION or tournament.structure eq HYBRID}">
                                 <c:choose>
                                     <c:when test="${not editMode}">
-                                        <form method="get" action="">
+                                        <form method="get" action="${pageContext.request.contextPath}/tournament/${tournament.id}">
                                             <input type="hidden" name="tournamentId" value="${tournament.id}"/>
                                             <input type="hidden" name="section" value="${param.section != null ? param.section : 'overview'}"/>
                                             <input type="hidden" name="edit" value="true"/>
@@ -224,7 +224,7 @@
                                         </form>
                                     </c:when>
                                     <c:otherwise>
-                                        <form method="get" action="">
+                                        <form method="get" action="${pageContext.request.contextPath}/tournament/${tournament.id}">
                                             <input type="hidden" name="tournamentId" value="${tournament.id}"/>
                                             <input type="hidden" name="section" value="${param.section != null ? param.section : 'overview'}"/>
                                             <button type="submit" class="btn empty">
@@ -317,7 +317,7 @@
                         </div>
                     </c:if>
                 </div>
-                <paw:users-grid participants="${participants}" isIndividualTournament="${isIndividualTournament}"/>
+                <paw:users-grid participants="${participants}" isIndividualTournament="${isIndividualTournament}" deleteMode="${isCreator and tournament.openInscriptions}"/>
                 <c:if test="${!isParticipant && tournament.openInscriptions}">
                     <div class="cards-container">
                         <c:choose>
@@ -347,8 +347,7 @@
             </c:when>
         </c:choose>
     </div>
-    <c:url var="tournamentUrl" value="/tournament">
-        <c:param name="tournamentId" value="${tournament.id}"/>
+    <c:url var="tournamentUrl" value="/tournament/${tournament.id}">
         <c:if test="${not empty param.section}">
             <c:param name="section" value="${param.section}"/>
         </c:if>
@@ -463,9 +462,10 @@
         </div>
     </form:form>
 </paw:modal>
-<c:url value="/tournament/setMatchResults" var="actionUrl"/>
+<c:url value="/tournament/setMatchResults" var="setMatchUrl"/>
 <paw:modal title="tournament.setMatchResults.title" id="setMatchResultsModal" returnUrl="${tournamentUrl}">
-    <form:form method="post" modelAttribute="setMatchResultsForm" action="${actionUrl}" cssClass="form">
+    <form:form method="post" modelAttribute="setMatchResultsForm" action="${setMatchUrl}" cssClass="form"
+               onsubmit="this.querySelectorAll('button, input[type=submit]').forEach(el => el.disabled = true);">
         <input type="hidden" id="modalMatchId" name="matchId" value=""/>
         <input type="hidden" name="tournamentId" value="${tournament.id}"/>
         <div class="row">
@@ -477,12 +477,22 @@
         </div>
     </form:form>
 </paw:modal>
+<c:url value="/tournament/removeParticipant" var="removeParticipantUrl"/>
+<paw:modal title="tournament.removeParticipant.title" id="removeParticipantModal" returnUrl="${tournamentUrl}">
+    <div class="modal-text">
+        <p class="main-text m semi-bold"><spring:message code="tournament.removeParticipant.text"/></p>
+        <p class="main-text m bold"><span id="removeParticipantName">—</span></p>
+    </div>
+    <form:form method="post" id="removeParticipantForm" action="${removeParticipantUrl}" onsubmit="this.querySelectorAll('button, input[type=submit]').forEach(el => el.disabled = true);">
+        <input type="hidden" id="modalParticipantId" name="participantId" value=""/>
+        <input type="hidden" name="tournamentId" value="${tournament.id}"/>
+        <div class="row center">
+            <paw:button text="tournament.removeParticipant.cancel" onclick="event.preventDefault(); closeModal('removeParticipantModal')" secondary="true"/>
+            <paw:button text="tournament.removeParticipant.remove" onclick="document.getElementById('removeParticipantModal').requestSubmit();"/>
+        </div>
+    </form:form>
+</paw:modal>
 
-<script>
-    function openSetMatchModal(matchId) {
-        document.getElementById('modalMatchId').value = matchId;
-        openModal('setMatchResultsModal');
-    }
-</script>
-
+<script src="${pageContext.request.contextPath}/js/removeParticipantModal.js"></script>
+<script src="${pageContext.request.contextPath}/js/matchResultsModal.js"></script>
 <script src="${pageContext.request.contextPath}/js/swap.js"></script>
