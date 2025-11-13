@@ -464,7 +464,6 @@ public class TournamentHibernateDao implements TournamentDao {
         return query.getSingleResult().intValue();
     }
 
-    @Transactional
     @Override
     public void updateTournamentRating(Long tournamentId, Float userRating) {
         em.createQuery("UPDATE Tournament t SET t.rating = :userRating WHERE t.id = :tournamentId")
