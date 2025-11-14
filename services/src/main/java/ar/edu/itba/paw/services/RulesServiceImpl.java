@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.services;
 
+import ar.edu.itba.paw.interfaces.exception.TournamentNotFoundException;
 import ar.edu.itba.paw.interfaces.persistence.RulesDao;
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.interfaces.services.RulesService;
@@ -35,13 +36,13 @@ public class RulesServiceImpl implements RulesService {
     @Transactional
     @Override
     public void updateRules(Long tournamentId, byte[] file) {
-        Tournament t = tournamentDao.findById(tournamentId).get();
-        Rules r = t.getRules();
+        Tournament tournament = tournamentDao.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
+        Rules r = tournament.getRules();
         if (r != null){
             rulesDao.updateRules(r.getId(), file);
         }else {
             r = insertRules(file);
-            t.setRules(r);
+            tournament.setRules(r);
         }
 
     }

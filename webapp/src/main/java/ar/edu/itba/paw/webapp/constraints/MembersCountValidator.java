@@ -65,7 +65,7 @@ public class MembersCountValidator implements ConstraintValidator<MembersCountCo
 
             if (newName == null || newName.isBlank()) return true;
 
-            Optional<Team> currentTeamOpt = teamService.getById(teamId);
+            Optional<Team> currentTeamOpt = teamService.findById(teamId);
             if (currentTeamOpt.isEmpty()) return true;
 
             Team currentTeam = currentTeamOpt.get();

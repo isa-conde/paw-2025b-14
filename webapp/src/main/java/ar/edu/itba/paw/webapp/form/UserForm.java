@@ -11,7 +11,7 @@ import javax.validation.constraints.Size;
 import javax.validation.constraints.Pattern;
 
 @PasswordMatches
-public class UserForm {
+public class UserForm implements HasPasswordMatcher {
 	//id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
 	//email text NOT NULL UNIQUE,
 	//username text NOT NULL UNIQUE,

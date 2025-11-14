@@ -13,6 +13,7 @@ import java.util.Optional;
 
 @Repository
 public class TeamHibernateDao implements TeamDao {
+    private static final int GRID_PAGE_SIZE = 9;
 
     @PersistenceContext
     private EntityManager em;
@@ -31,7 +32,7 @@ public class TeamHibernateDao implements TeamDao {
     }
 
     @Override
-    public Optional<Team> getById(Long id) {
+    public Optional<Team> findById(Long id) {
         return Optional.ofNullable(em.find(Team.class, id));
     }
 
@@ -57,8 +58,8 @@ public class TeamHibernateDao implements TeamDao {
         return em.createQuery(jpql, Long.class)
                 .setParameter("teamId", teamId)
                 .setParameter("isFinished", isFinished)
-                .setMaxResults(9)
-                .setFirstResult(page)
+                .setMaxResults(GRID_PAGE_SIZE)
+                .setFirstResult(page*GRID_PAGE_SIZE)
                 .getResultList();
     }
 
@@ -81,10 +82,11 @@ public class TeamHibernateDao implements TeamDao {
             AND p.user IS NULL
         """;
 
-        return (long) em.createQuery(jpql, Long.class)
+        Long total = em.createQuery(jpql, Long.class)
                 .setParameter("teamId", teamId)
                 .setParameter("isFinished", isFinished)
-                .getFirstResult();
+                .getSingleResult();
+        return (long) Math.ceil((double) total / GRID_PAGE_SIZE);
     }
 
     @Override

@@ -11,12 +11,11 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.List;
 
 @Repository
 public class TeamMemberHibernateDao implements TeamMemberDao {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MatchHibernateDao.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TeamMemberHibernateDao.class);
 
     @PersistenceContext
     private EntityManager em;

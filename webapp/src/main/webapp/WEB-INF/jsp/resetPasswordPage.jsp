@@ -4,7 +4,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 
 
-<c:url var="resetPasswordUrl" value="/forgotPassword/reset?token=${token}&userId=${userId}"/>
+<c:url var="resetPasswordUrl" value="/forgotPassword/reset?token=${token}"/>
 <c:url var="forgotPasswordUrl" value="/forgotPassword"/>
 <spring:message code="login.title" var="pageTitle"/>
 
@@ -15,10 +15,10 @@
             <form:form cssClass="form-container" modelAttribute="resetPasswordForm" action="${resetPasswordUrl}" method="post">
                 <input type="hidden" name="userId" value="${userId}"/>
                 <div>
-                    <paw:input path="newPassword" label="passwordReset.newPassword" inputType="password" hasConstraint="true"/>
+                    <paw:input path="password" label="passwordReset.newPassword" inputType="password" hasConstraint="true"/>
                 </div>
                 <div>
-                    <paw:input path="confirmNewPassword" label="passwordReset.confirmNewPassword" inputType="password" hasConstraint="true"/>
+                    <paw:input path="repeatPassword" label="passwordReset.confirmNewPassword" inputType="password" hasConstraint="true"/>
                 </div>
                 <div>
                     <paw:input path="" label="passwordReset.submit" inputType="submit"/>

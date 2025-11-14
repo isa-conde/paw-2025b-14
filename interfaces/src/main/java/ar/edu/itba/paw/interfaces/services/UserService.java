@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.interfaces.services;
 
+import ar.edu.itba.paw.model.Comment;
 import ar.edu.itba.paw.model.Token;
 import ar.edu.itba.paw.model.User;
 
@@ -11,7 +12,7 @@ public interface UserService {
 
     Optional<User> findById(long id);
 
-    User create(String username, String email, String password);
+    User create(String username, String email, String password, Locale locale);
 
     Optional<User> findByUsername(String username);
 
@@ -21,9 +22,9 @@ public interface UserService {
 
     void resendVerification(User user);
 
-    Optional<Token> checkTokenValidity(Long token, Long userId);
+    Optional<Token> checkTokenValidity(Long token);
 
-    void resetPassword(Long token, Long userId, String newPassword);
+    boolean resetPassword(Long token, String newPassword);
 
     boolean sameAsOldPassword(String newPassword, Long userId);
 
@@ -31,7 +32,7 @@ public interface UserService {
 
     boolean emailIsTaken(String email);
 
-    Optional<Token> verifyEmail(Long token, Long userId);
+    boolean verifyEmail(Long token, Long userId);
 
     void authenticateVerifiedUser(Long userId);
 
@@ -46,4 +47,12 @@ public interface UserService {
     List<User> findAll();
 
     Float getUserRating(Long userId);
+
+    User findUserByToken(Long token);
+
+    void commentOnProfile(User commenter, long receiverId, String comment);
+
+    List<Comment> getCommentsReceived(long receiverId, long page);
+
+    int getCommentPages(long receiverId);
 }

@@ -44,7 +44,8 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                     "/tournament/swap/matches",
                     "/tournament/swap/groups",
                     "/tournament/closeInscriptions",
-                    "/tournament/setWinner")
+                    "/tournament/setWinner",
+            "/tournament/setMatchResults")
             .access("@tournamentSecurity.isCreator(authentication, request)")
             .antMatchers("/tournaments/new/step1",
                     "/tournaments/new/step2",
@@ -56,7 +57,10 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
                     "/tournament/join/step1",
                     "/tournament/join/step2",
                     "/team/create",
-                    "team/update").hasRole("VERIFIED")
+                    "/team/update",
+                    "/tournament/contactOwner",
+                    "/tournament/rate",
+                    "/profile/{id}/comment").hasRole("VERIFIED")
         .and().formLogin()
             .defaultSuccessUrl("/", false)
             .usernameParameter("j_username")

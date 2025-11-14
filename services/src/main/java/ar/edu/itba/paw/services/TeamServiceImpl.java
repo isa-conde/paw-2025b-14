@@ -1,5 +1,7 @@
 package ar.edu.itba.paw.services;
 
+import ar.edu.itba.paw.interfaces.exception.TeamNotFoundException;
+import ar.edu.itba.paw.interfaces.exception.UserNotFoundException;
 import ar.edu.itba.paw.interfaces.persistence.*;
 import ar.edu.itba.paw.interfaces.services.TeamService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
@@ -55,13 +57,13 @@ public class TeamServiceImpl implements TeamService {
 
         if (members != null){
             for (String s : members){
-                teamMemberDao.addMember(team.getId(), userDao.findByUsername(s).get().getId());
+                teamMemberDao.addMember(team.getId(), userDao.findByUsername(s).orElseThrow(UserNotFoundException::new).getId());
             }
-            User owner = userDao.findById(ownerId).get();
+            User owner = userDao.findById(ownerId).orElseThrow(UserNotFoundException::new);
             if (!members.contains(owner.getUsername())) {
                 teamMemberDao.addMember(team.getId(), ownerId);
             }
-        }else{
+        } else {
             teamMemberDao.addMember(team.getId(), ownerId);
         }
 
@@ -69,8 +71,8 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public Optional<Team> getById(Long id) {
-        return teamDao.getById(id);
+    public Optional<Team> findById(Long id) {
+        return teamDao.findById(id);
     }
 
     @Override
@@ -101,7 +103,6 @@ public class TeamServiceImpl implements TeamService {
     @Transactional
     @Override
     public void updateTeam(Long teamId, String name, byte[] pfp, byte[] banner, List<String> members) {
-        Optional<Team> optionalTeam = teamDao.getById(teamId);
         Long pfpId = null;
         Long bannerId = null;
         if (pfp != null){
@@ -113,7 +114,7 @@ public class TeamServiceImpl implements TeamService {
 
         if (members != null){
             for (String s : members){
-                Long userId =  userDao.findByUsername(s).get().getId();
+                Long userId =  userDao.findByUsername(s).orElseThrow(UserNotFoundException::new).getId();
                 if (!teamMemberDao.isMember(teamId, userId)){
                     teamMemberDao.addMember(teamId, userId);
                 }
@@ -131,12 +132,7 @@ public class TeamServiceImpl implements TeamService {
     @Transactional
     @Override
     public List<User> getTeamMembers(Long teamId) {
-        Optional<Team> t = teamDao.getById(teamId);
-        if (t.isEmpty()){
-            LOGGER.warn("Team not found for teamId={} ",teamId);
-            throw new IllegalArgumentException();
-        }
-        return t.get().getMembers();
+        return teamDao.findById(teamId).orElseThrow(TeamNotFoundException::new).getMembers();
     }
 
     @Override

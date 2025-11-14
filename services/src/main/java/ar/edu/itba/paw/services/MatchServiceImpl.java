@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.exception.MatchWinnerAlreadySetException;
+import ar.edu.itba.paw.interfaces.exception.TournamentNotFoundException;
 import ar.edu.itba.paw.interfaces.persistence.MatchDao;
 import ar.edu.itba.paw.interfaces.persistence.ParticipantDao;
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
@@ -102,12 +103,9 @@ public class MatchServiceImpl implements MatchService {
             throw new MatchWinnerAlreadySetException();
         }
 
-        Tournament t = ts.findById(tournamentId).orElse(null);
-        if (t == null) {
-            return;
-        }
-        Structure structure = t.getStructure();
-        boolean isGroupStage = Boolean.TRUE.equals(t.getIsGroupStage());
+        Tournament tournament = ts.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
+        Structure structure = tournament.getStructure();
+        boolean isGroupStage = Boolean.TRUE.equals(tournament.getIsGroupStage());
         boolean isElimination = structure.equals(Structure.ELIMINATION) || ( structure.equals(Structure.HYBRID) && !isGroupStage);
 
         if(isElimination && localScore.equals(visitorScore)){

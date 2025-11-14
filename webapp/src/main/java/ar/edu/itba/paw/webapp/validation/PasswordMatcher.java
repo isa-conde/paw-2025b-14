@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.webapp.validation;
 
+import ar.edu.itba.paw.webapp.form.HasPasswordMatcher;
 import ar.edu.itba.paw.webapp.form.UserForm;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
@@ -17,9 +18,9 @@ public class PasswordMatcher implements ConstraintValidator<PasswordMatches, Obj
             return true;
         }
 
-        UserForm userForm = (UserForm) obj;
-        String password = userForm.getPassword();
-        String repeatPassword = userForm.getRepeatPassword();
+        HasPasswordMatcher form = (HasPasswordMatcher) obj;
+        String password = form.getPassword();
+        String repeatPassword = form.getRepeatPassword();
 
         if (password == null || repeatPassword == null) {
             return true;

@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.services;
 
+import ar.edu.itba.paw.interfaces.exception.GameFormatNotFoundException;
 import ar.edu.itba.paw.interfaces.exception.NameAlreadyUsedException;
 import ar.edu.itba.paw.interfaces.persistence.GameDao;
 import ar.edu.itba.paw.interfaces.persistence.GameFormatDao;
@@ -11,7 +12,6 @@ import ar.edu.itba.paw.model.enums.Genre;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.awt.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -91,10 +91,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public Optional<GameFormat> getFormatById(Long id) {
-        if (id == null){
-            return Optional.empty();
-        }
-        return gameFormatDao.getFormatById(id);
+    public GameFormat findFormatById(Long id) {
+        return gameFormatDao.findById(id).orElseThrow(GameFormatNotFoundException::new);
     }
 }

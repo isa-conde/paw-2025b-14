@@ -9,7 +9,7 @@ public interface TeamDao {
 
     Team create(String name, Long pfpId, Long bannerId, Long ownerId);
 
-    Optional<Team> getById(Long id);
+    Optional<Team> findById(Long id);
 
     List<Long> getPastTournaments(Long teamId, Integer page);
 

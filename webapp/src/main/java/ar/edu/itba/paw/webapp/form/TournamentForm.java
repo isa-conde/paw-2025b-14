@@ -3,9 +3,11 @@ package ar.edu.itba.paw.webapp.form;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
+import ar.edu.itba.paw.webapp.Constants;
 import ar.edu.itba.paw.webapp.constraints.DatesConstraint;
 import ar.edu.itba.paw.webapp.constraints.DiscordUrlConstraint;
 import ar.edu.itba.paw.webapp.constraints.ImageConstraint;
+import ar.edu.itba.paw.webapp.constraints.ValidPDF;
 import ar.edu.itba.paw.webapp.constraints.NoPasswordWithoutServerNameConstraint;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,7 +44,7 @@ public class TournamentForm implements HasDates, HasServer{
     @Min(value = 4, message = "{createTournament.minParticipants}", groups = StepTwo.class)
     @Max(value = 32, message = "{createTournament.maxParticipantsError}", groups = StepTwo.class)
     private Integer maxParticipants;
-    @ImageConstraint(groups = StepTwo.class)
+    @ImageConstraint(groups = StepTwo.class, maxSize = Constants.MAX_BANNER_SIZE, optional = false)
     @NotNull(message = "{createTournament.notNull}", groups = StepTwo.class)
     private MultipartFile image;
     @NotNull(message = "{createTournament.notNull}", groups = StepTwo.class)
@@ -53,6 +55,7 @@ public class TournamentForm implements HasDates, HasServer{
     private String discordChannel;
     byte[] imageBytes;
 
+    @ValidPDF(maxSize = Constants.MAX_PDF_SIZE)
     private MultipartFile rules;
 
     public String getName() {

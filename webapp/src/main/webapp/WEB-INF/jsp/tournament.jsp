@@ -413,7 +413,7 @@
                 </div>
                 <div class="row">
                     <paw:input path="image" label="createTournament.image" fileText="input.uploadImage" inputType="file"/>
-                    <paw:input path="rules" label="tournament.rules" inputType="file" fileText="input.uploadPdf"/>
+                    <paw:input path="rules" label="tournament.rules" inputType="file" fileText="input.uploadPdf" hasConstraint="true"/>
                 </div>
             </c:if>
             <div class="row center">

@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -22,8 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.sql.DataSource;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -48,23 +45,18 @@ public class UserHibernateDaoTest {
     private static final String USED_EMAIL = "another@mail.com";
     private static final String EMAIL = "some@mail.com";
     private static final String PASSWORD = "1234567890";
-    private Long usedId = 1L;
+    private static final String LOCALE = "en";
+    private final Long usedId = 100L;
     private static final Log log = LogFactory.getLog(UserHibernateDaoTest.class);
-    private User oldUser;
-    private int rows;
 
     @Before
     public void setUp(){
         jdbcTemplate = new JdbcTemplate(ds);
-        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate).usingGeneratedKeyColumns("id").withTableName("users");
-        final Map<String,Object> values = Map.of("username",USED_USERNAME, "email", USED_EMAIL, "password", PASSWORD, "verified", false,"locale","es");
-        usedId = jdbcInsert.executeAndReturnKey(values).longValue();
-        rows = JdbcTestUtils.countRowsInTable(jdbcTemplate,"users");
     }
 
     @Test
     public void createTest(){
-        final User user = userHibernateDao.create(USERNAME, EMAIL, PASSWORD);
+        final User user = userHibernateDao.create(USERNAME, EMAIL, PASSWORD,LOCALE);
         em.flush();
 
         Assert.assertNotNull(user);
@@ -73,28 +65,31 @@ public class UserHibernateDaoTest {
         Assert.assertEquals(PASSWORD,user.getPassword());
         Assert.assertFalse(user.isVerified());
         Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"users",
-                "username = '" + USERNAME + "' and email = '" + EMAIL + "' and password = '" + PASSWORD +"'"));
+                "username = '" + USERNAME + "' and email = '" + EMAIL + "' and password = '" + PASSWORD +"' and locale = '" + LOCALE +"'"));
     }
 
     @Test(expected = Exception.class)
     public void testNoUsername(){
-        userHibernateDao.create(USERNAME, null,PASSWORD);
+        userHibernateDao.create(USERNAME, null,PASSWORD,LOCALE);
     }
 
     @Test(expected = Exception.class)
     public void testNoEmail(){
-        userHibernateDao.create(null, EMAIL,PASSWORD);
+        userHibernateDao.create(null, EMAIL,PASSWORD,LOCALE);
     }
 
     @Test(expected = Exception.class)
+    public void testNoLocale() { userHibernateDao.create(USERNAME,EMAIL,PASSWORD,null); }
+
+    @Test(expected = Exception.class)
     public void testRepeatUsername(){
-        userHibernateDao.create(USED_USERNAME,EMAIL,PASSWORD);
+        userHibernateDao.create(USED_USERNAME,EMAIL,PASSWORD,LOCALE);
         em.flush();
     }
 
     @Test(expected = Exception.class)
     public void testRepeatMail(){
-        userHibernateDao.create(USERNAME,USED_EMAIL,PASSWORD);
+        userHibernateDao.create(USERNAME,USED_EMAIL,PASSWORD,LOCALE);
         em.flush();
     }
 
@@ -211,16 +206,25 @@ public class UserHibernateDaoTest {
         em.flush();
 
         Assert.assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"users",
-                "id = " + usedId + " and profile_picture_id = "+ usedId + " and bannerId = " + usedId
+                "id = " + usedId + " and profile_picture_id = "+ usedId + " and banner_id = " + usedId
                         + " and username = '" + USED_USERNAME + "a' and bio = '" + USERNAME + "'"));
     }
 
     @Test
     public void testUpdateLocale(){
-        userHibernateDao.updateUserLocale("en",usedId);
+        userHibernateDao.updateUserLocale(LOCALE,usedId);
         em.flush();
 
         Assert.assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"users",
-                "id = " + usedId + " and locale = 'en'"));
+                "id = " + usedId + " and locale = '" + LOCALE + "'"));
+    }
+
+    @Test
+    public void testUpdateUserRating(){
+        userHibernateDao.updateUserRating(usedId, 5f);
+        em.flush();
+
+        Assert.assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"users",
+                "id = " + usedId + " and rating = 5"));
     }
 }

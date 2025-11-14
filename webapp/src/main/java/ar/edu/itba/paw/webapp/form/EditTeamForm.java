@@ -1,6 +1,8 @@
 package ar.edu.itba.paw.webapp.form;
 
+import ar.edu.itba.paw.webapp.Constants;
 import ar.edu.itba.paw.webapp.constraints.ExistingUsersContraint;
+import ar.edu.itba.paw.webapp.constraints.ImageConstraint;
 import ar.edu.itba.paw.webapp.constraints.TeamNameNotTakenConstraint;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,9 +21,9 @@ public class EditTeamForm {
     private String name;
     @ExistingUsersContraint
     List<String> members;
-
+    @ImageConstraint(maxSize = Constants.MAX_PFP_SIZE)
     private MultipartFile profilePicture;
-
+    @ImageConstraint(maxSize = Constants.MAX_BANNER_SIZE)
     private MultipartFile bannerPicture;
 
     public String getName() {
