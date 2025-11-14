@@ -35,8 +35,8 @@ public interface UserDao {
 
     List<User> findAll();
 
-    void addUserAccount(User user, Platform platform, String username);
+    void addUserAccount(long userId, Platform platform, String username);
 
-    void deleteUserAccount(User user, Platform platform);
+    void deleteUserAccount(long userId, Platform platform);
 
 }

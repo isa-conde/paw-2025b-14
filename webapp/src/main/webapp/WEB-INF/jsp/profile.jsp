@@ -29,49 +29,79 @@
         </div>
     </paw:banner>
     <paw:profile-navbar user="${profile}" activeSection="overview"/>
-        <div class="content-container">
-            <div class="profile-main">
-                <div class="carrousel-title">
-                    <paw:text type="title"><spring:message code="profile.favouriteGames.title"/></paw:text>
-                </div>
-                <c:choose>
-                    <c:when test="${favouriteGames.size() > 0}">
-                        <paw:carrousel id="games" elements="${favouriteGames}" isGame="true"/>
-                    </c:when>
-                    <c:otherwise>
-                        <div class="no-cards-container">
-                            <paw:text weight="thin"><spring:message code="profile.favouriteGames.empty" arguments="${profile.username}"/></paw:text>
+        <div class="profile-content-container">
+            <div class="profile-layout">
+                <div class="profile-left-column">
+                    <paw:text type="title"><spring:message code="profile.accounts"/></paw:text>
+                    <c:choose>
+                        <c:when test="${userAccounts.size() > 0}">
+                            <c:forEach var="account" items="${userAccounts}">
+                                <div class="user-account-item" >
+                                    <img src="${pageContext.request.contextPath}/images/${account.platform}.png"
+                                         alt="${account.platform}"
+                                         width="45"
+                                         height="45"
+                                         class="platform-icon">
+                                    <paw:text size="m">
+                                        <c:out value="${account.username}"/>
+                                    </paw:text>
+                                </div>
+                            </c:forEach>
+                        </c:when>
+                        <c:otherwise>
+                            <paw:text weight="thin" size="l"><spring:message code="profile.modal.noAccounts"/></paw:text>
+                        </c:otherwise>
+                    </c:choose>
+                    <c:if test="${isMyProfile}">
+                        <div class="profile-left-column-button">
+                            <paw:button onclick="openModal('editAccountsModal')" secondary="true" text="profile.edit" image="${pencilUrl}"/>
                         </div>
-                    </c:otherwise>
-                </c:choose>
+                    </c:if>
+                </div>
 
-                <div class="carrousel-title">
-                    <paw:text type="title"><spring:message code="profile.upcomingTournaments.title"/></paw:text>
-                </div>
-                <c:choose>
-                    <c:when test="${activeTournaments.size() > 0}">
-                        <paw:carrousel id="activeTournaments" elements="${activeTournaments}"/>
-                    </c:when>
-                    <c:otherwise>
-                        <div class="no-cards-container">
-                            <paw:text weight="thin"><spring:message code="profile.activeTournaments.empty" arguments="${profile.username}"/></paw:text>
-                        </div>
-                    </c:otherwise>
-                </c:choose>
+                <div class="profile-main">
+                    <div class="carrousel-title">
+                        <paw:text type="title"><spring:message code="profile.favouriteGames.title"/></paw:text>
+                    </div>
+                    <c:choose>
+                        <c:when test="${favouriteGames.size() > 0}">
+                            <paw:carrousel id="games" elements="${favouriteGames}" isGame="true"/>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="no-cards-container">
+                                <paw:text weight="thin"><spring:message code="profile.favouriteGames.empty" arguments="${profile.username}"/></paw:text>
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
 
-                <div class="carrousel-title">
-                    <paw:text type="title"><spring:message code="profile.lastTournaments.title"/></paw:text>
+                    <div class="carrousel-title">
+                        <paw:text type="title"><spring:message code="profile.upcomingTournaments.title"/></paw:text>
+                    </div>
+                    <c:choose>
+                        <c:when test="${activeTournaments.size() > 0}">
+                            <paw:carrousel id="activeTournaments" elements="${activeTournaments}"/>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="no-cards-container">
+                                <paw:text weight="thin"><spring:message code="profile.activeTournaments.empty" arguments="${profile.username}"/></paw:text>
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
+
+                    <div class="carrousel-title">
+                        <paw:text type="title"><spring:message code="profile.lastTournaments.title"/></paw:text>
+                    </div>
+                    <c:choose>
+                        <c:when test="${lastTournaments.size() > 0}">
+                            <paw:carrousel id="lastTournaments" elements="${lastTournaments}"/>
+                        </c:when>
+                        <c:otherwise>
+                            <div class="no-cards-container">
+                                <paw:text weight="thin"><spring:message code="profile.lastTournaments.empty" arguments="${profile.username}"/></paw:text>
+                            </div>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
-                <c:choose>
-                    <c:when test="${lastTournaments.size() > 0}">
-                        <paw:carrousel id="lastTournaments" elements="${lastTournaments}"/>
-                    </c:when>
-                    <c:otherwise>
-                        <div class="no-cards-container">
-                            <paw:text weight="thin"><spring:message code="profile.lastTournaments.empty" arguments="${profile.username}"/></paw:text>
-                        </div>
-                    </c:otherwise>
-                </c:choose>
             </div>
         </div>
 </paw:layout>
@@ -96,5 +126,48 @@
         <div class="row center">
             <paw:input path="" label="tournament.edit.saveChanges" containerType="half" inputType="submit"/>
         </div>
+    </form:form>
+</paw:modal>
+
+<paw:modal title="profile.editAccount.title" id="editAccountsModal" returnUrl="${profileUrl}">
+        <div class="user-account-item-modal">
+            <c:choose>
+                <c:when test="${userAccounts.size() > 0}">
+                    <c:forEach var="account" items="${userAccounts}" varStatus="status">
+                        <form method="post" action="/account/delete">
+                            <input type="hidden" name="userId" value="${profile.id}">
+                            <input type="hidden" name="platform" value="${account.platform}">
+                            <div class="user-account-item">
+                                <img src="${pageContext.request.contextPath}/images/${account.platform}.png"
+                                     alt="${account.platform}"
+                                     width="40"
+                                     height="40"
+                                     class="platform-icon">
+                                <paw:text><c:out  value="${account.username}"/></paw:text>
+                                <paw:button onclick=""/>
+                            </div>
+                        </form>
+                    </c:forEach>
+                </c:when>
+                <c:otherwise>
+                    <paw:text weight="thin"><spring:message code="profile.modal.noAccounts"/></paw:text>
+                </c:otherwise>
+            </c:choose>
+            <c:if test="${availablePlatforms.size() > 0}">
+                <paw:button secondary="true" onclick="event.preventDefault(); openModal('addAccountModal')" text="profile.modal.addusername"/>
+            </c:if>
+        </div>
+</paw:modal>
+
+<paw:modal title="profile.modal.addusername" id="addAccountModal" returnUrl="${profileUrl}">
+    <form:form method="post" modelAttribute="addAccountForm"
+               action="${pageContext.request.contextPath}/account/add"
+               enctype="multipart/form-data" cssClass="form">
+        <input type="hidden" value="${profile.id}" name="userId">
+        <div class="add-account-modal">
+            <paw:input path="platform" inputType="select" label="profile.modal.platform" items="${availablePlatforms}"/>
+            <paw:input path="username" label="profile.modal.username" hasConstraint="true"/>
+        </div>
+        <paw:input path="" inputType="submit" label="profile.modal.addusername"/>
     </form:form>
 </paw:modal>

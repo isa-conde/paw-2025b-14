@@ -56,4 +56,6 @@ public interface UserService {
     void addUserAccount(long userId, Platform platform, String username);
 
     void deleteUserAccount(long userId, Platform platform);
+
+    List<Platform> getAvailablePlatforms(List<UserAccount> accounts);
 }

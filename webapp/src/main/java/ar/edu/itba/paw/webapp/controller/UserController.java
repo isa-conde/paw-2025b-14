@@ -8,12 +8,11 @@ import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.User;
-import ar.edu.itba.paw.model.enums.Elo;
-import ar.edu.itba.paw.model.enums.Genre;
-import ar.edu.itba.paw.model.enums.Region;
-import ar.edu.itba.paw.model.enums.Structure;
+import ar.edu.itba.paw.model.UserAccount;
+import ar.edu.itba.paw.model.enums.*;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
 import ar.edu.itba.paw.webapp.auth.PawUserDetails;
+import ar.edu.itba.paw.webapp.form.AddAccountForm;
 import ar.edu.itba.paw.webapp.form.EditProfileForm;
 import ar.edu.itba.paw.webapp.form.FilterForm;
 import ar.edu.itba.paw.webapp.form.TournamentForm;
@@ -140,7 +139,7 @@ public class UserController {
     }
 
     @RequestMapping("/profile/{id}")
-    public ModelAndView profile(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @PathVariable Long id, @ModelAttribute("editProfileForm") EditProfileForm editProfileForm){
+    public ModelAndView profile(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @PathVariable Long id, @ModelAttribute("editProfileForm") EditProfileForm editProfileForm, @ModelAttribute("addAccountForm") AddAccountForm addAccountForm){
         final ModelAndView mav = new ModelAndView("profile");
 
         Optional<User> profileOpt = us.findById(id);
@@ -149,17 +148,21 @@ public class UserController {
         }
         User profile = profileOpt.get();
         Float userRating = us.getUserRating(profile.getId());
+        List<UserAccount> userAccounts =  us.getUserAccounts(profile.getId());
         mav.addObject("user", currentUser.isPresent() ? currentUser.get().getPawUser() : null);
         mav.addObject("isMyProfile", profile.getId() == currentUser.get().getPawUser().getId());
         mav.addObject("profile", profileOpt.get());
         mav.addObject("favouriteGames", gs.getFavourites(id));
         mav.addObject("activeTournaments", ts.findUserActiveTournaments(id, 0L));
         mav.addObject("lastTournaments", ts.findUserPastTournaments(id, 0L));
-        mav.addObject("EditProfileForm", editProfileForm);
+        mav.addObject("editProfileForm", editProfileForm);
         mav.addObject("userRating", userRating);
+        mav.addObject("userAccounts", userAccounts);
+        mav.addObject("addAccountForm", addAccountForm);
+        mav.addObject("availablePlatforms", us.getAvailablePlatforms(userAccounts));
 
-        editProfileForm.setUsername(profileOpt.get().getUsername());
-        editProfileForm.setBio(profileOpt.get().getBio());
+        editProfileForm.setUsername(profile.getUsername());
+        editProfileForm.setBio(profile.getBio());
 
         boolean hasFormErrors = mav.getModel().containsKey(
                 BindingResult.MODEL_KEY_PREFIX + "editProfileForm"
@@ -260,7 +263,6 @@ public class UserController {
         return mav;
     }
 
-
     private long adjustPage(long page, int totalPages) {
         if (totalPages <= 0) return 0;
         if (page < 0) return 0;
@@ -269,9 +271,9 @@ public class UserController {
     }
 
     @RequestMapping(value = "/profile/update", method = { RequestMethod.POST })
-    public ModelAndView updateProfile(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam("userId") final long userId, @Valid @ModelAttribute("editProfileForm") final EditProfileForm form, final BindingResult result){
+    public ModelAndView updateProfile(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam("userId") final long userId, @Valid @ModelAttribute("editProfileForm") final EditProfileForm form, final BindingResult result,  @ModelAttribute("addAccountForm") AddAccountForm addAccountForm){
         if (currentUser.isPresent() && result.hasErrors()) {
-            ModelAndView mav = profile(currentUser, userId, form);
+            ModelAndView mav = profile(currentUser, userId, form, addAccountForm);
             mav.addObject("openModal", "'editProfileModal'");
             return mav;
         }
@@ -300,6 +302,43 @@ public class UserController {
         return mav;
     }
 
+    @RequestMapping(value = "/account/delete", method = { RequestMethod.POST })
+    public ModelAndView deleteUserAccount(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam("userId") final long userId, @RequestParam("platform") final Platform platform) {
+
+        User user = currentUser.map(PawUserDetails::getPawUser).orElse(null);
+        List<Platform> platforms = Arrays.stream(Platform.values()).toList();
+
+        ModelAndView mav = new ModelAndView("redirect:/profile/" + userId);
+        if (user == null || userId != user.getId() || !platforms.contains(platform)){
+            return mav;
+        }
+
+        us.deleteUserAccount(userId, platform);
+
+        return mav;
+    }
+
+    @RequestMapping(value = "/account/add", method = { RequestMethod.POST })
+    public ModelAndView addUserAccount(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @Valid @ModelAttribute("addAccountForm") final AddAccountForm form, final BindingResult result) {
+
+        User user = currentUser.map(PawUserDetails::getPawUser).orElse(null);
+
+        if (currentUser.isPresent() && result.hasErrors()) {
+            ModelAndView mav = profile(currentUser, form.getUserId(), new EditProfileForm(), form);
+            mav.addObject("openModal", "'addAccountModal'");
+            return mav;
+        }
+
+        ModelAndView mav = new ModelAndView("redirect:/profile/" + form.getUserId());
+        if (user == null || form.getUserId() != user.getId()){
+            return mav;
+        }
+
+        us.addUserAccount(form.getUserId(), form.getPlatform(), form.getUsername());
+
+        return mav;
+    }
+
     @GetMapping(value = "/users/search", produces = "application/json")
     @ResponseBody
     public List<String> searchUsers(@RequestParam String name) {
@@ -309,4 +348,6 @@ public class UserController {
                 .map(User::getUsername)
                 .collect(Collectors.toList());
     }
+
+
 }

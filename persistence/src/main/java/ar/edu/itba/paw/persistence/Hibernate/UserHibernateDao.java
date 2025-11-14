@@ -4,12 +4,10 @@ import ar.edu.itba.paw.interfaces.persistence.UserDao;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.UserAccount;
 import ar.edu.itba.paw.model.enums.Platform;
+import org.hibernate.query.NativeQuery;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
+import javax.persistence.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -137,19 +135,19 @@ public class UserHibernateDao implements UserDao {
     }
 
     @Override
-    public void addUserAccount(User user, Platform platform, String username) {
-        UserAccount userAccount = new UserAccount(user, platform, username);
-        user.addAccount(userAccount);
-        em.persist(user);
+    public void addUserAccount(long userId, Platform platform, String username) {
+        em.createNativeQuery("INSERT INTO user_account (user_id, platform, username) VALUES (:userId, CAST(:platform AS platform), :username)")
+                .setParameter("userId", userId)
+                .setParameter("platform", platform.name())
+                .setParameter("username", username)
+                .executeUpdate();
     }
 
     @Override
-    public void deleteUserAccount(User user, Platform platform) {
-        Optional<UserAccount> accountToRemove = user.getAccounts()
-                .stream()
-                .filter(acc -> acc.getPlatform() == platform)
-                .findFirst();
-        accountToRemove.ifPresent(user::removeAccount);
-        em.persist(user);
+    public void deleteUserAccount(long userId, Platform platform) {
+        em.createNativeQuery("DELETE FROM user_account WHERE user_id = :userId AND platform = CAST(:platform AS platform)")
+                .setParameter("userId", userId)
+                .setParameter("platform", platform.name())
+                .executeUpdate();
     }
 }

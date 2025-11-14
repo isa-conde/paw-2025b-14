@@ -1,14 +1,22 @@
 package ar.edu.itba.paw.model.ids;
 
 import ar.edu.itba.paw.model.enums.Platform;
+import org.hibernate.annotations.Type;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import java.io.Serializable;
 
 @Embeddable
 public class UserAccountId implements Serializable {
 
+    @Column(name = "user_id")
     private long userId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "platform", nullable = false)
     private Platform platform;
 
     public UserAccountId(){}
@@ -26,4 +34,7 @@ public class UserAccountId implements Serializable {
         return platform;
     }
 
+    public void setPlatform(Platform platform) {
+        this.platform = platform;
+    }
 }

@@ -12,15 +12,10 @@ public class UserAccount {
     @EmbeddedId
     private UserAccountId userAccountId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("userId")
     @JoinColumn(name = "user_id")
     private User user;
-
-    @MapsId("platform")
-    @Enumerated(EnumType.STRING)
-    @Column(name = "plarform", nullable = false)
-    private Platform platform;
 
     @Column(name = "username", nullable = false)
     private String username;
@@ -29,8 +24,8 @@ public class UserAccount {
 
     public UserAccount(User user, Platform platform, String username){
         this.user = user;
-        this.platform = platform;
-        this. username = username;
+        this.username = username;
+        this.userAccountId = new UserAccountId(user.getId(), platform);
     }
 
     public User getUser() {
@@ -38,7 +33,7 @@ public class UserAccount {
     }
 
     public Platform getPlatform() {
-        return platform;
+        return userAccountId.getPlatform();
     }
 
     public String getUsername() {
@@ -50,7 +45,10 @@ public class UserAccount {
     }
 
     public void setPlatform(Platform platform) {
-        this.platform = platform;
+        if (userAccountId == null) {
+            userAccountId = new UserAccountId();
+        }
+        userAccountId.setPlatform(platform);
     }
 
     public void setUsername(String username) {

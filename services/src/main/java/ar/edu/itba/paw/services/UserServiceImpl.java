@@ -25,6 +25,7 @@ import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Transactional(readOnly = true)
 @Service
@@ -260,21 +261,33 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserAccount> getUserAccounts(long userId) {
         User user = getUserOrThrow(userId);
-        return user.getAccounts();
+        List<UserAccount> accounts = user.getAccounts();
+        accounts.size();
+        return accounts;
     }
 
     @Transactional
     @Override
     public void addUserAccount(long userId, Platform platform, String username) {
-        User user = getUserOrThrow(userId);
-        userDao.addUserAccount(user, platform, username);
+        userDao.addUserAccount(userId, platform, username);
     }
 
     @Transactional
     @Override
     public void deleteUserAccount(long userId, Platform platform) {
-        User user = getUserOrThrow(userId);
-        userDao.deleteUserAccount(user, platform);
+        userDao.deleteUserAccount(userId, platform);
+    }
+
+    @Override
+    public List<Platform> getAvailablePlatforms(List<UserAccount> accounts) {
+        Set<Platform> usedPlatforms = accounts.stream()
+                .map(UserAccount::getPlatform)
+                .collect(Collectors.toSet());
+
+        return Arrays.stream(Platform.values())
+                .filter(p -> !usedPlatforms.contains(p))
+                .collect(Collectors.toList());
+
     }
 
     private User getUserOrThrow(Long userId) {
