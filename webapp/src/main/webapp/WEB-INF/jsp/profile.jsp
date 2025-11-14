@@ -23,13 +23,16 @@
                 <paw:text size="xl"><c:out value="${profile.username}"/></paw:text>
                 <paw:text size="m"><c:out value="${profile.bio}"/></paw:text>
             </div>
-            <div class="rating-container-profile">
-                <img src="${starUrl}" class="banner-star" alt="tournament.rating.imgLabel"/>
-                <c:if test="${userRating == null}">
-                    <spring:message code="profile.rating.noRating" var="noRating"/>
-                    <c:set var="userRating" value="${noRating}"/>
-                </c:if>
-                <paw:text weight="thin" size="s"> ${userRating} </paw:text>
+            <div class="profile-rating">
+                <paw:text size="m"><spring:message code="profile.rating.organizerRating"/></paw:text>
+                <div class="rating-container-profile">
+                    <img src="${starUrl}" class="banner-star" alt="tournament.rating.imgLabel"/>
+                    <c:if test="${userRating == null}">
+                        <spring:message code="profile.rating.noRating" var="noRating"/>
+                        <c:set var="userRating" value="${noRating}"/>
+                    </c:if>
+                    <paw:text weight="thin" size="s"> ${userRating} </paw:text>
+                </div>
             </div>
         </div>
     </paw:banner>
@@ -104,8 +107,6 @@
                                     <c:set var="commenterProfileUrl" value="/profile/${comment.commenter.id}"/>
                                     <a href="${commenterProfileUrl}" class="profile-comment-author"><c:out value="${comment.commenter.username}"/></a>
                                     <span class="profile-comment-date"><c:out value="${comment.formattedDate}"/></span>
-                                    <span>@</span>
-                                    <span class="profile-comment-time"><c:out value="${comment.formattedTime}"/></span>
                                 </div>
                                 <div class="profile-comment-body">
                                     <c:out value="${comment.comment}"/>

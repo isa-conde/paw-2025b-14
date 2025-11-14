@@ -1681,6 +1681,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     padding: 20px;
 }
 
+.profile-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
 /*Logout Button*/
 .logout-button {
     background-color: var(--secondary-details);
@@ -1941,5 +1948,4 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     color: var(--primary-text);
     padding: 6px 12px;
     max-width: 350px;
-    margin-top: 14px;
 }
