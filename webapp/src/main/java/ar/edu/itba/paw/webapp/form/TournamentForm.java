@@ -3,7 +3,7 @@ package ar.edu.itba.paw.webapp.form;
 import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
-import ar.edu.itba.paw.webapp.Constants;
+import ar.edu.itba.paw.interfaces.Constants;
 import ar.edu.itba.paw.webapp.constraints.DatesConstraint;
 import ar.edu.itba.paw.webapp.constraints.ImageConstraint;
 import ar.edu.itba.paw.webapp.constraints.ValidPDF;

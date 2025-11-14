@@ -1,6 +1,6 @@
 package ar.edu.itba.paw.webapp.form;
 
-import ar.edu.itba.paw.webapp.Constants;
+import ar.edu.itba.paw.interfaces.Constants;
 import ar.edu.itba.paw.webapp.constraints.ExistingUsersContraint;
 import ar.edu.itba.paw.webapp.constraints.ImageConstraint;
 import ar.edu.itba.paw.webapp.constraints.TeamNameNotTakenConstraint;

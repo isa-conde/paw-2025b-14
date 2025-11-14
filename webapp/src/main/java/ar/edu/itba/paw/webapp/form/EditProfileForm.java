@@ -1,13 +1,11 @@
 package ar.edu.itba.paw.webapp.form;
 
-import ar.edu.itba.paw.webapp.Constants;
+import ar.edu.itba.paw.interfaces.Constants;
 import ar.edu.itba.paw.webapp.constraints.ImageConstraint;
 import ar.edu.itba.paw.webapp.constraints.UpdateUsernameTakenConstraint;
-import ar.edu.itba.paw.webapp.validation.UsernameIsTaken;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.*;
-import java.time.LocalDate;
 
 @UpdateUsernameTakenConstraint
 public class EditProfileForm {

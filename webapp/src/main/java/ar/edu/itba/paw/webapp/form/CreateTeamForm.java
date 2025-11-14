@@ -5,7 +5,7 @@ import ar.edu.itba.paw.webapp.constraints.ExistingUsersContraint;
 import ar.edu.itba.paw.webapp.constraints.ImageConstraint;
 import ar.edu.itba.paw.webapp.constraints.TeamNameNotTakenConstraint;
 import org.springframework.web.multipart.MultipartFile;
-import ar.edu.itba.paw.webapp.Constants;
+import ar.edu.itba.paw.interfaces.Constants;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;

@@ -1,7 +1,6 @@
 package ar.edu.itba.paw.webapp.constraints;
 
-import ar.edu.itba.paw.webapp.Constants;
-import ar.edu.itba.paw.webapp.constraints.PDFValidator;
+import ar.edu.itba.paw.interfaces.Constants;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
