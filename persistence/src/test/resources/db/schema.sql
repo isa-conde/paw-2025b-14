@@ -103,6 +103,8 @@ insert into image (id, image) values (106, HEXTORAW(REPEAT('36', 64)));
 insert into image (id, image) values (107, HEXTORAW(REPEAT('37', 64)));
 insert into image (id, image) values (108, HEXTORAW(REPEAT('38', 64)));
 
+insert into rules (id, file) values (100, HEXTORAW(REPEAT('30', 64)));
+
 insert into tokens (id, user_id, token, expiry_date, used) values (100,100, 100, '2003-02-21', false);
 insert into tokens (id, user_id, token, expiry_date, used) values (101,100, 101, '2077-02-21', true);
 
