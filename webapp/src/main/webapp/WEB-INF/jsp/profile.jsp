@@ -114,6 +114,7 @@
                             </div>
                         </c:forEach>
                     </div>
+                    <paw:pagination currentPage="${commentsCurrentPage}" totalPages="${commentsTotalPages}" url="${profileUrl}"/>
                 </div>
             </div>
         </div>

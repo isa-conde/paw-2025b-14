@@ -52,5 +52,7 @@ public interface UserService {
 
     void commentOnProfile(User commenter, long receiverId, String comment);
 
-    List<Comment> getCommentsReceived(long receiverId);
+    List<Comment> getCommentsReceived(long receiverId, long page);
+
+    int getCommentPages(long receiverId);
 }

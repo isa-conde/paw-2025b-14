@@ -261,8 +261,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<Comment> getCommentsReceived(long receiverId) {
+    public List<Comment> getCommentsReceived(long receiverId, long page) {
         User receiver = findById(receiverId).orElseThrow(UserNotFoundException::new);
-        return commentDao.getCommentsByReceived(receiver);
+        return commentDao.getCommentsByReceived(receiver, page);
+    }
+
+    @Override
+    public int getCommentPages(long receiverId) {
+        User receiver = findById(receiverId).orElseThrow(UserNotFoundException::new);
+        return commentDao.getCommentPagesByReceived(receiver);
     }
 }

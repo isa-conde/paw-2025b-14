@@ -41,6 +41,8 @@ public class UserController {
     private final TournamentService ts;
     private final TeamService tms;
 
+    private final static long DEFAULT_PAGE = 0L;
+
     @Autowired
     MessageSource messageSource;
 
@@ -158,11 +160,14 @@ public class UserController {
     @RequestMapping("/profile/{id}")
     public ModelAndView profile(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
                                 @PathVariable Long id,
-                                @ModelAttribute("editProfileForm") EditProfileForm editProfileForm){
+                                @ModelAttribute("editProfileForm") EditProfileForm editProfileForm,
+                                @RequestParam(value = "page", defaultValue = "0") Long commentsPage){
         final ModelAndView mav = new ModelAndView("profile");
         User profile = us.findById(id).orElseThrow(UserNotFoundException::new);
         Float userRating = us.getUserRating(id);
-        List<Comment> comments = us.getCommentsReceived(id);
+        int totalCommentPages = us.getCommentPages(id);
+        commentsPage = adjustPage(commentsPage, totalCommentPages);
+        List<Comment> comments = us.getCommentsReceived(id, commentsPage);
         User loggedUser = null;
         if(currentUser.isPresent()) {
             loggedUser = currentUser.get().getPawUser();
@@ -176,6 +181,8 @@ public class UserController {
         mav.addObject("EditProfileForm", editProfileForm);
         mav.addObject("userRating", userRating);
         mav.addObject("comments", comments);
+        mav.addObject("commentsTotalPages", totalCommentPages);
+        mav.addObject("commentsCurrentPage", Math.toIntExact(commentsPage));
 
         editProfileForm.setUsername(profile.getUsername());
         editProfileForm.setBio(profile.getBio());
@@ -285,7 +292,7 @@ public class UserController {
                                 @ModelAttribute("commentForm") CommentForm commentForm,
                                 BindingResult result) {
         if(result.hasErrors()) {
-            return profile(currentUser, id, new EditProfileForm());
+            return profile(currentUser, id, new EditProfileForm(), DEFAULT_PAGE);
         }
         us.commentOnProfile(currentUser.orElseThrow(UserNotAuthenticatedException::new).getPawUser(), id, commentForm.getComment()); // aca se manda una excepcion, pero no deberia llegar por Spring Security.
         return new ModelAndView("redirect:/profile/{id}");
@@ -301,7 +308,7 @@ public class UserController {
     @RequestMapping(value = "/profile/update", method = { RequestMethod.POST })
     public ModelAndView updateProfile(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam("userId") final long userId, @Valid @ModelAttribute("editProfileForm") final EditProfileForm form, final BindingResult result){
         if (currentUser.isPresent() && result.hasErrors()) {
-            ModelAndView mav = profile(currentUser, userId, form);
+            ModelAndView mav = profile(currentUser, userId, form, DEFAULT_PAGE);
             mav.addObject("openModal", "'editProfileModal'");
             return mav;
         }

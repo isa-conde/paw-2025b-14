@@ -9,6 +9,8 @@ public interface CommentDao {
 
     void create(User commenter, User receiver, String comment);
 
-    List<Comment> getCommentsByReceived(User receiver);
+    List<Comment> getCommentsByReceived(User receiver, long page);
+
+    int getCommentPagesByReceived(User receiver);
 
 }
