@@ -1,9 +1,7 @@
 package ar.edu.itba.paw.webapp.form;
 
-import ar.edu.itba.paw.webapp.constraints.DatesConstraint;
-import ar.edu.itba.paw.webapp.constraints.DatesNullabilityConstraint;
-import ar.edu.itba.paw.webapp.constraints.MaxParticipantsNotBelowCurrent;
-import ar.edu.itba.paw.webapp.constraints.MaxParticipantsNullabilityConstraint;
+import ar.edu.itba.paw.webapp.Constants;
+import ar.edu.itba.paw.webapp.constraints.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,7 +25,9 @@ public class EditTournamentForm implements HasDates{
     @Min(value = 4, message = "{createTournament.minParticipants}")
     @Max(value = 32, message = "{createTournament.maxParticipantsError}")
     private Integer maxParticipants;
+    @ImageConstraint(maxSize = Constants.MAX_BANNER_SIZE)
     private MultipartFile image;
+    @ValidPDF(maxSize = Constants.MAX_PDF_SIZE)
     private MultipartFile rules;
 
     public String getName() {

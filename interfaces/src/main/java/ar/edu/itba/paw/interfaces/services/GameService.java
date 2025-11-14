@@ -29,5 +29,5 @@ public interface GameService {
 
     Long getPageAmount();
 
-    Optional<GameFormat> getFormatById(Long id);
+    GameFormat findFormatById(Long id);
 }

@@ -11,7 +11,7 @@ public interface GameFormatDao {
 
     List<GameFormat> getFormats(Long gameId);
 
-    Optional<GameFormat> getFormatById(Long id);
+    Optional<GameFormat> findById(Long id);
 
     Integer getPlayersPerTeam(Long id);
 

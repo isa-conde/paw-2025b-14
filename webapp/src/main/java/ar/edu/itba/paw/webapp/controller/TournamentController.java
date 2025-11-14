@@ -1,5 +1,8 @@
 package ar.edu.itba.paw.webapp.controller;
 
+import ar.edu.itba.paw.interfaces.exception.GameNotFoundException;
+import ar.edu.itba.paw.interfaces.exception.UserNotAuthenticatedException;
+import ar.edu.itba.paw.interfaces.exception.UserNotFoundException;
 import ar.edu.itba.paw.interfaces.services.*;
 import ar.edu.itba.paw.model.*;
 import ar.edu.itba.paw.model.Game.Game;
@@ -11,7 +14,6 @@ import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.webapp.auth.PawUserDetails;
 import ar.edu.itba.paw.webapp.form.EditTournamentForm;
-import ar.edu.itba.paw.webapp.form.GameForm;
 import ar.edu.itba.paw.webapp.form.SetMatchResultsForm;
 import ar.edu.itba.paw.webapp.form.TournamentForm;
 import ar.edu.itba.paw.webapp.form.*;
@@ -29,7 +31,6 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.*;
@@ -50,7 +51,7 @@ public class TournamentController {
     @Autowired
     MessageSource messageSource;
 
-    public TournamentController(final UserService us, final GameService gs, final TournamentService ts, final MatchService ms, final ParticipantService ps, final TeamService tms, MessageSource messageSource, final RulesService rs) {
+    public TournamentController(final UserService us, final GameService gs, final TournamentService ts, final MatchService ms, final ParticipantService ps, final TeamService tms, final RulesService rs) {
         this.us = us;
         this.gs = gs;
         this.ts = ts;
@@ -78,11 +79,6 @@ public class TournamentController {
     @ModelAttribute("rateTournamentForm")
     public RateTournamentForm getRateTournamentForm() {
         return new RateTournamentForm();
-    }
-
-    @ModelAttribute("gameForm")
-    public GameForm getGameForm() {
-        return new GameForm();
     }
 
     @ModelAttribute("setMatchResultsForm")
@@ -152,12 +148,12 @@ public class TournamentController {
             result.rejectValue("image", "error.tournamentForm.invalidImage");
         }
 
-        byte[] rulesBytes = null;
+        byte[] rulesBytes;
         try {
             if (form.getRules() != null && !form.getRules().isEmpty()) {
                 rulesBytes = form.getRules().getBytes();
+                rs.updateRules(tournamentId, rulesBytes);
             }
-            rs.updateRules(tournamentId, rulesBytes);
         } catch (IOException e) {
             result.rejectValue("image", "error.tournamentForm.invalidImage");
         }
@@ -201,17 +197,14 @@ public class TournamentController {
                     editTournamentForm.setEndDate(t.getEndDate());
                 }
             }
-            Optional<GameFormat> optionalGameFormat = gs.getFormatById(t.getFormatId());
-            if (optionalGameFormat.isPresent()){
-                GameFormat gf = optionalGameFormat.get();
-                mav.addObject("format", gf);
-                t.setFormat(gf.getName());
-            }
-            List<Participant> participants = ps.getTournamentParticipants(tournamentId, optionalGameFormat.isPresent() ? optionalGameFormat.get().getPlayersPerTeam() : 1);
+            GameFormat gameFormat = gs.findFormatById(t.getFormatId());
+            mav.addObject("format", gameFormat);
+            t.setFormat(gameFormat.getName());
+            List<Participant> participants = ps.getTournamentParticipants(tournamentId, gameFormat.getPlayersPerTeam());
             int participantCount = participants.size();
-            Optional<Game> optionalGame = gs.findById(t.getGameId());
-            Optional<User> optionalUser = us.findById(t.getCreatorId());
-            Boolean isIndividualTournament = optionalGameFormat.isEmpty() || optionalGameFormat.get().getPlayersPerTeam() == 1;
+            Game game = gs.findById(t.getGameId()).orElseThrow(GameNotFoundException::new);
+            User creator = us.findById(t.getCreatorId()).orElseThrow(UserNotFoundException::new);
+            Boolean isIndividualTournament = gameFormat.getPlayersPerTeam() == 1;
             Boolean isParticipant = user != null && ps.hasJoined(user.getId(), tournamentId);
             Boolean hasRankedTournament = user != null && ps.participantHasRatedTournament(user.getId(), tournamentId);
             Float creatorRating = us.getUserRating(t.getCreatorId());
@@ -223,8 +216,8 @@ public class TournamentController {
             mav.addObject("participants", participants);
             mav.addObject("user", user);
             mav.addObject("tournament", t);
-            mav.addObject("game", optionalGame.get());
-            mav.addObject("creator", optionalUser.get());
+            mav.addObject("game", game);
+            mav.addObject("creator", creator);
             mav.addObject("matches", matches);
             mav.addObject("groups", groups);
             mav.addObject("LEAGUE", Structure.LEAGUE);
@@ -280,16 +273,15 @@ public class TournamentController {
     }
 
     @RequestMapping(value = "/tournament/join", method = { RequestMethod.POST })
-    public ModelAndView joinTournament(@ModelAttribute("user") Optional<PawUserDetails> currentUser, HttpServletRequest request, @RequestParam("tournamentId") final long tournamentId) {
-        User user = currentUser.get().getPawUser();
+    public ModelAndView joinTournament(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam("tournamentId") final long tournamentId) {
+        User user = currentUser.orElseThrow(UserNotAuthenticatedException::new).getPawUser(); // aca se manda una excepcion, pero no deberia llegar por Spring Security.
         ps.joinTournamentUser(user.getId(), tournamentId);
         return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
     }
 
     @RequestMapping(value = "/tournament/leave", method = { RequestMethod.POST })
     public ModelAndView leaveTournament(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam("tournamentId") final long tournamentId) {
-        User user = currentUser.get().getPawUser();
-
+        User user = currentUser.orElseThrow(UserNotAuthenticatedException::new).getPawUser(); // idem a /tournament/join
         ps.leaveTournament(user.getId(), tournamentId);
         return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
     }
@@ -301,7 +293,7 @@ public class TournamentController {
     }
 
     @RequestMapping(value = "/tournament/startTournament", method = { RequestMethod.POST })
-    public ModelAndView startTournament(@RequestParam("tournamentId") final long tournamentId, HttpServletRequest request) {
+    public ModelAndView startTournament(@RequestParam("tournamentId") final long tournamentId) {
         ts.startTournament(tournamentId);
         return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
     }
@@ -339,7 +331,7 @@ public class TournamentController {
     public ModelAndView newTournamentFormStep1(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @ModelAttribute("tournamentForm") final TournamentForm form){
         final ModelAndView mav = new ModelAndView("tournamentForm");
 
-        User user = currentUser.get().getPawUser();
+        User user = currentUser.orElseThrow(UserNotAuthenticatedException::new).getPawUser(); // idem a /tournament/join
         mav.addObject("user", user);
         mav.addObject("step", 1);
         mav.addObject("games", gs.findAll());
@@ -368,7 +360,7 @@ public class TournamentController {
         .max(Integer::compareTo)
         .orElse(1);
 
-        User user = currentUser.get().getPawUser();
+        User user = currentUser.orElseThrow(UserNotAuthenticatedException::new).getPawUser(); // idem a /tournament/join
         mav.addObject("user", user);
         mav.addObject("step", 2);
         mav.addObject("formats", formats);
@@ -387,13 +379,13 @@ public class TournamentController {
 
 
     @RequestMapping(value = "/tournaments/new/step2", method = { RequestMethod.POST })
-    public ModelAndView createTournament(@ModelAttribute("user") Optional<PawUserDetails> currentUser, HttpServletRequest request, @Validated(TournamentForm.StepTwo.class) @ModelAttribute("tournamentForm") final TournamentForm form, final BindingResult result, SessionStatus status) {
+    public ModelAndView createTournament(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @Validated(TournamentForm.StepTwo.class) @ModelAttribute("tournamentForm") final TournamentForm form, final BindingResult result, SessionStatus status) {
         if (result.hasErrors()) {
             return newTournamentFormStep2(currentUser, form);
         }
-        User user = currentUser.get().getPawUser();
+        User user = currentUser.orElseThrow(UserNotAuthenticatedException::new).getPawUser(); // idem a /tournament/join
 
-        byte[] imageBytes = null;
+        byte[] imageBytes;
         try {
             if (form.getImage() != null && !form.getImage().isEmpty()) {
                 imageBytes = form.getImage().getBytes();
@@ -432,7 +424,7 @@ public class TournamentController {
             mav.addObject("openModal", "'contactOwnerModal'");
             return mav;
         }
-        User user = currentUser.get().getPawUser();
+        User user = currentUser.orElseThrow(UserNotAuthenticatedException::new).getPawUser(); // idem a /tournament/join
         ts.contactOwner(contactOwnerForm.getTournamentId(), user, contactOwnerForm.getSubject(), contactOwnerForm.getBody(), contactOwnerForm.getCreatorId());
         return mav;
     }
@@ -447,7 +439,7 @@ public class TournamentController {
             return mav;
         }
         ts.updateTouramentRating(rateTournamentForm.getTournamentId(), rateTournamentForm.getRating());
-        ps.updateCreatorRating(rateTournamentForm.getTournamentId(), rateTournamentForm.getCreatorId(), currentUser.get().getPawUser().getId(), rateTournamentForm.getRating());
+        ps.updateCreatorRating(rateTournamentForm.getTournamentId(), rateTournamentForm.getCreatorId(), currentUser.orElseThrow(UserNotAuthenticatedException::new).getPawUser().getId(), rateTournamentForm.getRating()); // idem a /tournament/join
         return new ModelAndView("redirect:/tournament?tournamentId=" + rateTournamentForm.getTournamentId());
     }
 }

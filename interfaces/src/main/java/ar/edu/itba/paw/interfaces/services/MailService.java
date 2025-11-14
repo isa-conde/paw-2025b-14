@@ -1,7 +1,11 @@
 package ar.edu.itba.paw.interfaces.services;
 
+import ar.edu.itba.paw.model.Participant;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.User;
+import org.springframework.scheduling.annotation.Async;
+
+import java.util.List;
 
 public interface MailService {
 
@@ -25,4 +29,5 @@ public interface MailService {
 
     void sendContactOwnerEmail(Tournament tournament, User user, String emailSubject, String emailBody, User creator);
 
+    void sendListEmail(Long tournamentId, List<Participant> participantList);
 }

@@ -1,7 +1,11 @@
 package ar.edu.itba.paw.services;
 
+import ar.edu.itba.paw.interfaces.exception.TournamentNotFoundException;
+import ar.edu.itba.paw.interfaces.exception.UserNotFoundException;
+import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.interfaces.persistence.UserDao;
 import ar.edu.itba.paw.interfaces.services.MailService;
+import ar.edu.itba.paw.model.Participant;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.User;
 import org.slf4j.Logger;
@@ -9,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
-import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -21,6 +24,7 @@ import org.thymeleaf.spring5.SpringTemplateEngine;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Locale;
 
 @Component
@@ -44,13 +48,16 @@ public class MailServiceImpl implements MailService {
     @Autowired
     private UserDao userDao;
 
+    @Autowired
+    private TournamentDao tournamentDao;
+
     private static final String CROWN_CID = "crown";
     private static final String CROWN_CLASSPATH = "images/crown.png";
 
     @Async
     @Override
     public void sendTournamentCreatedEmail(Long tournamentId, String userName, String tournamentName, String recipient) {
-        User user = userDao.findByUsername(userName).get();
+        User user = userDao.findByUsername(userName).orElseThrow(UserNotFoundException::new);
         Locale locale = toLocale(user.getLocale());
         Context ctx = new Context(locale);
         ctx.setVariable("userName", userName);
@@ -72,7 +79,7 @@ public class MailServiceImpl implements MailService {
     @Async
     @Override
     public void sendTournamentJoinedEmail(Long tournamentId, String userName, String tournamentName, String recipient, String creatorMail) {
-        User user = userDao.findByUsername(userName).get();
+        User user = userDao.findByUsername(userName).orElseThrow(UserNotFoundException::new);
         Locale locale = toLocale(user.getLocale());
         Context ctx = new Context(locale);
         ctx.setVariable("userName", userName);
@@ -96,7 +103,7 @@ public class MailServiceImpl implements MailService {
     @Override
     public void sendTournamentJoinedOwnerEmail(Long tournamentId, String ownerUsername, String joinerUsername, String tournamentName, String recipientOwnerEmail) {
 
-        User user = userDao.findByUsername(ownerUsername).get();
+        User user = userDao.findByUsername(ownerUsername).orElseThrow(UserNotFoundException::new);
         Locale locale = toLocale(user.getLocale());
 
         Context ctx = new Context(locale);
@@ -120,7 +127,7 @@ public class MailServiceImpl implements MailService {
     @Override
     public void sendTournamentTeamJoinedOwnerEmail(Long tournamentId, String ownerUsername, String teamName, String tournamentName, String recipientOwnerEmail) {
 
-        User user = userDao.findByUsername(ownerUsername).get();
+        User user = userDao.findByUsername(ownerUsername).orElseThrow(UserNotFoundException::new);
         Locale locale = toLocale(user.getLocale());
 
         Context ctx = new Context(locale);
@@ -144,7 +151,7 @@ public class MailServiceImpl implements MailService {
     @Async
     @Override
     public void sendVerificationEmail(Long userId, String userName, Long token, String recipient) {
-        User user = userDao.findByUsername(userName).get();
+        User user = userDao.findByUsername(userName).orElseThrow(UserNotFoundException::new);
         Locale locale = toLocale(user.getLocale());
         Context ctx = new Context(locale);
         ctx.setVariable("userName", userName);
@@ -165,10 +172,10 @@ public class MailServiceImpl implements MailService {
     @Async
     @Override
     public void sendResetPasswordEmail(Long userId, Long token, String recipient) {
-        User user = userDao.findById(userId).get();
+        User user = userDao.findById(userId).orElseThrow(UserNotFoundException::new);
         Locale locale = toLocale(user.getLocale());
         Context ctx = new Context(locale);
-        String resetPasswordUrl = baseUrl + "/forgotPassword/reset?token=" + token.toString() + "&userId=" + userId;
+        String resetPasswordUrl = baseUrl + "/forgotPassword/reset?token=" + token.toString();
         ctx.setVariable("resetPasswordUrl", resetPasswordUrl);
         ctx.setVariable("crownCid", "cid:" + CROWN_CID);
 
@@ -185,7 +192,7 @@ public class MailServiceImpl implements MailService {
     @Async
     @Override
     public void sendTournamentStartedEmail(Long tournamentId, String username, String tournamentName, String creatorMail, String recipient) {
-        User user = userDao.findByUsername(username).get();
+        User user = userDao.findByUsername(username).orElseThrow(UserNotFoundException::new);
         Locale locale = toLocale(user.getLocale());
         Context ctx = new Context(locale);
         ctx.setVariable("userName", username);
@@ -208,7 +215,7 @@ public class MailServiceImpl implements MailService {
     @Async
     @Override
     public void sendTournamentEndedEmail(Long tournamentId, String username, String tournamentName, String recipient) {
-        User user = userDao.findByUsername(username).get();
+        User user = userDao.findByUsername(username).orElseThrow(UserNotFoundException::new);
         Locale locale = toLocale(user.getLocale());
         Context ctx = new Context(locale);
         ctx.setVariable("userName", username);
@@ -230,7 +237,7 @@ public class MailServiceImpl implements MailService {
     @Async
     @Override
     public void sendTournamentWinnerEmail(Long tournamentId, String username, String tournamentName, String recipient) {
-        User user = userDao.findByUsername(username).get();
+        User user = userDao.findByUsername(username).orElseThrow(UserNotFoundException::new);
         Locale locale = toLocale(user.getLocale());
         Context ctx = new Context(locale);
         ctx.setVariable("userName", username);
@@ -274,6 +281,31 @@ public class MailServiceImpl implements MailService {
         sendEmail(creator.getEmail(), subject, body);
     }
 
+    @Async
+    @Override
+    public void sendListEmail(Long tournamentId, List<Participant> participantList) {
+        Tournament tournament = tournamentDao.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
+        User creator = userDao.findById(tournament.getCreatorId()).orElseThrow(UserNotFoundException::new);
+        Locale locale = toLocale(creator.getLocale());
+        Context ctx = new Context(locale);
+        ctx.setVariable("tournament", tournament);
+        ctx.setVariable("participantList", participantList);
+        String tournamentLink = baseUrl + "/tournament?tournamentId=" + tournament.getId();
+        ctx.setVariable("tournamentLink", tournamentLink);
+        ctx.setVariable("crownCid", "cid:" + CROWN_CID);
+
+        String mailTemplate = participantList.getFirst().getTeam() == null ? "participant-list" : "participant-list-with-teams";
+
+        String body = templateEngine.process(mailTemplate, ctx);
+
+        String subject = messageSource.getMessage(
+                "email.participantList.subject",
+                new Object[]{tournament.getName()},
+                locale);
+
+        sendEmail(creator.getEmail(), subject, body);
+    }
+
     private void sendEmail(String recipient, String subject, String body) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
@@ -285,8 +317,6 @@ public class MailServiceImpl implements MailService {
             mailSender.send(mimeMessage);
         } catch (MessagingException e) {
             throw new RuntimeException("Failed to build email", e);
-        } catch (MailException e) {
-            throw e;
         }
     }
 
