@@ -27,6 +27,7 @@ import javax.sql.DataSource;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -57,6 +58,7 @@ public class TournamentHibernateDaoTest {
     private static final Long ID = 100L;
     private static final Long NO_ONE_ID = 0L;
     private static final Integer MAX_PARTICIPANTS = 4;
+    private static final int PAGE_SIZE = 9;
 
     @Before
     public void setUp(){
@@ -185,6 +187,23 @@ public class TournamentHibernateDaoTest {
 
         Assert.assertNotNull(tournaments);
         Assert.assertTrue(tournaments.isEmpty());
+    }
+
+    @Test
+    public void testFindByCreatorEmptyPage(){
+        List<Tournament> tournaments = tournamentHibernateDao.findByCreator(ID,2L,false);
+
+        Assert.assertNotNull(tournaments);
+        Assert.assertTrue(tournaments.isEmpty());
+    }
+
+    @Test
+    public void testFindByCreatorFullPage(){
+        List<Tournament> tournaments = tournamentHibernateDao.findByCreator(ID,NO_ONE_ID,false);
+
+        Assert.assertNotNull(tournaments);
+        Assert.assertEquals(PAGE_SIZE,tournaments.size());
+        Assert.assertTrue(tournaments.stream().allMatch((tournament -> Objects.equals(tournament.getCreatorId(), ID) && !tournament.getFinished())));
     }
 
 //    @Test
