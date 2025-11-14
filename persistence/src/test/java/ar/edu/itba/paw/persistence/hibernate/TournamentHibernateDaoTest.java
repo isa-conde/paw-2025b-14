@@ -5,6 +5,7 @@ import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Genre;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
+import ar.edu.itba.paw.model.filters.TournamentFilter;
 import ar.edu.itba.paw.persistence.Hibernate.TournamentHibernateDao;
 import ar.edu.itba.paw.persistence.TestConfig;
 import org.junit.Assert;
@@ -13,7 +14,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -26,6 +26,8 @@ import javax.persistence.PersistenceContext;
 import javax.sql.DataSource;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Optional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = TestConfig.class)
@@ -46,15 +48,15 @@ public class TournamentHibernateDaoTest {
 
     private static final Genre GENRE = Genre.MOBA;
     private static final String NAME = "Jerma Rumble";
-    private static final Elo ELO = Elo.MID;
+    private static final Elo ELO = Elo.LOW;
     private static final Region REGION = Region.LAS;
     private static final Structure STRUCTURE = Structure.LEAGUE;
-    private static final LocalDate START_DATE = LocalDate.of(2025, 2, 21);
-    private static final LocalDate END_DATE = LocalDate.of(2026, 2, 21);
+    private static final LocalDate START_DATE = LocalDate.of(2026, 2, 21);
+    private static final LocalDate END_DATE = LocalDate.of(2027, 2, 21);
     private static final String FORMAT = "some format";
     private static final Long ID = 100L;
     private static final Long OTHER_ID = 2L;
-    private static final Integer MAX_PARTICIPANTS = 8;
+    private static final Integer MAX_PARTICIPANTS = 4;
 
     @Before
     public void setUp(){
@@ -106,36 +108,37 @@ public class TournamentHibernateDaoTest {
         + "' and end_date = '" + END_DATE.format(DateTimeFormatter.ISO_LOCAL_DATE) + "'"));
     }
 
-//    @Test
-//    public void testFindById(){
-//        Optional<Tournament> found = tournamentHibernateDao.findById(OTHER_ID);
-//
-//        Assert.assertTrue(found.isPresent());
-//        Tournament tournament = found.get();
-//        Assert.assertEquals(OTHER_ID, tournament.getId());
-//        Assert.assertEquals(ID, tournament.getCreator_id());
-//        Assert.assertEquals(NAME, tournament.getName());
-//        Assert.assertEquals(ID, tournament.getGame_id());
-//        Assert.assertEquals(REGION, tournament.getRegion());
-//        Assert.assertEquals(ELO, tournament.getElo());
-//        Assert.assertEquals(START_DATE, tournament.getStartDate());
-//        Assert.assertEquals(END_DATE, tournament.getEndDate());
-//        Assert.assertEquals(FORMAT, tournament.getFormat());
-//        Assert.assertEquals(STRUCTURE, tournament.getStructure());
-//        Assert.assertEquals(MAX_PARTICIPANTS, tournament.getMaxParticipants());
-//        Assert.assertEquals(ID, tournament.getImage_id());
-//        Assert.assertTrue(tournament.getOpenInscriptions());
-//        Assert.assertFalse(tournament.getFinished());
-//        Assert.assertEquals(ID, tournament.getFormat_id());
-//    }
-//
-//    @Test
-//    public void testFindByIdNotFound(){
-//        Optional<Tournament> found = tournamentHibernateDao.findById(-1L);
-//
-//        Assert.assertFalse(found.isPresent());
-//    }
-//
+    @Test
+    public void testFindById(){
+        Optional<Tournament> found = tournamentHibernateDao.findById(ID);
+
+        Assert.assertNotNull(found);
+        Assert.assertTrue(found.isPresent());
+        Tournament tournament = found.get();
+        Assert.assertEquals(ID, tournament.getId());
+        Assert.assertEquals(ID.longValue()  , tournament.getCreator().getId());
+        Assert.assertEquals(NAME, tournament.getName());
+        Assert.assertEquals(ID, tournament.getGame().getId());
+        Assert.assertEquals(REGION, tournament.getRegion());
+        Assert.assertEquals(ELO, tournament.getElo());
+        Assert.assertEquals(START_DATE, tournament.getStartDate());
+        Assert.assertEquals(END_DATE, tournament.getEndDate());
+        Assert.assertEquals(FORMAT, tournament.getFormat());
+        Assert.assertEquals(STRUCTURE, tournament.getStructure());
+        Assert.assertEquals(MAX_PARTICIPANTS, tournament.getMaxParticipants());
+        Assert.assertEquals(ID, tournament.getImageId());
+        Assert.assertTrue(tournament.getOpenInscriptions());
+        Assert.assertFalse(tournament.getFinished());
+        Assert.assertEquals(ID, tournament.getFormatId());
+    }
+
+    @Test
+    public void testFindByIdNotFound(){
+        Optional<Tournament> found = tournamentHibernateDao.findById(0L);
+
+        Assert.assertFalse(found.isPresent());
+    }
+
 //    @Test
 //    public void testFindGameTournaments(){
 //        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)

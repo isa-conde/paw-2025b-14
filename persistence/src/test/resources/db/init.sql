@@ -105,9 +105,16 @@ create table if not exists match(
     primary key (id,tournament_id)
 );
 
+create table if not exists  rules(
+   id integer identity not null,
+   file varbinary(1000000),
+
+);
+
 CREATE SEQUENCE if not exists users_userid_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE if not exists game_id_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE if not exists tournament_id_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE if not exists image_id_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE if not exists tokens_id_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE if not exists team_id_seq START WITH 1 INCREMENT BY 1;
+create sequence if not exists rules_id_seq start with 1 increment by 1;
