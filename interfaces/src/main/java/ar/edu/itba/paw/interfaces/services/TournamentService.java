@@ -19,7 +19,9 @@ public interface TournamentService {
 
     List<Tournament> findTournaments(TournamentFilter tournamentFilter, Long page);
 
-    Tournament create(Long creatorId, String name, Long gameId, Region region, Elo elo, LocalDate startDate, LocalDate endDate, String format, Structure structure, Integer maxParticipants, byte[] imageId, Boolean openInscriptions, Boolean isFinished, Long formatId, byte[] rulesId);
+    Tournament create(Long creatorId, String name, Long gameId, Region region, Elo elo, LocalDate startDate, LocalDate endDate, String format,
+                      Structure structure, Integer maxParticipants, byte[] imageId, Boolean openInscriptions, Boolean isFinished,
+                      Long formatId, byte[] rulesId, String serverName, String serverPassword, String discordChannel);
 
     List<Tournament> findByCreator(Long creatorId, Long page, Boolean isFinished);
 
@@ -39,7 +41,7 @@ public interface TournamentService {
 
     Integer getPageAmount(Integer pageSize, TournamentFilter tf);
 
-    void updateTournamentInfo(Long tournamentId, String name, LocalDate startDate, LocalDate endDate, Integer maxParticipants, byte[] image);
+    void updateTournamentInfo(Long tournamentId, String name, LocalDate startDate, LocalDate endDate, Integer maxParticipants, byte[] image, String serverName, String serverPassword, String discordChannel);
 
     int getTournamentParticipantsCount(Long tournamentId);
 

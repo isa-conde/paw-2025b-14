@@ -17,7 +17,9 @@ public interface TournamentDao {
 
     List<Tournament> findTournaments(TournamentFilter tournamentFilter, Long page);
 
-    Tournament create(Long creatorId, String name, Long gameId, Region region, Elo elo, LocalDate startDate, LocalDate endDate, String format, Structure structure, Integer maxParticipants, Long imageId, Boolean openInscriptions, Boolean isFinished, Long formatId, Long rulesId);
+    Tournament create(Long creatorId, String name, Long gameId, Region region, Elo elo, LocalDate startDate, LocalDate endDate,
+                      String format, Structure structure, Integer maxParticipants, Long imageId, Boolean openInscriptions, Boolean isFinished,
+                      Long formatId, Long rulesId, String serverName, String serverPassword, String discordChannel);
 
     Structure getTournamentStructure(Long tournamentId);
 
@@ -39,7 +41,7 @@ public interface TournamentDao {
 
     Integer getPageAmount(Integer pageSize, TournamentFilter tf);
 
-    void updateTournamentInfo(Long tournamentId, String name, LocalDate startDate, LocalDate endDate, Integer maxParticipants);
+    void updateTournamentInfo(Long tournamentId, String name, LocalDate startDate, LocalDate endDate, Integer maxParticipants, String serverName, String serverPassword, String discordChannel);
 
     int getTournamentParticipantsCount(Long tournamentId);
 

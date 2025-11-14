@@ -19,7 +19,7 @@
 <c:set var="playersPerTeam" value="${empty format.playersPerTeam ? 1 : format.playersPerTeam}"/>
 
 <c:choose>
-    <c:when test="${isCreator && !tournament.tournamentStarted}">
+    <c:when test="${isCreator && !tournament.finished}">
         <c:set var="cornerModal" value="editTournamentModal"/>
         <c:set var="cornerIcon" value="${pencilUrl}"/>
     </c:when>
@@ -108,13 +108,13 @@
                     <paw:icon-card icon="${pageContext.request.contextPath}/images/members.png" text="${teams}" subtext="${subtext}"/>
                 </div>
                 <c:if test="${tournamentWinner != null && tournamentWinner > 0}">
-                        <c:forEach var="p" items="${participants}">
-                            <c:if test="${p.id == tournamentWinner}">
-                                <div class="cards-container">
-                                    <paw:winner-card winnerName="${p.name}"/>
-                                </div>
-                            </c:if>
-                        </c:forEach>
+                    <c:forEach var="p" items="${participants}">
+                        <c:if test="${p.id == tournamentWinner}">
+                            <div class="cards-container">
+                                <paw:winner-card winnerName="${p.name}"/>
+                            </div>
+                        </c:if>
+                    </c:forEach>
                 </c:if>
                 <c:if test="${isParticipant && !tournament.tournamentStarted || !isParticipant && tournament.openInscriptions}">
                     <div class="cards-container">
@@ -263,6 +263,37 @@
                         </div>
                     </c:when>
                 </c:choose>
+                <c:if test="${(isParticipant || isCreator) && tournament.tournamentStarted && !tournament.finished}">
+                    <div class="cards-container">
+                        <c:if test="${tournament.serverName !=null}">
+                            <div class="card texture">
+                                <div class="copy-card-content-container">
+                                    <paw:copy-field label="tournament.serverName" value="${tournament.serverName}" />
+                                    <c:if test="${tournament.serverPassword != null}">
+                                        <paw:copy-field label="tournament.serverPassword" value="${tournament.serverPassword}" />
+                                    </c:if>
+                                </div>
+                            </div>
+                        </c:if>
+                        <c:if test="${tournament.discordChannel != null}">
+                            <div class="discord-card texture">
+                                <paw:text type="title" size="l">
+                                    <spring:message code="tournament.discordChannel.title"/>
+                                </paw:text>
+
+                                <div class="discord-row">
+                                    <c:url value="/images/crown.png" var="discordUrl" />
+                                    <img alt="Discord" src="${discordUrl}" width="30" height="30">
+                                    <a href="${tournament.discordChannel}" class="title-link" target="_blank" rel="noopener noreferrer">
+                                        <paw:text size="l" weight="semi-bold">
+                                            <spring:message code="tournament.discordChannel"/>
+                                        </paw:text>
+                                    </a>
+                                </div>
+                            </div>
+                        </c:if>
+                    </div>
+                </c:if>
             </c:when>
             <c:when test="${activeSection == 'matchesTab'}">
                 <c:choose>
@@ -360,26 +391,31 @@
                    action="${tournamentUpdateUrl}"
                    enctype="multipart/form-data" cssClass="form">
             <input type="hidden" name="tournamentId" value="${tournament.id}"/>
-            <div class="row">
-                <paw:input path="name" label="createTournament.name" hasConstraint="true"/>
-            </div>
             <c:if test="${!tournament.finished}">
+                <div class="row">
+                    <paw:input path="name" label="createTournament.name" hasConstraint="true"/>
+                    <c:if test="${tournament.openInscriptions}">
+                        <paw:input path="maxParticipants" label="createTournament.maxParticipants" arg="${playersPerTeam}" inputType="number" hasConstraint="true"/>
+                    </c:if>
+                </div>
                 <div class="row">
                     <c:if test="${!tournament.tournamentStarted}">
                         <paw:input path="startDate" label="createTournament.startDate" inputType="date" hasConstraint="true"/>
                     </c:if>
                     <paw:input path="endDate" label="createTournament.endDate" inputType="date" hasConstraint="true"/>
                 </div>
-                <c:if test="${tournament.openInscriptions}">
-                    <paw:input path="maxParticipants" label="createTournament.maxParticipants" arg="${playersPerTeam}" inputType="number" hasConstraint="true"/>
-                </c:if>
+                <div class="row">
+                    <paw:input path="serverName" label="tournament.serverName" hasConstraint="true"/>
+                    <paw:input path="serverPassword" label="tournament.serverPassword" hasConstraint="true"/>
+                </div>
+                <div class="row">
+                    <paw:input path="discordChannel" label="tournament.discordChannel.edit" hasConstraint="true"/>
+                </div>
+                <div class="row">
+                    <paw:input path="image" label="createTournament.image" fileText="input.uploadImage" inputType="file"/>
+                    <paw:input path="rules" label="tournament.rules" inputType="file" fileText="input.uploadPdf"/>
+                </div>
             </c:if>
-            <div class="row">
-                <paw:input path="image" label="createTournament.image" fileText="input.uploadImage" inputType="file"/>
-            </div>
-            <div class="row">
-                <paw:input path="rules" label="tournament.rules" inputType="file" fileText="input.uploadPdf"/>
-            </div>
             <div class="row center">
                 <paw:input path="" label="tournament.edit.saveChanges" containerType="half" inputType="submit"/>
             </div>
@@ -496,3 +532,4 @@
 <script src="${pageContext.request.contextPath}/js/removeParticipantModal.js"></script>
 <script src="${pageContext.request.contextPath}/js/matchResultsModal.js"></script>
 <script src="${pageContext.request.contextPath}/js/swap.js"></script>
+<script src="${pageContext.request.contextPath}/js/copyField.js"></script>

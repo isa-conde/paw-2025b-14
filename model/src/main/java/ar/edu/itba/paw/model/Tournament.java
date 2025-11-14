@@ -93,6 +93,15 @@ public class Tournament {
     @Column(name = "rating")
     private Float rating;
 
+    @Column(name = "server_name")
+    private String serverName;
+
+    @Column(name = "server_password")
+    private String serverPassword;
+
+    @Column(name = "discord_channel")
+    private String discordChannel;
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "tournament")
     private List<Participant> participants = new ArrayList<>();
 
@@ -103,7 +112,9 @@ public class Tournament {
     @JoinColumn(name = "rules_id", referencedColumnName = "id")
     private Rules rules;
 
-    public Tournament(User creator, String name, Game game, Region region, LocalDate startDate, LocalDate endDate, String format, Structure structure, Integer maxParticipants, Long imageId, Boolean openInscriptions, Boolean isFinished, GameFormat formatEntity){
+    public Tournament(User creator, String name, Game game, Region region, LocalDate startDate, LocalDate endDate, String format,
+                      Structure structure, Integer maxParticipants, Long imageId, Boolean openInscriptions, Boolean isFinished,
+                      GameFormat formatEntity, String serverName, String serverPassword, String discordChannel) {
         this.creator = creator;
         this.name = name;
         this.game = game;
@@ -118,24 +129,9 @@ public class Tournament {
         this.openInscriptions = openInscriptions;
         this.isFinished = isFinished;
         this.formatEntity = formatEntity;
-    }
-
-    public Tournament(Long id, Long creatorId, String name, Long gameId, Region region, Elo elo, LocalDate startDate, LocalDate endDate, String format, Structure structure, Integer maxParticipants, Long imageId, Boolean openInscriptions, Boolean isFinished, Long tournamentWinner, Boolean isGroupStage, Boolean tournamentStarted, Long formatId) {
-        this.id = id;
-        this.name = name;
-        this.region = region;
-        this.elo = elo;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.format = format;
-        this.structure = structure;
-        this.maxParticipants = maxParticipants;
-        this.imageId = imageId;
-        this.openInscriptions = openInscriptions;
-        this.isFinished = isFinished;
-        this.isGroupStage = isGroupStage;
-        this.tournamentStarted = tournamentStarted;
-        this.gameId = gameId;
+        this.serverName = serverName;
+        this.serverPassword = serverPassword;
+        this.discordChannel = discordChannel;
     }
 
     public Tournament() {}
@@ -338,6 +334,30 @@ public class Tournament {
 
     public void setRules(Rules rules) {
         this.rules = rules;
+    }
+
+    public String getServerName() {
+        return serverName;
+    }
+
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
+
+    public String getServerPassword() {
+        return serverPassword;
+    }
+
+    public void setServerPassword(String serverPassword) {
+        this.serverPassword = serverPassword;
+    }
+
+    public String getDiscordChannel() {
+        return discordChannel;
+    }
+
+    public void setDiscordChannel(String discordChannel) {
+        this.discordChannel = discordChannel;
     }
 }
 

@@ -47,6 +47,8 @@ public class MailServiceImpl implements MailService {
 
     private static final String CROWN_CID = "crown";
     private static final String CROWN_CLASSPATH = "images/crown.png";
+    private static final String DISCORD_CID = "discord";
+    private static final String DISCORD_CLASSPATH = "images/crown.png";
 
     @Async
     @Override
@@ -67,7 +69,7 @@ public class MailServiceImpl implements MailService {
                 new Object[]{tournamentName},
                 locale
         );
-        sendEmail(recipient, subject, body);
+        sendEmail(recipient, subject, body, false);
     }
 
     @Async
@@ -90,7 +92,7 @@ public class MailServiceImpl implements MailService {
                 new Object[]{tournamentName},
                 locale);
 
-        sendEmail(recipient, subject, body);
+        sendEmail(recipient, subject, body, false);
     }
 
     @Async
@@ -114,7 +116,7 @@ public class MailServiceImpl implements MailService {
                 locale
         );
 
-        sendEmail(recipientOwnerEmail, subject, body);
+        sendEmail(recipientOwnerEmail, subject, body, false);
     }
 
     @Async
@@ -138,7 +140,7 @@ public class MailServiceImpl implements MailService {
                 locale
         );
 
-        sendEmail(recipientOwnerEmail, subject, body);
+        sendEmail(recipientOwnerEmail, subject, body, false);
     }
 
 
@@ -160,7 +162,7 @@ public class MailServiceImpl implements MailService {
                 null,
                 locale);
 
-        sendEmail(recipient, subject, body);
+        sendEmail(recipient, subject, body, false);
     }
 
     @Async
@@ -180,19 +182,22 @@ public class MailServiceImpl implements MailService {
                 null,
                 locale);
 
-        sendEmail(recipient, subject, body);
+        sendEmail(recipient, subject, body, false);
     }
 
     @Async
     @Override
-    public void sendTournamentStartedEmail(Long tournamentId, String username, String tournamentName, String creatorMail, String recipient) {
+    public void sendTournamentStartedEmail(Tournament tournament, String username, String creatorMail, String recipient) {
         User user = userDao.findByUsername(username).get();
         Locale locale = toLocale(user.getLocale());
         Context ctx = new Context(locale);
         ctx.setVariable("userName", username);
-        ctx.setVariable("tournamentName", tournamentName);
-        String tournamentLink = baseUrl + "/tournament/" + tournamentId;
+        ctx.setVariable("tournamentName", tournament.getName());
+        String tournamentLink = baseUrl + "/tournament/" + tournament.getId();
         ctx.setVariable("tournamentLink", tournamentLink);
+        ctx.setVariable("serverName", tournament.getServerName());
+        ctx.setVariable("serverPassword", tournament.getServerPassword());
+        ctx.setVariable("discordChannel", tournament.getDiscordChannel());
         ctx.setVariable("creatorMail", creatorMail);
         ctx.setVariable("crownCid", "cid:" + CROWN_CID);
 
@@ -200,10 +205,10 @@ public class MailServiceImpl implements MailService {
 
         String subject = messageSource.getMessage(
                 "email.tournamentStartedNotification.subject",
-                new Object[]{tournamentName},
+                new Object[]{tournament.getName()},
                 locale);
 
-        sendEmail(recipient, subject, body);
+        sendEmail(recipient, subject, body, false);
     }
 
     @Async
@@ -225,7 +230,7 @@ public class MailServiceImpl implements MailService {
                 new Object[]{tournamentName},
                 locale);
 
-        sendEmail(recipient, subject, body);
+        sendEmail(recipient, subject, body, false);
     }
 
     @Async
@@ -247,7 +252,7 @@ public class MailServiceImpl implements MailService {
                 new Object[]{tournamentName},
                 locale);
 
-        sendEmail(recipient, subject, body);
+        sendEmail(recipient, subject, body, false);
     }
 
     @Async
@@ -272,7 +277,7 @@ public class MailServiceImpl implements MailService {
                 new Object[]{tournament.getName()},
                 locale);
 
-        sendEmail(creator.getEmail(), subject, body);
+        sendEmail(creator.getEmail(), subject, body, false);
     }
 
     @Async
@@ -299,18 +304,76 @@ public class MailServiceImpl implements MailService {
                 new Object[]{tournamentName},
                 locale);
 
-        sendEmail(recipient, subject, body);
+        sendEmail(recipient, subject, body, false);
+    }
+
+    @Async
+    @Override
+    public void sendServerInfoUpdated(Tournament tournament, String userName, String recipient){
+        Optional<User> optionalUser = userDao.findByUsername(userName);
+        if (optionalUser.isEmpty()){
+            LOGGER.warn("User {} not found", userName);
+            return;
+        }
+        User user = optionalUser.get();
+        Locale locale = toLocale(user.getLocale());
+        Context ctx = new Context(locale);
+        ctx.setVariable("userName", userName);
+        ctx.setVariable("tournamentName", tournament.getName());
+        String tournamentLink = baseUrl + "/tournament/" + tournament.getId();
+        ctx.setVariable("tournamentLink", tournamentLink);
+        ctx.setVariable("crownCid", "cid:" + CROWN_CID);
+
+        String body = templateEngine.process("server-info-updated", ctx);
+
+        String subject = messageSource.getMessage(
+                "email.serverInfoUpdated.subject",
+                new Object[]{tournament.getName()},
+                locale);
+
+        sendEmail(recipient, subject, body, false);
+    }
+
+    @Async
+    @Override
+    public void sendDiscordLinkUpdated(Tournament tournament, String userName, String recipient){
+        Optional<User> optionalUser = userDao.findByUsername(userName);
+        if (optionalUser.isEmpty()){
+            LOGGER.warn("User {} not found", userName);
+            return;
+        }
+        User user = optionalUser.get();
+        Locale locale = toLocale(user.getLocale());
+        Context ctx = new Context(locale);
+        ctx.setVariable("userName", userName);
+        ctx.setVariable("tournamentName", tournament.getName());
+        String tournamentLink = baseUrl + "/tournament/" + tournament.getId();
+        ctx.setVariable("tournamentLink", tournamentLink);
+        ctx.setVariable("crownCid", "cid:" + CROWN_CID);
+        ctx.setVariable("discordCid", "cid:" + DISCORD_CID);
+
+        String body = templateEngine.process("discord-channel-updated", ctx);
+
+        String subject = messageSource.getMessage(
+                "email.discordUpdated.subject",
+                new Object[]{tournament.getName()},
+                locale);
+
+        sendEmail(recipient, subject, body, true);
     }
 
 
-    private void sendEmail(String recipient, String subject, String body) {
+    private void sendEmail(String recipient, String subject, String body, Boolean hasDiscordLogo) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, StandardCharsets.UTF_8.name());
             helper.setTo(recipient);
             helper.setSubject(subject);
             helper.setText(body, true);
-            attachCommonInlines(helper);
+            attachCrownInline(helper);
+            if(hasDiscordLogo){
+                attachDiscordInline(helper);
+            }
             mailSender.send(mimeMessage);
         } catch (MessagingException e) {
             throw new RuntimeException("Failed to build email", e);
@@ -324,7 +387,7 @@ public class MailServiceImpl implements MailService {
         return loc.getLanguage().isEmpty() ? Locale.getDefault() : loc;
     }
 
-    private void attachCommonInlines(MimeMessageHelper helper) {
+    private void attachCrownInline(MimeMessageHelper helper) {
         org.springframework.core.io.ClassPathResource crown =
                 new org.springframework.core.io.ClassPathResource(CROWN_CLASSPATH);
         if (!crown.exists()) {
@@ -335,6 +398,20 @@ public class MailServiceImpl implements MailService {
             helper.addInline(CROWN_CID, crown, "image/png");
         } catch (MessagingException e) {
             LOGGER.warn("Failed to attach crown inline image: {}", e.getMessage());
+        }
+    }
+
+    private void attachDiscordInline(MimeMessageHelper helper) {
+        org.springframework.core.io.ClassPathResource discord =
+                new org.springframework.core.io.ClassPathResource(DISCORD_CLASSPATH);
+        if (!discord.exists()) {
+            LOGGER.warn("Discord image not found in classpath at {}", DISCORD_CLASSPATH);
+            return;
+        }
+        try {
+            helper.addInline(DISCORD_CID, discord, "image/png");
+        } catch (MessagingException e) {
+            LOGGER.warn("Failed to attach discord inline image: {}", e.getMessage());
         }
     }
 }

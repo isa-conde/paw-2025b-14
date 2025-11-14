@@ -435,6 +435,92 @@ button:disabled {
     color: var(--secondary-text);
 }
 
+/* ------- COPY FIELD ------- */
+
+.copy-field-container {
+    margin: 10px 0;
+}
+
+.copy-field-label {
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.copy-field-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 2px solid var(--secondary-details);
+    border-radius: 6px;
+    padding: 8px 12px;
+}
+
+.copy-field-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    font-size: 14px;
+}
+
+.copy-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    color: var(--secondary-text);
+}
+
+.copy-btn:hover .copy-icon {
+    opacity: 0.75;
+}
+
+.copy-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.copy-card-content-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.discord-card {
+    background-color: var(--background-card);
+    border-radius: 15px;
+    padding: 45px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    gap: 40px;
+    max-width: 600px;
+}
+
+.discord-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.discord-card.texture {
+    position: relative;
+    overflow: hidden;
+}
+
+.discord-card.texture::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url('/images/crown.png');
+    background-repeat: repeat;
+    background-size: 250px 250px;
+    background-position: 0 -50px;
+    opacity: 0.1;
+    pointer-events: none;
+}
+
 
 /* ------- BUTTON CONTENT CARD ------- */
 
@@ -921,7 +1007,7 @@ a.element-card:hover {
 
 .bin-icon:hover {
     cursor: pointer;
-    transform: scale(1.1);
+    opacity: 0.75
 }
 
 .users-grid-item .btn {

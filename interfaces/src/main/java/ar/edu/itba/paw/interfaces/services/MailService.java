@@ -13,7 +13,7 @@ public interface MailService {
 
     void sendTournamentTeamJoinedOwnerEmail(Long tournamentId, String ownerUsername, String teamName, String tournamentName, String recipientOwnerEmail);
 
-    void sendTournamentStartedEmail(Long tournamentId, String username, String tournamentName, String creatorMail, String recipient);
+    void sendTournamentStartedEmail(Tournament tournament, String username, String creatorMail, String recipient);
 
     void sendTournamentEndedEmail(Long tournamentId, String username, String tournamentName, String recipient);
 
@@ -26,4 +26,8 @@ public interface MailService {
     void sendContactOwnerEmail(Tournament tournament, User user, String emailSubject, String emailBody, User creator);
 
     void sendRemovedFromTournamentEmail(Long tournamentId, String userName, String tournamentName, String recipient);
+
+    void sendServerInfoUpdated(Tournament tournament, String userName, String recipient);
+
+    void sendDiscordLinkUpdated(Tournament tournament, String userName, String recipient);
 }

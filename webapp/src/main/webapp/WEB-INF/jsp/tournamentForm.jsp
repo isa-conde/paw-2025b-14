@@ -48,13 +48,34 @@
                             </div>
                             <div class="row">
                                 <paw:input path="elo" label="createTournament.skillLevel" inputType="select" itemMap="${elos}" hasConstraint="true" emptyOption="${emptyOption}" itemValue="a"/>
+                            </div>
+                            <div class="row">
                                 <paw:input path="image" label="createTournament.image" inputType="file" hasConstraint="true" accept="image/*" fileText="input.uploadImage"/>
+                            </div>
+                            <div class="row center">
+                                <paw:input path="" label="createTournament.next" containerType="half" inputType="submit"/>
+                            </div>
+                        </div>
+                    </form:form>
+                </c:when>
+                <c:when test="${step == 3}">
+                    <form:form cssClass="form" modelAttribute="tournamentForm" action="${pageContext.request.contextPath}/tournaments/new/step3" method="post" enctype="multipart/form-data" onsubmit="this.querySelector('button, input[type=submit]').disabled=true;" >
+                        <div>
+                            <paw:text type="title" size="xl"><spring:message code="createTournament.Step3"/></paw:text>
+                            <div class="row">
+                                <paw:input path="serverName" label="createTournament.serverName" hasConstraint="true"/>
+                            </div>
+                            <div class="row">
+                                <paw:input path="serverPassword" label="createTournament.serverPassword" hasConstraint="true"/>
+                            </div>
+                            <div class="row">
+                                <paw:input path="discordChannel" label="createTournament.discordChannel" hasConstraint="true"/>
                             </div>
                             <div class="row">
                                 <paw:input path="rules" label="createTournament.rules" inputType="file" accept=".pdf" hasConstraint="true" fileText="input.uploadPdf"/>
                             </div>
                             <div class="row center">
-                                <paw:input path="" label="createTournament.create" containerType="half" inputType="submit"/>
+                                <paw:input path="" label="createTournament.next" containerType="half" inputType="submit"/>
                             </div>
                         </div>
                     </form:form>
