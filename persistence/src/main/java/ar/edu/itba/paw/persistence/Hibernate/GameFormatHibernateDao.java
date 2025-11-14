@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,7 +28,7 @@ public class GameFormatHibernateDao implements GameFormatDao {
     }
 
     @Override
-    public Optional<GameFormat> getFormatById(Long id) {
+    public Optional<GameFormat> findById(Long id) {
         return Optional.of(em.find(GameFormat.class, id));
     }
 

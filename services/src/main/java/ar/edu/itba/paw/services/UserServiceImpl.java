@@ -1,11 +1,13 @@
 package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.exception.*;
+import ar.edu.itba.paw.interfaces.persistence.CommentDao;
 import ar.edu.itba.paw.interfaces.persistence.ImageDao;
 import ar.edu.itba.paw.interfaces.persistence.TokenDao;
 import ar.edu.itba.paw.interfaces.persistence.UserDao;
 import ar.edu.itba.paw.interfaces.services.MailService;
 import ar.edu.itba.paw.interfaces.services.UserService;
+import ar.edu.itba.paw.model.Comment;
 import ar.edu.itba.paw.model.Token;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.UserAccount;
@@ -38,18 +40,18 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final MailService ms;
     private final ImageDao imageDao;
+    private final CommentDao commentDao;
 
     private final static int RESET_PASSWORD_DAYS_DURATION = 1;
     private final static int VERIFICATION_DAYS_DURATION = 2;
-    private final static String ID_USER_INEXISTENT = "User with ID {} does not exist";
 
-
-    public UserServiceImpl(final UserDao userDao, final TokenDao tokenDao, final PasswordEncoder passwordEncoder, final MailService ms, final ImageDao imageDao) {
+    public UserServiceImpl(final UserDao userDao, final TokenDao tokenDao, final PasswordEncoder passwordEncoder, final MailService ms, final ImageDao imageDao, final CommentDao commentDao) {
         this.userDao = userDao;
         this.tokenDao = tokenDao;
         this.passwordEncoder = passwordEncoder;
         this.ms = ms;
         this.imageDao = imageDao;
+        this.commentDao = commentDao;
     }
 
     @Override
@@ -91,8 +93,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void requestPasswordReset(String email) {
-        Optional<User> user = findByEmail(email);
-        long userId = user.get().getId();
+        User user = findByEmail(email).orElseThrow(UserNotFoundException::new);
+        long userId = user.getId();
         Token token = generateToken(userId, RESET_PASSWORD_DAYS_DURATION);
         ms.sendResetPasswordEmail(userId, token.getToken(), email);
         LOGGER.info("Reset Password email correctly sent to the address {}", email);
@@ -112,7 +114,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean sameAsOldPassword(String newPassword, Long userId) {
-        String oldPassword = findById(userId).get().getPassword();
+        String oldPassword = findById(userId).orElseThrow(UserNotFoundException::new).getPassword();
         if(oldPassword == null) return false;
         return passwordEncoder.matches(newPassword, oldPassword);
     }
@@ -139,7 +141,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean verifyEmail(Long token, Long userId) {
         Optional<Token> optToken = checkTokenValidity(token);
-        User user = getUserOrThrow(userId);
+        findById(userId).orElseThrow(UserNotFoundException::new);
         if(optToken.isPresent()) {
             userDao.verifyUser(userId);
             return true;
@@ -149,8 +151,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void authenticateVerifiedUser(Long userId) {
-        User user = getUserOrThrow(userId);
-
+        User user = findById(userId).orElseThrow(UserNotFoundException::new);
         List<GrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
         authorities.add(new SimpleGrantedAuthority("ROLE_VERIFIED"));
@@ -182,16 +183,13 @@ public class UserServiceImpl implements UserService {
 
     private Token generateToken(Long userId, int validityDays) {
         SecureRandom secureRandom = new SecureRandom();
-        long tokenValue = secureRandom.nextLong();
+        long tokenValue;
+        Optional<Token> existingToken;
 
-        if (tokenValue < 0) {
-            tokenValue = Math.abs(tokenValue);
-        }
-
-        Optional<Token> token = tokenDao.findByToken(tokenValue);
-        if(token.isPresent()) {
-            // TODO: handle existing token
-        }
+        do {
+            tokenValue = Math.abs(secureRandom.nextLong());
+            existingToken = tokenDao.findByToken(tokenValue);
+        } while (existingToken.isPresent());
 
         LocalDate expiryDate = LocalDate.now().plusDays(validityDays);
         return tokenDao.create(userId, tokenValue, expiryDate);
@@ -232,7 +230,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void updateUserRating(Long userId, Float rating) {
-        User user = getUserOrThrow(userId);
+        User user = findById(userId).orElseThrow(UserNotFoundException::new);
         Float currentRating = user.getRating();
         Float newRating = (currentRating == null) ? rating : (currentRating + rating) / 2;
         userDao.updateUserRating(userId, newRating);
@@ -241,7 +239,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Float getUserRating(Long userId) {
-        User user = findById(userId).get();
+        User user = findById(userId).orElseThrow(UserNotFoundException::new);
         Float userRating = user.getRating();
         if (userRating == null) {
             return null;
@@ -251,10 +249,30 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findUserByToken(Long token) {
-        Optional<Token> optToken = tokenDao.findByToken(token);
-        if(optToken.isPresent()) {
-            return optToken.get().getUser();
-        } else throw new TokenNotFoundException();
+        Token tokenToReturn = tokenDao.findByToken(token).orElseThrow(TokenNotFoundException::new);
+        return tokenToReturn.getUser();
+    }
+
+    @Transactional
+    @Override
+    public void commentOnProfile(User commenter, long receiverId, String comment) {
+        if(receiverId == commenter.getId()) {
+            throw new InvalidCommentException();
+        }
+        User receiver = findById(receiverId).orElseThrow(UserNotFoundException::new);
+        commentDao.create(commenter, receiver, comment);
+    }
+
+    @Override
+    public List<Comment> getCommentsReceived(long receiverId, long page) {
+        User receiver = findById(receiverId).orElseThrow(UserNotFoundException::new);
+        return commentDao.getCommentsByReceived(receiver, page);
+    }
+
+    @Override
+    public int getCommentPages(long receiverId) {
+        User receiver = findById(receiverId).orElseThrow(UserNotFoundException::new);
+        return commentDao.getCommentPagesByReceived(receiver);
     }
 
     @Transactional
@@ -289,14 +307,4 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
 
     }
-
-    private User getUserOrThrow(Long userId) {
-        return findById(userId)
-                .orElseThrow(() -> {
-                    LOGGER.error(ID_USER_INEXISTENT, userId);
-                    return new UserNotFoundException();
-                });
-    }
-
-
 }

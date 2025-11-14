@@ -11,7 +11,6 @@ import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
-import org.hibernate.query.NativeQuery;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -134,7 +133,7 @@ public class TournamentHibernateDao implements TournamentDao {
     @Override
     public List<Tournament> findByCreator(Long creatorId, Long page, Boolean isFinished) {
         Query idQuery = em.createNativeQuery(
-                "SELECT t.id FROM Tournament t WHERE t.creator_id = ?1 AND t.is_finished = ?2 ORDER BY t.start_date ASC"
+                "SELECT t.id FROM Tournament t WHERE t.creator_id = ?1 AND t.is_finished = ?2 ORDER BY t.start_date"
         );
         idQuery.setParameter(1, creatorId);
         idQuery.setParameter(2, isFinished);
@@ -184,7 +183,7 @@ public class TournamentHibernateDao implements TournamentDao {
                         "    FROM Participant p " +
                         "    WHERE p.user_id = ?2 " +
                     ") " +
-                    "ORDER BY t.start_date ASC"
+                    "ORDER BY t.start_date"
 
         );
         idQuery.setParameter(1, isFinished);
@@ -249,7 +248,7 @@ public class TournamentHibernateDao implements TournamentDao {
                         "FROM Tournament t " +
                         "WHERE t.game_id IN ?1 " +
                         "AND t.open_inscriptions = true " +
-                        "ORDER BY t.game_id, t.start_date ASC ");
+                        "ORDER BY t.game_id, t.start_date");
         tournamentIdsQuery.setParameter(1, topGameIds.stream().map(Number::longValue).toList());
         tournamentIdsQuery.setMaxResults(TOURNAMENTS_PER_GAME);
 

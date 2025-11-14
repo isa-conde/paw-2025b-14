@@ -1,10 +1,12 @@
 package ar.edu.itba.paw.webapp.controller;
 
+import ar.edu.itba.paw.interfaces.exception.UserNotAuthenticatedException;
 import ar.edu.itba.paw.interfaces.exception.UserNotFoundException;
 import ar.edu.itba.paw.interfaces.services.GameService;
 import ar.edu.itba.paw.interfaces.services.TeamService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.interfaces.services.UserService;
+import ar.edu.itba.paw.model.Comment;
 import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.User;
@@ -12,6 +14,7 @@ import ar.edu.itba.paw.model.UserAccount;
 import ar.edu.itba.paw.model.enums.*;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
 import ar.edu.itba.paw.webapp.auth.PawUserDetails;
+import ar.edu.itba.paw.webapp.form.CommentForm;
 import ar.edu.itba.paw.webapp.form.AddAccountForm;
 import ar.edu.itba.paw.webapp.form.EditProfileForm;
 import ar.edu.itba.paw.webapp.form.FilterForm;
@@ -37,8 +40,15 @@ public class UserController {
     private final TournamentService ts;
     private final TeamService tms;
 
+    private final static long DEFAULT_PAGE = 0L;
+
     @Autowired
     MessageSource messageSource;
+
+    @ModelAttribute("commentForm")
+    public CommentForm commentForm() {
+        return new CommentForm();
+    }
 
     public UserController(GameService gs, UserService us, TournamentService ts, TeamService tms) {
         this.gs = gs;
@@ -52,7 +62,11 @@ public class UserController {
         final ModelAndView mav = new ModelAndView("index");
         List<Game> games = gs.findAllPaged(0L);
 
-        mav.addObject("user", currentUser.isPresent() ? currentUser.get().getPawUser() : null);
+        User loggedUser = null;
+        if(currentUser.isPresent()) {
+            loggedUser = currentUser.get().getPawUser();
+        }
+        mav.addObject("user", loggedUser);
         mav.addObject("games", games);
 
 
@@ -73,7 +87,7 @@ public class UserController {
         final ModelAndView mav = new ModelAndView("gamesPage");
         List<Game> allGames = gs.findAllPaged(page);
 
-        mav.addObject("user", currentUser.isPresent() ? currentUser.get().getPawUser() : null);
+        mav.addObject("user", currentUser.orElse(null));
         mav.addObject("games", allGames);
         mav.addObject("totalPages", gs.getPageAmount());
         mav.addObject("currentPage", page);
@@ -86,7 +100,11 @@ public class UserController {
         final ModelAndView mav = new ModelAndView("tournamentsPage");
         List<Game> allGames = gs.findAll();
 
-        mav.addObject("user", currentUser.isPresent() ? currentUser.get().getPawUser() : null);
+        User loggedUser = null;
+        if(currentUser.isPresent()) {
+            loggedUser = currentUser.get().getPawUser();
+        }
+        mav.addObject("user", loggedUser);
         mav.addObject("games", allGames);
         mav.addObject("structures", Arrays.stream(Structure.values()).toList());
         mav.addObject("regions", Arrays.stream(Region.values()).toList());
@@ -129,7 +147,7 @@ public class UserController {
     public ModelAndView search(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam("q") final String q){
         final ModelAndView mav = new ModelAndView("searchResults");
 
-        mav.addObject("user", currentUser.isPresent() ? currentUser.get().getPawUser() : null);
+        mav.addObject("user", currentUser.orElse(null));
         mav.addObject("games", gs.searchByName(q));
         mav.addObject("tournaments", ts.searchByName(q));
         mav.addObject("users", us.searchByName(q));
@@ -139,24 +157,33 @@ public class UserController {
     }
 
     @RequestMapping("/profile/{id}")
-    public ModelAndView profile(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @PathVariable Long id, @ModelAttribute("editProfileForm") EditProfileForm editProfileForm, @ModelAttribute("addAccountForm") AddAccountForm addAccountForm){
+    public ModelAndView profile(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                @PathVariable Long id,
+                                @ModelAttribute("editProfileForm") EditProfileForm editProfileForm,
+                                @RequestParam(value = "page", defaultValue = "0") Long commentsPage,
+                                @ModelAttribute("addAccountForm") AddAccountForm addAccountForm){
         final ModelAndView mav = new ModelAndView("profile");
-
-        Optional<User> profileOpt = us.findById(id);
-        if (profileOpt.isEmpty()){
-            throw new UserNotFoundException();
-        }
-        User profile = profileOpt.get();
-        Float userRating = us.getUserRating(profile.getId());
+        User profile = us.findById(id).orElseThrow(UserNotFoundException::new);
+        Float userRating = us.getUserRating(id);
+        int totalCommentPages = us.getCommentPages(id);
+        commentsPage = adjustPage(commentsPage, totalCommentPages);
+        List<Comment> comments = us.getCommentsReceived(id, commentsPage);
         List<UserAccount> userAccounts =  us.getUserAccounts(profile.getId());
-        mav.addObject("user", currentUser.isPresent() ? currentUser.get().getPawUser() : null);
-        mav.addObject("isMyProfile", profile.getId() == currentUser.get().getPawUser().getId());
-        mav.addObject("profile", profileOpt.get());
+        User loggedUser = null;
+        if(currentUser.isPresent()) {
+            loggedUser = currentUser.get().getPawUser();
+        }
+        mav.addObject("user", loggedUser);
+        mav.addObject("isMyProfile", loggedUser != null && loggedUser.getId() == id);
+        mav.addObject("profile", profile);
         mav.addObject("favouriteGames", gs.getFavourites(id));
         mav.addObject("activeTournaments", ts.findUserActiveTournaments(id, 0L));
         mav.addObject("lastTournaments", ts.findUserPastTournaments(id, 0L));
         mav.addObject("editProfileForm", editProfileForm);
         mav.addObject("userRating", userRating);
+        mav.addObject("comments", comments);
+        mav.addObject("commentsTotalPages", totalCommentPages);
+        mav.addObject("commentsCurrentPage", Math.toIntExact(commentsPage));
         mav.addObject("userAccounts", userAccounts);
         mav.addObject("addAccountForm", addAccountForm);
         mav.addObject("availablePlatforms", us.getAvailablePlatforms(userAccounts));
@@ -237,21 +264,21 @@ public class UserController {
     public ModelAndView profileTeams(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @PathVariable Long id, @ModelAttribute("editProfileForm") EditProfileForm editProfileForm){
         final ModelAndView mav = new ModelAndView("profileTeams");
 
-        Optional<User> profileOpt = us.findById(id);
-        if (profileOpt.isEmpty()){
-            throw new UserNotFoundException();
-        }
-        User profile = profileOpt.get();
+        User profile = us.findById(id).orElseThrow(UserNotFoundException::new);
         Float userRating = us.getUserRating(profile.getId());
-        mav.addObject("user", currentUser.isPresent() ? currentUser.get().getPawUser() : null);
-        mav.addObject("isMyProfile", profile.getId() == currentUser.get().getPawUser().getId());
-        mav.addObject("profile", profileOpt.get());
+        User loggedUser = null;
+        if(currentUser.isPresent()) {
+            loggedUser = currentUser.get().getPawUser();
+        }
+        mav.addObject("user", loggedUser);
+        mav.addObject("isMyProfile", loggedUser != null && loggedUser.getId() == id);
+        mav.addObject("profile", profile);
         mav.addObject("teams", tms.getUserTeams(id));
         mav.addObject("EditProfileForm", editProfileForm);
         mav.addObject("userRating", userRating);
 
-        editProfileForm.setUsername(profileOpt.get().getUsername());
-        editProfileForm.setBio(profileOpt.get().getBio());
+        editProfileForm.setUsername(profile.getUsername());
+        editProfileForm.setBio(profile.getBio());
         boolean hasFormErrors = mav.getModel().containsKey(
                 BindingResult.MODEL_KEY_PREFIX + "editProfileForm"
         );
@@ -261,6 +288,18 @@ public class UserController {
         }
 
         return mav;
+    }
+
+    @RequestMapping(path = "/profile/{id}/comment", method = RequestMethod.POST)
+    public ModelAndView comment(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                @PathVariable long id,
+                                @ModelAttribute("commentForm") CommentForm commentForm,
+                                BindingResult result) {
+        if(result.hasErrors()) {
+            return profile(currentUser, id, new EditProfileForm(), DEFAULT_PAGE, new AddAccountForm());
+        }
+        us.commentOnProfile(currentUser.orElseThrow(UserNotAuthenticatedException::new).getPawUser(), id, commentForm.getComment()); // aca se manda una excepcion, pero no deberia llegar por Spring Security.
+        return new ModelAndView("redirect:/profile/{id}");
     }
 
     private long adjustPage(long page, int totalPages) {
@@ -273,7 +312,7 @@ public class UserController {
     @RequestMapping(value = "/profile/update", method = { RequestMethod.POST })
     public ModelAndView updateProfile(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam("userId") final long userId, @Valid @ModelAttribute("editProfileForm") final EditProfileForm form, final BindingResult result,  @ModelAttribute("addAccountForm") AddAccountForm addAccountForm){
         if (currentUser.isPresent() && result.hasErrors()) {
-            ModelAndView mav = profile(currentUser, userId, form, addAccountForm);
+            ModelAndView mav = profile(currentUser, userId, form, DEFAULT_PAGE, addAccountForm);
             mav.addObject("openModal", "'editProfileModal'");
             return mav;
         }
@@ -348,6 +387,4 @@ public class UserController {
                 .map(User::getUsername)
                 .collect(Collectors.toList());
     }
-
-
 }

@@ -11,7 +11,7 @@ public interface TeamService {
 
     Team create(String name, byte[] pfp, byte[] banner, Long ownerId, List<String> members);
 
-    Optional<Team> getById(Long id);
+    Optional<Team> findById(Long id);
 
     List<Tournament> getActiveTournaments(Long teamId, Integer page);
 

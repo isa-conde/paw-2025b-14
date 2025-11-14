@@ -10,13 +10,8 @@ CREATE TABLE IF NOT EXISTS users(
     bio varchar(255),
     profile_picture_id integer,
     banner_id integer,
-    locale varchar(100)
-);
-
-create table if not exists user_favourites(
-    user_id INTEGER NOT NULL ,
-    game_id INTEGER NOT NULL,
-    primary key (user_id, game_id)
+    locale varchar(100) not null ,
+    rating float
 );
 
 CREATE TABLE IF NOT EXISTS game(
@@ -45,6 +40,8 @@ CREATE TABLE IF NOT EXISTS tournament(
     is_group_stage boolean,
     tournament_started boolean,
     format_id integer,
+    rating float,
+    rules_id integer,
     CONSTRAINT tournament_dates_check
         CHECK  ((start_date IS NULL) OR (end_date IS NULL) OR (start_date < end_date))
 );
@@ -72,13 +69,14 @@ create table if not exists tokens(
 create table if not exists team_member(
     team_id integer not null,
     user_id integer not null,
-    primary key (user_id,team_id)
+    verified boolean,
+    primary key (team_id, user_id)
 );
 
 create table if not exists team(
     id integer identity primary key not null ,
     name varchar(16) not null ,
-    profile_picture_id integer,
+    pfp_id integer,
     banner_id integer,
     owner_id integer not null
 );
@@ -107,7 +105,9 @@ create table if not exists match(
     primary key (id,tournament_id)
 );
 
-CREATE SEQUENCE if not exists users_id_seq START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE if not exists users_userid_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE if not exists game_id_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE if not exists tournament_id_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE if not exists image_id_seq START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE if not exists tokens_id_seq START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE if not exists team_id_seq START WITH 1 INCREMENT BY 1;

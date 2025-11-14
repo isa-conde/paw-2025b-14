@@ -1,5 +1,7 @@
 package ar.edu.itba.paw.webapp.auth;
 
+import ar.edu.itba.paw.interfaces.exception.TournamentNotFoundException;
+import ar.edu.itba.paw.interfaces.exception.UserNotFoundException;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.Tournament;
@@ -11,7 +13,6 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Objects;
-import java.util.Optional;
 
 @Component("tournamentSecurity")
 public class TournamentSecurity {
@@ -38,9 +39,9 @@ public class TournamentSecurity {
             throw e;
         }
 
-        Optional<User> u = userService.findByUsername(authentication.getName());
-        Optional<Tournament> t = tournamentService.findById(tid);
+        User user = userService.findByUsername(authentication.getName()).orElseThrow(UserNotFoundException::new);
+        Tournament tournament = tournamentService.findById(tid).orElseThrow(TournamentNotFoundException::new);
 
-        return u.isPresent() && t.isPresent() && Objects.equals(t.get().getCreatorId(), u.get().getId());
+        return Objects.equals(tournament.getCreatorId(), user.getId());
     }
 }

@@ -21,7 +21,8 @@
 <%@ attribute name="disabled" required="false" type="java.lang.Boolean"%>
 <%@ attribute name="rating" required="false" type="java.lang.Integer"%>
 <%@ attribute name="accept" required="false" type="java.lang.String" %>
-<%@attribute name="fileText" required="false" type="java.lang.String" %>
+<%@ attribute name="placeholder" required="false" type="java.lang.String" %>
+<%@ attribute name="fileText" required="false" type="java.lang.String" %>
 
 <c:set var="secondaryClass" value="${not empty secondary && secondary == 'true' ? 'secondary' : ''}"/>
 
@@ -105,7 +106,7 @@
                     <form:input type="password" path="${path}" class="input"/>
                 </c:when>
                 <c:when test="${inputType == 'textarea'}">
-                    <form:textarea path="${path}" class="input textarea"/>
+                    <form:textarea path="${path}" class="input textarea" placeholder="${placeholder}"/>
                 </c:when>
             </c:choose>
             <c:if test="${hasConstraint}">

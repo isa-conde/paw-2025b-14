@@ -1,7 +1,6 @@
 package ar.edu.itba.paw.services;
 
-import ar.edu.itba.paw.interfaces.exception.UserAlreadyJoinedException;
-import ar.edu.itba.paw.interfaces.exception.UserNotFoundException;
+import ar.edu.itba.paw.interfaces.exception.*;
 import ar.edu.itba.paw.interfaces.persistence.*;
 import ar.edu.itba.paw.interfaces.services.MailService;
 import ar.edu.itba.paw.interfaces.services.ParticipantService;
@@ -17,15 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 @Transactional(readOnly = true)
 @Service
 public class ParticipantServiceImpl implements ParticipantService {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ParticipantServiceImpl.class);
-
-    private final static int SINGLE_USER = 1;
 
     private final ParticipantDao participantDao;
     private final TournamentDao tournamentDao;
@@ -56,17 +52,17 @@ public class ParticipantServiceImpl implements ParticipantService {
         participantDao.joinTournamentUser(userId, tournamentId);
 
         List<Participant> participants = getTournamentParticipantUsers(tournamentId);
-        Optional<Tournament> tournament = tournamentDao.findById(tournamentId);
-        if (tournament.isPresent() && participants.size() == tournament.get().getMaxParticipants()) {
+        Tournament tournament = tournamentDao.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
+        if (participants.size() == tournament.getMaxParticipants()) {
             ts.closeInscriptions(tournamentId);
             LOGGER.info("Max participant count has been reached. The inscriptions for tournament with ID {} have been closed", tournamentId);
         }
         LOGGER.info("User with ID {} has joined tournament with ID {}", userId, tournamentId);
-        User user = userDao.findById(userId).get();
-        User creator = userDao.findById(tournament.get().getCreatorId()).get();
-        ms.sendTournamentJoinedEmail(tournamentId, user.getUsername(), tournament.get().getName(), user.getEmail(), creator.getEmail());
+        User user = userDao.findById(userId).orElseThrow(UserNotFoundException::new);
+        User creator = userDao.findById(tournament.getCreatorId()).orElseThrow(UserNotFoundException::new);
+        ms.sendTournamentJoinedEmail(tournamentId, user.getUsername(), tournament.getName(), user.getEmail(), creator.getEmail());
         LOGGER.info("Tournament joined email correctly sent to the address {}", user.getEmail());
-        ms.sendTournamentJoinedOwnerEmail(tournamentId, creator.getUsername(), user.getUsername(), tournament.get().getName(), creator.getEmail());
+        ms.sendTournamentJoinedOwnerEmail(tournamentId, creator.getUsername(), user.getUsername(), tournament.getName(), creator.getEmail());
         LOGGER.info("Tournament joined notification email correctly sent to tournament owner with address {}", creator.getEmail());
     }
 
@@ -116,8 +112,8 @@ public class ParticipantServiceImpl implements ParticipantService {
         if (tournamentDao.isTournamentStarted(tournamentId)) {
             throw new IllegalStateException("Members cannot be swapped after the tournament has started"); // TODO: custom handling
         }
-        Optional<Tournament> t = tournamentDao.findById(tournamentId);
-        Integer teamSize = gameFormatDao.getFormatById(t.get().getFormatId()).get().getPlayersPerTeam();
+        Tournament tournament = tournamentDao.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
+        Integer teamSize = gameFormatDao.findById(tournament.getFormatId()).orElseThrow(GameFormatNotFoundException::new).getPlayersPerTeam();
 
         Integer g1 = participantDao.getGroupNumber(tournamentId, user1, teamSize);
         Integer g2 = participantDao.getGroupNumber(tournamentId, user2, teamSize);
@@ -134,14 +130,9 @@ public class ParticipantServiceImpl implements ParticipantService {
     @Transactional
     @Override
     public void joinTournamentTeam(Long tournamentId, Long teamId, List<Long> participants){
-        Optional<Tournament> tournament = tournamentDao.findById(tournamentId);
-        Optional<Team> optionalTeam = teamDao.getById(teamId);
-        if(tournament.isEmpty() || optionalTeam.isEmpty()){
-            return;
-        }
-        Tournament t = tournament.get();
-        Team team = optionalTeam.get();
-        User creator = userDao.findById(t.getCreatorId()).get();
+        Tournament tournament = tournamentDao.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
+        Team team = teamDao.findById(teamId).orElseThrow(TeamNotFoundException::new);
+        User creator = userDao.findById(tournament.getCreatorId()).orElseThrow(UserNotFoundException::new);
 
         for(Long p : participants){
             if(hasJoined(p, tournamentId)) {
@@ -152,14 +143,14 @@ public class ParticipantServiceImpl implements ParticipantService {
         List<Participant> currentParticipants = getTournamentParticipants(tournamentId, ts.getPlayersPerTeam(tournamentId));
         for(Long p : participants){
             participantDao.joinTournamentUserWithTeam(p, tournamentId, teamId);
-            User user = userDao.findById(p).get();
-            ms.sendTournamentJoinedEmail(tournamentId, user.getUsername(), t.getName(), user.getEmail(), creator.getEmail());
+            User user = userDao.findById(p).orElseThrow(UserNotFoundException::new);
+            ms.sendTournamentJoinedEmail(tournamentId, user.getUsername(), tournament.getName(), user.getEmail(), creator.getEmail());
             LOGGER.info("Tournament joined email correctly sent to the address {}", user.getEmail());
         }
-        ms.sendTournamentTeamJoinedOwnerEmail(tournamentId, creator.getUsername(), team.getName(), t.getName(), creator.getEmail());
+        ms.sendTournamentTeamJoinedOwnerEmail(tournamentId, creator.getUsername(), team.getName(), tournament.getName(), creator.getEmail());
         LOGGER.info("Tournament joined notification email correctly sent to tournament owner with address {}", creator.getEmail());
         participantDao.joinTournamentTeam(tournamentId, teamId);
-        if (currentParticipants.size() + 1 == t.getMaxParticipants()) {
+        if (currentParticipants.size() + 1 == tournament.getMaxParticipants()) {
             ts.closeInscriptions(tournamentId);
             LOGGER.info("Max participant count has been reached. The inscriptions for tournament with ID {} have been closed", tournamentId);
         }
@@ -177,7 +168,7 @@ public class ParticipantServiceImpl implements ParticipantService {
             throw new UserNotFoundException();
         }
         participantDao.updateHasRated(reviewerId, tournamentId);
-        User user = userDao.findById(creatorId).get();
+        User user = userDao.findById(creatorId).orElseThrow(UserNotFoundException::new);
         Float currentRating = user.getRating();
         Float newRating = (currentRating == null) ? rating : (currentRating + rating) / 2;
         userDao.updateUserRating(creatorId, newRating);
