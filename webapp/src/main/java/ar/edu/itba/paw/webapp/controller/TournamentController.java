@@ -283,6 +283,7 @@ public class TournamentController {
     public ModelAndView leaveTournament(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam("tournamentId") final long tournamentId) {
         User user = currentUser.orElseThrow(UserNotAuthenticatedException::new).getPawUser(); // idem a /tournament/join
         ps.leaveTournament(user.getId(), tournamentId);
+        ts.notifyCreatorOfLeavingUser(user, tournamentId);
         return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
     }
 

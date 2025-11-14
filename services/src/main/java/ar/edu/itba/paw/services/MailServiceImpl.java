@@ -306,6 +306,29 @@ public class MailServiceImpl implements MailService {
         sendEmail(creator.getEmail(), subject, body);
     }
 
+    @Async
+    @Override
+    public void sendTournamentAbandonedEmail(User creator, User participant, Tournament tournament) {
+        Locale locale = toLocale(creator.getLocale());
+        Context ctx = new Context(locale);
+        ctx.setVariable("creator", creator);
+        ctx.setVariable("participant", participant);
+        ctx.setVariable("tournament", tournament);
+        String tournamentLink = baseUrl + "/tournament?tournamentId=" + tournament.getId();
+        ctx.setVariable("tournamentLink", tournamentLink);
+        ctx.setVariable("crownCid", "cid:" + CROWN_CID);
+
+        String body = templateEngine.process("tournament-abandoned-owner-notification", ctx);
+
+        String subject = messageSource.getMessage(
+                "email.tournamentAbandoned.subject",
+                new Object[]{tournament.getName()},
+                locale);
+
+        LOGGER.debug("Information for tournament abandoned email has correctly been set");
+        sendEmail(creator.getEmail(), subject, body);
+    }
+
     private void sendEmail(String recipient, String subject, String body) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {

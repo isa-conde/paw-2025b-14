@@ -61,6 +61,7 @@ public interface TournamentService {
 
     void updateTouramentRating(Long tournamentId, Float userRating);
 
+    void notifyCreatorOfLeavingUser(User user, long tournamentId);
 }
 
 
