@@ -2,8 +2,6 @@ package ar.edu.itba.paw.persistence.Hibernate;
 
 import ar.edu.itba.paw.interfaces.persistence.GameDao;
 import ar.edu.itba.paw.model.Game.Game;
-import ar.edu.itba.paw.model.Game.GameFormat;
-import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Genre;
 import org.springframework.stereotype.Repository;
 
@@ -13,8 +11,6 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.util.List;
 import java.util.Optional;
-
-import static java.util.stream.Collectors.toList;
 
 @Repository
 public class GameHibernateDao implements GameDao {
@@ -87,7 +83,7 @@ public class GameHibernateDao implements GameDao {
         int pageSize = GRID_PAGE_SIZE;
         int offset = (int) (page * pageSize);
 
-        Query idQuery = em.createNativeQuery("SELECT DISTINCT (id) FROM Game ORDER BY id ASC ");
+        Query idQuery = em.createNativeQuery("SELECT DISTINCT (id) FROM Game ORDER BY id");
         idQuery.setFirstResult(offset);
         idQuery.setMaxResults(pageSize);
 

@@ -1,17 +1,15 @@
 package ar.edu.itba.paw.webapp.controller;
 
+import ar.edu.itba.paw.interfaces.exception.TeamNotFoundException;
+import ar.edu.itba.paw.interfaces.exception.UserNotFoundException;
 import ar.edu.itba.paw.interfaces.services.TeamService;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.Team;
 import ar.edu.itba.paw.model.User;
-import ar.edu.itba.paw.model.filters.TournamentFilter;
 import ar.edu.itba.paw.webapp.auth.PawUserDetails;
 import ar.edu.itba.paw.webapp.form.CreateTeamForm;
-import ar.edu.itba.paw.webapp.form.EditProfileForm;
 import ar.edu.itba.paw.webapp.form.EditTeamForm;
-import ar.edu.itba.paw.webapp.form.TournamentForm;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -82,14 +80,10 @@ public class TeamController {
             mav.addObject("user", user);
         }
 
-        Optional<Team> optionalTeam = ts.getById(id);
-        if (optionalTeam.isEmpty()){
-            return new ModelAndView("redirect:/");
-        }
+        Team team = ts.findById(id).orElseThrow(TeamNotFoundException::new);
 
-        Team team = optionalTeam.get();
         mav.addObject("team", team);
-        mav.addObject("owner", us.findById(team.getOwner().getId()).get());
+        mav.addObject("owner", us.findById(team.getOwner().getId()).orElseThrow(UserNotFoundException::new));
         mav.addObject("pastTournaments", ts.getPastTournaments(id, page2));
         mav.addObject("activeTournaments", ts.getActiveTournaments(id, page1));
         mav.addObject("teamForm", editTeamForm);

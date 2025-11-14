@@ -1,13 +1,14 @@
 package ar.edu.itba.paw.webapp.constraints;
 
 import ar.edu.itba.paw.interfaces.services.TournamentService;
-import ar.edu.itba.paw.webapp.constraints.DatesNullabilityConstraint;
+import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.webapp.form.EditTournamentForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import java.util.Optional;
 
 @Component
 public class DatesNullabilityValidator implements ConstraintValidator<DatesNullabilityConstraint, EditTournamentForm> {
@@ -24,13 +25,12 @@ public class DatesNullabilityValidator implements ConstraintValidator<DatesNulla
         if (form == null) return true;
         ctx.disableDefaultConstraintViolation();
 
-        var t = tournamentService.findById(form.getTournamentId()).orElse(null);
-        if (t == null) {
-            return true;
-        }
+        Optional<Tournament> optTournament = tournamentService.findById(form.getTournamentId());
+        if (optTournament.isEmpty()) return true;
+        Tournament tournament = optTournament.get();
 
-        boolean started = Boolean.TRUE.equals(t.getTournamentStarted());
-        boolean finished = Boolean.TRUE.equals(t.getFinished());
+        boolean started = Boolean.TRUE.equals(tournament.getTournamentStarted());
+        boolean finished = Boolean.TRUE.equals(tournament.getFinished());
 
         boolean valid = true;
 

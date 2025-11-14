@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.webapp.controller;
 
+import ar.edu.itba.paw.interfaces.exception.UserNotFoundException;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.Token;
 import ar.edu.itba.paw.model.User;
@@ -73,20 +74,16 @@ public class AuthController {
 
     @RequestMapping(value = "/verify", method = RequestMethod.POST)
     public ModelAndView resendVerification(@RequestParam("userId") long userId) {
-        Optional<User> user = us.findById(userId);
-        us.resendVerification(user.get());
+        User user = us.findById(userId).orElseThrow(UserNotFoundException::new);
+        us.resendVerification(user);
         return new ModelAndView("redirect:/verify?userId=" + userId);
     }
 
     @RequestMapping(value = "/verify", method = RequestMethod.GET)
     public ModelAndView verifyPage(@RequestParam("userId") long userId) {
         ModelAndView mav = new ModelAndView("verificationPage");
-        Optional<User> userOpt = us.findById(userId);
-        if (userOpt.isPresent()) {
-            mav.addObject("user", userOpt.get());
-        } else {
-            return new ModelAndView("redirect:/register");
-        }
+        User user = us.findById(userId).orElseThrow(UserNotFoundException::new);
+        mav.addObject("user", user);
         return mav;
     }
 

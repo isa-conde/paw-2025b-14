@@ -32,7 +32,7 @@ public class TeamHibernateDao implements TeamDao {
     }
 
     @Override
-    public Optional<Team> getById(Long id) {
+    public Optional<Team> findById(Long id) {
         return Optional.ofNullable(em.find(Team.class, id));
     }
 

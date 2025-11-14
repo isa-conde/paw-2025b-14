@@ -66,7 +66,7 @@ public class TeamHibernateDaoTest {
 
     @Test
     public void testFindNothing(){
-        Optional<Team> nothing = teamHibernateDao.getById(0L);
+        Optional<Team> nothing = teamHibernateDao.findById(0L);
 
         Assert.assertNotNull(nothing);
         Assert.assertTrue(nothing.isEmpty());
@@ -74,7 +74,7 @@ public class TeamHibernateDaoTest {
 
     @Test
     public void testFindById(){
-        Optional<Team> team = teamHibernateDao.getById(ID);
+        Optional<Team> team = teamHibernateDao.findById(ID);
 
         Assert.assertNotNull(team);
         Assert.assertTrue(team.isPresent());
