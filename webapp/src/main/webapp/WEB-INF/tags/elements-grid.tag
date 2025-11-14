@@ -40,8 +40,8 @@
                             <paw:element-card
                                     image="${pageContext.request.contextPath}/image/${e.imageId}"
                                     title="${e.name}"
-                                    startDate="${e.startDate}"
-                                    endDate="${e.endDate}"
+                                    started="${e.tournamentStarted}"
+                                    finished="${e.isFinished}"
                                     game="${hasHeader? tournamentGame.name : ''}"
                                     id="${e.id}"
                                     isGame="false"/>

@@ -1,18 +1,18 @@
 <%@ tag language="java" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ attribute name="image" required="true" rtexprvalue="true" %>
 <%@ attribute name="game" required="false" rtexprvalue="true" %>
 <%@ attribute name="title" required="true" rtexprvalue="true" %>
-<%@ attribute name="startDate" required="false" type="java.time.LocalDate" %>
-<%@attribute name="endDate" required="false" type="java.time.LocalDate" %>
 <%@ attribute name="tags" required="false" rtexprvalue="true" type="java.util.List" %>
 <%@ attribute name="id" required="true" rtexprvalue="true" %>
 <%@ attribute name="isGame" required="false" rtexprvalue="true" %>
+<%@ attribute name="started" required="false" type="java.lang.Boolean" %>
+<%@ attribute name="finished" required="false" type="java.lang.Boolean" %>
 
-<c:set var="hasDate" value="${not empty startDate && not empty endDate}"/>
+<c:set var="hasChip" value="${not empty started && not empty finished}"/>
 <c:set var="url" value="${pageContext.request.contextPath}/${isGame == 'true' ? 'tournamentsPage?gameId=' : 'tournament?tournamentId='}${id}"/>
-
 <a href="${url}" class="element-card">
     <img src="${image}" alt="Background" class="element-card-image">
     <div class="element-card-content game">
@@ -20,11 +20,19 @@
     </div>
     <div class="element-card-content">
         <paw:text type="title" size="s" stroke="true"><c:out value="${title}"/></paw:text>
-        <c:if test="${hasDate}">
-            <div class="element-card-date">
-                <paw:datetime date="${startDate}" size="s" weight="semi-bold"/>
-                <paw:text size="s" weight="semi-bold"> - </paw:text>
-                <paw:datetime date="${endDate}" size="s" weight="semi-bold"/>
+        <c:if test="${hasChip}">
+            <div class="date-chip">
+            <c:choose>
+                <c:when test="${started && !finished}">
+                    <spring:message code="card.inProgress"/>
+                </c:when>
+                <c:when test="${finished}">
+                    <spring:message code="card.finished"/>
+                </c:when>
+                <c:otherwise>
+                    <spring:message code="card.comingSoon"/>
+                </c:otherwise>
+            </c:choose>
             </div>
         </c:if>
     </div>

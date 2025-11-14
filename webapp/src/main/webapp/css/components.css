@@ -68,6 +68,18 @@ button:disabled {
     gap: 6px;
 }
 
+.date-chip {
+    border-radius: 15px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--background-card);
+    color: var(--primary-text);
+    padding: 5px 30px;
+    gap: 6px;
+    border: 1px solid var(--background);
+}
+
 .chip-close {
     margin-left: 8px;
     cursor: pointer;
@@ -1619,6 +1631,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     display: flex;
     flex-direction: column;
     align-items: center;
+    padding-top: 5px;
 }
 
 .user-account-item{

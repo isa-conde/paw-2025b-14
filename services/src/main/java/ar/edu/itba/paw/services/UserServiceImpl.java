@@ -278,7 +278,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public List<UserAccount> getUserAccounts(long userId) {
-        User user = getUserOrThrow(userId);
+        User user = findById(userId).orElseThrow(UserNotFoundException::new);
         List<UserAccount> accounts = user.getAccounts();
         accounts.size();
         return accounts;

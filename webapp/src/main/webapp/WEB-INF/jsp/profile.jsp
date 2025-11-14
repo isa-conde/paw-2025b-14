@@ -47,8 +47,8 @@
                                 <div class="user-account-item" >
                                     <img src="${pageContext.request.contextPath}/images/${account.platform}.png"
                                          alt="${account.platform}"
-                                         width="45"
-                                         height="45"
+                                         width="40"
+                                         height="40"
                                          class="platform-icon">
                                     <paw:text size="m">
                                         <c:out value="${account.username}"/>
@@ -62,7 +62,7 @@
                     </c:choose>
                     <c:if test="${isMyProfile}">
                         <div class="profile-left-column-button">
-                            <paw:button onclick="openModal('editAccountsModal')" secondary="true" text="profile.edit" image="${pencilUrl}"/>
+                            <paw:button size="m" onclick="openModal('editAccountsModal')" secondary="true" text="profile.edit" image="${pencilUrl}"/>
                         </div>
                     </c:if>
                 </div>
@@ -109,58 +109,44 @@
                         </div>
                     </c:otherwise>
                 </c:choose>
-
-                <div class="profile-comments">
-                    <paw:text type="title"><spring:message code="profile.comments.title"/></paw:text>
-                    <c:if test="${not empty user && !isMyProfile}">
-                        <div class="profile-comments-form">
-                            <spring:message code="profile.comments.placeholder" var="commentPlaceholder"/>
-                            <spring:message code="profile.comments.submit" var="commentSubmit"/>
-                            <form:form method="post" modelAttribute="commentForm" action="${commentUrl}" cssClass="comment-form">
-                                <form:textarea path="comment" cssClass="input textarea comment-textarea" placeholder="${commentPlaceholder}"/>
-                                <form:errors path="comment" cssClass="form-error" element="span"/>
-                                <button type="submit" class="btn comment-submit">${commentSubmit}</button>
-                            </form:form>
-                        </div>
-                    </c:if>
-
-                    <div class="profile-comments-list">
-                        <c:if test="${empty comments}">
-                            <div class="profile-comment-empty">
-                                <paw:text weight="thin"><spring:message code="profile.comments.empty"/></paw:text>
-                            </div>
-                        </c:if>
-                        <c:forEach var="comment" items="${comments}">
-                            <div class="profile-comment">
-                                <div class="profile-comment-header">
-                                    <c:set var="commenterProfileUrl" value="/profile/${comment.commenter.id}"/>
-                                    <a href="${commenterProfileUrl}" class="profile-comment-author"><c:out value="${comment.commenter.username}"/></a>
-                                    <span class="profile-comment-date"><c:out value="${comment.formattedDate}"/></span>
-                                </div>
-                                <div class="profile-comment-body">
-                                    <c:out value="${comment.comment}"/>
-                                </div>
-                            </div>
-                        </c:forEach>
-                    </div>
-                    <paw:pagination currentPage="${commentsCurrentPage}" totalPages="${commentsTotalPages}" url="${profileUrl}"/>
-                </div>
-                    <div class="carrousel-title">
-                        <paw:text type="title"><spring:message code="profile.lastTournaments.title"/></paw:text>
-                    </div>
-                    <c:choose>
-                        <c:when test="${lastTournaments.size() > 0}">
-                            <paw:carrousel id="lastTournaments" elements="${lastTournaments}"/>
-                        </c:when>
-                        <c:otherwise>
-                            <div class="no-cards-container">
-                                <paw:text weight="thin"><spring:message code="profile.lastTournaments.empty" arguments="${profile.username}"/></paw:text>
-                            </div>
-                        </c:otherwise>
-                    </c:choose>
                 </div>
             </div>
+    <div class="profile-comments">
+        <paw:text type="title"><spring:message code="profile.comments.title"/></paw:text>
+        <c:if test="${not empty user && !isMyProfile}">
+            <div class="profile-comments-form">
+                <spring:message code="profile.comments.placeholder" var="commentPlaceholder"/>
+                <spring:message code="profile.comments.submit" var="commentSubmit"/>
+                <form:form method="post" modelAttribute="commentForm" action="${commentUrl}" cssClass="comment-form">
+                    <form:textarea path="comment" cssClass="input textarea comment-textarea" placeholder="${commentPlaceholder}"/>
+                    <form:errors path="comment" cssClass="form-error" element="span"/>
+                    <button type="submit" class="btn comment-submit">${commentSubmit}</button>
+                </form:form>
+            </div>
+        </c:if>
+
+        <div class="profile-comments-list">
+            <c:if test="${empty comments}">
+                <div class="profile-comment-empty">
+                    <paw:text weight="thin"><spring:message code="profile.comments.empty"/></paw:text>
+                </div>
+            </c:if>
+            <c:forEach var="comment" items="${comments}">
+                <div class="profile-comment">
+                    <div class="profile-comment-header">
+                        <c:set var="commenterProfileUrl" value="/profile/${comment.commenter.id}"/>
+                        <a href="${commenterProfileUrl}" class="profile-comment-author"><c:out value="${comment.commenter.username}"/></a>
+                        <span class="profile-comment-date"><c:out value="${comment.formattedDate}"/></span>
+                    </div>
+                    <div class="profile-comment-body">
+                        <c:out value="${comment.comment}"/>
+                    </div>
+                </div>
+            </c:forEach>
         </div>
+        <paw:pagination currentPage="${commentsCurrentPage}" totalPages="${commentsTotalPages}" url="${profileUrl}"/>
+
+    </div>
 </paw:layout>
 
 <paw:modal title="profile.edit.modal.title" id="editProfileModal" returnUrl="${profileUrl}">

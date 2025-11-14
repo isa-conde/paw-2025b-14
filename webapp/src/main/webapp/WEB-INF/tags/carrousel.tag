@@ -32,8 +32,8 @@
                             <paw:element-card
                                     image="${pageContext.request.contextPath}/image/${e.imageId}"
                                     title="${isGame? e.name : e.name}"
-                                    startDate="${isGame? '' : e.startDate}"
-                                    endDate="${isGame? '' : e.endDate}"
+                                    started="${e.tournamentStarted}"
+                                    finished="${e.isFinished}"
                                     id="${isGame? e.id : e.id}"
                                     isGame="${isGame}"/>
                             </div>

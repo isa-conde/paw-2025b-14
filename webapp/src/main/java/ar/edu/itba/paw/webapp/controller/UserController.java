@@ -363,7 +363,7 @@ public class UserController {
         User user = currentUser.map(PawUserDetails::getPawUser).orElse(null);
 
         if (currentUser.isPresent() && result.hasErrors()) {
-            ModelAndView mav = profile(currentUser, form.getUserId(), new EditProfileForm(), form);
+            ModelAndView mav = profile(currentUser, form.getUserId(), new EditProfileForm(),DEFAULT_PAGE ,form);
             mav.addObject("openModal", "'addAccountModal'");
             return mav;
         }
