@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Transactional(readOnly = true)
 @Service
@@ -175,11 +176,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     @Transactional
     @Override
     public void removeParticipant(Long tournamentId, Long participantId){
-        Optional<Tournament> optionalTournament = tournamentDao.findById(tournamentId);
-        if(optionalTournament.isEmpty()){
-            return;
-        }
-        Tournament tournament = optionalTournament.get();
+        Tournament tournament = tournamentDao.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
         if(!tournament.getOpenInscriptions()){
             LOGGER.warn("Cannot remove participant from a closed tournament");
             return;
