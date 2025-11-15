@@ -223,7 +223,7 @@ public class TournamentController {
             mav.addObject("LEAGUE", Structure.LEAGUE);
             mav.addObject("ELIMINATION", Structure.ELIMINATION);
             mav.addObject("HYBRID", Structure.HYBRID);
-            mav.addObject("tournamentWinner", t.getTournament_winner());
+            mav.addObject("tournamentWinner", t.getTournamentWinner());
             mav.addObject("participantCount", participantCount);
             mav.addObject("maxStage", maxStage);
             mav.addObject("editTournamentForm", editTournamentForm);
@@ -283,6 +283,7 @@ public class TournamentController {
     public ModelAndView leaveTournament(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam("tournamentId") final long tournamentId) {
         User user = currentUser.orElseThrow(UserNotAuthenticatedException::new).getPawUser(); // idem a /tournament/join
         ps.leaveTournament(user.getId(), tournamentId);
+        ts.notifyCreatorOfLeavingUser(user, tournamentId);
         return new ModelAndView("redirect:/tournament?tournamentId=" + tournamentId);
     }
 

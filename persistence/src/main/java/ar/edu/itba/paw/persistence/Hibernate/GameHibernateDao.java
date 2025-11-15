@@ -83,7 +83,7 @@ public class GameHibernateDao implements GameDao {
         int pageSize = GRID_PAGE_SIZE;
         int offset = (int) (page * pageSize);
 
-        Query idQuery = em.createNativeQuery("SELECT DISTINCT (id) FROM Game ORDER BY id");
+        Query idQuery = em.createNativeQuery("SELECT DISTINCT (id) FROM game ORDER BY id ASC ");
         idQuery.setFirstResult(offset);
         idQuery.setMaxResults(pageSize);
 

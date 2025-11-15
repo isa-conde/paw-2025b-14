@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.interfaces.services;
 
 import ar.edu.itba.paw.model.Participant;
+import ar.edu.itba.paw.model.User;
 
 import java.util.List;
 

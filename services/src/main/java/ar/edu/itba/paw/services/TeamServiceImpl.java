@@ -114,9 +114,9 @@ public class TeamServiceImpl implements TeamService {
 
         if (members != null){
             for (String s : members){
-                Long userid =  userDao.findByUsername(s).orElseThrow(UserNotFoundException::new).getId();
-                if (!teamMemberDao.isMember(teamId,userid)){
-                    teamMemberDao.addMember(teamId, userid);
+                Long userId =  userDao.findByUsername(s).orElseThrow(UserNotFoundException::new).getId();
+                if (!teamMemberDao.isMember(teamId, userId)){
+                    teamMemberDao.addMember(teamId, userId);
                 }
             }
         }

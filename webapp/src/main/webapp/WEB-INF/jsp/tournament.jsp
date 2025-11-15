@@ -95,6 +95,9 @@
                         <spring:argument value="${countText}"/>
                         <spring:argument value="${teamSizeNorm}"/>
                     </spring:message>
+                    <c:if test="${tournament.openInscriptions}">
+                        <c:set var="subtext" value="${participantCount} / "/>
+                    </c:if>
 
                     <spring:message code="elo.${tournament.elo}" var="elo"/>
                     <spring:message code="elo.text" arguments="${elo}" var="eloText"/>
@@ -102,7 +105,7 @@
                     <paw:icon-card icon="${pageContext.request.contextPath}/images/map.png" text="${tournament.region}"/>
                     <paw:icon-card icon="${pageContext.request.contextPath}/images/team.png" text="${tournament.format}"/>
                     <paw:icon-card icon="${pageContext.request.contextPath}/images/level.png" text="${eloText}"/>
-                    <paw:icon-card icon="${pageContext.request.contextPath}/images/members.png" text="${teams}" subtext="${participantCount} / "/>
+                    <paw:icon-card icon="${pageContext.request.contextPath}/images/members.png" text="${teams}" subtext="${subtext}"/>
                 </div>
                 <c:if test="${tournamentWinner != null && tournamentWinner > 0}">
                         <c:forEach var="p" items="${participants}">

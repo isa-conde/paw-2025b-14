@@ -514,4 +514,10 @@ public class TournamentServiceImpl implements TournamentService {
         LOGGER.debug("Tournament {} rating updated to {}", tournament.getName(), newRating);
     }
 
+    @Override
+    public void notifyCreatorOfLeavingUser(User user, long tournamentId) {
+        Tournament tournament = findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
+        ms.sendTournamentAbandonedEmail(tournament.getCreator(), user, tournament);
+    }
+
 }

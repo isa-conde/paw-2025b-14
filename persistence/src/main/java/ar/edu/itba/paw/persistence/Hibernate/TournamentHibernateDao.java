@@ -133,7 +133,7 @@ public class TournamentHibernateDao implements TournamentDao {
     @Override
     public List<Tournament> findByCreator(Long creatorId, Long page, Boolean isFinished) {
         Query idQuery = em.createNativeQuery(
-                "SELECT t.id FROM Tournament t WHERE t.creator_id = ?1 AND t.is_finished = ?2 ORDER BY t.start_date"
+                "SELECT t.id FROM Tournament t WHERE t.creator_id = ?1 AND t.is_finished = ?2 ORDER BY t.start_date ASC"
         );
         idQuery.setParameter(1, creatorId);
         idQuery.setParameter(2, isFinished);
@@ -205,7 +205,7 @@ public class TournamentHibernateDao implements TournamentDao {
                         "FROM Tournament t " +
                         "WHERE t.game_id IN ?1 " +
                         "AND t.open_inscriptions = true " +
-                        "ORDER BY t.game_id, t.start_date");
+                        "ORDER BY t.game_id, t.start_date ASC ");
         tournamentIdsQuery.setParameter(1, topGameIds.stream().map(Number::longValue).toList());
         tournamentIdsQuery.setMaxResults(TOURNAMENTS_PER_GAME);
 
@@ -463,7 +463,6 @@ public class TournamentHibernateDao implements TournamentDao {
         return query.getSingleResult().intValue();
     }
 
-    @Transactional
     @Override
     public void updateTournamentRating(Long tournamentId, Float userRating) {
         em.createQuery("UPDATE Tournament t SET t.rating = :userRating WHERE t.id = :tournamentId")

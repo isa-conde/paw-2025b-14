@@ -30,4 +30,6 @@ public interface MailService {
     void sendContactOwnerEmail(Tournament tournament, User user, String emailSubject, String emailBody, User creator);
 
     void sendListEmail(Long tournamentId, List<Participant> participantList);
+
+    void sendTournamentAbandonedEmail(User creator, User participant, Tournament tournament);
 }
