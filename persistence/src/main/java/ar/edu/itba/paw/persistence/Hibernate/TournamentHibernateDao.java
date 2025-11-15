@@ -164,49 +164,6 @@ public class TournamentHibernateDao implements TournamentDao {
     }
 
     @Override
-    public List<Tournament> findUserActiveTournaments(Long userId, Long page) {
-        return findUserTournaments(userId, false, page);
-    }
-
-    @Override
-    public List<Tournament> findUserPastTournaments(Long userId, Long page) {
-        return findUserTournaments(userId, true, page);
-    }
-
-    private List<Tournament> findUserTournaments(Long userId, Boolean isFinished, Long page) {
-        Query idQuery = em.createNativeQuery(
-                "SELECT t.id " +
-                    "FROM Tournament t " +
-                    "WHERE t.is_finished = ?1 " +
-                    "  AND t.id IN ( " +
-                        "    SELECT p.tournament_id " +
-                        "    FROM Participant p " +
-                        "    WHERE p.user_id = ?2 " +
-                    ") " +
-                    "ORDER BY t.start_date"
-
-        );
-        idQuery.setParameter(1, isFinished);
-        idQuery.setParameter(2, userId);
-        idQuery.setFirstResult((int)(page * PAGE_SIZE));
-        idQuery.setMaxResults(PAGE_SIZE);
-
-        @SuppressWarnings("unchecked")
-        List<Number> tournamentIds = idQuery.getResultList();
-        if (tournamentIds.isEmpty()) return Collections.emptyList();
-
-        TypedQuery<Tournament> fullQuery = em.createQuery(
-                "SELECT DISTINCT t FROM Tournament t " +
-                        "WHERE t.id IN :ids " +
-                        "ORDER BY t.startDate ASC",
-                Tournament.class
-        );
-        fullQuery.setParameter("ids", tournamentIds.stream().map(Number::longValue).toList());
-
-        return fullQuery.getResultList();
-    }
-
-    @Override
     public void closeInscriptions(Long tournamentId) {
         Tournament t = em.find(Tournament.class, tournamentId);
         t.setOpenInscriptions(false);
@@ -215,7 +172,7 @@ public class TournamentHibernateDao implements TournamentDao {
 
     @Override
     public List<Tournament> searchByName(String name) {
-        TypedQuery<Tournament> query = em.createQuery("SELECT t FROM Tournament t WHERE LOWER(t.name) LIKE CONCAT('%', LOWER(:name), '%')", Tournament.class);
+        TypedQuery<Tournament> query = em.createQuery("SELECT t FROM Tournament t WHERE LOWER(t.name) LIKE CONCAT('%', LOWER(:name), '%') AND t.tournamentStarted = false", Tournament.class);
         query.setParameter("name", name);
         return query.getResultList();
     }
@@ -384,6 +341,49 @@ public class TournamentHibernateDao implements TournamentDao {
     public boolean isClosed(Long tournamentId) {
         Tournament t = em.find(Tournament.class, tournamentId);
         return !t.getOpenInscriptions();
+    }
+
+    @Override
+    public List<Tournament> findUserActiveTournaments(Long userId, Long page) {
+        return findUserTournaments(userId, false, page);
+    }
+
+    @Override
+    public List<Tournament> findUserPastTournaments(Long userId, Long page) {
+        return findUserTournaments(userId, true, page);
+    }
+
+    private List<Tournament> findUserTournaments(Long userId, Boolean isFinished, Long page) {
+        Query idQuery = em.createNativeQuery(
+                "SELECT t.id " +
+                        "FROM Tournament t " +
+                        "WHERE t.is_finished = ?1 " +
+                        "  AND t.id IN ( " +
+                        "    SELECT p.tournament_id " +
+                        "    FROM Participant p " +
+                        "    WHERE p.user_id = ?2 " +
+                        ") " +
+                        "ORDER BY t.start_date"
+
+        );
+        idQuery.setParameter(1, isFinished);
+        idQuery.setParameter(2, userId);
+        idQuery.setFirstResult((int)(page * PAGE_SIZE));
+        idQuery.setMaxResults(PAGE_SIZE);
+
+        @SuppressWarnings("unchecked")
+        List<Number> tournamentIds = idQuery.getResultList();
+        if (tournamentIds.isEmpty()) return Collections.emptyList();
+
+        TypedQuery<Tournament> fullQuery = em.createQuery(
+                "SELECT DISTINCT t FROM Tournament t " +
+                        "WHERE t.id IN :ids " +
+                        "ORDER BY t.startDate ASC",
+                Tournament.class
+        );
+        fullQuery.setParameter("ids", tournamentIds.stream().map(Number::longValue).toList());
+
+        return fullQuery.getResultList();
     }
 
     private int countUserTournaments(Long userId, Boolean isFinished) {

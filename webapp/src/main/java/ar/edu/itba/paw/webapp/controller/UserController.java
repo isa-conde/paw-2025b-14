@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.webapp.controller;
 
+import ar.edu.itba.paw.interfaces.Constants;
 import ar.edu.itba.paw.interfaces.exception.UserNotAuthenticatedException;
 import ar.edu.itba.paw.interfaces.exception.UserNotFoundException;
 import ar.edu.itba.paw.interfaces.services.GameService;
@@ -110,7 +111,7 @@ public class UserController {
         mav.addObject("regions", Arrays.stream(Region.values()).toList());
         Map<Elo, String> elosMap = Arrays.stream(Elo.values())
                 .collect(Collectors.toMap(
-                        elo -> elo,  // clave: el enum (valor del select)
+                        elo -> elo,
                         elo -> messageSource.getMessage("elo." + elo.name(), null, LocaleContextHolder.getLocale()),
                         (a, b) -> a,
                         LinkedHashMap::new
@@ -118,7 +119,7 @@ public class UserController {
 
         mav.addObject("elos", elosMap);
         mav.addObject("genres", Arrays.stream(Genre.values()).toList());
-        mav.addObject("teamSizes", List.of(1,2,3,4,5));
+        mav.addObject("teamSizes", Constants.TEAM_SIZES);
         mav.addObject("currentPage", page);
 
         tf.setGameId(filterForm.getGameId());
@@ -215,7 +216,7 @@ public class UserController {
         int totalPages2 = 0;
 
         switch (section) {
-            case "owned" -> {
+            case Constants.TOURNAMENTS_OWNED -> {
                 totalPages1 = ts.getPagesBySection(profile.getId(), "ownedOngoing");
                 totalPages2 = ts.getPagesBySection(profile.getId(), "ownedFinished");
 
@@ -229,7 +230,7 @@ public class UserController {
                 mav.addObject("finishedTournaments", finishedTournaments);
             }
 
-            case "finished" -> {
+            case Constants.TOURNAMENTS_FINISHED -> {
                 totalPages1 = ts.getPagesBySection(profile.getId(), "finished");
                 totalPages2 = ts.getUserWonTournamentPages(profile.getId());
 
@@ -243,7 +244,7 @@ public class UserController {
                 mav.addObject("wonTournaments", wonTournaments);
             }
 
-            case "active" -> {
+            case Constants.TOURNAMENTS_ACTIVE -> {
                 totalPages1 = ts.getPagesBySection(profile.getId(), "active");
                 page1 = adjustPage(page1, totalPages1);
 
