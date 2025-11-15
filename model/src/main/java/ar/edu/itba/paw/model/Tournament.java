@@ -42,10 +42,12 @@ public class Tournament {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "region", columnDefinition = "region_enum")
+    @ColumnTransformer(write = "?::region_enum")
     private Region region;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "elo")
+    @Column(name = "elo", columnDefinition = "elo_enum")
+    @ColumnTransformer(write = "?::elo_enum")
     private Elo elo;
 
     @Column(name = "start_date")
@@ -59,6 +61,7 @@ public class Tournament {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "structure", columnDefinition = "structure_enum")
+    @ColumnTransformer(write = "?::structure_enum")
     private Structure structure;
 
     @Column(name = "max_participants", nullable = false)
