@@ -225,7 +225,7 @@ public class TournamentHibernateDao implements TournamentDao {
         t.setTournamentStarted(true);
         em.persist(t);
     }
-
+/// ward
     @Override
     public Map<Long, List<Tournament>> getUnfilteredTournamentPages(Long page) {
         Query topGamesQuery = em.createNativeQuery(
@@ -332,7 +332,7 @@ public class TournamentHibernateDao implements TournamentDao {
 
         return query.getSingleResult().intValue();
     }
-
+/// end ward
     @Override
     public void setIsGroupStage(Long tournamentId, Boolean bool) {
         Tournament t = em.find(Tournament.class, tournamentId);

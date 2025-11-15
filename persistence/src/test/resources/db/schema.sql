@@ -53,45 +53,49 @@ insert into game (id, name, genre, image_id) values (147, 'Bonestorm DGC', 'DGC'
 insert into game (id, name, genre, image_id) values (148, 'Bonestorm MOBILE', 'MOBILE', 100);
 
 insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
-    (100, 100, 'Jerma Rumble', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, true, false,true, false,100,100);
+    (100, 100, 'Jerma Rumble open x', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, true, false,true, false,100,100);
 insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
-    (101, 100, 'Jerma Rumble', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, false, true,true, true,100,100);
+    (101, 100, 'Jerma Rumble close x', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, false, true,true, true,100,100);
 insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
-    (102, 100, 'Jerma Rumble', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, true, false,true, false,100,100);
+    (102, 100, 'Jerma Rumble open', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, true, false,true, false,100,100);
 insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
-    (103, 100, 'Jerma Rumble', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, false, true,true, true,100,100);
+    (103, 100, 'Jerma Rumble close', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, false, true,true, true,100,100);
 insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
-    (104, 100, 'Jerma Rumble', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, true, false,true, false,100,100);
+    (104, 100, 'Jerma Rumble open', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, true, false,true, false,100,100);
 insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
-    (105, 100, 'Jerma Rumble', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, false, true,true, true,100,100);
+    (105, 100, 'Jerma Rumble close', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, false, true,true, true,100,100);
 insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
-    (106, 100, 'Jerma Rumble', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, true, false,true, false,100,100);
+    (106, 100, 'Jerma Rumble open', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, true, false,true, false,100,100);
 insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
-    (107, 100, 'Jerma Rumble', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, false, true,true, true,100,100);
+    (107, 100, 'Jerma Rumble close', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, false, true,true, true,100,100);
 insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
-    (108, 100, 'Jerma Rumble', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, true, false,true, false,100,100);
+    (108, 100, 'Jerma Rumble open', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, true, false,true, false,100,100);
 insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
-    (109, 100, 'Jerma Rumble', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, false, true,true, true,100,100);
+    (109, 100, 'Jerma Rumble close', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, false, true,true, true,100,100);
 insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
-    (110, 100, 'Jerma Rumble', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, true, false,true, false,100,100);
+    (110, 100, 'Jerma Rumble open', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, true, false,true, false,100,100);
 insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
-    (111, 100, 'Jerma Rumble', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, false, true,true, true,100,100);
+    (111, 100, 'Jerma Rumble close', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, false, true,true, true,100,100);
 insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
-    (112, 100, 'Jerma Rumble', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, true, false,true, false,100,100);
+    (112, 100, 'Jerma Rumble open', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, true, false,true, false,100,100);
 insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
-    (113, 100, 'Jerma Rumble', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, false, true,true, true,100,100);
+    (113, 100, 'Jerma Rumble close', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, false, true,true, true,100,100);
 insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
-    (114, 100, 'Jerma Rumble', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, true, false,true, false,100,100);
+    (114, 100, 'Jerma Rumble open', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, true, false,true, false,100,100);
 insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
-    (115, 100, 'Jerma Rumble', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, false, true,true, true,100,100);
+    (115, 100, 'Jerma Rumble close', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, false, true,true, true,100,100);
 insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
-    (116, 100, 'Jerma Rumble', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, true, false,true, false,100,100);
+    (116, 100, 'Jerma Rumble open', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, true, false,true, false,100,100);
 insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
-    (117, 100, 'Jerma Rumble', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, false, true,true, true,100,100);
+    (117, 100, 'Jerma Rumble close', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, false, true,true, true,100,100);
 insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
-    (118, 100, 'Jerma Rumble', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, true, false,true, false,100,100);
+    (118, 100, 'Jerma Rumble open', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, true, false,true, false,100,100);
 insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
-    (119, 100, 'Jerma Rumble', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, false, true,true, true,100,100);
+    (119, 100, 'Jerma Rumble close', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, false, true,true, true,100,100);
+insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
+    (120, 101, 'Jerma Rumble open', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, true, false,true, false,100,100);
+insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
+    (121, 101, 'Jerma Rumble close', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, false, true,true, true,100,100);
 
 insert into image (id, image) values (100, HEXTORAW(REPEAT('30', 64)));
 insert into image (id, image) values (101, HEXTORAW(REPEAT('31', 64)));
@@ -116,23 +120,44 @@ insert into team_member (user_id, team_id) values (101, 100);
 insert into team_member (user_id, team_id) values (100, 101);
 
 insert into participant (id, user_id, tournament_id) values (100,100,100);
-insert into participant (id, team_id, tournament_id) values (101,100,100);
-insert into participant (id, team_id, tournament_id) values (102,100,101);
-insert into participant (id, team_id, tournament_id) values (103,100,102);
-insert into participant (id, team_id, tournament_id) values (104,100,103);
-insert into participant (id, team_id, tournament_id) values (105,100,104);
-insert into participant (id, team_id, tournament_id) values (106,100,105);
-insert into participant (id, team_id, tournament_id) values (107,100,106);
-insert into participant (id, team_id, tournament_id) values (108,100,107);
-insert into participant (id, team_id, tournament_id) values (109,100,108);
-insert into participant (id, team_id, tournament_id) values (110,100,109);
-insert into participant (id, team_id, tournament_id) values (111,100,110);
-insert into participant (id, team_id, tournament_id) values (112,100,111);
-insert into participant (id, team_id, tournament_id) values (113,100,112);
-insert into participant (id, team_id, tournament_id) values (114,100,113);
-insert into participant (id, team_id, tournament_id) values (115,100,114);
-insert into participant (id, team_id, tournament_id) values (116,100,115);
-insert into participant (id, team_id, tournament_id) values (117,100,116);
-insert into participant (id, team_id, tournament_id) values (118,100,117);
-insert into participant (id, team_id, tournament_id) values (119,100,118);
-insert into participant (id, team_id, tournament_id) values (120,100,119);
+insert into participant (id, user_id, tournament_id) values (101,100,101);
+insert into participant (id, user_id, tournament_id) values (102,100,102);
+insert into participant (id, user_id, tournament_id) values (103,100,103);
+insert into participant (id, user_id, tournament_id) values (104,100,104);
+insert into participant (id, user_id, tournament_id) values (105,100,105);
+insert into participant (id, user_id, tournament_id) values (106,100,106);
+insert into participant (id, user_id, tournament_id) values (107,100,107);
+insert into participant (id, user_id, tournament_id) values (108,100,108);
+insert into participant (id, user_id, tournament_id) values (109,100,109);
+insert into participant (id, user_id, tournament_id) values (110,100,110);
+insert into participant (id, user_id, tournament_id) values (111,100,111);
+insert into participant (id, user_id, tournament_id) values (112,100,112);
+insert into participant (id, user_id, tournament_id) values (113,100,113);
+insert into participant (id, user_id, tournament_id) values (114,100,114);
+insert into participant (id, user_id, tournament_id) values (115,100,115);
+insert into participant (id, user_id, tournament_id) values (116,100,116);
+insert into participant (id, user_id, tournament_id) values (117,100,117);
+insert into participant (id, user_id, tournament_id) values (118,100,118);
+insert into participant (id, user_id, tournament_id) values (119,100,119);
+insert into participant (id, team_id, tournament_id) values (120,100,100);
+insert into participant (id, team_id, tournament_id) values (121,100,101);
+insert into participant (id, team_id, tournament_id) values (122,100,102);
+insert into participant (id, team_id, tournament_id) values (123,100,103);
+insert into participant (id, team_id, tournament_id) values (124,100,104);
+insert into participant (id, team_id, tournament_id) values (125,100,105);
+insert into participant (id, team_id, tournament_id) values (126,100,106);
+insert into participant (id, team_id, tournament_id) values (127,100,107);
+insert into participant (id, team_id, tournament_id) values (128,100,108);
+insert into participant (id, team_id, tournament_id) values (129,100,109);
+insert into participant (id, team_id, tournament_id) values (130,100,110);
+insert into participant (id, team_id, tournament_id) values (131,100,111);
+insert into participant (id, team_id, tournament_id) values (132,100,112);
+insert into participant (id, team_id, tournament_id) values (133,100,113);
+insert into participant (id, team_id, tournament_id) values (134,100,114);
+insert into participant (id, team_id, tournament_id) values (135,100,115);
+insert into participant (id, team_id, tournament_id) values (136,100,116);
+insert into participant (id, team_id, tournament_id) values (137,100,117);
+insert into participant (id, team_id, tournament_id) values (138,100,118);
+insert into participant (id, team_id, tournament_id) values (139,100,119);
+insert into participant (id, user_id, tournament_id) values (140,101,120);
+insert into participant (id, team_id, tournament_id) values (141,101,120);
