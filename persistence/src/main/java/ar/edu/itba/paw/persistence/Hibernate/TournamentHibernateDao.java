@@ -244,7 +244,7 @@ public class TournamentHibernateDao implements TournamentDao {
 
         return orderedMap;
     }
-
+    /// end ward
     @Override
     public Integer getPageAmount(Integer pageSize, TournamentFilter tf) {
         Map<String, Object> params = new HashMap<>();
@@ -263,7 +263,7 @@ public class TournamentHibernateDao implements TournamentDao {
 
         return (int) Math.ceil((double) count / pageSize);
     }
-    /// end ward
+
     @Override
     public void updateTournamentInfo(Long tournamentId, String name, LocalDate startDate, LocalDate endDate, Integer maxParticipants, String serverName, String serverPassword, String discordChannel) {
         Tournament t = em.find(Tournament.class, tournamentId);

@@ -28,6 +28,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -60,6 +61,7 @@ public class TournamentHibernateDaoTest {
     private static final Long NO_ONE_ID = 0L;
     private static final Integer MAX_PARTICIPANTS = 4;
     private static final int PAGE_SIZE = 9;
+    private static final int MAX_GAMES = 3;
     private static final int TOURNEYS_BY_ID = 20;
     private static final int TOURNEYS_WITH_ID = 22;
     private static final int OPEN_BY_ID = TOURNEYS_BY_ID / 2;
@@ -112,14 +114,17 @@ public class TournamentHibernateDaoTest {
         Assert.assertFalse(tournament.getFinished());
         Assert.assertEquals(ID,tournament.getFormatId());
         Assert.assertEquals(ID,tournament.getRules().getId());
-        //TODO AGREGAR TESTOS AL SERVIDOR DE DISCORD
+        Assert.assertEquals(SERVER_LINK, tournament.getDiscordChannel());
+        Assert.assertEquals(SERVER_NAME, tournament.getServerName());
+        Assert.assertEquals(SERVER_PASSWORD, tournament.getServerPassword());
         Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"tournament",
                 "id = " + tournament.getId() + " and name = '" + NAME + "' and creator_id = " + ID
          + " and game_id = creator_id and image_id = game_id and format_id = game_id and rules_id = game_id and "
         + "format = '" + FORMAT + "' and region = '" + REGION + "' and elo = '" + ELO + "' and structure = '"
         + STRUCTURE + "' and max_participants = " + MAX_PARTICIPANTS + " and is_finished = false and " +
         " open_inscriptions = true and start_date = '" + START_DATE.format(DateTimeFormatter.ISO_LOCAL_DATE)
-        + "' and end_date = '" + END_DATE.format(DateTimeFormatter.ISO_LOCAL_DATE) + "'"));
+        + "' and end_date = '" + END_DATE.format(DateTimeFormatter.ISO_LOCAL_DATE) + "' and server_name = '"
+        + SERVER_NAME + "' and server_password = '" + SERVER_PASSWORD + "' and discord_channel = '" + SERVER_LINK + "'"));
     }
 
     @Test
@@ -653,13 +658,14 @@ public class TournamentHibernateDaoTest {
         LocalDate newStartDate = LocalDate.of(2025, 9, 30);
         LocalDate newEndDate = LocalDate.of(2026, 9, 30);
         Integer newMaxParticipants = 16;
-        tournamentHibernateDao.updateTournamentInfo(ID, newName, newStartDate, newEndDate, newMaxParticipants);
+        tournamentHibernateDao.updateTournamentInfo(ID, newName, newStartDate, newEndDate, newMaxParticipants, SERVER_NAME, SERVER_PASSWORD, SERVER_LINK);
         em.flush();
 
         Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"tournament",
                 "id = " + ID + " and name = '" + newName + "' and max_participants = " + newMaxParticipants
         + " and start_date = '" + newStartDate.format(DateTimeFormatter.ISO_LOCAL_DATE) + "' and end_date = '"
-                        + newEndDate.format(DateTimeFormatter.ISO_LOCAL_DATE) + "'"));
+                        + newEndDate.format(DateTimeFormatter.ISO_LOCAL_DATE) + "' and server_name = '" + SERVER_NAME
+        + "' and server_password = '" + SERVER_PASSWORD + "' and discord_channel = '" + SERVER_LINK + "'"));
     }
 
     @Test
@@ -672,67 +678,57 @@ public class TournamentHibernateDaoTest {
     }
 
     @Test
-    public void testGetPageAmount(){
+    public void testGetPageAmountNoFilter(){
         TournamentFilter filter = new TournamentFilter();
+
+        Integer pageAmount = tournamentHibernateDao.getPageAmount(MAX_GAMES, filter);
+
+        Assert.assertEquals(1, pageAmount.intValue());
+    }
+
+    @Test
+    public void testGetPageAmountFilter(){
+        TournamentFilter filter = new TournamentFilter();
+        filter.setElo(ELO);
 
         Integer pageAmount = tournamentHibernateDao.getPageAmount(PAGE_SIZE, filter);
 
-        Assert.assertEquals(TOURNEYS_WITH_ID, pageAmount.intValue());
+        Assert.assertEquals((int)Math.ceil((double)OPEN_WITH_ID/PAGE_SIZE), pageAmount.intValue());
     }
 
-//    @Test
-//    public void testGetUnfilteredTournamentPages(){
-//        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
-//                .withTableName("tournament");
-//        SqlParameterSource values;
-//        for (int i = 1; i <= 9; i++) {
-//            values = new MapSqlParameterSource()
-//                    .addValue("id",OTHER_ID+i*2)
-//                    .addValue("creator_id",OTHER_ID)
-//                    .addValue("name",NAME)
-//                    .addValue("game_id",ID)
-//                    .addValue("region", REGION)
-//                    .addValue("elo", ELO)
-//                    .addValue("startDate", START_DATE.plusDays(i))
-//                    .addValue("endDate", END_DATE.plusDays(i))
-//                    .addValue("format", FORMAT)
-//                    .addValue("structure", STRUCTURE)
-//                    .addValue("maxParticipants", MAX_PARTICIPANTS)
-//                    .addValue("image_id", ID)
-//                    .addValue("open_inscriptions", true)
-//                    .addValue("is_finished", false)
-//                    .addValue("tournament_started", false)
-//                    .addValue("format_id", ID);
-//            jdbcInsert.execute(values);
-//        }
-//        for (int i = 0; i <= 9; i++) {
-//            values = new MapSqlParameterSource()
-//                    .addValue("id",OTHER_ID+i*2+1)
-//                    .addValue("creator_id",OTHER_ID)
-//                    .addValue("name",NAME)
-//                    .addValue("game_id",OTHER_ID)
-//                    .addValue("region", REGION)
-//                    .addValue("elo", ELO)
-//                    .addValue("startDate", START_DATE.plusDays(i))
-//                    .addValue("endDate", END_DATE.plusDays(i))
-//                    .addValue("format", FORMAT)
-//                    .addValue("structure", STRUCTURE)
-//                    .addValue("maxParticipants", MAX_PARTICIPANTS)
-//                    .addValue("image_id", ID)
-//                    .addValue("open_inscriptions", true)
-//                    .addValue("is_finished", false)
-//                    .addValue("tournament_started", false)
-//                    .addValue("format_id", ID);
-//            jdbcInsert.execute(values);
-//        }
-//        Map<Long, List<Tournament>> pages = tournamentHibernateDao.getUnfilteredTournamentPages(NO_ONE_ID);
-//
-//        Assert.assertEquals(2, pages.size());
-//        for (List<Tournament> list : pages.values()) {
-//            Assert.assertEquals(9, list.size());
-//            Assert.assertTrue(list.stream().allMatch(Tournament::getOpenInscriptions));
-//        }
-//    }
+    @Rollback
+    @Test
+    public void testGetPageAmountNoFilterEmpty(){
+        JdbcTestUtils.dropTables(jdbcTemplate,"tournament");
+        TournamentFilter filter = new TournamentFilter();
+
+        Integer pageAmount = tournamentHibernateDao.getPageAmount(MAX_GAMES, filter);
+
+        Assert.assertEquals(0, pageAmount.intValue());
+    }
+
+    @Rollback
+    @Test
+    public void testGetPageAmountFilterEmpty(){
+        JdbcTestUtils.dropTables(jdbcTemplate,"tournament");
+        TournamentFilter filter = new TournamentFilter();
+        filter.setElo(ELO);
+
+        Integer pageAmount = tournamentHibernateDao.getPageAmount(PAGE_SIZE, filter);
+
+        Assert.assertEquals(0, pageAmount.intValue());
+    }
+
+    @Test
+    public void testGetUnfilteredTournamentPages(){
+        Map<Long, List<Tournament>> pages = tournamentHibernateDao.getUnfilteredTournamentPages(NO_ONE_ID);
+
+        Assert.assertEquals(2, pages.size());
+        for (List<Tournament> list : pages.values()) {
+            Assert.assertEquals(9, list.size());
+            Assert.assertTrue(list.stream().allMatch(Tournament::getOpenInscriptions));
+        }
+    }
 
 //    @Test
 //    public void testFindTournamentsWithNameAndFormatFilter() {

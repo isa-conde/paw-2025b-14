@@ -42,6 +42,9 @@ CREATE TABLE IF NOT EXISTS tournament(
     format_id integer,
     rating float,
     rules_id integer,
+    server_name varchar(50),
+    server_password varchar(50),
+    discord_channel varchar(50),
     CONSTRAINT tournament_dates_check
         CHECK  ((start_date IS NULL) OR (end_date IS NULL) OR (start_date < end_date))
 );
