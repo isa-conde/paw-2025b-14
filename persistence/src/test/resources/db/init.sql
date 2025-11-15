@@ -87,7 +87,9 @@ create table if not exists participant(
     team_id integer,
     tournament_id integer not null ,
     points integer default 0 not null ,
+    score_difference integer,
     group_number integer,
+    has_rated boolean,
     constraint participant_user_or_team_chk check (
         user_id is not null or team_id is not null
 ));
