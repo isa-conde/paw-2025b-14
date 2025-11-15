@@ -12,7 +12,6 @@ import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -187,7 +186,7 @@ public class TournamentHibernateDao implements TournamentDao {
         t.setTournamentStarted(true);
         em.persist(t);
     }
-
+/// ward
     @Override
     public Map<Long, List<Tournament>> getUnfilteredTournamentPages(Long page) {
         Query topGamesQuery = em.createNativeQuery(
@@ -264,7 +263,7 @@ public class TournamentHibernateDao implements TournamentDao {
 
         return (int) Math.ceil((double) count / pageSize);
     }
-
+    /// end ward
     @Override
     public void updateTournamentInfo(Long tournamentId, String name, LocalDate startDate, LocalDate endDate, Integer maxParticipants, String serverName, String serverPassword, String discordChannel) {
         Tournament t = em.find(Tournament.class, tournamentId);
@@ -451,9 +450,10 @@ public class TournamentHibernateDao implements TournamentDao {
 
     @Override
     public Integer getUserWonTournamentPages(Long userId) {
-        Query nativeQuery = em.createNativeQuery("SELECT COUNT(t.id) FROM tournament t WHERE tournament_winner = (SELECT p.id FROM participant p WHERE p.user_id = ?1 AND p.tournament_id = t.id)", Long.class);
-        nativeQuery.setParameter(1, userId);
-        return nativeQuery.getFirstResult();
+        TypedQuery<Long> nativeQuery = em.createQuery("SELECT COUNT(t.id) FROM Tournament t WHERE t.winner = (SELECT p FROM Participant p WHERE p.user = :user AND p.tournament = t)", Long.class);
+        nativeQuery.setParameter("user", em.getReference(User.class, userId));
+        Long ans = nativeQuery.getSingleResult();
+        return (int) Math.ceil(ans.doubleValue()/PAGE_SIZE);
     }
 
     @Override
