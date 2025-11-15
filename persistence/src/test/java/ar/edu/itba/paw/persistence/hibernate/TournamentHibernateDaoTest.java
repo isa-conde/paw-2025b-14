@@ -558,12 +558,9 @@ public class TournamentHibernateDaoTest {
     @Test
     public void testGetUsersWonTournamentsPages(){
         jdbcTemplate.update("update tournament set tournament_winner = id where id < 120");
-        List<Long> ans2 = jdbcTemplate.queryForList("select tournament_winner from tournament", Long.class);
-        ans2.forEach(System.out::println);
-        em.flush();
         int ans = tournamentHibernateDao.getUserWonTournamentPages(ID);
 
-        Assert.assertEquals((int)Math.ceil(((double) OPEN_BY_ID/PAGE_SIZE)),ans);
+        Assert.assertEquals((int)Math.ceil(((double) TOURNEYS_BY_ID/PAGE_SIZE)),ans);
     }
 
     @Test
@@ -572,70 +569,109 @@ public class TournamentHibernateDaoTest {
 
         Assert.assertEquals(0,ans);
     }
-//    @Test
-//    public void testGetTournamentParticipantsCount(){
-//        SimpleJdbcInsert participantInsert = new SimpleJdbcInsert(jdbcTemplate)
-//                .withTableName("participant");
-//        participantInsert.execute(Map.of("id",ID,"user_id", ID, "tournament_id", OTHER_ID, "points", 0));
-//        participantInsert.execute(Map.of("id",OTHER_ID,"user_id", OTHER_ID, "tournament_id", OTHER_ID, "points", 0));
-//        int count = tournamentHibernateDao.getTournamentParticipantsCount(OTHER_ID);
-//
-//        Assert.assertEquals(2, count);
-//    }
-//
-//    @Test
-//    public void testUpdateTournamentInfo(){
-//        String newName = "Updated Name";
-//        LocalDate newStartDate = LocalDate.of(2025, 9, 30);
-//        LocalDate newEndDate = LocalDate.of(2026, 9, 30);
-//        Integer newMaxParticipants = 16;
-//        tournamentHibernateDao.updateTournamentInfo(OTHER_ID, newName, newStartDate, newEndDate, newMaxParticipants);
-//        Tournament updated = jdbcTemplate.queryForObject("SELECT * FROM tournament WHERE id = ?", ROW_MAPPER, OTHER_ID);
-//
-//        Assert.assertNotNull(updated);
-//        Assert.assertEquals(newName, updated.getName());
-//        Assert.assertNotEquals(NAME,updated.getName());
-//        Assert.assertEquals(newStartDate, updated.getStartDate());
-//        Assert.assertNotEquals(START_DATE,updated.getStartDate());
-//        Assert.assertEquals(newEndDate, updated.getEndDate());
-//        Assert.assertNotEquals(END_DATE,updated.getEndDate());
-//        Assert.assertEquals(newMaxParticipants, updated.getMaxParticipants());
-//        Assert.assertNotEquals(MAX_PARTICIPANTS,updated.getMaxParticipants());
-//    }
-//
-//    @Test
-//    public void testGetPageAmount(){
-//        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
-//            .withTableName("tournament");
-//        for (int i = 0; i < 4; i++) {
-//            SqlParameterSource values = new MapSqlParameterSource()
-//                    .addValue("id",OTHER_ID+1+i)
-//                    .addValue("creator_id",OTHER_ID)
-//                    .addValue("name",NAME+i)
-//                    .addValue("game_id",ID)
-//                    .addValue("region", REGION)
-//                    .addValue("elo", ELO)
-//                    .addValue("startDate", START_DATE)
-//                    .addValue("endDate", END_DATE)
-//                    .addValue("format", FORMAT)
-//                    .addValue("structure", STRUCTURE)
-//                    .addValue("maxParticipants", MAX_PARTICIPANTS)
-//                    .addValue("image_id", ID)
-//                    .addValue("open_inscriptions", true)
-//                    .addValue("is_finished", false)
-//                    .addValue("tournament_started", false)
-//                    .addValue("format_id", ID);
-//            jdbcInsert.execute(values);
-//        }
-//        TournamentFilter filter = new TournamentFilter();
-//        filter.setGame_id(ID);
-//        int pageSize = 2;
-//
-//        Integer pageAmount = tournamentHibernateDao.getPageAmount(pageSize, filter);
-//
-//        Assert.assertEquals(3, pageAmount.intValue());
-//    }
-//
+
+    @Test
+    public void testGetUsersWonTournamentsFullPage(){
+        jdbcTemplate.update("update tournament set tournament_winner = id where id < 110");
+        List<Tournament> ans = tournamentHibernateDao.getUserWonTournament(ID,NO_ONE_ID);
+
+        Assert.assertNotNull(ans);
+        Assert.assertFalse(ans.isEmpty());
+        Assert.assertEquals(PAGE_SIZE,ans.size());
+        Assert.assertTrue(ans.stream().allMatch(t-> t.getWinner().getUser().getId() == ID));
+    }
+
+    @Test
+    public void testGetUsersWonTournamentsLastPage(){
+        jdbcTemplate.update("update tournament set tournament_winner = id where id < 110");
+        List<Tournament> ans = tournamentHibernateDao.getUserWonTournament(ID,1L);
+
+        Assert.assertNotNull(ans);
+        Assert.assertFalse(ans.isEmpty());
+        Assert.assertEquals(1,ans.size());
+        Tournament t = ans.get(0);
+        Assert.assertEquals(ID.longValue(), t.getWinner().getUser().getId());
+    }
+
+    @Test
+    public void testGetUsersWonTournamentsEmptyPage(){
+        jdbcTemplate.update("update tournament set tournament_winner = id where id < 110");
+        List<Tournament> ans = tournamentHibernateDao.getUserWonTournament(ID,2L);
+
+        Assert.assertNotNull(ans);
+        Assert.assertTrue(ans.isEmpty());
+    }
+
+    @Test
+    public void testGetNoWonTournaments(){
+        List<Tournament> ans = tournamentHibernateDao.getUserWonTournament(ID,NO_ONE_ID);
+
+        Assert.assertNotNull(ans);
+        Assert.assertTrue(ans.isEmpty());
+    }
+
+    @Test
+    public void testGetNoOnesWonTournaments(){
+        List<Tournament> ans = tournamentHibernateDao.getUserWonTournament(NO_ONE_ID,NO_ONE_ID);
+
+        Assert.assertNotNull(ans);
+        Assert.assertTrue(ans.isEmpty());
+    }
+
+    @Test
+    public void testGetTournamentParticipantsCount(){
+        int count = tournamentHibernateDao.getTournamentParticipantsCount(ID);
+
+        Assert.assertEquals(2, count);
+    }
+
+    @Rollback
+    @Test
+    public void testGetEmptyTournamentsParticipant(){
+        JdbcTestUtils.deleteFromTables(jdbcTemplate,"participant");
+        int count = tournamentHibernateDao.getTournamentParticipantsCount(ID);
+
+        Assert.assertEquals(0,count);
+    }
+
+    @Test
+    public void testGetNoTournamentsParticipants(){
+        int count = tournamentHibernateDao.getTournamentParticipantsCount(NO_ONE_ID);
+
+        Assert.assertEquals(0,count);
+    }
+    @Test
+    public void testUpdateTournamentInfo(){
+        String newName = "Updated Name";
+        LocalDate newStartDate = LocalDate.of(2025, 9, 30);
+        LocalDate newEndDate = LocalDate.of(2026, 9, 30);
+        Integer newMaxParticipants = 16;
+        tournamentHibernateDao.updateTournamentInfo(ID, newName, newStartDate, newEndDate, newMaxParticipants);
+        em.flush();
+
+        Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"tournament",
+                "id = " + ID + " and name = '" + newName + "' and max_participants = " + newMaxParticipants
+        + " and start_date = '" + newStartDate.format(DateTimeFormatter.ISO_LOCAL_DATE) + "' and end_date = '"
+                        + newEndDate.format(DateTimeFormatter.ISO_LOCAL_DATE) + "'"));
+    }
+
+    @Test
+    public void testUpdateTournamentRating(){
+        tournamentHibernateDao.updateTournamentRating(ID,4.0f);
+        em.flush();
+
+        Assert.assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"tournament",
+                "id = " + ID + " and rating = 4.0"));
+    }
+
+    @Test
+    public void testGetPageAmount(){
+        TournamentFilter filter = new TournamentFilter();
+
+        Integer pageAmount = tournamentHibernateDao.getPageAmount(PAGE_SIZE, filter);
+
+        Assert.assertEquals(TOURNEYS_WITH_ID, pageAmount.intValue());
+    }
 
 //    @Test
 //    public void testGetUnfilteredTournamentPages(){
