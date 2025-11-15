@@ -6,7 +6,7 @@
 
 <c:url value="/tournament/join" var="joinUrl"/>
 <c:url value="/tournament/leave" var="leaveUrl"/>
-<c:url value="/tournament/update?tournamentId=${tournament.id}" var="tournamentUpdateUrl"/>
+<c:url value="/tournament/update/${tournament.id}" var="tournamentUpdateUrl"/>
 <c:url value="/tournament/contactOwner" var="contactOwnerUrl"/>
 <c:url value="/tournament/rate" var="rateTournamentUrl"/>
 <c:url value="/images/pencil.png" var="pencilUrl"/>
@@ -19,7 +19,7 @@
 <c:set var="playersPerTeam" value="${empty format.playersPerTeam ? 1 : format.playersPerTeam}"/>
 
 <c:choose>
-    <c:when test="${isCreator && !tournament.tournamentStarted}">
+    <c:when test="${isCreator && !tournament.finished}">
         <c:set var="cornerModal" value="editTournamentModal"/>
         <c:set var="cornerIcon" value="${pencilUrl}"/>
     </c:when>
@@ -108,13 +108,13 @@
                     <paw:icon-card icon="${pageContext.request.contextPath}/images/members.png" text="${teams}" subtext="${subtext}"/>
                 </div>
                 <c:if test="${tournamentWinner != null && tournamentWinner > 0}">
-                        <c:forEach var="p" items="${participants}">
-                            <c:if test="${p.id == tournamentWinner}">
-                                <div class="cards-container">
-                                    <paw:winner-card winnerName="${p.name}"/>
-                                </div>
-                            </c:if>
-                        </c:forEach>
+                    <c:forEach var="p" items="${participants}">
+                        <c:if test="${p.id == tournamentWinner}">
+                            <div class="cards-container">
+                                <paw:winner-card winnerName="${p.name}"/>
+                            </div>
+                        </c:if>
+                    </c:forEach>
                 </c:if>
                 <c:if test="${isParticipant && !tournament.tournamentStarted || !isParticipant && tournament.openInscriptions}">
                     <div class="cards-container">
@@ -214,7 +214,7 @@
                             <c:if test="${tournament.structure eq ELIMINATION or tournament.structure eq HYBRID}">
                                 <c:choose>
                                     <c:when test="${not editMode}">
-                                        <form method="get" action="">
+                                        <form method="get" action="${pageContext.request.contextPath}/tournament/${tournament.id}">
                                             <input type="hidden" name="tournamentId" value="${tournament.id}"/>
                                             <input type="hidden" name="section" value="${param.section != null ? param.section : 'overview'}"/>
                                             <input type="hidden" name="edit" value="true"/>
@@ -224,7 +224,7 @@
                                         </form>
                                     </c:when>
                                     <c:otherwise>
-                                        <form method="get" action="">
+                                        <form method="get" action="${pageContext.request.contextPath}/tournament/${tournament.id}">
                                             <input type="hidden" name="tournamentId" value="${tournament.id}"/>
                                             <input type="hidden" name="section" value="${param.section != null ? param.section : 'overview'}"/>
                                             <button type="submit" class="btn empty">
@@ -263,6 +263,37 @@
                         </div>
                     </c:when>
                 </c:choose>
+                <c:if test="${(isParticipant || isCreator) && tournament.tournamentStarted && !tournament.finished}">
+                    <div class="cards-container">
+                        <c:if test="${tournament.serverName !=null}">
+                            <div class="card texture">
+                                <div class="copy-card-content-container">
+                                    <paw:copy-field label="tournament.serverName" value="${tournament.serverName}" />
+                                    <c:if test="${tournament.serverPassword != null}">
+                                        <paw:copy-field label="tournament.serverPassword" value="${tournament.serverPassword}" />
+                                    </c:if>
+                                </div>
+                            </div>
+                        </c:if>
+                        <c:if test="${tournament.discordChannel != null}">
+                            <div class="discord-card texture">
+                                <paw:text type="title" size="l">
+                                    <spring:message code="tournament.discordChannel.title"/>
+                                </paw:text>
+
+                                <div class="discord-row">
+                                    <c:url value="/images/crown.png" var="discordUrl" />
+                                    <img alt="Discord" src="${discordUrl}" width="30" height="30">
+                                    <a href="${tournament.discordChannel}" class="title-link" target="_blank" rel="noopener noreferrer">
+                                        <paw:text size="l" weight="semi-bold">
+                                            <spring:message code="tournament.discordChannel"/>
+                                        </paw:text>
+                                    </a>
+                                </div>
+                            </div>
+                        </c:if>
+                    </div>
+                </c:if>
             </c:when>
             <c:when test="${activeSection == 'matchesTab'}">
                 <c:choose>
@@ -317,7 +348,7 @@
                         </div>
                     </c:if>
                 </div>
-                <paw:users-grid participants="${participants}" isIndividualTournament="${isIndividualTournament}"/>
+                <paw:users-grid participants="${participants}" isIndividualTournament="${isIndividualTournament}" deleteMode="${isCreator and tournament.openInscriptions}"/>
                 <c:if test="${!isParticipant && tournament.openInscriptions}">
                     <div class="cards-container">
                         <c:choose>
@@ -347,8 +378,7 @@
             </c:when>
         </c:choose>
     </div>
-    <c:url var="tournamentUrl" value="/tournament">
-        <c:param name="tournamentId" value="${tournament.id}"/>
+    <c:url var="tournamentUrl" value="/tournament/${tournament.id}">
         <c:if test="${not empty param.section}">
             <c:param name="section" value="${param.section}"/>
         </c:if>
@@ -361,26 +391,31 @@
                    action="${tournamentUpdateUrl}"
                    enctype="multipart/form-data" cssClass="form">
             <input type="hidden" name="tournamentId" value="${tournament.id}"/>
-            <div class="row">
-                <paw:input path="name" label="createTournament.name" hasConstraint="true"/>
-            </div>
             <c:if test="${!tournament.finished}">
+                <div class="row">
+                    <paw:input path="name" label="createTournament.name" hasConstraint="true"/>
+                    <c:if test="${tournament.openInscriptions}">
+                        <paw:input path="maxParticipants" label="createTournament.maxParticipants" arg="${playersPerTeam}" inputType="number" hasConstraint="true"/>
+                    </c:if>
+                </div>
                 <div class="row">
                     <c:if test="${!tournament.tournamentStarted}">
                         <paw:input path="startDate" label="createTournament.startDate" inputType="date" hasConstraint="true"/>
                     </c:if>
                     <paw:input path="endDate" label="createTournament.endDate" inputType="date" hasConstraint="true"/>
                 </div>
-                <c:if test="${tournament.openInscriptions}">
-                    <paw:input path="maxParticipants" label="createTournament.maxParticipants" arg="${playersPerTeam}" inputType="number" hasConstraint="true"/>
-                </c:if>
+                <div class="row">
+                    <paw:input path="serverName" label="tournament.serverName" hasConstraint="true"/>
+                    <paw:input path="serverPassword" label="tournament.serverPassword" hasConstraint="true"/>
+                </div>
+                <div class="row">
+                    <paw:input path="discordChannel" label="tournament.discordChannel.edit" hasConstraint="true"/>
+                </div>
+                <div class="row">
+                    <paw:input path="image" label="createTournament.image" fileText="input.uploadImage" inputType="file"/>
+                    <paw:input path="rules" label="tournament.rules" inputType="file" fileText="input.uploadPdf" hasConstraint="true"/>
+                </div>
             </c:if>
-            <div class="row">
-                <paw:input path="image" label="createTournament.image" fileText="input.uploadImage" inputType="file"/>
-            </div>
-            <div class="row">
-                <paw:input path="rules" label="tournament.rules" inputType="file" fileText="input.uploadPdf" hasConstraint="true"/>
-            </div>
             <div class="row center">
                 <paw:input path="" label="tournament.edit.saveChanges" containerType="half" inputType="submit"/>
             </div>
@@ -463,9 +498,10 @@
         </div>
     </form:form>
 </paw:modal>
-<c:url value="/tournament/setMatchResults" var="actionUrl"/>
+<c:url value="/tournament/setMatchResults" var="setMatchUrl"/>
 <paw:modal title="tournament.setMatchResults.title" id="setMatchResultsModal" returnUrl="${tournamentUrl}">
-    <form:form method="post" modelAttribute="setMatchResultsForm" action="${actionUrl}" cssClass="form">
+    <form:form method="post" modelAttribute="setMatchResultsForm" action="${setMatchUrl}" cssClass="form"
+               onsubmit="this.querySelectorAll('button, input[type=submit]').forEach(el => el.disabled = true);">
         <input type="hidden" id="modalMatchId" name="matchId" value=""/>
         <input type="hidden" name="tournamentId" value="${tournament.id}"/>
         <div class="row">
@@ -477,12 +513,23 @@
         </div>
     </form:form>
 </paw:modal>
+<c:url value="/tournament/removeParticipant" var="removeParticipantUrl"/>
+<paw:modal title="tournament.removeParticipant.title" id="removeParticipantModal" returnUrl="${tournamentUrl}">
+    <div class="modal-text">
+        <p class="main-text m semi-bold"><spring:message code="tournament.removeParticipant.text"/></p>
+        <p class="main-text m bold"><span id="removeParticipantName">—</span></p>
+    </div>
+    <form:form method="post" id="removeParticipantForm" action="${removeParticipantUrl}" onsubmit="this.querySelectorAll('button, input[type=submit]').forEach(el => el.disabled = true);">
+        <input type="hidden" id="modalParticipantId" name="participantId" value=""/>
+        <input type="hidden" name="tournamentId" value="${tournament.id}"/>
+        <div class="row center">
+            <paw:button text="tournament.removeParticipant.cancel" onclick="event.preventDefault(); closeModal('removeParticipantModal')" secondary="true"/>
+            <paw:button text="tournament.removeParticipant.remove" onclick="document.getElementById('removeParticipantModal').requestSubmit();"/>
+        </div>
+    </form:form>
+</paw:modal>
 
-<script>
-    function openSetMatchModal(matchId) {
-        document.getElementById('modalMatchId').value = matchId;
-        openModal('setMatchResultsModal');
-    }
-</script>
-
+<script src="${pageContext.request.contextPath}/js/removeParticipantModal.js"></script>
+<script src="${pageContext.request.contextPath}/js/matchResultsModal.js"></script>
 <script src="${pageContext.request.contextPath}/js/swap.js"></script>
+<script src="${pageContext.request.contextPath}/js/copyField.js"></script>

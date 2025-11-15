@@ -24,4 +24,6 @@ public interface ParticipantService {
     Boolean participantHasRatedTournament(Long tournamentId, Long userId);
 
     void updateCreatorRating(Long tournamentId, Long creatorId, Long reviewerId, Float rating);
+
+    void removeParticipant(Long tournamentId, Long participantId);
 }

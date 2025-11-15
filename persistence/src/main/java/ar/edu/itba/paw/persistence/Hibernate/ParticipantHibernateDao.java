@@ -144,6 +144,26 @@ public class ParticipantHibernateDao implements ParticipantDao{
     }
 
     @Override
+    public void removeTournamentParticipantTeam(Long tournamentId, Long participantId){
+        String jpql = """
+        DELETE FROM Participant p
+        WHERE p.tournament.id = :tournamentId
+        AND p.id = :participantId
+        """;
+        em.createQuery(jpql).setParameter("tournamentId", tournamentId).setParameter("participantId", participantId).executeUpdate();
+    }
+
+    @Override
+    public void removeTournamentParticipantUser(Long tournamentId, Long participantId){
+        String jpql = """
+        DELETE FROM Participant p
+        WHERE p.tournament.id = :tournamentId
+        AND p.id = :participantId
+        """;
+        em.createQuery(jpql).setParameter("tournamentId", tournamentId).setParameter("participantId", participantId).executeUpdate();
+    }
+
+    @Override
     public void updateGroupNumberForUsers(long tournamentId, int groupNumber, List<Long> userIds, Integer teamSize) {
         String jpql;
 

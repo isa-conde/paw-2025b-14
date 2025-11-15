@@ -19,28 +19,32 @@
                                 <c:set var="localName" value="${match.local == null ? 'TBD' : match.local.name}"/>
                                 <span><c:out value="${localName}"/></span>
                                 <c:if test="${isEditing and match.localId != null}">
-                                    <input type="checkbox"
-                                           class="edit-check"
-                                           name="selected"
-                                           value="${match.id}:${match.localId}"
-                                           form="${formId}"
-                                           data-kind="bracket"
-                                           data-match="${match.id}"
-                                           data-user="${match.localId}"/>
+                                    <label>
+                                        <input type="checkbox"
+                                               class="edit-check"
+                                               name="selected"
+                                               value="${match.id}:${match.localId}"
+                                               form="${formId}"
+                                               data-kind="bracket"
+                                               data-match="${match.id}"
+                                               data-user="${match.localId}"/>
+                                    </label>
                                 </c:if>
                             </div>
                             <div class="bracket-team ${match.winner == 2 ? 'winner' : ''}">
                                 <c:set var="visitorName" value="${match.visitor == null ? 'TBD' : match.visitor.name}"/>
                                 <span><c:out value="${visitorName}"/></span>
                                 <c:if test="${isEditing and match.visitorId != null}">
-                                    <input type="checkbox"
-                                           class="edit-check"
-                                           name="selected"
-                                           value="${match.id}:${match.visitorId}"
-                                           form="${formId}"
-                                           data-kind="bracket"
-                                           data-match="${match.id}"
-                                           data-user="${match.visitorId}"/>
+                                    <label>
+                                        <input type="checkbox"
+                                               class="edit-check"
+                                               name="selected"
+                                               value="${match.id}:${match.visitorId}"
+                                               form="${formId}"
+                                               data-kind="bracket"
+                                               data-match="${match.id}"
+                                               data-user="${match.visitorId}"/>
+                                    </label>
                                 </c:if>
                             </div>
                         </div>

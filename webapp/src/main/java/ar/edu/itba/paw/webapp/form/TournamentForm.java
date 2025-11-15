@@ -5,8 +5,10 @@ import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.interfaces.Constants;
 import ar.edu.itba.paw.webapp.constraints.DatesConstraint;
+import ar.edu.itba.paw.webapp.constraints.DiscordUrlConstraint;
 import ar.edu.itba.paw.webapp.constraints.ImageConstraint;
 import ar.edu.itba.paw.webapp.constraints.ValidPDF;
+import ar.edu.itba.paw.webapp.constraints.NoPasswordWithoutServerNameConstraint;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,10 +16,12 @@ import java.time.LocalDate;
 import javax.validation.constraints.*;
 
 @DatesConstraint(groups = TournamentForm.StepOne.class)
-public class TournamentForm implements HasDates{
+@NoPasswordWithoutServerNameConstraint(groups = TournamentForm.StepThree.class)
+public class TournamentForm implements HasDates, HasServer{
 
     public interface StepOne {}
     public interface StepTwo {}
+    public interface StepThree {}
 
     @NotBlank(message = "{createTournament.notNull}", groups = StepOne.class)
     @Size(max = 100, groups = StepOne.class)
@@ -45,6 +49,11 @@ public class TournamentForm implements HasDates{
     private MultipartFile image;
     @NotNull(message = "{createTournament.notNull}", groups = StepTwo.class)
     private Long formatId;
+    private String serverName;
+    private String serverPassword;
+    @DiscordUrlConstraint(groups = StepThree.class)
+    private String discordChannel;
+    byte[] imageBytes;
 
     @ValidPDF(maxSize = Constants.MAX_PDF_SIZE)
     private MultipartFile rules;
@@ -77,6 +86,7 @@ public class TournamentForm implements HasDates{
         this.elo = elo;
     }
 
+    @Override
     public LocalDate getStartDate() {
         return startDate;
     }
@@ -84,6 +94,7 @@ public class TournamentForm implements HasDates{
         this.startDate = startDate;
     }
 
+    @Override
     public LocalDate getEndDate() {
         return endDate;
     }
@@ -124,6 +135,36 @@ public class TournamentForm implements HasDates{
     }
     public void setRules(MultipartFile rules) {
         this.rules = rules;
+    }
+
+    @Override
+    public String getServerName() {
+        return serverName;
+    }
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
+
+    @Override
+    public String getServerPassword() {
+        return serverPassword;
+    }
+    public void setServerPassword(String serverPassword) {
+        this.serverPassword = serverPassword;
+    }
+
+    public String getDiscordChannel() {
+        return discordChannel;
+    }
+    public void setDiscordChannel(String discordChannel) {
+        this.discordChannel = discordChannel;
+    }
+
+    public byte[] getImageBytes() {
+        return imageBytes;
+    }
+    public void setImageBytes(byte[] imageBytes) {
+        this.imageBytes = imageBytes;
     }
 }
 

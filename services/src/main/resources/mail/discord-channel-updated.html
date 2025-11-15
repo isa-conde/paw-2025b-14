@@ -65,30 +65,14 @@
     <div th:insert="email-header :: header"></div>
 
     <div class="content">
-        <h1 th:text="#{email.tournamentStartedNotification.title(${tournamentName})}">The tournament has begun!</h1>
-        <p th:text="#{email.tournamentStartedNotification.greeting(${userName})}">Hello user,</p>
-        <p th:text="#{email.tournamentStartedNotification.body(${tournamentName})}">
-            The tournament has begun! Click the button below to see your matches.
+        <h1 th:text="#{email.discordUpdated.title(${tournamentName})}">The tournament Discord channel was updated</h1>
+        <p th:text="#{email.discordUpdated.greeting(${userName})}">Hello user,</p>
+        <p th:text="#{email.discordUpdated.body(${tournamentName})}">
+            The tournament Discord channel was updated
         </p>
-        <br/>
-        <p th:text="#{email.tournamentStartedNotification.serverName(${serverName})}">Server name</p>
-        <p th:text="#{email.tournamentStartedNotification.serverPassword(${serverPassword})}">Server password</p>
-        <div class="row" style="display: flex; align-items: center; gap: 6px;">
-            <img alt="Discord"
-                 src="cid:discord"
-                 width="20" height="20"
-                 style="display:block;border:0;outline:none;">
-
-            <a th:href="${discordChannel}"
-               th:text="#{email.tournamentStartedNotification.discord}"
-               style="text-decoration: none; color: #5865F2; font-weight: bold;">
-                Discord Channel
-            </a>
-        </div>
-        <br/>
-        <p th:text="#{email.tournamentStartedNotification.advice(${creatorMail})}">Contact the creator with their email.</p>
-        <a class="btn" th:href="${tournamentLink}" th:text="#{email.tournamentStartedNotification.buttonLabel}">Go to Tournament</a>
+        <a class="btn" th:href="${pageLink}" th:text="#{email.discordUpdated.buttonLabel}">Open Tournament</a>
     </div>
+
 </div>
 </body>
 </html>

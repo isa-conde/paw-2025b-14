@@ -113,8 +113,12 @@ public class TournamentHibernateDao implements TournamentDao {
     }
 
     @Override
-    public Tournament create(Long creatorId, String name, Long gameId, Region region, Elo elo, LocalDate startDate, LocalDate endDate, String format, Structure structure, Integer maxParticipants, Long imageId, Boolean openInscriptions, Boolean isFinished, Long formatId, Long rulesId) {
-        Tournament t = new Tournament(em.getReference(User.class, creatorId), name, em.getReference(Game.class,  gameId), region, startDate, endDate, format, structure, maxParticipants, imageId, openInscriptions, isFinished, em.getReference(GameFormat.class, formatId));
+    public Tournament create(Long creatorId, String name, Long gameId, Region region, Elo elo, LocalDate startDate, LocalDate endDate, String format,
+                             Structure structure, Integer maxParticipants, Long imageId, Boolean openInscriptions, Boolean isFinished, Long formatId,
+                             Long rulesId, String serverName, String serverPassword, String discordChannel) {
+        Tournament t = new Tournament(em.getReference(User.class, creatorId), name, em.getReference(Game.class,  gameId), region, startDate, endDate, format,
+                structure, maxParticipants, imageId, openInscriptions, isFinished, em.getReference(GameFormat.class, formatId),
+                serverName, serverPassword, discordChannel);
         t.setTournamentStarted(false);
         t.setElo(elo);
         if (rulesId != null){
@@ -262,7 +266,7 @@ public class TournamentHibernateDao implements TournamentDao {
     }
 
     @Override
-    public void updateTournamentInfo(Long tournamentId, String name, LocalDate startDate, LocalDate endDate, Integer maxParticipants) {
+    public void updateTournamentInfo(Long tournamentId, String name, LocalDate startDate, LocalDate endDate, Integer maxParticipants, String serverName, String serverPassword, String discordChannel) {
         Tournament t = em.find(Tournament.class, tournamentId);
         if (name != null){
             t.setName(name);
@@ -272,6 +276,12 @@ public class TournamentHibernateDao implements TournamentDao {
             t.setEndDate(endDate);
         }if (maxParticipants != null){
             t.setMaxParticipants(maxParticipants);
+        }if (serverName != null){
+            t.setServerName(serverName);
+        }if (serverPassword != null){
+            t.setServerPassword(serverPassword);
+        }if (discordChannel != null){
+            t.setDiscordChannel(discordChannel);
         }
         em.persist(t);
     }

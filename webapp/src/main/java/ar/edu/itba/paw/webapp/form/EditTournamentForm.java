@@ -12,7 +12,8 @@ import java.time.LocalDate;
 @DatesNullabilityConstraint
 @MaxParticipantsNotBelowCurrent
 @MaxParticipantsNullabilityConstraint
-public class EditTournamentForm implements HasDates{
+@NoPasswordWithoutServerNameConstraint
+public class EditTournamentForm implements HasDates, HasServer {
     @NotNull
     private Long tournamentId;
     @NotBlank(message = "{createTournament.notNull}")
@@ -29,6 +30,10 @@ public class EditTournamentForm implements HasDates{
     private MultipartFile image;
     @ValidPDF(maxSize = Constants.MAX_PDF_SIZE)
     private MultipartFile rules;
+    private String serverName;
+    private String serverPassword;
+    @DiscordUrlConstraint(groups = TournamentForm.StepThree.class)
+    private String discordChannel;
 
     public String getName() {
         return name;
@@ -37,6 +42,7 @@ public class EditTournamentForm implements HasDates{
         this.name = name;
     }
 
+    @Override
     public LocalDate getStartDate() {
         return startDate;
     }
@@ -44,6 +50,7 @@ public class EditTournamentForm implements HasDates{
         this.startDate = startDate;
     }
 
+    @Override
     public LocalDate getEndDate() {
         return endDate;
     }
@@ -73,5 +80,28 @@ public class EditTournamentForm implements HasDates{
     }
     public void setRules(MultipartFile rules) {
         this.rules = rules;
+    }
+
+    @Override
+    public String getServerName() {
+        return serverName;
+    }
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
+
+    @Override
+    public String getServerPassword() {
+        return serverPassword;
+    }
+    public void setServerPassword(String serverPassword) {
+        this.serverPassword = serverPassword;
+    }
+
+    public String getDiscordChannel() {
+        return discordChannel;
+    }
+    public void setDiscordChannel(String discordChannel) {
+        this.discordChannel = discordChannel;
     }
 }

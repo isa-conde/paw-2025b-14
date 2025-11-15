@@ -40,6 +40,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
             .antMatchers("/", "/verify", "/verify/confirm").permitAll()
             .antMatchers("/tournament/update",
                     "/tournament/startTournament",
+                    "/tournament/removeParticipant",
                     "/tournament/swap/matches",
                     "/tournament/swap/groups",
                     "/tournament/closeInscriptions",
@@ -48,6 +49,7 @@ public class WebAuthConfig extends WebSecurityConfigurerAdapter {
             .access("@tournamentSecurity.isCreator(authentication, request)")
             .antMatchers("/tournaments/new/step1",
                     "/tournaments/new/step2",
+                    "/tournaments/new/step3",
                     "/tournament/join",
                     "/myTournaments",
                     "/profile/update",

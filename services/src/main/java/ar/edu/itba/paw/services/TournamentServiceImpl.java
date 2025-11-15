@@ -72,13 +72,16 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Transactional
     @Override
-    public Tournament create(Long creatorId, String name, Long gameId, Region region, Elo elo, LocalDate startDate, LocalDate endDate, String format, Structure structure, Integer maxParticipants, byte[] image, Boolean openInscriptions, Boolean isFinished, Long formatId, byte[] rules) {
+    public Tournament create(Long creatorId, String name, Long gameId, Region region, Elo elo, LocalDate startDate, LocalDate endDate, String format,
+                             Structure structure, Integer maxParticipants, byte[] image, Boolean openInscriptions, Boolean isFinished, Long formatId,
+                             byte[] rules, String serverName, String serverPassword, String discordChannel) {
         Long imageId = imageDao.insertImage(image);
         Long rulesId = null;
         if (rules != null){
             rulesId = rulesDao.insertRules(rules).getId();
         }
-        Tournament toReturn = tournamentDao.create(creatorId, name, gameId, region, elo, startDate, endDate, format, structure, maxParticipants, imageId, openInscriptions, isFinished, formatId, rulesId);
+        Tournament toReturn = tournamentDao.create(creatorId, name, gameId, region, elo, startDate, endDate, format, structure, maxParticipants,
+                imageId, openInscriptions, isFinished, formatId, rulesId, serverName, serverPassword, discordChannel);
         User creator = userDao.findById(creatorId).orElseThrow(UserNotFoundException::new);
         ms.sendTournamentCreatedEmail(toReturn.getId(), creator.getUsername(), name, creator.getEmail());
         LOGGER.info("Tournament {} has been successfully created", name);
@@ -207,7 +210,7 @@ public class TournamentServiceImpl implements TournamentService {
         User creator = optCreator.get();
         for(Participant p : participants) {
             User participant = userDao.findById(p.getUser().getId()).orElseThrow(UserNotFoundException::new);
-            ms.sendTournamentStartedEmail(tournamentId, participant.getUsername(), tournament.getName(), creator.getEmail(), participant.getEmail());
+            ms.sendTournamentStartedEmail(tournament, participant.getUsername(), creator.getEmail(), participant.getEmail());
         }
     }
 
@@ -229,13 +232,28 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Transactional
     @Override
-    public void updateTournamentInfo(Long tournamentId, String name, LocalDate startDate, LocalDate endDate, Integer maxParticipants, byte[] image){
-        Tournament tournament = findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
-        if(image != null){
-            imageDao.updateImage(tournament.getImageId(), image);
+    public void updateTournamentInfo(Long tournamentId, String name, LocalDate startDate, LocalDate endDate, Integer maxParticipants, byte[] image, String serverName, String serverPassword, String discordChannel){
+        Tournament t = findById(tournamentId).orElse(null);
+        if(t != null){
+            if(image != null){
+                imageDao.updateImage(t.getImageId(), image);
+            }
+            tournamentDao.updateTournamentInfo(tournamentId, name, startDate, endDate, maxParticipants, serverName, serverPassword, discordChannel);
+            if(t.getTournamentStarted()){
+                if(serverName != null || serverPassword != null || discordChannel != null){
+                    List<Participant> participants = participantDao.getTournamentParticipantUsers(tournamentId);
+                    for(Participant p : participants) {
+                        User participant = userDao.findById(p.getUser().getId()).orElseThrow(TournamentNotFoundException::new);
+                        if(serverName != null || serverPassword != null){
+                            ms.sendServerInfoUpdated(t, participant.getUsername(), participant.getEmail());
+                        }else {
+                            ms.sendDiscordLinkUpdated(t, participant.getUsername(), participant.getEmail());
+                        }
+                    }
+                }
+            }
+            LOGGER.info("The tournament with ID {} has successfully been updated", tournamentId);
         }
-        tournamentDao.updateTournamentInfo(tournamentId, name, startDate, endDate, maxParticipants);
-        LOGGER.info("The tournament with ID {} has successfully been updated", tournamentId);
     }
 
     @Override

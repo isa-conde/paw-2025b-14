@@ -20,20 +20,15 @@
 <c:url var="teamsUrl" value="/profile/${profileId}/teams"/>
 <c:set var="navbarUrls" value="${[overviewUrl, tourneysUrl, teamsUrl]}"/>
 
-
-
 <nav class="navbar">
     <c:forEach var="section" items="${navbarSections}" varStatus="status">
         <c:set var="label" value="${navbarLabels[status.index]}" />
         <c:set var="isActive" value="${section == activeSection}" />
-
         <a href="${navbarUrls[status.index]}" class="navbar-section ${isActive ? 'active' : ''}">
             <div>
                 <paw:text>${label}</paw:text>
             </div>
         </a>
-
-
         <div class="navbar-separator"></div>
     </c:forEach>
 </nav>

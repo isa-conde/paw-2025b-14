@@ -10,7 +10,7 @@
 
 <paw:modal title="logout.modal.title" id="logoutConfirmModal">
     <div class="row center">
-        <paw:button text="logout.confirm" onclick="window.location.href='${logoutUrl}'"/>
         <paw:button text="logout.cancel" onclick="closeModal('logoutConfirmModal')" secondary="true"/>
+        <paw:button text="logout.confirm" onclick="window.location.href='${logoutUrl}'"/>
     </div>
 </paw:modal>
