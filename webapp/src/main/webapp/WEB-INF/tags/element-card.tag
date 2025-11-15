@@ -11,8 +11,8 @@
 <%@ attribute name="started" required="false" type="java.lang.Boolean" %>
 <%@ attribute name="finished" required="false" type="java.lang.Boolean" %>
 
-<c:set var="hasChip" value="${not empty started && not empty finished}"/>
-<c:set var="url" value="${pageContext.request.contextPath}/${isGame == 'true' ? 'tournamentsPage?gameId=' : 'tournament?tournamentId='}${id}"/>
+<c:set var="hasChip" value="${not empty started && not empty finished && !isGame}"/>
+<c:set var="url" value="${pageContext.request.contextPath}/${isGame == 'true' ? 'tournamentsPage?gameId=' : 'tournament/'}${id}"/>
 <a href="${url}" class="element-card">
     <img src="${image}" alt="Background" class="element-card-image">
     <div class="element-card-content game">

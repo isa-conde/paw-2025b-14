@@ -282,7 +282,7 @@
                                 </paw:text>
 
                                 <div class="discord-row">
-                                    <c:url value="/images/crown.png" var="discordUrl" />
+                                    <c:url value="/images/DISCORD.png" var="discordUrl" />
                                     <img alt="Discord" src="${discordUrl}" width="30" height="30">
                                     <a href="${tournament.discordChannel}" class="title-link" target="_blank" rel="noopener noreferrer">
                                         <paw:text size="l" weight="semi-bold">

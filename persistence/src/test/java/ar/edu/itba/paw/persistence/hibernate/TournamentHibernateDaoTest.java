@@ -57,6 +57,9 @@ public class TournamentHibernateDaoTest {
     private static final Long ID = 100L;
     private static final Long NO_ONE_ID = 0L;
     private static final Integer MAX_PARTICIPANTS = 4;
+    private static final String SERVER_NAME = "Discord Channel";
+    private static final String SERVER_PASSWORD = "Discord Password";
+    private static final String SERVER_LINK = "Discord Link";
 
     @Before
     public void setUp(){
@@ -80,7 +83,10 @@ public class TournamentHibernateDaoTest {
                 true,
                 false,
                 ID,
-                ID);
+                ID,
+                SERVER_NAME,
+                SERVER_PASSWORD,
+                SERVER_LINK);
         em.flush();
 
         Assert.assertNotNull(tournament);
@@ -99,6 +105,7 @@ public class TournamentHibernateDaoTest {
         Assert.assertFalse(tournament.getFinished());
         Assert.assertEquals(ID,tournament.getFormatId());
         Assert.assertEquals(ID,tournament.getRules().getId());
+        //TODO AGREGAR TESTOS AL SERVIDOR DE DISCORD
         Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"tournament",
                 "id = " + tournament.getId() + " and name = '" + NAME + "' and creator_id = " + ID
          + " and game_id = creator_id and image_id = game_id and format_id = game_id and rules_id = game_id and "

@@ -1764,13 +1764,28 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     margin-bottom: 8px;
 }
 
-.user-account-item-modal{
+.user-account-modal{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-account-left {
     display: flex;
     align-items: center;
-    gap: 20px;
-    margin-bottom: 8px;
-    flex-direction: column;
+    gap: 15px;
+    flex-direction: row;
 }
+
+.user-account-modal-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 50%;
+    padding: 5px 0;
+}
+
 
 .flex-row{
     display: flex;

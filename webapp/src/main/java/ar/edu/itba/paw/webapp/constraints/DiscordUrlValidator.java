@@ -32,7 +32,7 @@ public class DiscordUrlValidator implements ConstraintValidator<DiscordUrlConstr
         }
 
         String regex =
-                "^https://(discord\\.com|discordapp\\.com)/channels/(@me|\\d+)/\\d+$";
+                "^https://(discord\\.gg|discord(?:app)?\\.com)/[A-Za-z0-9/@._-]+$";
 
         return value.matches(regex);
     }

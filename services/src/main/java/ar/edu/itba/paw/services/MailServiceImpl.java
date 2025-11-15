@@ -388,6 +388,35 @@ public class MailServiceImpl implements MailService {
         sendEmail(creator.getEmail(), subject, body, false);
     }
 
+    @Async
+    @Override
+    public void sendDiscordLinkUpdated(Tournament tournament, String userName, String recipient){
+        Optional<User> optionalUser = userDao.findByUsername(userName);
+        if (optionalUser.isEmpty()){
+            LOGGER.warn("User {} not found", userName);
+            return;
+        }
+        User user = optionalUser.get();
+        Locale locale = toLocale(user.getLocale());
+        Context ctx = new Context(locale);
+        ctx.setVariable("userName", userName);
+        ctx.setVariable("tournamentName", tournament.getName());
+        String tournamentLink = baseUrl + "/tournament/" + tournament.getId();
+        ctx.setVariable("tournamentLink", tournamentLink);
+        ctx.setVariable("crownCid", "cid:" + CROWN_CID);
+        ctx.setVariable("discordCid", "cid:" + DISCORD_CID);
+
+        String body = templateEngine.process("discord-channel-updated", ctx);
+
+        String subject = messageSource.getMessage(
+                "email.discordUpdated.subject",
+                new Object[]{tournament.getName()},
+                locale);
+
+        sendEmail(recipient, subject, body, true);
+    }
+
+
     private void sendEmail(String recipient, String subject, String body, Boolean hasDiscordLogo) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {

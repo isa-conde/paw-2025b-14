@@ -449,6 +449,8 @@ public class TournamentController {
             return newTournamentFormStep3(currentUser, form);
         }
 
+        System.out.println("ELO del form: '" + form.getElo() + "'");
+
         final Tournament t = ts.create(user.getId(), form.getName(), form.getGameId(),
                 form.getRegion(), form.getElo(), form.getStartDate(), form.getEndDate(),
                 null, form.getStructure(), form.getMaxParticipants(), form.getImageBytes(), true, false, form.getFormatId(),

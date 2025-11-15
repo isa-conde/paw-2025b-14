@@ -173,22 +173,24 @@
 </paw:modal>
 
 <paw:modal title="profile.editAccount.title" id="editAccountsModal" returnUrl="${profileUrl}">
-        <div class="user-account-item-modal">
+        <div class="user-account-modal">
             <c:choose>
                 <c:when test="${userAccounts.size() > 0}">
                     <c:forEach var="account" items="${userAccounts}" varStatus="status">
-                        <form method="post" action="/account/delete">
+                        <form method="post" action="/account/delete" class="user-account-modal-item">
                             <input type="hidden" name="userId" value="${profile.id}">
                             <input type="hidden" name="platform" value="${account.platform}">
-                            <div class="user-account-item">
-                                <img src="${pageContext.request.contextPath}/images/${account.platform}.png"
-                                     alt="${account.platform}"
-                                     width="40"
-                                     height="40"
-                                     class="platform-icon">
-                                <paw:text><c:out  value="${account.username}"/></paw:text>
-                                <paw:button onclick=""/>
-                            </div>
+                                <div class="user-account-left">
+                                    <img src="${pageContext.request.contextPath}/images/${account.platform}.png"
+                                         alt="${account.platform}"
+                                         width="40"
+                                         height="40"
+                                         class="platform-icon">
+
+                                    <paw:text><c:out value="${account.username}"/></paw:text>
+                                </div>
+
+                                <paw:button onclick="" image="${pageContext.request.contextPath}/images/bin.png" size="m"/>
                         </form>
                     </c:forEach>
                 </c:when>
