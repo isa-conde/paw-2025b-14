@@ -363,7 +363,7 @@ public class TournamentHibernateDaoTest {
         List<Tournament> tournaments = tournamentHibernateDao.searchByName("");
 
         Assert.assertNotNull(tournaments);
-        Assert.assertEquals(TOURNEYS_WITH_ID, tournaments.size());
+        Assert.assertEquals(OPEN_WITH_ID, tournaments.size());
         Assert.assertTrue(tournaments.stream().allMatch(t -> t.getName().toLowerCase().contains("".toLowerCase())));
     }
 

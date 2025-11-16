@@ -107,6 +107,7 @@ create table if not exists match(
     winner integer,
     stage integer,
     is_group_stage boolean,
+    date date,
     primary key (id,tournament_id)
 );
 

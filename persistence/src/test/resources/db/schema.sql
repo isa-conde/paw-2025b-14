@@ -163,3 +163,5 @@ insert into participant (id, user_id, tournament_id, points) values (140,101,120
 insert into participant (id, team_id, tournament_id, points) values (141,101,120, 0);
 
 insert into game_format (id, name, players_per_team, game_id) values (100, 'formi', 6, 103);
+
+insert into match (id, tournament_id, local_id, visitor_id, winner, local_score, visitor_score, is_group_stage) VALUES (0, 100, 100, 101, 2, 4, 5, true);
