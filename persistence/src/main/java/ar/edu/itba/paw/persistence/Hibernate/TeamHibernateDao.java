@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.persistence.Hibernate;
 
+import ar.edu.itba.paw.interfaces.exception.UserNotFoundException;
 import ar.edu.itba.paw.interfaces.persistence.TeamDao;
 import ar.edu.itba.paw.model.Team;
 import ar.edu.itba.paw.model.User;
@@ -22,9 +23,8 @@ public class TeamHibernateDao implements TeamDao {
     public Team create(String name, Long pfpId, Long bannerId, Long ownerId) {
         User owner = em.find(User.class, ownerId);
         if (owner == null) {
-            throw new IllegalArgumentException();
+            throw new UserNotFoundException();
         }
-
         Team team = new Team(name, pfpId, bannerId);
         team.setOwner(owner);
         em.persist(team);
@@ -64,16 +64,16 @@ public class TeamHibernateDao implements TeamDao {
     }
 
     @Override
-    public Long getActivePages(Long teamId) {
+    public long getActivePages(Long teamId) {
         return getTeamTournamentsPages(teamId, false);
     }
 
     @Override
-    public Long getPastPages(Long teamId) {
+    public long getPastPages(Long teamId) {
         return getTeamTournamentsPages(teamId, true);
     }
 
-    private Long getTeamTournamentsPages(Long teamId, Boolean isFinished){
+    private long getTeamTournamentsPages(Long teamId, boolean isFinished){
         String jpql = """
             SELECT DISTINCT COUNT (DISTINCT (p.tournament.id))
             FROM Participant p
@@ -108,7 +108,7 @@ public class TeamHibernateDao implements TeamDao {
     }
 
     @Override
-    public Boolean teamNameTaken(String name) {
+    public boolean teamNameTaken(String name) {
         String jpql = "SELECT COUNT(t) FROM Team t WHERE t.name = :name";
         Long count = em.createQuery(jpql, Long.class)
                 .setParameter("name", name)

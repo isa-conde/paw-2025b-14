@@ -35,7 +35,7 @@ public class MembersNotInTournamentValidator implements ConstraintValidator<Memb
             return true;
         }
 
-        final Long tournamentId = form.getTournamentId();
+        final long tournamentId = form.getTournamentId();
 
         List<Long> memberIds = form.getMembers().stream()
                 .filter(Objects::nonNull)

@@ -19,9 +19,9 @@ public interface UserDao {
 
     void changePassword(long userId, String newPassword);
 
-    Boolean checkUsernameExists(String username);
+    boolean checkUsernameExists(String username);
 
-    Boolean checkEmailExists(String email);
+    boolean checkEmailExists(String email);
 
     void verifyUser(long userId);
 

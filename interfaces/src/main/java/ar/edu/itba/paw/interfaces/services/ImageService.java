@@ -4,7 +4,7 @@ import java.util.Optional;
 
 public interface ImageService {
 
-    Optional<byte[]> findById(Long id);
+    Optional<byte[]> findById(long id);
 
     Long insertImage(byte[] img);
 

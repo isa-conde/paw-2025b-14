@@ -17,19 +17,19 @@ public interface TeamService {
 
     List<Tournament> getPastTournaments(Long teamId, Integer page);
 
-    Long getActivePages(Long teamId);
+    long getActivePages(Long teamId);
 
-    Long getPastPages(Long teamId);
+    long getPastPages(Long teamId);
 
     List<Team> getUserTeams(Long userId);
 
     void updateTeam(Long teamId, String name, byte[] pfp, byte[] banner, List<String> members);
 
-    Boolean isMember(Long teamId, Long userId);
+    boolean isMember(Long teamId, Long userId);
 
     List<User> getTeamMembers(Long teamId);
 
-    Boolean teamNameTaken(String name);
+    boolean teamNameTaken(String name);
 
     List<Team> getUserTeamsBySizeNotInTournament(Long userId, Long tournamentId);
 

@@ -246,7 +246,7 @@ public class TournamentHibernateDao implements TournamentDao {
     }
 
     @Override
-    public Integer getPageAmount(Integer pageSize, TournamentFilter tf) {
+    public int getPageAmount(int pageSize, TournamentFilter tf) {
         Map<String, Object> params = new HashMap<>();
         StringBuilder jpql;
         if (tf.isEmpty()){
@@ -321,7 +321,7 @@ public class TournamentHibernateDao implements TournamentDao {
     }
 
     @Override
-    public Boolean isTournamentStarted(Long tournamentId) {
+    public boolean isTournamentStarted(Long tournamentId) {
         Tournament t = em.find(Tournament.class, tournamentId);
         return t.getTournamentStarted();
     }
@@ -415,19 +415,19 @@ public class TournamentHibernateDao implements TournamentDao {
     }
 
     @Override
-    public Integer getUserActiveTournamentsPages(Long userId) {
+    public int getUserActiveTournamentsPages(Long userId) {
         int count = countUserTournaments(userId, false);
         return (int) Math.ceil(count / 9.0);
     }
 
     @Override
-    public Integer getUserPastTournamentsPages(Long userId) {
+    public int getUserPastTournamentsPages(Long userId) {
         int count = countUserTournaments(userId, true);
         return (int) Math.ceil(count / 9.0);
     }
 
     @Override
-    public Integer getCreatedAndFinishedTournamentsPages(Long userId) {
+    public int getCreatedAndFinishedTournamentsPages(Long userId) {
         int count = countCreatedTournaments(userId, true);
         return (int) Math.ceil(count / 9.0);
     }
@@ -449,7 +449,7 @@ public class TournamentHibernateDao implements TournamentDao {
     }
 
     @Override
-    public Integer getUserWonTournamentPages(Long userId) {
+    public int getUserWonTournamentPages(Long userId) {
         TypedQuery<Long> nativeQuery = em.createQuery("SELECT COUNT(t.id) FROM Tournament t WHERE t.winner = (SELECT p FROM Participant p WHERE p.user = :user AND p.tournament = t)", Long.class);
         nativeQuery.setParameter("user", em.getReference(User.class, userId));
         Long ans = nativeQuery.getSingleResult();
@@ -457,7 +457,7 @@ public class TournamentHibernateDao implements TournamentDao {
     }
 
     @Override
-    public Integer getCreatedAndOngoingTournamentsPages(Long userId) {
+    public int getCreatedAndOngoingTournamentsPages(Long userId) {
         int count = countCreatedTournaments(userId, false);
         return (int) Math.ceil(count / 9.0);
     }

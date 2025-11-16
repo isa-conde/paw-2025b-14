@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 @Transactional(readOnly = true)
 @Service
@@ -42,7 +41,7 @@ public class ParticipantServiceImpl implements ParticipantService {
 
     @Transactional
     @Override
-    public void joinTournamentUser(Long userId, Long tournamentId) {
+    public void joinTournamentUser(long userId, long tournamentId) {
         if(hasJoined(userId, tournamentId)) {
             LOGGER.warn("User with ID {} has already joined tournament with ID {}", userId, tournamentId);
             throw new UserAlreadyJoinedException();
@@ -82,12 +81,12 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
-    public Integer getTournamentGroups(Long tournamentId){
+    public int getTournamentGroups(Long tournamentId){
         return participantDao.getTournamentGroups(tournamentId);
     }
 
     @Override
-    public Boolean hasJoined(Long userId, Long tournamentId) {
+    public boolean hasJoined(Long userId, Long tournamentId) {
         return participantDao.hasJoined(userId, tournamentId);
     }
 
@@ -109,13 +108,16 @@ public class ParticipantServiceImpl implements ParticipantService {
     @Override
     public void swapGroups(Long tournamentId, Long user1, Long user2){
         if (tournamentDao.isTournamentStarted(tournamentId)) {
-            throw new IllegalStateException("Members cannot be swapped after the tournament has started"); // TODO: custom handling
+            throw new TournamentAlreadyStartedException();
         }
         Tournament tournament = tournamentDao.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
         Integer teamSize = gameFormatDao.findById(tournament.getFormatId()).orElseThrow(GameFormatNotFoundException::new).getPlayersPerTeam();
 
         Integer g1 = participantDao.getGroupNumber(tournamentId, user1, teamSize);
         Integer g2 = participantDao.getGroupNumber(tournamentId, user2, teamSize);
+        if(g1 == null || g2 == null) {
+            throw new MissingGroupNumberException();
+        }
 
         if (g1.equals(g2)) {
             LOGGER.warn("Cannot swap users within the same group");
@@ -128,7 +130,7 @@ public class ParticipantServiceImpl implements ParticipantService {
 
     @Transactional
     @Override
-    public void joinTournamentTeam(Long tournamentId, Long teamId, List<Long> participants){
+    public void joinTournamentTeam(long tournamentId, long teamId, List<Long> participants){
         Tournament tournament = tournamentDao.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
         Team team = teamDao.findById(teamId).orElseThrow(TeamNotFoundException::new);
         User creator = userDao.findById(tournament.getCreatorId()).orElseThrow(UserNotFoundException::new);
@@ -156,7 +158,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
-    public Boolean participantHasRatedTournament(Long tournamentId, Long userId) {
+    public boolean participantHasRatedTournament(Long tournamentId, Long userId) {
         return participantDao.hasRated(tournamentId, userId);
     }
 
@@ -175,7 +177,7 @@ public class ParticipantServiceImpl implements ParticipantService {
 
     @Transactional
     @Override
-    public void removeParticipant(Long tournamentId, Long participantId){
+    public void removeParticipant(long tournamentId, Long participantId){
         Tournament tournament = tournamentDao.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
         if(!tournament.getOpenInscriptions()){
             LOGGER.warn("Cannot remove participant from a closed tournament");

@@ -22,18 +22,18 @@ public class GameFormatHibernateDao implements GameFormatDao {
     }
 
     @Override
-    public List<GameFormat> getFormats(Long gameId) {
+    public List<GameFormat> getFormats(long gameId) {
         Game g = em.find(Game.class, gameId);
         return g.getFormats();
     }
 
     @Override
-    public Optional<GameFormat> findById(Long id) {
+    public Optional<GameFormat> findById(long id) {
         return Optional.of(em.find(GameFormat.class, id));
     }
 
     @Override
-    public Integer getPlayersPerTeam(Long id) {
+    public int getPlayersPerTeam(long id) {
         GameFormat gameFormat = em.find(GameFormat.class, id);
         return gameFormat.getPlayersPerTeam();
     }

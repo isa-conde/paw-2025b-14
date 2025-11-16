@@ -23,9 +23,9 @@ public interface MailService {
 
     void sendTournamentWinnerEmail(Long tournamentId, String username, String tournamentName, String recipient);
 
-    void sendVerificationEmail(Long userId, String userName, Long token, String recipient);
+    void sendVerificationEmail(Long userId, String userName, long token, String recipient);
 
-    void sendResetPasswordEmail(Long userId, Long token, String recipient);
+    void sendResetPasswordEmail(Long userId, long token, String recipient);
 
     void sendContactOwnerEmail(Tournament tournament, User user, String emailSubject, String emailBody, User creator);
 

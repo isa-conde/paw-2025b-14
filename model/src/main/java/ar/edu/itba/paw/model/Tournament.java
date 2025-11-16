@@ -37,8 +37,8 @@ public class Tournament {
     @JoinColumn(name = "game_id", nullable = false)
     private Game game;
 
-    @Column(name = "game_id", insertable = false, updatable = false)
-    private Long gameId;
+    @Column(name = "game_id", insertable = false, updatable = false, nullable = false)
+    private long gameId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "region", columnDefinition = "region_enum")
@@ -65,7 +65,7 @@ public class Tournament {
     private Structure structure;
 
     @Column(name = "max_participants", nullable = false)
-    private Integer maxParticipants;
+    private int maxParticipants;
 
     @Column(name = "image_id")
     private Long imageId;
@@ -83,8 +83,8 @@ public class Tournament {
     @Column(name = "is_group_stage")
     private Boolean isGroupStage;
 
-    @Column(name = "tournament_started")
-    private Boolean tournamentStarted;
+    @Column(name = "tournament_started", nullable = false)
+    private boolean tournamentStarted;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "format_id", nullable = false)
@@ -113,7 +113,7 @@ public class Tournament {
     private Rules rules;
 
     public Tournament(User creator, String name, Game game, Region region, LocalDate startDate, LocalDate endDate, String format,
-                      Structure structure, Integer maxParticipants, Long imageId, Boolean openInscriptions, Boolean isFinished,
+                      Structure structure, int maxParticipants, Long imageId, Boolean openInscriptions, Boolean isFinished,
                       GameFormat formatEntity, String serverName, String serverPassword, String discordChannel) {
         this.creator = creator;
         this.name = name;
@@ -148,7 +148,7 @@ public class Tournament {
         return name;
     }
 
-    public Long getGameId() {
+    public long getGameId() {
         return gameId;
     }
 
@@ -180,7 +180,7 @@ public class Tournament {
         return structure;
     }
 
-    public Integer getMaxParticipants() {
+    public int getMaxParticipants() {
         return maxParticipants;
     }
 
@@ -206,7 +206,7 @@ public class Tournament {
         return isGroupStage;
     }
 
-    public Boolean getTournamentStarted() {
+    public boolean getTournamentStarted() {
         return tournamentStarted;
     }
 
@@ -264,7 +264,7 @@ public class Tournament {
         this.imageId = imageId;
     }
 
-    public void setMaxParticipants(Integer maxParticipants) {
+    public void setMaxParticipants(int maxParticipants) {
         this.maxParticipants = maxParticipants;
     }
 
@@ -296,7 +296,7 @@ public class Tournament {
         this.openInscriptions = openInscriptions;
     }
 
-    public void setTournamentStarted(Boolean tournamentStarted) {
+    public void setTournamentStarted(boolean tournamentStarted) {
         this.tournamentStarted = tournamentStarted;
     }
 

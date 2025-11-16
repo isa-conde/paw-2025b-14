@@ -15,7 +15,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_userid_seq")
     @SequenceGenerator(sequenceName = "users_userid_seq", name = "users_userid_seq", allocationSize = 1)
     @Column(name = "id")
-    private long id;
+    private Long id;
 
     @Column(name = "username", nullable = false, unique = true)
     private String username;
@@ -63,7 +63,7 @@ public class User {
 
     public User(){}
 
-    public User(final long id, final String username, final String email, String password, boolean verified, String bio, Long pfpId, Long bannerId, String locale) {
+    public User(final Long id, final String username, final String email, String password, boolean verified, String bio, Long pfpId, Long bannerId, String locale) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -83,11 +83,11 @@ public class User {
         this.locale = locale;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

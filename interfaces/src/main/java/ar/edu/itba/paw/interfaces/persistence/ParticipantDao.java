@@ -7,17 +7,17 @@ import java.util.List;
 
 public interface ParticipantDao {
 
-    void joinTournamentUser(Long userId, Long tournamentId);
+    void joinTournamentUser(long userId, long tournamentId);
 
-    void joinTournamentUserWithTeam(Long userId, Long tournamentId, Long teamId);
+    void joinTournamentUserWithTeam(Long userId, long tournamentId, long teamId);
 
-    void joinTournamentTeam(Long tournamentId, Long teamId);
+    void joinTournamentTeam(long tournamentId, long teamId);
 
-    Participant getTournamentParticipantById(Long tournamentId, Long participantId, Integer teamSize);
+    Participant getTournamentParticipantById(long tournamentId, Long participantId, int teamSize);
 
-    Boolean hasJoined(Long userId, Long tournamentId);
+    boolean hasJoined(Long userId, long tournamentId);
 
-    Boolean hasRated(Long userId, Long tournamentId);
+    boolean hasRated(Long userId, Long tournamentId);
 
     void leaveTournamentUser(Long userId, Long tournamentId);
 
@@ -37,7 +37,7 @@ public interface ParticipantDao {
 
     PointsPair getTournamentSecondMaxPointsPairGroup(Long tournamentId, Integer group);
 
-    Integer getTournamentGroups(Long tournamentId);
+    int getTournamentGroups(Long tournamentId);
 
     List<Participant> getTournamentParticipantUsers(Long tournamentId);
 

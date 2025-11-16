@@ -4,6 +4,6 @@ public interface TeamMemberDao {
 
     void addMember(Long teamId, Long userId);
 
-    Boolean isMember(Long teamId, Long userId);
+    boolean isMember(Long teamId, Long userId);
 
 }

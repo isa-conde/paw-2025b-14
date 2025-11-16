@@ -65,14 +65,14 @@ public class UserHibernateDao implements UserDao {
     }
 
     @Override
-    public Boolean checkUsernameExists(String username) {
-    final TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE u.username = :username", User.class);
-    query.setParameter("username", username);
-    return !query.getResultList().isEmpty();
+    public boolean checkUsernameExists(String username) {
+        final TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE u.username = :username", User.class);
+        query.setParameter("username", username);
+        return !query.getResultList().isEmpty();
     }
 
     @Override
-    public Boolean checkEmailExists(String email) {
+    public boolean checkEmailExists(String email) {
         final TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class);
         query.setParameter("email", email);
         return !query.getResultList().isEmpty();

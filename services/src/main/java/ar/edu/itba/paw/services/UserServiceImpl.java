@@ -206,6 +206,11 @@ public class UserServiceImpl implements UserService {
         if (banner != null){
             bannerId = imageDao.insertImage(banner);
         }
+
+        if(pfpId == null || bannerId == null) {
+            throw new ImageNotFoundException();
+        }
+
         userDao.updateProfileInfo(userId, username, bio, pfpId, bannerId);
         LOGGER.info("Profile of user {} has been correctly updated", username);
     }

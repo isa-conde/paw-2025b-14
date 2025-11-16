@@ -1,7 +1,6 @@
 package ar.edu.itba.paw.services;
 
-import ar.edu.itba.paw.interfaces.exception.MatchWinnerAlreadySetException;
-import ar.edu.itba.paw.interfaces.exception.TournamentNotFoundException;
+import ar.edu.itba.paw.interfaces.exception.*;
 import ar.edu.itba.paw.interfaces.persistence.MatchDao;
 import ar.edu.itba.paw.interfaces.persistence.ParticipantDao;
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
@@ -38,11 +37,11 @@ public class MatchServiceImpl implements MatchService {
 
     @Transactional
     @Override
-    public void swapMatchesMembers(Long tournamentId, Long match1, Long match2, Long user1, Long user2){
+    public void swapMatchesMembers(long tournamentId, long match1, long match2, long user1, long user2){
         Match m1 = matchDao.getMatch(tournamentId, match1);
         Match m2 = matchDao.getMatch(tournamentId, match2);
         if (m1 == null || m2 == null) {
-            throw new IllegalArgumentException("Both matches must exist in the tournament"); // TODO: custom handling
+            throw new MatchNotFoundException();
         }
 
         boolean u1IsLocalM1 = m1.getLocalId() != null && m1.getLocalId().equals(user1);
@@ -51,7 +50,7 @@ public class MatchServiceImpl implements MatchService {
         boolean u2IsVisitM2 = m2.getVisitorId() != null && m2.getVisitorId().equals(user2);
 
         if ((!u1IsLocalM1 && !u1IsVisitM1) || (!u2IsLocalM2 && !u2IsVisitM2)) {
-            throw new IllegalArgumentException("user1 must be in match1 and user2 must be in match2"); // TODO: custom handling
+            throw new ParticipantNotInMatchException();
         }
         if (u1IsLocalM1) {
             matchDao.updateMatchLocal(tournamentId, match1, user2);
@@ -68,16 +67,13 @@ public class MatchServiceImpl implements MatchService {
 
     @Transactional
     @Override
-    public Map<Integer, List<Match>> getTournamentMatchesByStage(Long tournamentId){
-        List<Match> matches = matchDao.getTournamentMatches(tournamentId, ts.getPlayersPerTeam(tournamentId));
+    public Map<Integer, List<Match>> getTournamentMatchesByStage(long tournamentId){
+        int teamSize = ts.getPlayersPerTeam(tournamentId);
+        List<Match> matches = matchDao.getTournamentMatches(tournamentId, teamSize);
         if (matches.isEmpty()) {
             return Collections.emptyMap();
         }
         matches.sort(Comparator.comparingLong(Match::getId));
-        Integer teamSize = ts.getPlayersPerTeam(tournamentId);
-        if(teamSize == null){
-            teamSize = 1;
-        }
         Map<Integer, List<Match>> result = new TreeMap<>();
         Boolean isGroupStage = tournamentDao.getIsGroupStage(tournamentId);
         for (Match m : matches) {
@@ -94,9 +90,9 @@ public class MatchServiceImpl implements MatchService {
 
     @Transactional
     @Override
-    public void setMatchResults(Long matchId, Long tournamentId, Integer localScore, Integer visitorScore) {
+    public void setMatchResults(long matchId, long tournamentId, Integer localScore, Integer visitorScore) {
         if (localScore == null || visitorScore == null) {
-            throw new IllegalArgumentException("Scores cannot be empty"); // TODO: custom handling
+            throw new ScoresInvalidException();
         }
         if(hasWinner(matchId, tournamentId)) {
             LOGGER.warn("Match with ID {} already has a winner", matchId);
@@ -144,8 +140,11 @@ public class MatchServiceImpl implements MatchService {
         LOGGER.info("The winner of match with ID {} has been correctly set", matchId);
     }
 
-    private void setNextMatchInfo(Long matchId, Long tournamentId, Long winnerId) {
+    private void setNextMatchInfo(long matchId, long tournamentId, Long winnerId) {
         Integer currentStage = matchDao.getMatchStage(tournamentId, matchId);
+        if(currentStage == null) {
+            throw new StageIsNotSetException();
+        }
 
         List<Long> idsThisStage = matchDao.getStageMatchIds(currentStage, tournamentId).stream().sorted().toList();
         List<Long> idsNextStage = matchDao.getStageMatchIds(currentStage + 1, tournamentId).stream().sorted().toList();
@@ -155,6 +154,9 @@ public class MatchServiceImpl implements MatchService {
             return;
         }
         Long parentMatchId = idsNextStage.get(indexInStage / 2);
+        if(parentMatchId == null) {
+            throw new MatchNotFoundException();
+        }
         boolean isLeftChild = (indexInStage % 2 == 0);
         if (isLeftChild) {
             matchDao.updateMatchLocal(tournamentId, parentMatchId, winnerId);

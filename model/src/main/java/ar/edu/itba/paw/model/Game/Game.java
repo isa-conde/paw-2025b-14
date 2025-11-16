@@ -19,7 +19,7 @@ public class Game {
     private Long id;
 
     @Column(name = "name", nullable = false)
-    private  String name;
+    private String name;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "genre", columnDefinition = "genre_enum")

@@ -1,15 +1,14 @@
 package ar.edu.itba.paw.interfaces.services;
 
 import ar.edu.itba.paw.model.Participant;
-import ar.edu.itba.paw.model.User;
 
 import java.util.List;
 
 public interface ParticipantService {
 
-    void joinTournamentUser(Long userId, Long tournamentId);
+    void joinTournamentUser(long userId, long tournamentId);
 
-    Boolean hasJoined(Long userId, Long tournamentId);
+    boolean hasJoined(Long userId, Long tournamentId);
 
     void leaveTournament(Long userId, Long tournamentId);
 
@@ -17,13 +16,13 @@ public interface ParticipantService {
 
     List<Participant> getTournamentParticipants(Long tournamentId, Integer teamSize);
 
-    Integer getTournamentGroups(Long tournamentId);
+    int getTournamentGroups(Long tournamentId);
 
-    void joinTournamentTeam(Long tournamentId, Long teamId, List<Long> participants);
+    void joinTournamentTeam(long tournamentId, long teamId, List<Long> participants);
 
-    Boolean participantHasRatedTournament(Long tournamentId, Long userId);
+    boolean participantHasRatedTournament(Long tournamentId, Long userId);
 
     void updateCreatorRating(Long tournamentId, Long creatorId, Long reviewerId, Float rating);
 
-    void removeParticipant(Long tournamentId, Long participantId);
+    void removeParticipant(long tournamentId, Long participantId);
 }

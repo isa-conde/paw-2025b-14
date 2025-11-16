@@ -55,7 +55,7 @@ public class GameHibernateDaoTest {
         final Game game = gameHibernateDao.create(NAME, GENRE, 1);
         em.flush();
 
-        Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"game","name = '" + NAME + "' and genre = '" + GENRE + "' and image_id = 1"));
+        Assert.assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"game","name = '" + NAME + "' and genre = '" + GENRE + "' and image_id = 1"));
         Assert.assertNotNull(game);
         Assert.assertEquals(NAME, game.getName());
         Assert.assertEquals(GENRE, game.getGenre());
@@ -248,9 +248,9 @@ public class GameHibernateDaoTest {
     public void testGetPageAmount(){
         long expected = (long) Math.ceil((double) (OTHER_NAMES.length * Genre.values().length) /GRID_PAGE_SIZE);
 
-        Long ans = gameHibernateDao.getPageAmount();
+        long ans = gameHibernateDao.getPageAmount();
 
-        Assert.assertEquals(expected,ans.longValue());
+        Assert.assertEquals(expected,ans);
     }
 
     @Test

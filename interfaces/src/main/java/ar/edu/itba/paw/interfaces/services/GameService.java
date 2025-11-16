@@ -23,11 +23,11 @@ public interface GameService {
 
     List<GameFormat> getFormats(Long gameId);
 
-    List<Game> getFavourites(Long userId);
+    List<Game> getFavourites(long userId);
 
-    List<Game> findAllPaged(Long page);
+    List<Game> findAllPaged(long page);
 
-    Long getPageAmount();
+    long getPageAmount();
 
     GameFormat findFormatById(Long id);
 }

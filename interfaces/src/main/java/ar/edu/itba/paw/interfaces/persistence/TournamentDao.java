@@ -39,7 +39,7 @@ public interface TournamentDao {
 
     Map<Long,List<Tournament>> getUnfilteredTournamentPages(Long page);
 
-    Integer getPageAmount(Integer pageSize, TournamentFilter tf);
+    int getPageAmount(int pageSize, TournamentFilter tf);
 
     void updateTournamentInfo(Long tournamentId, String name, LocalDate startDate, LocalDate endDate, Integer maxParticipants, String serverName, String serverPassword, String discordChannel);
 
@@ -51,7 +51,7 @@ public interface TournamentDao {
 
     void setTournamentWinner(Long tournamentId, Long winnerId);
 
-    Boolean isTournamentStarted(Long tournamentId);
+    boolean isTournamentStarted(Long tournamentId);
 
     void updateAllStartDates();
 
@@ -59,17 +59,17 @@ public interface TournamentDao {
 
     boolean isClosed(Long tournamentId);
 
-    Integer getUserPastTournamentsPages(Long userId);
+    int getUserPastTournamentsPages(Long userId);
 
-    Integer getUserActiveTournamentsPages(Long userId);
+    int getUserActiveTournamentsPages(Long userId);
 
-    Integer getCreatedAndOngoingTournamentsPages(Long userId);
+    int getCreatedAndOngoingTournamentsPages(Long userId);
 
-    Integer getCreatedAndFinishedTournamentsPages(Long userId);
+    int getCreatedAndFinishedTournamentsPages(Long userId);
 
     void updateTournamentRating(Long tournamentId, Float userRating);
 
     List <Tournament> getUserWonTournament(Long userId, Long page);
 
-    Integer getUserWonTournamentPages(Long userId);
+    int getUserWonTournamentPages(Long userId);
 }

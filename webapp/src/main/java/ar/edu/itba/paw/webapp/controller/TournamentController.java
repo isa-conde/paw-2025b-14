@@ -113,7 +113,7 @@ public class TournamentController {
 
     @RequestMapping(value = "/tournament/swap/matches", method = RequestMethod.POST)
     public ModelAndView swapMatchesMembers(
-            @RequestParam("tournamentId") Long tournamentId,
+            @RequestParam("tournamentId") long tournamentId,
             @RequestParam(name="selected", required=false) List<String> selected,
             RedirectAttributes ra) {
 
@@ -184,8 +184,7 @@ public class TournamentController {
         Map<Integer, List<Match>> matches = ms.getTournamentMatchesByStage(tournamentId);
         long maxStage = matches != null ? matches.keySet().stream().max(Integer::compareTo).orElse(0) : 0L;
 
-        Integer groups = ps.getTournamentGroups(tournamentId);
-
+        int groups = ps.getTournamentGroups(tournamentId);
 
         if(optionalTournament.isPresent()) {
             Tournament t = optionalTournament.get();
@@ -482,7 +481,7 @@ public class TournamentController {
             mav.addObject("openModal", "'rateTournamentModal'");
             return mav;
         }
-        ts.updateTouramentRating(rateTournamentForm.getTournamentId(), rateTournamentForm.getRating());
+        ts.updateTournamentRating(rateTournamentForm.getTournamentId(), rateTournamentForm.getRating());
         ps.updateCreatorRating(rateTournamentForm.getTournamentId(), rateTournamentForm.getCreatorId(), currentUser.orElseThrow(UserNotAuthenticatedException::new).getPawUser().getId(), rateTournamentForm.getRating());
         return new ModelAndView("redirect:/tournament/" + rateTournamentForm.getTournamentId());
     }

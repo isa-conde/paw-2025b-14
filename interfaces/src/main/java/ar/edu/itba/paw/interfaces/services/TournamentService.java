@@ -25,7 +25,7 @@ public interface TournamentService {
 
     List<Tournament> findByCreator(Long creatorId, Long page, Boolean isFinished);
 
-    void setFinished(Long tournamentId, Long matchId);
+    void setFinished(long tournamentId, long matchId);
 
     void closeInscriptions(Long tournamentId);
 
@@ -39,29 +39,29 @@ public interface TournamentService {
 
     Map<Game,List<Tournament>> getUnfilteredTournamentPages(Long page);
 
-    Integer getPageAmount(Integer pageSize, TournamentFilter tf);
+    int getPageAmount(int pageSize, TournamentFilter tf);
 
     void updateTournamentInfo(Long tournamentId, String name, LocalDate startDate, LocalDate endDate, Integer maxParticipants, byte[] image, String serverName, String serverPassword, String discordChannel);
 
     int getTournamentParticipantsCount(Long tournamentId);
 
-    void createBracketFromGroups(Long tournamentId);
+    void createBracketFromGroups(long tournamentId);
 
     List<Tournament> getCreatedAndFinishedTournaments(Long userId, Long page);
 
     List<Tournament> getCreatedAndOngoingTournaments(Long userId, Long page);
 
-    Integer getPlayersPerTeam(Long tournamentId);
+    int getPlayersPerTeam(Long tournamentId);
 
-    Integer getPagesBySection(Long userId, String section);
+    int getPagesBySection(Long userId, String section);
 
     List <Tournament> getUserWonTournament(Long userId, Long page);
 
-    Integer getUserWonTournamentPages(Long userId);
+    int getUserWonTournamentPages(Long userId);
 
     void contactOwner(Long tournamentId, User currentUser, String subject, String body, Long creatorId);
 
-    void updateTouramentRating(Long tournamentId, Float userRating);
+    void updateTournamentRating(Long tournamentId, Float userRating);
 
     void notifyCreatorOfLeavingUser(User user, long tournamentId);
 }

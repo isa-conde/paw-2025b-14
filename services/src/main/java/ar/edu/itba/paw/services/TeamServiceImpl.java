@@ -1,6 +1,8 @@
 package ar.edu.itba.paw.services;
 
+import ar.edu.itba.paw.interfaces.exception.ImageNotFoundException;
 import ar.edu.itba.paw.interfaces.exception.TeamNotFoundException;
+import ar.edu.itba.paw.interfaces.exception.TournamentNotFoundException;
 import ar.edu.itba.paw.interfaces.exception.UserNotFoundException;
 import ar.edu.itba.paw.interfaces.persistence.*;
 import ar.edu.itba.paw.interfaces.services.TeamService;
@@ -52,6 +54,10 @@ public class TeamServiceImpl implements TeamService {
             bannerId = imageDao.insertImage(banner);
         }
 
+        if(pfpId == null || bannerId == null) {
+            throw new ImageNotFoundException();
+        }
+
         Team team = teamDao.create(name, pfpId, bannerId, ownerId);
         LOGGER.info("The team {} has been successfully created", name);
 
@@ -86,12 +92,12 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public Long getActivePages(Long teamId) {
+    public long getActivePages(Long teamId) {
         return teamDao.getActivePages(teamId);
     }
 
     @Override
-    public Long getPastPages(Long teamId) {
+    public long getPastPages(Long teamId) {
         return teamDao.getPastPages(teamId);
     }
 
@@ -112,6 +118,10 @@ public class TeamServiceImpl implements TeamService {
             bannerId = imageDao.insertImage(banner);
         }
 
+        if(pfpId == null || bannerId == null) {
+            throw new ImageNotFoundException();
+        }
+
         if (members != null){
             for (String s : members){
                 Long userId =  userDao.findByUsername(s).orElseThrow(UserNotFoundException::new).getId();
@@ -125,7 +135,7 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public Boolean isMember(Long teamId, Long userId) {
+    public boolean isMember(Long teamId, Long userId) {
         return teamMemberDao.isMember(teamId, userId);
     }
 
@@ -136,7 +146,7 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public Boolean teamNameTaken(String name) {
+    public boolean teamNameTaken(String name) {
         return teamDao.teamNameTaken(name);
     }
 
@@ -153,6 +163,9 @@ public class TeamServiceImpl implements TeamService {
     private List<Tournament> getTournamentsFromIds(List<Long> tournamentIds) {
         List<Tournament> tournaments = new ArrayList<>();
         for (Long id : tournamentIds) {
+            if(id == null) {
+                throw new TournamentNotFoundException();
+            }
             tournamentDao.findById(id).ifPresent(tournaments::add);
         }
         return tournaments;

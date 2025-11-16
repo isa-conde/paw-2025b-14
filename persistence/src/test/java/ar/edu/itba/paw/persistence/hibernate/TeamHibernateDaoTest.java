@@ -57,7 +57,7 @@ public class TeamHibernateDaoTest {
 
         Assert.assertNotNull(created);
         Assert.assertEquals(TEAM,created.getName());
-        Assert.assertEquals(ID.longValue(),created.getOwner().getId());
+        Assert.assertEquals(ID.longValue(), (long) created.getOwner().getId());
         Assert.assertEquals(ID,created.getBannerId());
         Assert.assertEquals(ID,created.getPfpId());
         Assert.assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"team",
@@ -80,7 +80,7 @@ public class TeamHibernateDaoTest {
         Assert.assertTrue(team.isPresent());
         Team present = team.get();
         Assert.assertEquals(OTHER_TEAM,present.getName());
-        Assert.assertEquals(ID.longValue(),present.getOwner().getId());
+        Assert.assertEquals(ID.longValue(), (long) present.getOwner().getId());
         Assert.assertNull(present.getBannerId());
         Assert.assertNull(present.getPfpId());
         Assert.assertEquals(ID,present.getId());
@@ -164,18 +164,16 @@ public class TeamHibernateDaoTest {
 
     @Test
     public void testGetActiveTournamentsPages(){
-        Long ans = teamHibernateDao.getActivePages(ID);
+        long ans = teamHibernateDao.getActivePages(ID);
 
-        Assert.assertNotNull(ans);
-        Assert.assertEquals(2L,ans.longValue());
+        Assert.assertEquals(2L, ans);
     }
 
     @Test
     public void testGetPastTournamentsPages(){
-        Long ans = teamHibernateDao.getPastPages(ID);
+        long ans = teamHibernateDao.getPastPages(ID);
 
-        Assert.assertNotNull(ans);
-        Assert.assertEquals(2L,ans.longValue());
+        Assert.assertEquals(2L, ans);
     }
 
     @Test
@@ -187,7 +185,7 @@ public class TeamHibernateDaoTest {
         Assert.assertEquals(1,ans.size());
         Team present = ans.get(0);
         Assert.assertEquals(OTHER_TEAM,present.getName());
-        Assert.assertEquals(ID.longValue(),present.getOwner().getId());
+        Assert.assertEquals(ID.longValue(), (long) present.getOwner().getId());
         Assert.assertNull(present.getBannerId());
         Assert.assertNull(present.getPfpId());
         Assert.assertEquals(ID,present.getId());
@@ -204,17 +202,15 @@ public class TeamHibernateDaoTest {
 
     @Test
     public void testNameTaken(){
-        Boolean isTaken = teamHibernateDao.teamNameTaken(OTHER_TEAM);
+        boolean isTaken = teamHibernateDao.teamNameTaken(OTHER_TEAM);
 
-        Assert.assertNotNull(isTaken);
         Assert.assertTrue(isTaken);
     }
 
     @Test
     public void testNameNotTaken(){
-        Boolean isTaken = teamHibernateDao.teamNameTaken(TEAM);
+        boolean isTaken = teamHibernateDao.teamNameTaken(TEAM);
 
-        Assert.assertNotNull(isTaken);
         Assert.assertFalse(isTaken);
     }
 
@@ -226,7 +222,7 @@ public class TeamHibernateDaoTest {
         Assert.assertFalse(foundTeams.isEmpty());
         Assert.assertEquals(2, foundTeams.size());
         for (int i = 0; i < 2; i++) {
-            Assert.assertEquals(ID.longValue(),foundTeams.get(i).getOwner().getId());
+            Assert.assertEquals(ID.longValue(), (long) foundTeams.get(i).getOwner().getId());
             Assert.assertNull(foundTeams.get(i).getBannerId());
             Assert.assertNull(foundTeams.get(i).getPfpId());
             Assert.assertEquals(ID + i,foundTeams.get(i).getId().longValue());

@@ -7,7 +7,6 @@ import ar.edu.itba.paw.model.Team;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.User;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -21,7 +20,7 @@ public class ParticipantHibernateDao implements ParticipantDao{
     private EntityManager em;
 
     @Override
-    public void joinTournamentUser(Long userId, Long tournamentId) {
+    public void joinTournamentUser(long userId, long tournamentId) {
         Participant participant = new Participant(em.getReference(Tournament.class, tournamentId));
         participant.setUser(em.getReference(User.class, userId));
         participant.setPoints(0);
@@ -31,7 +30,7 @@ public class ParticipantHibernateDao implements ParticipantDao{
     }
 
     @Override
-    public void joinTournamentUserWithTeam(Long userId, Long tournamentId, Long teamId) {
+    public void joinTournamentUserWithTeam(Long userId, long tournamentId, long teamId) {
         Participant participant = new Participant(em.getReference(Tournament.class, tournamentId));
         participant.setUser(em.getReference(User.class, userId));
         participant.setTeam(em.getReference(Team.class, teamId));
@@ -39,7 +38,7 @@ public class ParticipantHibernateDao implements ParticipantDao{
     }
 
     @Override
-    public void joinTournamentTeam(Long tournamentId, Long teamId) {
+    public void joinTournamentTeam(long tournamentId, long teamId) {
         Participant participant = new Participant(em.getReference(Tournament.class, tournamentId));
         participant.setTeam(em.getReference(Team.class, teamId));
         participant.setPoints(0);
@@ -48,8 +47,7 @@ public class ParticipantHibernateDao implements ParticipantDao{
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Participant getTournamentParticipantById(Long tournamentId, Long participantId, Integer teamSize) {
+    public Participant getTournamentParticipantById(long tournamentId, Long participantId, int teamSize) {
         String jpql;
 
         if (teamSize > 1) {
@@ -79,9 +77,8 @@ public class ParticipantHibernateDao implements ParticipantDao{
         return toReturn.stream().findFirst().orElse(null);
     }
 
-    @Transactional(readOnly = true)
     @Override
-    public Boolean hasJoined(Long userId, Long tournamentId) {
+    public boolean hasJoined(Long userId, long tournamentId) {
         String jpql = """
         SELECT COUNT(p)
         FROM Participant p
@@ -98,7 +95,7 @@ public class ParticipantHibernateDao implements ParticipantDao{
     }
 
     @Override
-    public Boolean hasRated(Long userId, Long tournamentId) {
+    public boolean hasRated(Long userId, Long tournamentId) {
         String jpql = """
         SELECT COUNT(p)
         FROM Participant p
@@ -349,7 +346,7 @@ public class ParticipantHibernateDao implements ParticipantDao{
     }
 
     @Override
-    public Integer getTournamentGroups(Long tournamentId) {
+    public int getTournamentGroups(Long tournamentId) {
         return em.createQuery("SELECT COUNT(DISTINCT p.groupNumber) FROM Participant p WHERE p.tournament.id = :tournamentId", Long.class)
                 .setParameter("tournamentId", tournamentId)
                 .getSingleResult()

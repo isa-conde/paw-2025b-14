@@ -29,7 +29,7 @@ public class DatesNullabilityValidator implements ConstraintValidator<DatesNulla
         if (optTournament.isEmpty()) return true;
         Tournament tournament = optTournament.get();
 
-        boolean started = Boolean.TRUE.equals(tournament.getTournamentStarted());
+        boolean started = tournament.getTournamentStarted();
         boolean finished = Boolean.TRUE.equals(tournament.getFinished());
 
         boolean valid = true;

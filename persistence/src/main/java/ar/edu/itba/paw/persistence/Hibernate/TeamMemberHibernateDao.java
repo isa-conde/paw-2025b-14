@@ -42,7 +42,7 @@ public class TeamMemberHibernateDao implements TeamMemberDao {
     }
 
     @Override
-    public Boolean isMember(Long teamId, Long userId) {
+    public boolean isMember(Long teamId, Long userId) {
         return em.find(TeamMember.class, new TeamMemberId(teamId, userId)) != null;
     }
 

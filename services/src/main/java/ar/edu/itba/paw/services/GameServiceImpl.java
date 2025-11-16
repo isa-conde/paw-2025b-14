@@ -1,6 +1,8 @@
 package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.exception.GameFormatNotFoundException;
+import ar.edu.itba.paw.interfaces.exception.GameNotFoundException;
+import ar.edu.itba.paw.interfaces.exception.ImageNotFoundException;
 import ar.edu.itba.paw.interfaces.exception.NameAlreadyUsedException;
 import ar.edu.itba.paw.interfaces.persistence.GameDao;
 import ar.edu.itba.paw.interfaces.persistence.GameFormatDao;
@@ -55,6 +57,9 @@ public class GameServiceImpl implements GameService {
         if(gameDao.checkNameExists(name)){
             throw new NameAlreadyUsedException(name);
         }
+        if(imageId == null) {
+            throw new ImageNotFoundException();
+        }
         return gameDao.create(name, genre, imageId);
     }
 
@@ -62,6 +67,9 @@ public class GameServiceImpl implements GameService {
     @Override
     public Game createWithFormats(String name, Genre genre, List<GameFormat> formats, byte[] image) {
         Long imageId = imageDao.insertImage(image);
+        if(imageId == null) {
+            throw new ImageNotFoundException();
+        }
         for (GameFormat f : formats){
             gameFormatDao.insertFormat(f);
         }
@@ -70,28 +78,34 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public List<GameFormat> getFormats(Long gameId) {
+        if(gameId == null) {
+            throw new GameNotFoundException();
+        }
         return gameFormatDao.getFormats(gameId);
     }
 
 
     @Transactional
     @Override
-    public List<Game> getFavourites(Long userId) {
+    public List<Game> getFavourites(long userId) {
         return gameDao.getFavourites(userId);
     }
 
     @Override
-    public List<Game> findAllPaged(Long page){
+    public List<Game> findAllPaged(long page){
         return gameDao.findAllPaged(page);
     }
 
     @Override
-    public Long getPageAmount(){
+    public long getPageAmount(){
         return gameDao.getPageAmount();
     }
 
     @Override
     public GameFormat findFormatById(Long id) {
+        if(id == null) {
+            throw new GameFormatNotFoundException();
+        }
         return gameFormatDao.findById(id).orElseThrow(GameFormatNotFoundException::new);
     }
 }

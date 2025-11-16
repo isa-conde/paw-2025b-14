@@ -15,15 +15,15 @@ public interface TeamDao {
 
     List<Long> getActiveTournaments(Long teamId, Integer page);
 
-    Long getActivePages(Long teamId);
+    long getActivePages(Long teamId);
 
-    Long getPastPages(Long teamId);
+    long getPastPages(Long teamId);
 
     List<Team> getUserTeams(Long userId);
 
     void updateTeam(Long teamId, String name, Long pfpId, Long bannerId);
 
-    Boolean teamNameTaken(String name);
+    boolean teamNameTaken(String name);
 
     List<Team> searchByName(String name);
 

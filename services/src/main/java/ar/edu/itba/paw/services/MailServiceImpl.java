@@ -153,12 +153,12 @@ public class MailServiceImpl implements MailService {
 
     @Async
     @Override
-    public void sendVerificationEmail(Long userId, String userName, Long token, String recipient) {
+    public void sendVerificationEmail(Long userId, String userName, long token, String recipient) {
         User user = userDao.findByUsername(userName).orElseThrow(UserNotFoundException::new);
         Locale locale = toLocale(user.getLocale());
         Context ctx = new Context(locale);
         ctx.setVariable("userName", userName);
-        String verificationUrl = baseUrl + "/verify/confirm?token=" + token.toString() + "&userId=" + userId.toString();
+        String verificationUrl = baseUrl + "/verify/confirm?token=" + token + "&userId=" + userId.toString();
         ctx.setVariable("verificationUrl", verificationUrl);
         ctx.setVariable("crownCid", "cid:" + CROWN_CID);
 
@@ -174,11 +174,11 @@ public class MailServiceImpl implements MailService {
 
     @Async
     @Override
-    public void sendResetPasswordEmail(Long userId, Long token, String recipient) {
+    public void sendResetPasswordEmail(Long userId, long token, String recipient) {
         User user = userDao.findById(userId).orElseThrow(UserNotFoundException::new);
         Locale locale = toLocale(user.getLocale());
         Context ctx = new Context(locale);
-        String resetPasswordUrl = baseUrl + "/forgotPassword/reset?token=" + token.toString();
+        String resetPasswordUrl = baseUrl + "/forgotPassword/reset?token=" + token;
         ctx.setVariable("resetPasswordUrl", resetPasswordUrl);
         ctx.setVariable("crownCid", "cid:" + CROWN_CID);
 
