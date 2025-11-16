@@ -23,15 +23,9 @@ public interface TournamentService {
                       Structure structure, Integer maxParticipants, byte[] imageId, Boolean openInscriptions, Boolean isFinished,
                       Long formatId, byte[] rulesId, String serverName, String serverPassword, String discordChannel);
 
-    List<Tournament> findByCreator(Long creatorId, Long page, Boolean isFinished);
-
     void setFinished(Long tournamentId, Long matchId);
 
     void closeInscriptions(Long tournamentId);
-
-    List<Tournament> findUserActiveTournaments(Long userId, Long page);
-
-    List<Tournament> findUserPastTournaments(Long userId, Long page);
 
     List<Tournament> searchByName(String name);
 
@@ -47,23 +41,18 @@ public interface TournamentService {
 
     void createBracketFromGroups(Long tournamentId);
 
-    List<Tournament> getCreatedAndFinishedTournaments(Long userId, Long page);
-
-    List<Tournament> getCreatedAndOngoingTournaments(Long userId, Long page);
-
     Integer getPlayersPerTeam(Long tournamentId);
-
-    Integer getPagesBySection(Long userId, String section);
-
-    List <Tournament> getUserWonTournament(Long userId, Long page);
-
-    Integer getUserWonTournamentPages(Long userId);
 
     void contactOwner(Long tournamentId, User currentUser, String subject, String body, Long creatorId);
 
     void updateTouramentRating(Long tournamentId, Float userRating);
 
     void notifyCreatorOfLeavingUser(User user, long tournamentId);
+
+    List<Tournament> findUserTournaments(Long userId, Boolean isFinished, Boolean isCreator, Boolean won, Long page);
+
+    int countUserTournaments(Long userId, Boolean isFinished, Boolean isCreator, Boolean won);
+
 }
 
 

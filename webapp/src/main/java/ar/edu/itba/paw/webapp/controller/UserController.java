@@ -178,8 +178,8 @@ public class UserController {
         mav.addObject("isMyProfile", loggedUser != null && loggedUser.getId() == id);
         mav.addObject("profile", profile);
         mav.addObject("favouriteGames", gs.getFavourites(id));
-        mav.addObject("activeTournaments", ts.findUserActiveTournaments(id, 0L));
-        mav.addObject("lastTournaments", ts.findUserPastTournaments(id, 0L));
+        mav.addObject("activeTournaments", ts.findUserTournaments(id, false , false , false ,0L));
+        mav.addObject("lastTournaments", ts.findUserTournaments(id, true , false , false ,0L));
         mav.addObject("editProfileForm", editProfileForm);
         mav.addObject("userRating", userRating);
         mav.addObject("comments", comments);
@@ -217,38 +217,38 @@ public class UserController {
 
         switch (section) {
             case Constants.TOURNAMENTS_OWNED -> {
-                totalPages1 = ts.getPagesBySection(profile.getId(), "ownedOngoing");
-                totalPages2 = ts.getPagesBySection(profile.getId(), "ownedFinished");
+                totalPages1 = ts.countUserTournaments(profile.getId(), Constants.ONGOING, Constants.CREATOR, Constants.ALLTOURNEYS);
+                totalPages2 = ts.countUserTournaments(profile.getId(), Constants.FINISHED, Constants.CREATOR, Constants.ALLTOURNEYS);
 
                 page1 = adjustPage(page1, totalPages1);
                 page2 = adjustPage(page2, totalPages2);
 
-                List<Tournament> onGoingTournaments = ts.getCreatedAndOngoingTournaments(profile.getId(), page1);
-                List<Tournament> finishedTournaments = ts.getCreatedAndFinishedTournaments(profile.getId(), page2);
+                List<Tournament> onGoingTournaments = ts.findUserTournaments(profile.getId(), Constants.ONGOING, Constants.CREATOR, Constants.ALLTOURNEYS, page1);
+                List<Tournament> finishedTournaments = ts.findUserTournaments(profile.getId(), Constants.FINISHED, Constants.CREATOR, Constants.ALLTOURNEYS, page2);
 
                 mav.addObject("onGoingTournaments", onGoingTournaments);
                 mav.addObject("finishedTournaments", finishedTournaments);
             }
 
             case Constants.TOURNAMENTS_FINISHED -> {
-                totalPages1 = ts.getPagesBySection(profile.getId(), "finished");
-                totalPages2 = ts.getUserWonTournamentPages(profile.getId());
+                totalPages1 = ts.countUserTournaments(profile.getId(), Constants.FINISHED, Constants.PARTICIPANT, Constants.ALLTOURNEYS);
+                totalPages2 = ts.countUserTournaments(profile.getId(), Constants.FINISHED, Constants.PARTICIPANT, Constants.WON);
 
                 page1 = adjustPage(page1, totalPages1);
                 page2 = adjustPage(page2, totalPages2);
 
-                List<Tournament> pastTournaments = ts.findUserPastTournaments(profile.getId(), page1);
-                List<Tournament> wonTournaments = ts.getUserWonTournament(profile.getId(), page2);
+                List<Tournament> pastTournaments = ts.findUserTournaments(profile.getId(), Constants.FINISHED, Constants.PARTICIPANT, Constants.ALLTOURNEYS, page1);
+                List<Tournament> wonTournaments = ts.findUserTournaments(profile.getId(), Constants.FINISHED, Constants.PARTICIPANT, Constants.WON, page2);
 
                 mav.addObject("pastTournaments", pastTournaments);
                 mav.addObject("wonTournaments", wonTournaments);
             }
 
             case Constants.TOURNAMENTS_ACTIVE -> {
-                totalPages1 = ts.getPagesBySection(profile.getId(), "active");
+                totalPages1 = ts.countUserTournaments(profile.getId(), Constants.ONGOING, Constants.PARTICIPANT, Constants.ALLTOURNEYS);
                 page1 = adjustPage(page1, totalPages1);
 
-                List<Tournament> joinedTournaments = ts.findUserActiveTournaments(profile.getId(), page1);
+                List<Tournament> joinedTournaments = ts.findUserTournaments(profile.getId(),  Constants.ONGOING, Constants.PARTICIPANT, Constants.ALLTOURNEYS, page1);
                 mav.addObject("joinedTournaments", joinedTournaments);
             }
         }

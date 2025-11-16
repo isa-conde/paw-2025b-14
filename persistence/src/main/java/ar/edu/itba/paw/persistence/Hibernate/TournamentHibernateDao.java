@@ -132,33 +132,6 @@ public class TournamentHibernateDao implements TournamentDao {
         Tournament t = em.find(Tournament.class, tournamentId);
         return t.getStructure();
     }
-
-    @Override
-    public List<Tournament> findByCreator(Long creatorId, Long page, Boolean isFinished) {
-        Query idQuery = em.createNativeQuery(
-                "SELECT t.id FROM Tournament t WHERE t.creator_id = ?1 AND t.is_finished = ?2 ORDER BY t.start_date ASC"
-        );
-        idQuery.setParameter(1, creatorId);
-        idQuery.setParameter(2, isFinished);
-        idQuery.setFirstResult((int) (page * PAGE_SIZE));
-        idQuery.setMaxResults(PAGE_SIZE);
-
-        @SuppressWarnings("unchecked")
-        List<Number> tournamentIds = idQuery.getResultList();
-
-        if (tournamentIds.isEmpty()) return Collections.emptyList();
-
-        TypedQuery<Tournament> fullQuery = em.createQuery(
-                "SELECT DISTINCT t FROM Tournament t " +
-                        "WHERE t.id IN :ids " +
-                        "ORDER BY t.startDate ASC",
-                Tournament.class
-        );
-        fullQuery.setParameter("ids", tournamentIds.stream().map(Number::longValue).toList());
-
-        return fullQuery.getResultList();
-    }
-
     @Override
     public void setFinished(Long tournamentId) {
         Tournament t = em.find(Tournament.class, tournamentId);
@@ -353,35 +326,54 @@ public class TournamentHibernateDao implements TournamentDao {
     }
 
     @Override
-    public List<Tournament> findUserActiveTournaments(Long userId, Long page) {
-        return findUserTournaments(userId, false, page);
+    public void updateTournamentRating(Long tournamentId, Float userRating) {
+        em.createQuery("UPDATE Tournament t SET t.rating = :userRating WHERE t.id = :tournamentId")
+                .setParameter("userRating", userRating)
+                .setParameter("tournamentId", tournamentId)
+                .executeUpdate();
     }
 
     @Override
-    public List<Tournament> findUserPastTournaments(Long userId, Long page) {
-        return findUserTournaments(userId, true, page);
-    }
+    public List<Tournament> findUserTournaments(Long userId, Boolean isFinished, Boolean isCreator, Boolean won, Long page) {
+        Query nativeQuery;
 
-    private List<Tournament> findUserTournaments(Long userId, Boolean isFinished, Long page) {
-        Query idQuery = em.createNativeQuery(
-                "SELECT t.id " +
-                        "FROM Tournament t " +
-                        "WHERE t.is_finished = ?1 " +
-                        "  AND t.id IN ( " +
-                        "    SELECT p.tournament_id " +
-                        "    FROM Participant p " +
-                        "    WHERE p.user_id = ?2 " +
-                        ") " +
-                        "ORDER BY t.start_date"
+        if (won) {
+            nativeQuery = em.createNativeQuery(
+                    "SELECT t.id FROM tournament t " +
+                            "WHERE t.tournament_winner = (" +
+                            "   SELECT p.id FROM participant p " +
+                            "   WHERE p.user_id = ?1 AND p.tournament_id = t.id" +
+                            ") " +
+                            "ORDER BY t.start_date ASC"
+            );
+            nativeQuery.setParameter(1, userId);
+        } else if (isCreator) {
+            nativeQuery = em.createNativeQuery(
+                    "SELECT t.id FROM tournament t " +
+                            "WHERE t.creator_id = ?1 AND t.is_finished = ?2 " +
+                            "ORDER BY t.start_date ASC"
+            );
+            nativeQuery.setParameter(1, userId);
+            nativeQuery.setParameter(2, isFinished);
+        } else {
+            nativeQuery = em.createNativeQuery(
+                    "SELECT t.id FROM tournament t " +
+                            "WHERE t.is_finished = ?1 " +
+                            "  AND t.id IN (" +
+                            "       SELECT p.tournament_id FROM participant p " +
+                            "       WHERE p.user_id = ?2" +
+                            "  ) " +
+                            "ORDER BY t.start_date ASC"
+            );
+            nativeQuery.setParameter(1, isFinished);
+            nativeQuery.setParameter(2, userId);
+        }
 
-        );
-        idQuery.setParameter(1, isFinished);
-        idQuery.setParameter(2, userId);
-        idQuery.setFirstResult((int)(page * PAGE_SIZE));
-        idQuery.setMaxResults(PAGE_SIZE);
+        nativeQuery.setFirstResult((int)(page * PAGE_SIZE));
+        nativeQuery.setMaxResults(PAGE_SIZE);
 
         @SuppressWarnings("unchecked")
-        List<Number> tournamentIds = idQuery.getResultList();
+        List<Number> tournamentIds = nativeQuery.getResultList();
         if (tournamentIds.isEmpty()) return Collections.emptyList();
 
         TypedQuery<Tournament> fullQuery = em.createQuery(
@@ -390,94 +382,50 @@ public class TournamentHibernateDao implements TournamentDao {
                         "ORDER BY t.startDate ASC",
                 Tournament.class
         );
-        fullQuery.setParameter("ids", tournamentIds.stream().map(Number::longValue).toList());
+        fullQuery.setParameter("ids",
+                tournamentIds.stream().map(Number::longValue).toList()
+        );
 
         return fullQuery.getResultList();
     }
 
-    private int countUserTournaments(Long userId, Boolean isFinished) {
-        TypedQuery<Long> query = em.createQuery(
-                "SELECT COUNT(p) " +
-                        "FROM Participant p " +
-                        "WHERE p.user = :user " +
-                        "AND p.tournament IN (" +
-                        "SELECT t " +
-                        "FROM Tournament t " +
-                        "WHERE t.isFinished = :isFinished" +
-                        ")",
-                Long.class
-        );
-        query.setParameter("user", em.getReference(User.class, userId));
-        query.setParameter("isFinished", isFinished);
+    public int countUserTournaments(Long userId, Boolean isFinished, Boolean isCreator, Boolean won) {
+        Long count;
 
-        Long count = query.getSingleResult();
-        return count.intValue();
+        if (won) {
+            count = em.createQuery(
+                            "SELECT COUNT(t) FROM Tournament t " +
+                                    "WHERE t.winner = (" +
+                                    "   SELECT p FROM Participant p " +
+                                    "   WHERE p.user.id = :userId AND p.tournament = t" +
+                                    ")",
+                            Long.class
+                    )
+                    .setParameter("userId", userId)
+                    .getSingleResult();
+        } else if (isCreator) {
+            count = em.createQuery(
+                            "SELECT COUNT(t) FROM Tournament t " +
+                                    "WHERE t.creator.id = :userId AND t.isFinished = :isFinished",
+                            Long.class
+                    )
+                    .setParameter("userId", userId)
+                    .setParameter("isFinished", isFinished)
+                    .getSingleResult();
+        } else {
+            count = em.createQuery(
+                            "SELECT COUNT(p) FROM Participant p " +
+                                    "WHERE p.user.id = :userId " +
+                                    "AND p.tournament.isFinished = :isFinished",
+                            Long.class
+                    )
+                    .setParameter("userId", userId)
+                    .setParameter("isFinished", isFinished)
+                    .getSingleResult();
+        }
+        int totalElements = count.intValue();
+        return (int) Math.ceil((double) totalElements / PAGE_SIZE);
     }
 
-    @Override
-    public Integer getUserActiveTournamentsPages(Long userId) {
-        int count = countUserTournaments(userId, false);
-        return (int) Math.ceil(count / 9.0);
-    }
 
-    @Override
-    public Integer getUserPastTournamentsPages(Long userId) {
-        int count = countUserTournaments(userId, true);
-        return (int) Math.ceil(count / 9.0);
-    }
-
-    @Override
-    public Integer getCreatedAndFinishedTournamentsPages(Long userId) {
-        int count = countCreatedTournaments(userId, true);
-        return (int) Math.ceil(count / 9.0);
-    }
-
-    @Override
-    public List<Tournament> getUserWonTournament(Long userId, Long page) {
-        Query nativeQuery = em.createNativeQuery("SELECT t.id FROM tournament t WHERE tournament_winner = (SELECT p.id FROM participant p WHERE p.user_id = ?1 AND p.tournament_id = t.id)");
-        nativeQuery.setParameter(1, userId);
-        nativeQuery.setMaxResults(PAGE_SIZE);
-        nativeQuery.setFirstResult((int) (page * PAGE_SIZE));
-
-        @SuppressWarnings("unchecked")
-        List<Number> rawIds = nativeQuery.getResultList();
-        List<Long> ids = rawIds.stream().map(Number::longValue).toList();
-
-        return em.createQuery("SELECT t FROM Tournament t WHERE id in :ids", Tournament.class)
-                .setParameter("ids", ids)
-                .getResultList();
-    }
-
-    @Override
-    public Integer getUserWonTournamentPages(Long userId) {
-        TypedQuery<Long> nativeQuery = em.createQuery("SELECT COUNT(t.id) FROM Tournament t WHERE t.winner = (SELECT p FROM Participant p WHERE p.user = :user AND p.tournament = t)", Long.class);
-        nativeQuery.setParameter("user", em.getReference(User.class, userId));
-        Long ans = nativeQuery.getSingleResult();
-        return (int) Math.ceil(ans.doubleValue()/PAGE_SIZE);
-    }
-
-    @Override
-    public Integer getCreatedAndOngoingTournamentsPages(Long userId) {
-        int count = countCreatedTournaments(userId, false);
-        return (int) Math.ceil(count / 9.0);
-    }
-
-    private int countCreatedTournaments(Long userId, boolean isFinished) {
-        TypedQuery<Long> query = em.createQuery(
-                "SELECT COUNT(t) FROM Tournament t WHERE t.creator = :creator AND t.isFinished = :isFinished",
-                Long.class
-        );
-        query.setParameter("creator", em.getReference(User.class, userId));
-        query.setParameter("isFinished", isFinished);
-
-        return query.getSingleResult().intValue();
-    }
-
-    @Override
-    public void updateTournamentRating(Long tournamentId, Float userRating) {
-        em.createQuery("UPDATE Tournament t SET t.rating = :userRating WHERE t.id = :tournamentId")
-                .setParameter("userRating", userRating)
-                .setParameter("tournamentId", tournamentId)
-                .executeUpdate();
-    }
 }

@@ -88,11 +88,6 @@ public class TournamentServiceImpl implements TournamentService {
         return toReturn;
     }
 
-    @Override
-    public List<Tournament> findByCreator(Long creatorId, Long page, Boolean isFinished) {
-        return tournamentDao.findByCreator(creatorId, page, isFinished);
-    }
-
     @Transactional
     @Override
     public void setFinished(Long tournamentId, Long lastMatchId) { // TODO: check for possible error handling
@@ -171,16 +166,6 @@ public class TournamentServiceImpl implements TournamentService {
         tournamentDao.closeInscriptions(tournamentId);
         ms.sendListEmail(tournamentId, participants);
         LOGGER.info("The inscriptions for the tournament with ID {} have been successfully closed", tournamentId);
-    }
-
-    @Override
-    public List<Tournament> findUserActiveTournaments(Long userId, Long page) {
-        return tournamentDao.findUserActiveTournaments(userId, page);
-    }
-
-    @Override
-    public List<Tournament> findUserPastTournaments(Long userId, Long page) {
-        return tournamentDao.findUserPastTournaments(userId, page);
     }
 
     @Override
@@ -479,41 +464,6 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public Integer getPagesBySection(Long userId, String section) {
-        if (Objects.equals(section, "active")){
-            return tournamentDao.getUserActiveTournamentsPages(userId);
-        }if (Objects.equals(section, "finished")){
-            return tournamentDao.getUserPastTournamentsPages(userId);
-        }if (Objects.equals(section, "ownedFinished")){
-            return tournamentDao.getCreatedAndFinishedTournamentsPages(userId);
-        }if (Objects.equals(section, "ownedOngoing")){
-            return tournamentDao.getCreatedAndOngoingTournamentsPages(userId);
-        }
-        return 1;
-    }
-
-    @Override
-    public List<Tournament> getUserWonTournament(Long userId, Long page) {
-        return tournamentDao.getUserWonTournament(userId, page);
-    }
-
-    @Override
-    public Integer getUserWonTournamentPages(Long userId) {
-        return tournamentDao.getUserWonTournamentPages(userId);
-    }
-
-
-    @Override
-    public List<Tournament> getCreatedAndFinishedTournaments(Long userId, Long page) {
-        return findByCreator(userId, page, true);
-    }
-
-    @Override
-    public List<Tournament> getCreatedAndOngoingTournaments(Long userId, Long page) {
-        return findByCreator(userId, page, false);
-    }
-
-    @Override
     public void contactOwner(Long tournamentId, User currentUser, String subject, String body, Long creatorId) {
         Tournament tournament = findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
         User creator = userDao.findById(creatorId).orElseThrow(TournamentNotFoundException::new);
@@ -536,6 +486,16 @@ public class TournamentServiceImpl implements TournamentService {
     public void notifyCreatorOfLeavingUser(User user, long tournamentId) {
         Tournament tournament = findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
         ms.sendTournamentAbandonedEmail(tournament.getCreator(), user, tournament);
+    }
+
+    @Override
+    public List<Tournament> findUserTournaments(Long userId, Boolean isFinished, Boolean isCreator, Boolean won, Long page) {
+        return tournamentDao.findUserTournaments(userId, isFinished, isCreator, won, page);
+    }
+
+    @Override
+    public int countUserTournaments(Long userId, Boolean isFinished, Boolean isCreator, Boolean won) {
+        return tournamentDao.countUserTournaments(userId, isFinished, isCreator, won);
     }
 
 }

@@ -23,13 +23,7 @@ public interface TournamentDao {
 
     Structure getTournamentStructure(Long tournamentId);
 
-    List<Tournament> findByCreator(Long creatorId, Long page, Boolean isFinished);
-
     void setFinished(Long tournamentId);
-
-    List<Tournament> findUserActiveTournaments(Long userId, Long page);
-
-    List<Tournament> findUserPastTournaments(Long userId, Long page);
 
     void closeInscriptions(Long tournamentId);
 
@@ -59,17 +53,9 @@ public interface TournamentDao {
 
     boolean isClosed(Long tournamentId);
 
-    Integer getUserPastTournamentsPages(Long userId);
-
-    Integer getUserActiveTournamentsPages(Long userId);
-
-    Integer getCreatedAndOngoingTournamentsPages(Long userId);
-
-    Integer getCreatedAndFinishedTournamentsPages(Long userId);
-
     void updateTournamentRating(Long tournamentId, Float userRating);
 
-    List <Tournament> getUserWonTournament(Long userId, Long page);
+    List<Tournament> findUserTournaments(Long userId, Boolean isFinished, Boolean isCreator, Boolean won, Long page);
 
-    Integer getUserWonTournamentPages(Long userId);
+    int countUserTournaments(Long userId, Boolean isFinished, Boolean isCreator, Boolean won);
 }

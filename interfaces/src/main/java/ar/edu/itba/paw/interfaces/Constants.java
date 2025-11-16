@@ -14,6 +14,13 @@ public final class Constants {
     public static final String TOURNAMENTS_OWNED = "owned";
     public static final String TOURNAMENTS_FINISHED= "finished";
     public static final String TOURNAMENTS_ACTIVE= "active";
+    public static final Boolean FINISHED = true;
+    public static final Boolean ONGOING = false;
+    public static final Boolean CREATOR = true;
+    public static final Boolean PARTICIPANT = false;
+    public static final Boolean WON = true;
+    public static final Boolean ALLTOURNEYS = false;
+
 
 
 }
