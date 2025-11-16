@@ -154,6 +154,9 @@ public class MatchHibernateDao implements MatchDao {
 
     @Override
     public Integer getTournamentGroupMaxStage(Long tournamentId, Integer groupNumber) {
-        return 0;
+        TypedQuery<Integer> query = em.createQuery("SELECT COALESCE(MAX(m.stage), 0) FROM Match m WHERE m.tournament = :tournament AND m.local.groupNumber = :groupNumber", Integer.class);
+        query.setParameter("tournament", em.getReference(Tournament.class, tournamentId));
+        query.setParameter("groupNumber", groupNumber);
+        return query.getSingleResult();
     }
 }

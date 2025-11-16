@@ -239,7 +239,7 @@ public class GameHibernateDaoTest {
 
         Assert.assertNotNull(favourites);
         Assert.assertFalse(favourites.isEmpty());
-        Assert.assertEquals(1, favourites.size());
+        Assert.assertEquals(3, favourites.size());
         Assert.assertNotNull(favourites.get(0));
         Assert.assertEquals(firstUsedId, favourites.get(0).getId());
     }

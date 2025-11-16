@@ -4,7 +4,11 @@ set ignorecase true;
 insert into users (id, email, username, password, verified, locale)
     values (100, 'another@mail.com','janedoe','1234567890',false,'es');
 insert into users (id, email, username, password, verified, locale)
-values (101, 'another2@mail.com','janetdoe','1234567890',false,'es');
+    values (101, 'another2@mail.com','janetdoe','1234567890',false,'es');
+insert into users (id, email, username, password, verified, locale)
+    values (102, 'another3@mail.com','johandoe','1234567890',false,'es');
+insert into users (id, email, username, password, verified, locale)
+    values (103, 'another4@mail.com','joedoe','1234567890',false,'es');
 
 insert into game (id, name, genre, image_id) values (100, 'Grand Theft Walrus MOBA', 'MOBA', 100);
 insert into game (id, name, genre, image_id) values (101, 'Grand Theft Walrus FPS', 'FPS', 100);
@@ -81,19 +85,19 @@ insert into tournament (id, creator_id, name, game_id, region, elo, start_date, 
 insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
     (113, 100, 'Jerma Rumble close', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, false, true,false, true,100,100);
 insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
-    (114, 100, 'Jerma Rumble open', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, true, false,true, false,100,100);
+    (114, 100, 'Jerma Rumble open', 101, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, true, false,true, false,100,100);
 insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
     (115, 100, 'Jerma Rumble close', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, false, true,false, true,100,100);
 insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
-    (116, 100, 'Jerma Rumble open', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, true, false,true, false,100,100);
+    (116, 100, 'Jerma Rumble open', 101, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, true, false,true, false,100,100);
 insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
     (117, 100, 'Jerma Rumble close', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, false, true,false, true,100,100);
 insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
-    (118, 100, 'Jerma Rumble open', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, true, false,true, false,100,100);
+    (118, 100, 'Jerma Rumble open', 102, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, true, false,true, false,100,100);
 insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
     (119, 100, 'Jerma Rumble close', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, false, true,false, true,100,100);
 insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
-    (120, 101, 'Jerma Rumble open', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, true, false,true, false,100,100);
+    (120, 101, 'Jerma Rumble open', 103, 'LAN', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, true, false,true, false,100,100);
 insert into tournament (id, creator_id, name, game_id, region, elo, start_date, end_date, format, structure, max_participants, image_id, open_inscriptions, is_finished, is_group_stage, tournament_started, format_id, rules_id) values
     (121, 101, 'Jerma Rumble close', 100, 'LAS', 'LOW', '2026-02-21', '2027-02-21', 'some format', 'LEAGUE', 4, 100, false, true,false, true,100,100);
 
@@ -161,3 +165,21 @@ insert into participant (id, team_id, tournament_id, points) values (138,100,118
 insert into participant (id, team_id, tournament_id, points) values (139,100,119, 0);
 insert into participant (id, user_id, tournament_id, points) values (140,101,120, 0);
 insert into participant (id, team_id, tournament_id, points) values (141,101,120, 0);
+
+insert into game_format (id, name, players_per_team, game_id) values (100, 'formi', 6, 103);
+
+insert into match (id, tournament_id, local_id, visitor_id, winner, local_score, visitor_score, is_group_stage, stage)
+    VALUES (0, 100, 100, 101, 2, 4, 5, true, 1);
+insert into match (id, tournament_id, local_id, visitor_id, winner, local_score, visitor_score, is_group_stage, stage)
+    VALUES (1, 100, 100, 102, 2, 4, 5, true, 2);
+insert into match (id, tournament_id, local_id, visitor_id, winner, local_score, visitor_score, is_group_stage, stage)
+    VALUES (2, 100, 100, 103, 2, 4, 5, true, 3);
+insert into match (id, tournament_id, local_id, visitor_id, winner, local_score, visitor_score, is_group_stage, stage)
+    VALUES (3, 100, 101, 102, 2, 4, 5, true, 3);
+insert into match (id, tournament_id, local_id, visitor_id, winner, local_score, visitor_score, is_group_stage, stage)
+    VALUES (4, 100, 101, 103, 2, 4, 5, true, 2);
+insert into match (id, tournament_id, local_id, visitor_id, winner, local_score, visitor_score, is_group_stage, stage)
+    VALUES (5, 100, 102, 103, 2, 4, 5, true, 1);
+
+insert into match (id, tournament_id, is_group_stage)
+VALUES (0, 102, true);

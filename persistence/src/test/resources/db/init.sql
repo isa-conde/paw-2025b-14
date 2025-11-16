@@ -42,6 +42,9 @@ CREATE TABLE IF NOT EXISTS tournament(
     format_id integer,
     rating float,
     rules_id integer,
+    server_name varchar(50),
+    server_password varchar(50),
+    discord_channel varchar(50),
     CONSTRAINT tournament_dates_check
         CHECK  ((start_date IS NULL) OR (end_date IS NULL) OR (start_date < end_date))
 );
@@ -104,6 +107,7 @@ create table if not exists match(
     winner integer,
     stage integer,
     is_group_stage boolean,
+    date date,
     primary key (id,tournament_id)
 );
 
@@ -120,3 +124,4 @@ CREATE SEQUENCE if not exists image_id_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE if not exists tokens_id_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE if not exists team_id_seq START WITH 1 INCREMENT BY 1;
 create sequence if not exists rules_id_seq start with 1 increment by 1;
+create sequence if not exists participant_user_id_seq start with 1 increment by 1;
