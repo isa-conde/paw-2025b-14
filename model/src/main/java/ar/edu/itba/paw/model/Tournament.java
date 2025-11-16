@@ -45,7 +45,7 @@ public class Tournament {
     private Region region;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "elo")
+    @Column(name = "elo", columnDefinition = "elo_enum")
     private Elo elo;
 
     @Column(name = "start_date")

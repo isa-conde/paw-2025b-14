@@ -124,3 +124,4 @@ CREATE SEQUENCE if not exists image_id_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE if not exists tokens_id_seq START WITH 1 INCREMENT BY 1;
 CREATE SEQUENCE if not exists team_id_seq START WITH 1 INCREMENT BY 1;
 create sequence if not exists rules_id_seq start with 1 increment by 1;
+create sequence if not exists participant_user_id_seq start with 1 increment by 1;
