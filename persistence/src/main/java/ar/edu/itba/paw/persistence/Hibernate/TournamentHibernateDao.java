@@ -84,7 +84,7 @@ public class TournamentHibernateDao implements TournamentDao {
             params.put("region", filter.getRegion());
         }
         if (filter.getFormat() != null) {
-            jpql.append(" AND t.format.id = :formatId");
+            jpql.append(" AND t.format = :formatId");
             params.put("formatId", filter.getFormat());
         }
         if (filter.getStructure() != null) {
@@ -186,7 +186,7 @@ public class TournamentHibernateDao implements TournamentDao {
         t.setTournamentStarted(true);
         em.persist(t);
     }
-/// ward
+
     @Override
     public Map<Long, List<Tournament>> getUnfilteredTournamentPages(Long page) {
         Query topGamesQuery = em.createNativeQuery(
@@ -202,49 +202,62 @@ public class TournamentHibernateDao implements TournamentDao {
         List<Number> topGameIds = topGamesQuery.getResultList();
 
         if (topGameIds.isEmpty()) return Collections.emptyMap();
-
-        Query tournamentIdsQuery = em.createNativeQuery(
-                "SELECT t.id " +
-                        "FROM Tournament t " +
-                        "WHERE t.game_id IN ?1 " +
-                        "AND t.open_inscriptions = true " +
-                        "ORDER BY t.game_id, t.start_date ASC ");
-        tournamentIdsQuery.setParameter(1, topGameIds.stream().map(Number::longValue).toList());
-        tournamentIdsQuery.setMaxResults(TOURNAMENTS_PER_GAME);
-
-        @SuppressWarnings("unchecked")
-        List<Number> tournamentIds = tournamentIdsQuery.getResultList();
-        if (tournamentIds.isEmpty()) return Collections.emptyMap();
-
-        TypedQuery<Tournament> fullQuery = em.createQuery(
-                "SELECT DISTINCT t FROM Tournament t " +
-                        "LEFT JOIN FETCH t.game g " +
-                        "WHERE t.id IN :ids " +
-                        "ORDER BY t.game.id, t.startDate ASC",
-                Tournament.class
-        );
-        fullQuery.setParameter("ids", tournamentIds.stream().map(Number::longValue).toList());
-
-        List<Tournament> tournaments = fullQuery.getResultList();
-
-        Map<Long, List<Tournament>> grouped = tournaments.stream()
-                .collect(Collectors.groupingBy(
-                        t -> t.getGame().getId(),
-                        LinkedHashMap::new,
-                        Collectors.toList()
-                ));
-
-        Map<Long, List<Tournament>> orderedMap = new LinkedHashMap<>();
-        for (Number gameId : topGameIds) {
-            Long gid = gameId.longValue();
-            if (grouped.containsKey(gid)) {
-                orderedMap.put(gid, grouped.get(gid));
-            }
+        Map<Long,List<Tournament>> ans = new LinkedHashMap<>();
+        for(Number game : topGameIds){
+            TypedQuery<Tournament> tournamentIdsQuery = em.createQuery(
+                    "SELECT t " +
+                            "FROM Tournament t " +
+                            "WHERE t.game.id = :id " +
+                            "AND t.openInscriptions = true " +
+                            "ORDER BY t.startDate ASC ", Tournament.class);
+            tournamentIdsQuery.setParameter("id", game.longValue());
+            tournamentIdsQuery.setMaxResults(TOURNAMENTS_PER_GAME);
+            List<Tournament> tournaments = tournamentIdsQuery.getResultList();
+            ans.put(game.longValue(),tournaments);
         }
 
-        return orderedMap;
+//        Query tournamentIdsQuery = em.createNativeQuery(
+//                "SELECT t.id " +
+//                        "FROM Tournament t " +
+//                        "WHERE t.game_id IN ?1 " +
+//                        "AND t.open_inscriptions = true " +
+//                        "ORDER BY t.game_id, t.start_date ASC ");
+//        tournamentIdsQuery.setParameter(1, topGameIds.stream().map(Number::longValue).toList());
+//        tournamentIdsQuery.setMaxResults(TOURNAMENTS_PER_GAME);
+//
+//        @SuppressWarnings("unchecked")
+//        List<Number> tournamentIds = tournamentIdsQuery.getResultList();
+//        if (tournamentIds.isEmpty()) return Collections.emptyMap();
+//
+//        TypedQuery<Tournament> fullQuery = em.createQuery(
+//                "SELECT DISTINCT t FROM Tournament t " +
+//                        "LEFT JOIN FETCH t.game g " +
+//                        "WHERE t.id IN :ids " +
+//                        "ORDER BY t.game.id, t.startDate ASC",
+//                Tournament.class
+//        );
+//        fullQuery.setParameter("ids", tournamentIds.stream().map(Number::longValue).toList());
+//
+//        List<Tournament> tournaments = fullQuery.getResultList();
+//
+//        Map<Long, List<Tournament>> grouped = tournaments.stream()
+//                .collect(Collectors.groupingBy(
+//                        t -> t.getGame().getId(),
+//                        LinkedHashMap::new,
+//                        Collectors.toList()
+//                ));
+//
+//        Map<Long, List<Tournament>> orderedMap = new LinkedHashMap<>();
+//        for (Number gameId : topGameIds) {
+//            Long gid = gameId.longValue();
+//            if (grouped.containsKey(gid)) {
+//                orderedMap.put(gid, grouped.get(gid));
+//            }
+//        }
+
+        return ans;
     }
-    /// end ward
+
     @Override
     public Integer getPageAmount(Integer pageSize, TournamentFilter tf) {
         Map<String, Object> params = new HashMap<>();
