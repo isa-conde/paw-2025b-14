@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.persistence.hibernate;
 
+import ar.edu.itba.paw.model.Match.PointsPair;
 import ar.edu.itba.paw.model.Participant;
 import ar.edu.itba.paw.persistence.Hibernate.ParticipantHibernateDao;
 import ar.edu.itba.paw.persistence.TestConfig;
@@ -66,11 +67,11 @@ public class ParticipantHibernateDaoTest {
 
     @Test
     public void testJoinTeam(){
-        participantHibernateDao.joinTournamentTeam(ID,ID+1);
+        participantHibernateDao.joinTournamentTeam(ID+1,ID+1);
         em.flush();
 
         Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
-                "tournament_id = " + ID +
+                "tournament_id = " + (ID+1) +
                         " and team_id = " + (ID+1)));
     }
 
@@ -87,12 +88,12 @@ public class ParticipantHibernateDaoTest {
 
     @Test
     public void testGetUsers(){
-        List<Participant> ans = participantHibernateDao.getTournamentParticipantUsers(ID);
+        List<Participant> ans = participantHibernateDao.getTournamentParticipantUsers(ID+1);
 
         Assert.assertNotNull(ans);
         Assert.assertFalse(ans.isEmpty());
         Assert.assertEquals(1,ans.size());
-        Assert.assertEquals(ID,ans.get(0).getId());
+        Assert.assertEquals(ID+1,ans.get(0).getId().longValue());
         Assert.assertEquals(0,ans.get(0).getPoints().intValue());
         Assert.assertEquals(OTHER_USERNAME,ans.get(0).getName());
     }
@@ -107,12 +108,12 @@ public class ParticipantHibernateDaoTest {
 
     @Test
     public void testGetTeams(){
-        List<Participant> ans = participantHibernateDao.getTournamentParticipantTeams(ID);
+        List<Participant> ans = participantHibernateDao.getTournamentParticipantTeams(ID+1);
 
         Assert.assertNotNull(ans);
         Assert.assertFalse(ans.isEmpty());
         Assert.assertEquals(1,ans.size());
-        Assert.assertEquals(ID+20,ans.get(0).getId().longValue());
+        Assert.assertEquals(ID+21,ans.get(0).getId().longValue());
         Assert.assertEquals(0,ans.get(0).getPoints().intValue());
         Assert.assertEquals(TEAM,ans.get(0).getName());
     }
@@ -133,7 +134,7 @@ public class ParticipantHibernateDaoTest {
         Assert.assertEquals(OTHER_USERNAME,ans.getName());
         Assert.assertEquals(ID,ans.getId());
         Assert.assertEquals(ID,ans.getTournament().getId());
-        Assert.assertEquals(Integer.valueOf(0),ans.getPoints());
+        Assert.assertEquals(Integer.valueOf(7),ans.getPoints());
     }
 
     @Test
@@ -143,193 +144,267 @@ public class ParticipantHibernateDaoTest {
         Assert.assertNull(ans);
     }
 
-//    @Test
-//    public void testHasJoined(){
-//        boolean ans = participantHibernateDao.hasJoined(ID,ID);
-//
-//        Assert.assertTrue(ans);
-//    }
-//
-//    @Test
-//    public void testHasNotJoined(){
-//        boolean ans = participantHibernateDao.hasJoined(ID+2,ID);
-//
-//        Assert.assertFalse(ans);
-//    }
-//
-//    @Test
-//    public void testLeaveUser(){
-//        participantHibernateDao.leaveTournamentUser(ID,ID);
-//
-//        Assert.assertEquals(3,JdbcTestUtils.countRowsInTable(jdbcTemplate,"participant"));
-//        Assert.assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
-//                "tournament_id = user_id and user_id = ID"));
-//    }
-//
-//    @Test
-//    public void testLeaveNoOne(){
-//        participantHibernateDao.leaveTournamentUser(ID+2,ID);
-//
-//        Assert.assertEquals(4,JdbcTestUtils.countRowsInTable(jdbcTemplate,"participant"));
-//    }
-//
-//    @Test
-//    public void testUpdateGroupNumberUsers(){
-//        participantHibernateDao.updateGroupNumberForUsers(ID,3,List.of(ID,ID+1),1);
-//
-//        Assert.assertEquals(2,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
-//                "groupNumber = 3 and user_id is not null"));
-//        Assert.assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
-//                "groupNumber <> 3 and user_id is not null"));
-//        Assert.assertEquals(0, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "participant",
-//                "groupNumber = 3 and team_id is not null"));
-//    }
-//
-//    @Test
-//    public void testUpdateGroupNumberTeams(){
-//        participantHibernateDao.updateGroupNumberForUsers(ID+1, 3, List.of(ID, ID + 1), 2);
-//
-//        Assert.assertEquals(2, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "participant",
-//                "groupNumber = 3 and team_id is not null"));
-//        Assert.assertEquals(0, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "participant",
-//                "groupNumber <> 3 and team_id is not null"));
-//        Assert.assertEquals(0, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "participant",
-//                "groupNumber = 3 and user_id is not null"));
-//    }
-//
-//    @Test
-//    public void testSwapGroups(){
-//        participantHibernateDao.swapGroups(ID,ID,ID+1,1,2,1);
-//
-//        Assert.assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
-//                "groupNumber = user_id"));
-//        Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
-//                "groupNumber = 1 and user_id = 2"));
-//        Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
-//                "groupNumber = 2 and user_id = 1"));
-//    }
-//
-//    @Test
-//    public void testGetMaxPoints(){
-//        int ans = participantHibernateDao.getTournamentMaxPointsGroup(ID, 1);
-//
-//        Assert.assertEquals(21,ans);
-//    }
-//
-//    @Test
-//    public void testGetSecondMaxPoints(){
-//        SimpleJdbcInsert jdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
-//                .withTableName("participant")
-//                .usingGeneratedKeyColumns("id");
-//        jdbcInsert.execute(Map.of("user_id",ID+2,"tournament_id",ID,"points",14,"groupNumber",1));
-//        int ans = participantHibernateDao.getTournamentSecondMaxPointsGroup(ID, 1);
-//
-//        Assert.assertEquals(14,ans);
-//    }
-//
-//    @Test
-//    public void testGetGroupNumberUser(){
-//        int ans = participantHibernateDao.getGroupNumber(ID,ID,1);
-//
-//        Assert.assertEquals(1,ans);
-//    }
-//
-//    @Test
-//    public void testGetNoGroupNumberUser(){
-//        jdbcTemplate.update("update participant set groupNumber = null");
-//        int ans = participantHibernateDao.getGroupNumber(ID,ID,1);
-//
-//        Assert.assertEquals(0,ans);
-//    }
-//
-//    @Test
-//    public void testGetGroupNumberTeam(){
-//        int ans = participantHibernateDao.getGroupNumber(ID+1,ID,2);
-//
-//        Assert.assertEquals(1,ans);
-//    }
-//
-//    @Test
-//    public void testGetNoGroupNumberTeam(){
-//        jdbcTemplate.update("update participant set groupNumber = null");
-//        int ans = participantHibernateDao.getGroupNumber(ID+1,ID,2);
-//
-//        Assert.assertEquals(0,ans);
-//    }
-//
-//    @Test
-//    public void testGetUserByPoints(){
-//        List<Participant> ans = participantHibernateDao.getTournamentParticipantsByPoints(ID,null,21,1);
-//
-//        Assert.assertNotNull(ans);
-//        Assert.assertFalse(ans.isEmpty());
-//        Assert.assertEquals(1,ans.size());
-//        Assert.assertEquals(ID,ans.get(0).getId());
-//        Assert.assertEquals(21,ans.get(0).getPoints().intValue());
-//        Assert.assertEquals(1,ans.get(0).getGroupNumber().intValue());
-//        Assert.assertEquals(USERNAME,ans.get(0).getName());
-//    }
-//
-//    @Test
-//    public void testGetUserByPointsInGroup(){
-//        jdbcTemplate.update("update participant set points = 21 where groupNumber = 2");
-//        List<Participant> ans = participantHibernateDao.getTournamentParticipantsByPoints(ID,1,21,1);
-//
-//        Assert.assertNotNull(ans);
-//        Assert.assertFalse(ans.isEmpty());
-//        Assert.assertEquals(1,ans.size());
-//        Assert.assertEquals(ID,ans.get(0).getId());
-//        Assert.assertEquals(21,ans.get(0).getPoints().intValue());
-//        Assert.assertEquals(1,ans.get(0).getGroupNumber().intValue());
-//        Assert.assertEquals(USERNAME,ans.get(0).getName());
-//    }
-//
-//    @Test
-//    public void testGetTeamByPoints(){
-//        List<Participant> ans = participantHibernateDao.getTournamentParticipantsByPoints(ID+1,null,21,2);
-//
-//        Assert.assertNotNull(ans);
-//        Assert.assertFalse(ans.isEmpty());
-//        Assert.assertEquals(1,ans.size());
-//        Assert.assertEquals(ID,ans.get(0).getId());
-//        Assert.assertEquals(21,ans.get(0).getPoints().intValue());
-//        Assert.assertEquals(1,ans.get(0).getGroupNumber().intValue());
-//        Assert.assertEquals(USERNAME,ans.get(0).getName());
-//    }
-//
-//    @Test
-//    public void testGetTeamByPointsInGroup(){
-//        jdbcTemplate.update("update participant set points = 21 where groupNumber = 2");
-//        List<Participant> ans = participantHibernateDao.getTournamentParticipantsByPoints(ID+1,1,21,2);
-//
-//        Assert.assertNotNull(ans);
-//        Assert.assertFalse(ans.isEmpty());
-//        Assert.assertEquals(1,ans.size());
-//        Assert.assertEquals(ID,ans.get(0).getId());
-//        Assert.assertEquals(21,ans.get(0).getPoints().intValue());
-//        Assert.assertEquals(1,ans.get(0).getGroupNumber().intValue());
-//        Assert.assertEquals(USERNAME,ans.get(0).getName());
-//    }
-//
-//    @Test
-//    public void testGetGroups(){
-//        int ans = participantHibernateDao.getTournamentGroups(ID);
-//
-//        Assert.assertEquals(2,ans);
-//    }
-//
-//    @Test
-//    public void testGetNoGroups(){
-//        int ans = participantHibernateDao.getTournamentGroups(ID+2);
-//
-//        Assert.assertEquals(0,ans);
-//    }
-//
-//    @Test
-//    public void testAddPoints(){
-//        participantHibernateDao.sumPoints(ID,ID+1,3, 1);
-//        int ans = jdbcTemplate.queryForObject("select points from participant where tournament_id = ? and user_id = ?", Integer.class,ID,ID+1);
-//
-//        Assert.assertEquals(5,ans);
-//    }
+    @Test
+    public void testHasJoined(){
+        boolean ans = participantHibernateDao.hasJoined(ID,ID);
+
+        Assert.assertTrue(ans);
+    }
+
+    @Test
+    public void testHasNotJoined(){
+        boolean ans = participantHibernateDao.hasJoined(ID+2,ID);
+
+        Assert.assertFalse(ans);
+    }
+
+    @Test
+    public void testLeaveUser(){
+        participantHibernateDao.leaveTournamentUser(ID,ID);
+
+        Assert.assertEquals(43,JdbcTestUtils.countRowsInTable(jdbcTemplate,"participant"));
+        Assert.assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
+                "tournament_id = user_id and user_id = " + ID));
+    }
+
+    @Test
+    public void testLeaveNoOne(){
+        participantHibernateDao.leaveTournamentUser(ID+2,ID);
+
+        Assert.assertEquals(44,JdbcTestUtils.countRowsInTable(jdbcTemplate,"participant"));
+    }
+
+    @Test
+    public void testUpdateGroupNumberUsers(){
+        participantHibernateDao.updateGroupNumberForUsers(ID,3,List.of(ID),1);
+        em.flush();
+
+        Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
+                "group_number = 3 and user_id = " + ID));
+    }
+
+    @Test
+    public void testUpdateGroupNumberTeams(){
+        participantHibernateDao.updateGroupNumberForUsers(ID+1, 3, List.of(ID), 2);
+        em.flush();
+
+        Assert.assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "participant",
+                "group_number = 3 and team_id = " + ID));
+    }
+
+    @Test
+    public void testSwapGroups(){
+        participantHibernateDao.swapGroups(ID,ID,ID+1,1,2,1);
+        em.flush();
+
+        Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
+                "group_number = 1 and user_id = " + (ID+1)));
+        Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
+                "group_number = 2 and user_id = " + ID));
+    }
+
+    @Test
+    public void testGetMaxPoints(){
+        PointsPair ans = participantHibernateDao.getTournamentMaxPointsPairGroup(ID, 1);
+
+        Assert.assertEquals(7,ans.getPoints().intValue());
+        Assert.assertEquals(6,ans.getScoreDifference().intValue());
+    }
+
+    @Test
+    public void testGetSecondMaxPoints(){
+        PointsPair ans = participantHibernateDao.getTournamentSecondMaxPointsPairGroup(ID, 1);
+
+        Assert.assertEquals(1,ans.getPoints().intValue());
+        Assert.assertEquals(-6,ans.getScoreDifference().intValue());
+    }
+
+    @Test
+    public void testGetGroupNumberUser(){
+        Integer ans = participantHibernateDao.getGroupNumber(ID,ID,1);
+
+        Assert.assertNotNull(ans);
+        Assert.assertEquals(1,ans.intValue());
+    }
+
+    @Test
+    public void testGetNoGroupNumberUser(){
+        jdbcTemplate.update("update participant set group_number = null");
+        Integer ans = participantHibernateDao.getGroupNumber(ID,ID,1);
+
+        Assert.assertNull(ans);
+    }
+
+    @Test
+    public void testGetGroupNumberTeam(){
+        Integer ans = participantHibernateDao.getGroupNumber(ID,ID,2);
+
+        Assert.assertNotNull(ans);
+        Assert.assertEquals(1,ans.intValue());
+    }
+
+    @Test
+    public void testGetNoGroupNumberTeam(){
+        jdbcTemplate.update("update participant set group_number = null");
+        Integer ans = participantHibernateDao.getGroupNumber(ID,ID,2);
+
+        Assert.assertNull(ans);
+    }
+
+    @Test
+    public void testGetUserByPoints(){
+        List<Participant> ans = participantHibernateDao.getTournamentParticipantsByPointsPair(ID+1,null,new PointsPair(7,6),1);
+
+        Assert.assertNotNull(ans);
+        Assert.assertFalse(ans.isEmpty());
+        Assert.assertEquals(1,ans.size());
+        Assert.assertEquals(ID+1,ans.get(0).getId().longValue());
+        Assert.assertEquals(7,ans.get(0).getPoints().intValue());
+        Assert.assertEquals(6, ans.get(0).getScoreDifference().intValue());
+        Assert.assertEquals(OTHER_USERNAME,ans.get(0).getName());
+    }
+
+    @Test
+    public void testGetUserByPointsInGroup(){
+        List<Participant> ans = participantHibernateDao.getTournamentParticipantsByPointsPair(ID,1,new PointsPair(7,6),1);
+
+        Assert.assertNotNull(ans);
+        Assert.assertFalse(ans.isEmpty());
+        Assert.assertEquals(1,ans.size());
+        Assert.assertEquals(ID,ans.get(0).getId());
+        Assert.assertEquals(7,ans.get(0).getPoints().intValue());
+        Assert.assertEquals(6, ans.get(0).getScoreDifference().intValue());
+        Assert.assertEquals(1,ans.get(0).getGroupNumber().intValue());
+        Assert.assertEquals(OTHER_USERNAME,ans.get(0).getName());
+    }
+
+    @Test
+    public void testGetTeamByPoints(){
+        List<Participant> ans = participantHibernateDao.getTournamentParticipantsByPointsPair(ID+1,null,new PointsPair(7,6),2);
+
+        Assert.assertNotNull(ans);
+        Assert.assertFalse(ans.isEmpty());
+        Assert.assertEquals(1,ans.size());
+        Assert.assertEquals(ID+21,ans.get(0).getId().longValue());
+        Assert.assertEquals(7,ans.get(0).getPoints().intValue());
+        Assert.assertEquals(6,ans.get(0).getScoreDifference().intValue());
+        Assert.assertEquals(TEAM,ans.get(0).getName());
+    }
+
+    @Test
+    public void testGetTeamByPointsInGroup(){
+        List<Participant> ans = participantHibernateDao.getTournamentParticipantsByPointsPair(ID,1,new PointsPair(7,6),2);
+
+        Assert.assertNotNull(ans);
+        Assert.assertFalse(ans.isEmpty());
+        Assert.assertEquals(1,ans.size());
+        Assert.assertEquals(ID+20,ans.get(0).getId().longValue());
+        Assert.assertEquals(7,ans.get(0).getPoints().intValue());
+        Assert.assertEquals(6,ans.get(0).getScoreDifference().intValue());
+        Assert.assertEquals(1,ans.get(0).getGroupNumber().intValue());
+        Assert.assertEquals(TEAM,ans.get(0).getName());
+    }
+
+    @Test
+    public void testGetGroups(){
+        int ans = participantHibernateDao.getTournamentGroups(ID);
+
+        Assert.assertEquals(1,ans);
+    }
+
+    @Test
+    public void testGetNoGroups(){
+        int ans = participantHibernateDao.getTournamentGroups(ID+2);
+
+        Assert.assertEquals(0,ans);
+    }
+
+    @Test
+    public void testAddPoints(){
+        participantHibernateDao.sumPoints(ID,ID,3, 1,1);
+
+        Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
+                "tournament_id = user_id and user_id = " + ID + " and points = " + (7+3) +
+                " and score_difference = " + (6+1)));
+    }
+
+    @Test
+    public void testHasRated(){
+        jdbcTemplate.update("update participant set has_rated = true");
+        Boolean ans = participantHibernateDao.hasRated(ID, ID);
+
+        Assert.assertTrue(ans);
+    }
+
+    @Test
+    public void testHasNotRated(){
+        jdbcTemplate.update("update participant set has_rated = false");
+        Boolean ans = participantHibernateDao.hasRated(ID, ID);
+
+        Assert.assertFalse(ans);
+    }
+
+    @Test
+    public void testHasNotRatedNull(){
+        Boolean ans = participantHibernateDao.hasRated(ID, ID);
+
+        Assert.assertFalse(ans);
+    }
+
+    @Test
+    public void testRate(){
+        participantHibernateDao.updateHasRated(ID, ID);
+        em.flush();
+
+        Assert.assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "participant",
+                "tournament_id = user_id and user_id = " + ID + " and has_rated = true"));
+    }
+
+    @Test
+    public void testLeaveTeam(){
+        participantHibernateDao.leaveTournamentTeam(ID,ID);
+
+        Assert.assertEquals(43,JdbcTestUtils.countRowsInTable(jdbcTemplate,"participant"));
+        Assert.assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
+                "tournament_id = team_id and team_id = " + ID));
+    }
+
+    @Test
+    public void testLeaveNoTeam(){
+        participantHibernateDao.leaveTournamentTeam(ID+2,ID);
+
+        Assert.assertEquals(44,JdbcTestUtils.countRowsInTable(jdbcTemplate,"participant"));
+    }
+
+    @Test
+    public void testRemoveTeam(){
+        participantHibernateDao.removeTournamentParticipantTeam(ID,ID+20);
+
+        Assert.assertEquals(43,JdbcTestUtils.countRowsInTable(jdbcTemplate,"participant"));
+        Assert.assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
+                "tournament_id = team_id and team_id = " + ID));
+    }
+
+    @Test
+    public void testRemoveNoTeam(){
+        participantHibernateDao.removeTournamentParticipantTeam(ID, 0L);
+
+        Assert.assertEquals(44,JdbcTestUtils.countRowsInTable(jdbcTemplate,"participant"));
+    }
+
+    @Test
+    public void testRemoveUser(){
+        participantHibernateDao.removeTournamentParticipantUser(ID,ID);
+
+        Assert.assertEquals(43,JdbcTestUtils.countRowsInTable(jdbcTemplate,"participant"));
+        Assert.assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
+                "tournament_id = team_id and user_id = " + ID));
+    }
+
+    @Test
+    public void testRemoveNoUser(){
+        participantHibernateDao.removeTournamentParticipantUser(ID, 0L);
+
+        Assert.assertEquals(44,JdbcTestUtils.countRowsInTable(jdbcTemplate,"participant"));
+    }
 }

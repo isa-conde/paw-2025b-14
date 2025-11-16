@@ -141,7 +141,7 @@ public class ParticipantHibernateDao implements ParticipantDao{
                 .setParameter("tournamentId", tournamentId)
                 .executeUpdate();
     }
-
+/// ward
     @Override
     public void removeTournamentParticipantTeam(Long tournamentId, Long participantId){
         String jpql = """
@@ -161,7 +161,7 @@ public class ParticipantHibernateDao implements ParticipantDao{
         """;
         em.createQuery(jpql).setParameter("tournamentId", tournamentId).setParameter("participantId", participantId).executeUpdate();
     }
-
+/// end ward
     @Override
     public void updateGroupNumberForUsers(long tournamentId, int groupNumber, List<Long> userIds, Integer teamSize) {
         String jpql;
@@ -280,7 +280,6 @@ public class ParticipantHibernateDao implements ParticipantDao{
         fillParticipantTransientFields(toReturn);
         return toReturn;
     }
-
 
     @Override
     public PointsPair getTournamentMaxPointsPairGroup(Long tournamentId, Integer group) {
