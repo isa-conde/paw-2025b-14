@@ -35,6 +35,7 @@ public class ParticipantHibernateDao implements ParticipantDao{
         Participant participant = new Participant(em.getReference(Tournament.class, tournamentId));
         participant.setUser(em.getReference(User.class, userId));
         participant.setTeam(em.getReference(Team.class, teamId));
+        participant.setPoints(0);
         em.persist(participant);
     }
 
@@ -48,7 +49,6 @@ public class ParticipantHibernateDao implements ParticipantDao{
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Participant getTournamentParticipantById(Long tournamentId, Long participantId, Integer teamSize) {
         String jpql;
 
@@ -79,7 +79,6 @@ public class ParticipantHibernateDao implements ParticipantDao{
         return toReturn.stream().findFirst().orElse(null);
     }
 
-    @Transactional(readOnly = true)
     @Override
     public Boolean hasJoined(Long userId, Long tournamentId) {
         String jpql = """
