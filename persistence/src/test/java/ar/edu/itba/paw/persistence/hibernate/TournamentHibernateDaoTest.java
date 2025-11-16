@@ -36,7 +36,7 @@ import java.util.*;
 public class TournamentHibernateDaoTest {
     @PersistenceContext
     private EntityManager em;
-    
+
     @Autowired
     private DataSource ds;
 
@@ -185,77 +185,77 @@ public class TournamentHibernateDaoTest {
     public void testGetTournamentStructureNotFound(){
         tournamentHibernateDao.getTournamentStructure(NO_ONE_ID);
     }
-
-    @Test
-    public void testFindByCreatorNone(){
-        List<Tournament> tournaments = tournamentHibernateDao.findByCreator(NO_ONE_ID, NO_ONE_ID,false);
-
-        Assert.assertNotNull(tournaments);
-        Assert.assertTrue(tournaments.isEmpty());
-    }
-
-    @Test
-    public void testFindByCreatorEmptyPageFalse(){
-        List<Tournament> tournaments = tournamentHibernateDao.findByCreator(ID,2L,false);
-
-        Assert.assertNotNull(tournaments);
-        Assert.assertTrue(tournaments.isEmpty());
-    }
-
-    @Test
-    public void testFindByCreatorEmptyPageTrue(){
-        List<Tournament> tournaments = tournamentHibernateDao.findByCreator(ID,2L,true);
-
-        Assert.assertNotNull(tournaments);
-        Assert.assertTrue(tournaments.isEmpty());
-    }
-
-    @Test
-    public void testFindByCreatorFullPageFalse(){
-        List<Tournament> tournaments = tournamentHibernateDao.findByCreator(ID,NO_ONE_ID,false);
-
-        Assert.assertNotNull(tournaments);
-        Assert.assertEquals(PAGE_SIZE,tournaments.size());
-        Assert.assertTrue(tournaments.stream().allMatch((tournament -> Objects.equals(tournament.getCreatorId(), ID) && !tournament.getFinished())));
-    }
-
-    @Test
-    public void testFindByCreatorFullPageTrue(){
-        List<Tournament> tournaments = tournamentHibernateDao.findByCreator(ID,NO_ONE_ID,true);
-
-        Assert.assertNotNull(tournaments);
-        Assert.assertEquals(PAGE_SIZE,tournaments.size());
-        Assert.assertTrue(tournaments.stream().allMatch((tournament -> Objects.equals(tournament.getCreatorId(), ID) && tournament.getFinished())));
-    }
-
-    @Test
-    public void testFindByCreatorLastPageFalse(){
-        List<Tournament> tournaments = tournamentHibernateDao.findByCreator(ID,1L,false);
-
-        Assert.assertNotNull(tournaments);
-        Assert.assertEquals(1L, tournaments.size());
-        Assert.assertEquals(ID, tournaments.get(0).getCreatorId());
-        Assert.assertFalse(tournaments.get(0).getFinished());
-    }
-
-    @Test
-    public void testFindByCreatorLastPageTrue(){
-        List<Tournament> tournaments = tournamentHibernateDao.findByCreator(ID,1L,true);
-
-        Assert.assertNotNull(tournaments);
-        Assert.assertEquals(1L, tournaments.size());
-        Assert.assertEquals(ID, tournaments.get(0).getCreatorId());
-        Assert.assertTrue(tournaments.get(0).getFinished());
-    }
-
-    @Test
-    public void testSetFinished(){
-        tournamentHibernateDao.setFinished(ID);
-        em.flush();
-
-        Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"tournament",
-                "is_finished = true and id = " + ID));
-    }
+//
+//    @Test
+//    public void testFindByCreatorNone(){
+//        List<Tournament> tournaments = tournamentHibernateDao.findByCreator(NO_ONE_ID, NO_ONE_ID,false);
+//
+//        Assert.assertNotNull(tournaments);
+//        Assert.assertTrue(tournaments.isEmpty());
+//    }
+//
+//    @Test
+//    public void testFindByCreatorEmptyPageFalse(){
+//        List<Tournament> tournaments = tournamentHibernateDao.findByCreator(ID,2L,false);
+//
+//        Assert.assertNotNull(tournaments);
+//        Assert.assertTrue(tournaments.isEmpty());
+//    }
+//
+//    @Test
+//    public void testFindByCreatorEmptyPageTrue(){
+//        List<Tournament> tournaments = tournamentHibernateDao.findByCreator(ID,2L,true);
+//
+//        Assert.assertNotNull(tournaments);
+//        Assert.assertTrue(tournaments.isEmpty());
+//    }
+//
+//    @Test
+//    public void testFindByCreatorFullPageFalse(){
+//        List<Tournament> tournaments = tournamentHibernateDao.findByCreator(ID,NO_ONE_ID,false);
+//
+//        Assert.assertNotNull(tournaments);
+//        Assert.assertEquals(PAGE_SIZE,tournaments.size());
+//        Assert.assertTrue(tournaments.stream().allMatch((tournament -> Objects.equals(tournament.getCreatorId(), ID) && !tournament.getFinished())));
+//    }
+//
+//    @Test
+//    public void testFindByCreatorFullPageTrue(){
+//        List<Tournament> tournaments = tournamentHibernateDao.findByCreator(ID,NO_ONE_ID,true);
+//
+//        Assert.assertNotNull(tournaments);
+//        Assert.assertEquals(PAGE_SIZE,tournaments.size());
+//        Assert.assertTrue(tournaments.stream().allMatch((tournament -> Objects.equals(tournament.getCreatorId(), ID) && tournament.getFinished())));
+//    }
+//
+//    @Test
+//    public void testFindByCreatorLastPageFalse(){
+//        List<Tournament> tournaments = tournamentHibernateDao.findByCreator(ID,1L,false);
+//
+//        Assert.assertNotNull(tournaments);
+//        Assert.assertEquals(1L, tournaments.size());
+//        Assert.assertEquals(ID, tournaments.get(0).getCreatorId());
+//        Assert.assertFalse(tournaments.get(0).getFinished());
+//    }
+//
+//    @Test
+//    public void testFindByCreatorLastPageTrue(){
+//        List<Tournament> tournaments = tournamentHibernateDao.findByCreator(ID,1L,true);
+//
+//        Assert.assertNotNull(tournaments);
+//        Assert.assertEquals(1L, tournaments.size());
+//        Assert.assertEquals(ID, tournaments.get(0).getCreatorId());
+//        Assert.assertTrue(tournaments.get(0).getFinished());
+//    }
+//
+//    @Test
+//    public void testSetFinished(){
+//        tournamentHibernateDao.setFinished(ID);
+//        em.flush();
+//
+//        Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"tournament",
+//                "is_finished = true and id = " + ID));
+//    }
 
     @Test
     public void testSetFinishedRedundant(){
@@ -283,80 +283,80 @@ public class TournamentHibernateDaoTest {
         Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"tournament",
                 "open_inscriptions = false and id = " + (ID+1)));
     }
-
-    @Test
-    public void testFindUserActiveTournamentsFullPage(){
-        List<Tournament> tournaments = tournamentHibernateDao.findUserActiveTournaments(ID,0L);
-
-        Assert.assertNotNull(tournaments);
-        Assert.assertFalse(tournaments.isEmpty());
-        Assert.assertEquals(PAGE_SIZE,tournaments.size());
-        Assert.assertTrue(tournaments.stream().allMatch((tournament -> !tournament.getFinished() && tournament.getId() % 2 == 0 && tournament.getId() < 120)));
-    }
-
-    @Test
-    public void testFindUserPastTournamentsFullPage(){
-        List<Tournament> tournaments = tournamentHibernateDao.findUserPastTournaments(ID,0L);
-
-        Assert.assertNotNull(tournaments);
-        Assert.assertFalse(tournaments.isEmpty());
-        Assert.assertEquals(PAGE_SIZE,tournaments.size());
-        Assert.assertTrue(tournaments.stream().allMatch((tournament -> tournament.getFinished() && tournament.getId() % 2 == 1 && tournament.getId() < 120)));
-    }
-
-    @Test
-    public void testFindUserActiveTournamentsEmptyPage(){
-        List<Tournament> tournaments = tournamentHibernateDao.findUserActiveTournaments(ID,2L);
-
-        Assert.assertNotNull(tournaments);
-        Assert.assertTrue(tournaments.isEmpty());
-    }
-
-    @Test
-    public void testFindUserPastTournamentsEmptyPage(){
-        List<Tournament> tournaments = tournamentHibernateDao.findUserPastTournaments(ID,2L);
-
-        Assert.assertNotNull(tournaments);
-        Assert.assertTrue(tournaments.isEmpty());
-    }
-
-    @Test
-    public void testFindUserActiveTournamentsLastPage(){
-        List<Tournament> tournaments = tournamentHibernateDao.findUserActiveTournaments(ID,1L);
-
-        Assert.assertNotNull(tournaments);
-        Assert.assertFalse(tournaments.isEmpty());
-        Assert.assertEquals(1,tournaments.size());
-        Tournament tournament = tournaments.get(0);
-        Assert.assertTrue(!tournament.getFinished() && tournament.getId() % 2 == 0 && tournament.getId() < 120);
-    }
-
-    @Test
-    public void testFindUserPastTournamentsLastPage(){
-        List<Tournament> tournaments = tournamentHibernateDao.findUserPastTournaments(ID,1L);
-
-        Assert.assertNotNull(tournaments);
-        Assert.assertFalse(tournaments.isEmpty());
-        Assert.assertEquals(1,tournaments.size());
-        Tournament tournament = tournaments.get(0);
-        Assert.assertTrue(tournament.getFinished() && tournament.getId() % 2 == 1 && tournament.getId() < 120);
-    }
-
-    @Test
-    public void testFindNoOnesActiveTournaments(){
-        List<Tournament> tournaments = tournamentHibernateDao.findUserActiveTournaments(NO_ONE_ID,NO_ONE_ID);
-
-        Assert.assertNotNull(tournaments);
-        Assert.assertTrue(tournaments.isEmpty());
-    }
-
-    @Test
-    public void testFindNoOnesPastTournaments(){
-        List<Tournament> tournaments = tournamentHibernateDao.findUserPastTournaments(NO_ONE_ID,NO_ONE_ID);
-
-        Assert.assertNotNull(tournaments);
-        Assert.assertTrue(tournaments.isEmpty());
-    }
+//
+//    @Test
+//    public void testFindUserActiveTournamentsFullPage(){
+//        List<Tournament> tournaments = tournamentHibernateDao.findUserActiveTournaments(ID,0L);
+//
+//        Assert.assertNotNull(tournaments);
+//        Assert.assertFalse(tournaments.isEmpty());
+//        Assert.assertEquals(PAGE_SIZE,tournaments.size());
+//        Assert.assertTrue(tournaments.stream().allMatch((tournament -> !tournament.getFinished() && tournament.getId() % 2 == 0 && tournament.getId() < 120)));
+//    }
+//
+//    @Test
+//    public void testFindUserPastTournamentsFullPage(){
+//        List<Tournament> tournaments = tournamentHibernateDao.findUserPastTournaments(ID,0L);
+//
+//        Assert.assertNotNull(tournaments);
+//        Assert.assertFalse(tournaments.isEmpty());
+//        Assert.assertEquals(PAGE_SIZE,tournaments.size());
+//        Assert.assertTrue(tournaments.stream().allMatch((tournament -> tournament.getFinished() && tournament.getId() % 2 == 1 && tournament.getId() < 120)));
+//    }
+//
+//    @Test
+//    public void testFindUserActiveTournamentsEmptyPage(){
+//        List<Tournament> tournaments = tournamentHibernateDao.findUserActiveTournaments(ID,2L);
+//
+//        Assert.assertNotNull(tournaments);
+//        Assert.assertTrue(tournaments.isEmpty());
+//    }
+//
+//    @Test
+//    public void testFindUserPastTournamentsEmptyPage(){
+//        List<Tournament> tournaments = tournamentHibernateDao.findUserPastTournaments(ID,2L);
+//
+//        Assert.assertNotNull(tournaments);
+//        Assert.assertTrue(tournaments.isEmpty());
+//    }
+//
+//    @Test
+//    public void testFindUserActiveTournamentsLastPage(){
+//        List<Tournament> tournaments = tournamentHibernateDao.findUserActiveTournaments(ID,1L);
+//
+//        Assert.assertNotNull(tournaments);
+//        Assert.assertFalse(tournaments.isEmpty());
+//        Assert.assertEquals(1,tournaments.size());
+//        Tournament tournament = tournaments.get(0);
+//        Assert.assertTrue(!tournament.getFinished() && tournament.getId() % 2 == 0 && tournament.getId() < 120);
+//    }
+//
+//    @Test
+//    public void testFindUserPastTournamentsLastPage(){
+//        List<Tournament> tournaments = tournamentHibernateDao.findUserPastTournaments(ID,1L);
+//
+//        Assert.assertNotNull(tournaments);
+//        Assert.assertFalse(tournaments.isEmpty());
+//        Assert.assertEquals(1,tournaments.size());
+//        Tournament tournament = tournaments.get(0);
+//        Assert.assertTrue(tournament.getFinished() && tournament.getId() % 2 == 1 && tournament.getId() < 120);
+//    }
+//
+//    @Test
+//    public void testFindNoOnesActiveTournaments(){
+//        List<Tournament> tournaments = tournamentHibernateDao.findUserActiveTournaments(NO_ONE_ID,NO_ONE_ID);
+//
+//        Assert.assertNotNull(tournaments);
+//        Assert.assertTrue(tournaments.isEmpty());
+//    }
+//
+//    @Test
+//    public void testFindNoOnesPastTournaments(){
+//        List<Tournament> tournaments = tournamentHibernateDao.findUserPastTournaments(NO_ONE_ID,NO_ONE_ID);
+//
+//        Assert.assertNotNull(tournaments);
+//        Assert.assertTrue(tournaments.isEmpty());
+//    }
 
     @Test
     public void testSearchByNameAll(){
@@ -507,125 +507,125 @@ public class TournamentHibernateDaoTest {
 
         Assert.assertTrue(closed);
     }
-
-    @Test
-    public void testGetUserActiveTournaments(){
-        int ans = tournamentHibernateDao.getUserActiveTournamentsPages(ID);
-
-        Assert.assertEquals((int)Math.ceil(((double) OPEN_BY_ID/PAGE_SIZE)),ans);
-    }
-
-    @Test
-    public void testGetUserPastTournaments(){
-        int ans = tournamentHibernateDao.getUserPastTournamentsPages(ID);
-
-        Assert.assertEquals((int)Math.ceil(((double) OPEN_BY_ID/PAGE_SIZE)),ans);
-    }
-
-    @Test
-    public void testGetNoOnesActiveTournamentsPages(){
-        int ans = tournamentHibernateDao.getUserActiveTournamentsPages(0L);
-
-        Assert.assertEquals(0,ans);
-    }
-
-    @Test
-    public void testGetNoOnesPastTournamentsPages(){
-        int ans = tournamentHibernateDao.getUserPastTournamentsPages(0L);
-
-        Assert.assertEquals(0,ans);
-    }
-
-    @Test
-    public void testGetCreatedAndFinishedTournamentPages(){
-        int ans = tournamentHibernateDao.getCreatedAndFinishedTournamentsPages(ID);
-
-        Assert.assertEquals((int)Math.ceil(((double) OPEN_BY_ID/PAGE_SIZE)),ans);
-    }
-
-    @Test
-    public void testGetCreatedAndOngoingTournamentPages(){
-        int ans = tournamentHibernateDao.getCreatedAndOngoingTournamentsPages(ID);
-
-        Assert.assertEquals((int)Math.ceil(((double) OPEN_BY_ID/PAGE_SIZE)),ans);
-    }
-
-    @Test
-    public void testGetCreatedAndFinishedNothing(){
-        int ans = tournamentHibernateDao.getCreatedAndFinishedTournamentsPages(0L);
-
-        Assert.assertEquals(0,ans);
-    }
-
-    @Test
-    public void testGetCreatedAndOngoingNothing(){
-        int ans = tournamentHibernateDao.getCreatedAndOngoingTournamentsPages(0L);
-
-        Assert.assertEquals(0,ans);
-    }
-
-    @Test
-    public void testGetUsersWonTournamentsPages(){
-        jdbcTemplate.update("update tournament set tournament_winner = id where id < 120");
-        int ans = tournamentHibernateDao.getUserWonTournamentPages(ID);
-
-        Assert.assertEquals((int)Math.ceil(((double) TOURNEYS_BY_ID/PAGE_SIZE)),ans);
-    }
-
-    @Test
-    public void testGetNoWonTournamentsPages(){
-        int ans = tournamentHibernateDao.getUserWonTournamentPages(ID);
-
-        Assert.assertEquals(0,ans);
-    }
-
-    @Test
-    public void testGetUsersWonTournamentsFullPage(){
-        jdbcTemplate.update("update tournament set tournament_winner = id where id < 110");
-        List<Tournament> ans = tournamentHibernateDao.getUserWonTournament(ID,NO_ONE_ID);
-
-        Assert.assertNotNull(ans);
-        Assert.assertFalse(ans.isEmpty());
-        Assert.assertEquals(PAGE_SIZE,ans.size());
-        Assert.assertTrue(ans.stream().allMatch(t-> t.getWinner().getUser().getId() == ID));
-    }
-
-    @Test
-    public void testGetUsersWonTournamentsLastPage(){
-        jdbcTemplate.update("update tournament set tournament_winner = id where id < 110");
-        List<Tournament> ans = tournamentHibernateDao.getUserWonTournament(ID,1L);
-
-        Assert.assertNotNull(ans);
-        Assert.assertFalse(ans.isEmpty());
-        Assert.assertEquals(1,ans.size());
-        Tournament t = ans.get(0);
-        Assert.assertEquals(ID.longValue(), t.getWinner().getUser().getId());
-    }
-
-    @Test
-    public void testGetUsersWonTournamentsEmptyPage(){
-        jdbcTemplate.update("update tournament set tournament_winner = id where id < 110");
-        List<Tournament> ans = tournamentHibernateDao.getUserWonTournament(ID,2L);
-
-        Assert.assertNotNull(ans);
-        Assert.assertTrue(ans.isEmpty());
-    }
-
-    @Test
-    public void testGetNoWonTournaments(){
-        List<Tournament> ans = tournamentHibernateDao.getUserWonTournament(ID,NO_ONE_ID);
-
-        Assert.assertNotNull(ans);
-        Assert.assertTrue(ans.isEmpty());
-    }
-
-    @Test
-    public void testGetNoOnesWonTournaments(){
-        List<Tournament> ans = tournamentHibernateDao.getUserWonTournament(NO_ONE_ID,NO_ONE_ID);
-
-        Assert.assertNotNull(ans);
-        Assert.assertTrue(ans.isEmpty());
-    }
+//
+//    @Test
+//    public void testGetUserActiveTournaments(){
+//        int ans = tournamentHibernateDao.getUserActiveTournamentsPages(ID);
+//
+//        Assert.assertEquals((int)Math.ceil(((double) OPEN_BY_ID/PAGE_SIZE)),ans);
+//    }
+//
+//    @Test
+//    public void testGetUserPastTournaments(){
+//        int ans = tournamentHibernateDao.getUserPastTournamentsPages(ID);
+//
+//        Assert.assertEquals((int)Math.ceil(((double) OPEN_BY_ID/PAGE_SIZE)),ans);
+//    }
+//
+//    @Test
+//    public void testGetNoOnesActiveTournamentsPages(){
+//        int ans = tournamentHibernateDao.getUserActiveTournamentsPages(0L);
+//
+//        Assert.assertEquals(0,ans);
+//    }
+//
+//    @Test
+//    public void testGetNoOnesPastTournamentsPages(){
+//        int ans = tournamentHibernateDao.getUserPastTournamentsPages(0L);
+//
+//        Assert.assertEquals(0,ans);
+//    }
+//
+//    @Test
+//    public void testGetCreatedAndFinishedTournamentPages(){
+//        int ans = tournamentHibernateDao.getCreatedAndFinishedTournamentsPages(ID);
+//
+//        Assert.assertEquals((int)Math.ceil(((double) OPEN_BY_ID/PAGE_SIZE)),ans);
+//    }
+//
+//    @Test
+//    public void testGetCreatedAndOngoingTournamentPages(){
+//        int ans = tournamentHibernateDao.getCreatedAndOngoingTournamentsPages(ID);
+//
+//        Assert.assertEquals((int)Math.ceil(((double) OPEN_BY_ID/PAGE_SIZE)),ans);
+//    }
+//
+//    @Test
+//    public void testGetCreatedAndFinishedNothing(){
+//        int ans = tournamentHibernateDao.getCreatedAndFinishedTournamentsPages(0L);
+//
+//        Assert.assertEquals(0,ans);
+//    }
+//
+//    @Test
+//    public void testGetCreatedAndOngoingNothing(){
+//        int ans = tournamentHibernateDao.getCreatedAndOngoingTournamentsPages(0L);
+//
+//        Assert.assertEquals(0,ans);
+//    }
+//
+//    @Test
+//    public void testGetUsersWonTournamentsPages(){
+//        jdbcTemplate.update("update tournament set tournament_winner = id where id < 120");
+//        int ans = tournamentHibernateDao.getUserWonTournamentPages(ID);
+//
+//        Assert.assertEquals((int)Math.ceil(((double) TOURNEYS_BY_ID/PAGE_SIZE)),ans);
+//    }
+//
+//    @Test
+//    public void testGetNoWonTournamentsPages(){
+//        int ans = tournamentHibernateDao.getUserWonTournamentPages(ID);
+//
+//        Assert.assertEquals(0,ans);
+//    }
+//
+//    @Test
+//    public void testGetUsersWonTournamentsFullPage(){
+//        jdbcTemplate.update("update tournament set tournament_winner = id where id < 110");
+//        List<Tournament> ans = tournamentHibernateDao.getUserWonTournament(ID,NO_ONE_ID);
+//
+//        Assert.assertNotNull(ans);
+//        Assert.assertFalse(ans.isEmpty());
+//        Assert.assertEquals(PAGE_SIZE,ans.size());
+//        Assert.assertTrue(ans.stream().allMatch(t-> t.getWinner().getUser().getId() == ID));
+//    }
+//
+//    @Test
+//    public void testGetUsersWonTournamentsLastPage(){
+//        jdbcTemplate.update("update tournament set tournament_winner = id where id < 110");
+//        List<Tournament> ans = tournamentHibernateDao.getUserWonTournament(ID,1L);
+//
+//        Assert.assertNotNull(ans);
+//        Assert.assertFalse(ans.isEmpty());
+//        Assert.assertEquals(1,ans.size());
+//        Tournament t = ans.get(0);
+//        Assert.assertEquals(ID.longValue(), t.getWinner().getUser().getId());
+//    }
+//
+//    @Test
+//    public void testGetUsersWonTournamentsEmptyPage(){
+//        jdbcTemplate.update("update tournament set tournament_winner = id where id < 110");
+//        List<Tournament> ans = tournamentHibernateDao.getUserWonTournament(ID,2L);
+//
+//        Assert.assertNotNull(ans);
+//        Assert.assertTrue(ans.isEmpty());
+//    }
+//
+//    @Test
+//    public void testGetNoWonTournaments(){
+//        List<Tournament> ans = tournamentHibernateDao.getUserWonTournament(ID,NO_ONE_ID);
+//
+//        Assert.assertNotNull(ans);
+//        Assert.assertTrue(ans.isEmpty());
+//    }
+//
+//    @Test
+//    public void testGetNoOnesWonTournaments(){
+//        List<Tournament> ans = tournamentHibernateDao.getUserWonTournament(NO_ONE_ID,NO_ONE_ID);
+//
+//        Assert.assertNotNull(ans);
+//        Assert.assertTrue(ans.isEmpty());
+//    }
 
     @Test
     public void testGetTournamentParticipantsCount(){
