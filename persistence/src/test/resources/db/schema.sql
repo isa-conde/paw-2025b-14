@@ -4,7 +4,11 @@ set ignorecase true;
 insert into users (id, email, username, password, verified, locale)
     values (100, 'another@mail.com','janedoe','1234567890',false,'es');
 insert into users (id, email, username, password, verified, locale)
-values (101, 'another2@mail.com','janetdoe','1234567890',false,'es');
+    values (101, 'another2@mail.com','janetdoe','1234567890',false,'es');
+insert into users (id, email, username, password, verified, locale)
+    values (102, 'another3@mail.com','johandoe','1234567890',false,'es');
+insert into users (id, email, username, password, verified, locale)
+    values (103, 'another4@mail.com','joedoe','1234567890',false,'es');
 
 insert into game (id, name, genre, image_id) values (100, 'Grand Theft Walrus MOBA', 'MOBA', 100);
 insert into game (id, name, genre, image_id) values (101, 'Grand Theft Walrus FPS', 'FPS', 100);
@@ -164,4 +168,18 @@ insert into participant (id, team_id, tournament_id, points) values (141,101,120
 
 insert into game_format (id, name, players_per_team, game_id) values (100, 'formi', 6, 103);
 
-insert into match (id, tournament_id, local_id, visitor_id, winner, local_score, visitor_score, is_group_stage) VALUES (0, 100, 100, 101, 2, 4, 5, true);
+insert into match (id, tournament_id, local_id, visitor_id, winner, local_score, visitor_score, is_group_stage, stage)
+    VALUES (0, 100, 100, 101, 2, 4, 5, true, 1);
+insert into match (id, tournament_id, local_id, visitor_id, winner, local_score, visitor_score, is_group_stage, stage)
+    VALUES (1, 100, 100, 102, 2, 4, 5, true, 2);
+insert into match (id, tournament_id, local_id, visitor_id, winner, local_score, visitor_score, is_group_stage, stage)
+    VALUES (2, 100, 100, 103, 2, 4, 5, true, 3);
+insert into match (id, tournament_id, local_id, visitor_id, winner, local_score, visitor_score, is_group_stage, stage)
+    VALUES (3, 100, 101, 102, 2, 4, 5, true, 3);
+insert into match (id, tournament_id, local_id, visitor_id, winner, local_score, visitor_score, is_group_stage, stage)
+    VALUES (4, 100, 101, 103, 2, 4, 5, true, 2);
+insert into match (id, tournament_id, local_id, visitor_id, winner, local_score, visitor_score, is_group_stage, stage)
+    VALUES (5, 100, 102, 103, 2, 4, 5, true, 1);
+
+insert into match (id, tournament_id, is_group_stage)
+VALUES (0, 102, true);
