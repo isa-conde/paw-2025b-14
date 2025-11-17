@@ -37,8 +37,6 @@ public interface UserDao {
 
     void updateUserRating(Long userId, Float rating);
 
-    List<User> findAll();
-
     void addUserAccount(long userId, Platform platform, String username);
 
     void deleteUserAccount(long userId, Platform platform);

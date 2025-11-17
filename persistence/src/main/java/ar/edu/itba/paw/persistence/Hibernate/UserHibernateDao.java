@@ -181,11 +181,6 @@ public class UserHibernateDao implements UserDao {
     }
 
     @Override
-    public List<User> findAll() {
-        return em.createQuery("SELECT u FROM User u", User.class).getResultList();
-    }
-
-    @Override
     public void addUserAccount(long userId, Platform platform, String username) {
         em.createNativeQuery("INSERT INTO user_account (user_id, platform, username) VALUES (?1, CAST(?2 AS platform), ?3)")
                 .setParameter(1, userId)

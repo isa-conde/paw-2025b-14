@@ -44,8 +44,6 @@ public interface UserService {
 
     int countSearchByNameUser(String name);
 
-    List<User> findAll();
-
     Float getUserRating(Long userId);
 
     User findUserByToken(Long token);

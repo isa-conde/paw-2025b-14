@@ -213,11 +213,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> findAll() {
-        return userDao.findAll();
-    }
-
-    @Override
     public Float getUserRating(Long userId) {
         User user = findById(userId).orElseThrow(UserNotFoundException::new);
         Float userRating = user.getRating();
