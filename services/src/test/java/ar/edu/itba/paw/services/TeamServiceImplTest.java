@@ -88,15 +88,15 @@ public class TeamServiceImplTest {
 
     private User createMockUser(Long id, String username) {
         User user = Mockito.mock(User.class);
-        Mockito.when(user.getId()).thenReturn(id);
-        Mockito.when(user.getUsername()).thenReturn(username);
+        Mockito.lenient().when(user.getId()).thenReturn(id);
+        Mockito.lenient().when(user.getUsername()).thenReturn(username);
         return user;
     }
 
     private Team createMockTeam(Long id, String name, Long ownerId) {
         Team team = Mockito.mock(Team.class);
-        Mockito.when(team.getId()).thenReturn(id);
-        Mockito.when(team.getName()).thenReturn(name);
+        Mockito.lenient().when(team.getId()).thenReturn(id);
+        Mockito.lenient().when(team.getName()).thenReturn(name);
         // Agrega más getters si necesitas verificarlos
         return team;
     }
