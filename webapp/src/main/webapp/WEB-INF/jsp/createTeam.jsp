@@ -13,6 +13,9 @@
             <form:form cssClass="form center" modelAttribute="teamForm" action="${pageContext.request.contextPath}/team/create" method="post" enctype="multipart/form-data" id="teamForm">
                 <div>
                     <paw:text type="title" size="xl"><spring:message code="team.create.title"/></paw:text>
+                    <c:if test="${not empty returnUrl}">
+                        <input type="hidden" name="returnUrl" value="${returnUrl}" />
+                    </c:if>
                     <div class="row center">
                         <paw:input path="name" label="team.create.name" hasConstraint="true"/>
                     </div>
