@@ -93,7 +93,7 @@ public class ParticipantHibernateDaoTest {
         Assert.assertFalse(ans.isEmpty());
         Assert.assertEquals(1,ans.size());
         Assert.assertEquals(ID,ans.get(0).getId());
-        Assert.assertEquals(0,ans.get(0).getPoints().intValue());
+        Assert.assertEquals(0,ans.get(0).getPoints());
         Assert.assertEquals(OTHER_USERNAME,ans.get(0).getName());
     }
 
@@ -113,7 +113,7 @@ public class ParticipantHibernateDaoTest {
         Assert.assertFalse(ans.isEmpty());
         Assert.assertEquals(1,ans.size());
         Assert.assertEquals(ID+20,ans.get(0).getId().longValue());
-        Assert.assertEquals(0,ans.get(0).getPoints().intValue());
+        Assert.assertEquals(0,ans.get(0).getPoints());
         Assert.assertEquals(TEAM,ans.get(0).getName());
     }
 
@@ -133,7 +133,7 @@ public class ParticipantHibernateDaoTest {
         Assert.assertEquals(OTHER_USERNAME,ans.getName());
         Assert.assertEquals(ID,ans.getId());
         Assert.assertEquals(ID,ans.getTournament().getId());
-        Assert.assertEquals(Integer.valueOf(0),ans.getPoints());
+        Assert.assertEquals(0,ans.getPoints());
     }
 
     @Test

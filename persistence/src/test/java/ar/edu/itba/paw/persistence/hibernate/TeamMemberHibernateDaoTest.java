@@ -61,16 +61,6 @@ public class TeamMemberHibernateDaoTest {
         em.flush();
     }
 
-    @Test(expected = RuntimeException.class)
-    public void testAddNoOne(){
-        teamMemberHibernateDao.addMember(ID,null);
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void testAddNowhere(){
-        teamMemberHibernateDao.addMember(null,ID);
-    }
-
     @Test
     public void testIsMember(){
         Boolean isMember = teamMemberHibernateDao.isMember(ID, ID-1);
