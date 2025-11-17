@@ -200,7 +200,7 @@
                     <c:when test="${user.id == tournament.creatorId && tournament.openInscriptions}">
                         <c:if test="${participantCount > 1}">
                             <div class="cards-container">
-                                <form method="post" action="${pageContext.request.contextPath}/tournament/closeInscriptions">
+                                <form method="post" action="${pageContext.request.contextPath}/tournament/closeInscriptions" onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
                                     <input type="hidden" name="tournamentId" value="${tournament.id}"/>
                                     <button type="submit" class="btn"><paw:text size="l"><spring:message code="tournament.closeInscriptions"/></paw:text></button>
                                 </form>
@@ -231,7 +231,7 @@
                                         </form>
                                         <c:choose>
                                             <c:when test="${tournament.structure == HYBRID && tournament.isGroupStage}">
-                                                <form id="swapGroupsForm" method="post" action="${pageContext.request.contextPath}/tournament/swap/groups">
+                                                <form id="swapGroupsForm" method="post" action="${pageContext.request.contextPath}/tournament/swap/groups" onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
                                                     <input type="hidden" name="tournamentId" value="${tournament.id}">
                                                     <button type="submit" id="swapBtn" class="btn" disabled>
                                                         <paw:text size="l"><spring:message code="tournament.edit.swap"/></paw:text>
@@ -239,7 +239,7 @@
                                                 </form>
                                             </c:when>
                                             <c:otherwise>
-                                                <form id="swapMembersForm" method="post" action="${pageContext.request.contextPath}/tournament/swap/matches">
+                                                <form id="swapMembersForm" method="post" action="${pageContext.request.contextPath}/tournament/swap/matches" onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
                                                     <input type="hidden" name="tournamentId" value="${tournament.id}">
                                                     <button type="submit" id="swapBtn" class="btn" disabled>
                                                         <paw:text size="l"><spring:message code="tournament.edit.swap"/></paw:text>
@@ -251,7 +251,7 @@
                                 </c:choose>
                             </c:if>
                             <c:if test="${!editMode}">
-                                <form method="post" action="${pageContext.request.contextPath}/tournament/startTournament">
+                                <form method="post" action="${pageContext.request.contextPath}/tournament/startTournament" onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
                                     <input type="hidden" name="tournamentId" value="${tournament.id}"/>
                                     <button type="submit" class="btn">
                                         <paw:text size="l"><spring:message code="tournament.startTournament"/></paw:text>
@@ -456,7 +456,7 @@
 </paw:layout>
 
 <paw:modal title="tournament.join.chooseTeam" id="chooseTeamModal" returnUrl="${tournamentUrl}">
-    <form:form method="post" modelAttribute="joinTeamForm" action="${pageContext.request.contextPath}/tournament/join/step1" cssClass="form">
+    <form:form method="post" modelAttribute="joinTeamForm" action="${pageContext.request.contextPath}/tournament/join/step1" cssClass="form" onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
         <form:hidden path="tournamentId" value="${tournament.id}"/>
         <c:choose>
             <c:when test="${userTeams.size() <= 0}">
