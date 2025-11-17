@@ -117,16 +117,8 @@ public class ParticipantServiceImpl implements ParticipantService {
         if (tournament.getTournamentStarted()) {
             throw new TournamentAlreadyStartedException();
         }
-        GameFormat format = tournament.getFormatEntity();
-        int teamSize;
-        if(format == null) {
-            teamSize = 1;
-        }else{
-            teamSize = format.getPlayersPerTeam();
-        }
-
-        Integer g1 = participantDao.getGroupNumber(tournamentId, user1, teamSize);
-        Integer g2 = participantDao.getGroupNumber(tournamentId, user2, teamSize);
+        Integer g1 = participantDao.getGroupNumber(tournamentId, user1);
+        Integer g2 = participantDao.getGroupNumber(tournamentId, user2);
         if(g1 == null || g2 == null) {
             throw new MissingGroupNumberException();
         }
@@ -134,7 +126,7 @@ public class ParticipantServiceImpl implements ParticipantService {
             LOGGER.warn("Cannot swap users within the same group");
             return;
         }
-        participantDao.swapGroups(tournamentId, user1, user2, g1, g2, teamSize);
+        participantDao.swapGroups(tournamentId, user1, user2, g1, g2);
         LOGGER.info("Users with IDs {} and {} have successfully swapped groups", user1, user2);
     }
 

@@ -14,6 +14,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Optional;
@@ -31,12 +32,13 @@ public class TeamController {
 
     @RequestMapping("/team/create")
     public ModelAndView teamForm(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
-                                 @ModelAttribute("teamForm") CreateTeamForm form){
+                                 @ModelAttribute("teamForm") CreateTeamForm form,
+                                 @RequestParam(value = "returnUrl", required = false) String returnUrl) {
         ModelAndView mav = new ModelAndView("createTeam");
 
-        if (currentUser.isPresent()) {
-            User user = currentUser.get().getPawUser();
-            mav.addObject("user", user);
+        currentUser.ifPresent(u -> mav.addObject("user", u.getPawUser()));
+        if (returnUrl != null) {
+            mav.addObject("returnUrl", returnUrl);
         }
         return mav;
     }
@@ -44,13 +46,15 @@ public class TeamController {
     @RequestMapping(value = "/team/create", method = { RequestMethod.POST })
     public ModelAndView createTeam(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
                                    @Valid @ModelAttribute("teamForm") CreateTeamForm form,
-                                   final BindingResult result){
-        if (result.hasErrors()){
-            return teamForm(currentUser, form);
+                                   final BindingResult result,
+                                   HttpServletRequest request) {
+        if (result.hasErrors()) {
+            return teamForm(currentUser, form, form.getReturnUrl());
         }
 
         if (currentUser.isPresent()) {
             User user = currentUser.get().getPawUser();
+
             byte[] pfpBytes = null;
             try {
                 if (form.getPfp() != null && !form.getPfp().isEmpty()) {
@@ -58,7 +62,9 @@ public class TeamController {
                 }
             } catch (IOException e) {
                 result.rejectValue("pfp", "error.tournamentForm.invalidImage");
+                return teamForm(currentUser, form, form.getReturnUrl());
             }
+
             byte[] bannerBytes = null;
             try {
                 if (form.getBanner() != null && !form.getBanner().isEmpty()) {
@@ -66,11 +72,38 @@ public class TeamController {
                 }
             } catch (IOException e) {
                 result.rejectValue("banner", "error.tournamentForm.invalidImage");
+                return teamForm(currentUser, form, form.getReturnUrl());
             }
+
             Team team = ts.create(form.getName(), pfpBytes, bannerBytes, user.getId(), form.getMembers());
+
+            String returnUrl = form.getReturnUrl();
+            if (returnUrl == null) {
+                returnUrl = request.getParameter("returnUrl");
+            }
+
+            if (isSafeInternalRedirect(request, returnUrl)) {
+                return new ModelAndView("redirect:" + returnUrl);
+            }
+
             return new ModelAndView("redirect:/team/profile/" + team.getId());
         }
-        return null;
+        return teamForm(currentUser, form, form.getReturnUrl());
+    }
+
+    private boolean isSafeInternalRedirect(HttpServletRequest request, String returnUrl) {
+        if (returnUrl == null || returnUrl.isBlank()) return false;
+
+        String lower = returnUrl.toLowerCase();
+        if (lower.startsWith("http://") || lower.startsWith("https://")) {
+            return false;
+        }
+
+        String ctx = request.getContextPath();
+        if (ctx != null && !ctx.isEmpty() && returnUrl.startsWith(ctx + "/")) {
+            return true;
+        }
+        return returnUrl.startsWith("/");
     }
 
     @RequestMapping("/team/profile/{id}")

@@ -10,9 +10,13 @@
             <img src="${pageContext.request.contextPath}/images/teamCreationImage.jpg" alt="Team Image" />
         </div>
         <div class="tournament-form-page__form">
-            <form:form cssClass="form center" modelAttribute="teamForm" action="${pageContext.request.contextPath}/team/create" method="post" enctype="multipart/form-data" id="teamForm">
+            <c:url var="url" value="/team/create"/>
+            <form:form cssClass="form center" modelAttribute="teamForm" action="${url}" method="post" enctype="multipart/form-data" id="teamForm" onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
                 <div>
                     <paw:text type="title" size="xl"><spring:message code="team.create.title"/></paw:text>
+                    <c:if test="${not empty returnUrl}">
+                        <input type="hidden" name="returnUrl" value="${returnUrl}" />
+                    </c:if>
                     <div class="row center">
                         <paw:input path="name" label="team.create.name" hasConstraint="true"/>
                     </div>

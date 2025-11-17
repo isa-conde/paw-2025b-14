@@ -86,7 +86,7 @@ public class MatchHibernateDaoTest {
 
     @Test
     public void testGetTournamentMatches(){
-        List<Match> ans = matchHibernateDao.getTournamentMatches(ID, 1);
+        List<Match> ans = matchHibernateDao.getTournamentMatches(ID, null);
 
         Assert.assertNotNull(ans);
         Assert.assertFalse(ans.isEmpty());
@@ -103,7 +103,7 @@ public class MatchHibernateDaoTest {
 
     @Test
     public void testGetNoMatches(){
-        List<Match> ans = matchHibernateDao.getTournamentMatches(OTHER_ID, 1);
+        List<Match> ans = matchHibernateDao.getTournamentMatches(OTHER_ID, null);
 
         Assert.assertNotNull(ans);
         Assert.assertTrue(ans.isEmpty());

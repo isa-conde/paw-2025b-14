@@ -13,6 +13,7 @@ import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
+import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.*;
+
+import static ar.edu.itba.paw.interfaces.Constants.*;
 
 @Transactional(readOnly = true)
 @Service
@@ -54,10 +57,6 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public Optional<Tournament> findById(long id) {
         Optional<Tournament> toReturn = tournamentDao.findById(id);
-        if(toReturn.isEmpty()) {
-            LOGGER.error("Tournament with ID {} does not exist", id);
-            throw new TournamentNotFoundException();
-        }
         return toReturn;
     }
 
@@ -183,7 +182,8 @@ public class TournamentServiceImpl implements TournamentService {
             teamSize = 1;
         }else{
             teamSize = format.getPlayersPerTeam();
-        }        List<Participant> participants;
+        }
+        List<Participant> participants;
         List<Participant> teams = new ArrayList<>();
         participants = participantDao.getTournamentParticipantUsers(tournamentId);
         if (teamSize > 1) {
@@ -379,8 +379,7 @@ public class TournamentServiceImpl implements TournamentService {
 
     private void createMatchesHybrid(Tournament t, List<Participant> participants) {
         int n = participants.size();
-        int teamSize = gameFormatDao.findById(t.getFormatId()).orElseThrow(GameFormatNotFoundException::new).getPlayersPerTeam();
-        if (n > 8){
+        if (n >= MIN_HYBRID_PARTICIPANTS){
             tournamentDao.setIsGroupStage(t.getId(), true);
             int groupsCount = calculateGroups(n);
             List<Integer> distribution = distributeParticipants(n);
@@ -390,7 +389,7 @@ public class TournamentServiceImpl implements TournamentService {
                 List<Participant> group = new ArrayList<>(participants.subList(index, index + size));
                 Long[] ids = group.stream().map(Participant::getId).toArray(Long[]::new);
                 int groupNumber = g + 1;
-                participantDao.updateGroupNumberForUsers(t.getId(), groupNumber, Arrays.asList(ids), teamSize);
+                participantDao.updateGroupNumberForUsers(t.getId(), groupNumber, Arrays.asList(ids));
                 index += size;
             }
         }else{
@@ -400,8 +399,8 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     private int calculateGroups(int n) {
-        int groups = Math.max(1, n / 3);   // min 3 participants per group
-        groups = Math.min(groups, 16);     // máx 16  groups
+        int groups = Math.max(1, n / MIN_PARTICIPANTS_PER_GROUP);
+        groups = Math.min(groups, MAX_GROUPS);
         return groups;
     }
 
@@ -542,4 +541,11 @@ public class TournamentServiceImpl implements TournamentService {
         return tournamentDao.countUserTournaments(userId, isFinished, isCreator, won);
     }
 
+    @Transactional
+    @Override
+    public GameFormat getFormat(long tournamentId){
+        Tournament t = findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
+        Hibernate.initialize(t.getFormatEntity());
+        return t.getFormatEntity();
+    }
 }

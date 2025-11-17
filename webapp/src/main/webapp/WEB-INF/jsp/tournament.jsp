@@ -200,7 +200,7 @@
                     <c:when test="${user.id == tournament.creatorId && tournament.openInscriptions}">
                         <c:if test="${participantCount > 1}">
                             <div class="cards-container">
-                                <form method="post" action="${pageContext.request.contextPath}/tournament/closeInscriptions">
+                                <form method="post" action="${pageContext.request.contextPath}/tournament/closeInscriptions" onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
                                     <input type="hidden" name="tournamentId" value="${tournament.id}"/>
                                     <button type="submit" class="btn"><paw:text size="l"><spring:message code="tournament.closeInscriptions"/></paw:text></button>
                                 </form>
@@ -231,7 +231,7 @@
                                         </form>
                                         <c:choose>
                                             <c:when test="${tournament.structure == HYBRID && tournament.isGroupStage}">
-                                                <form id="swapGroupsForm" method="post" action="${pageContext.request.contextPath}/tournament/swap/groups">
+                                                <form id="swapGroupsForm" method="post" action="${pageContext.request.contextPath}/tournament/swap/groups" onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
                                                     <input type="hidden" name="tournamentId" value="${tournament.id}">
                                                     <button type="submit" id="swapBtn" class="btn" disabled>
                                                         <paw:text size="l"><spring:message code="tournament.edit.swap"/></paw:text>
@@ -239,7 +239,7 @@
                                                 </form>
                                             </c:when>
                                             <c:otherwise>
-                                                <form id="swapMembersForm" method="post" action="${pageContext.request.contextPath}/tournament/swap/matches">
+                                                <form id="swapMembersForm" method="post" action="${pageContext.request.contextPath}/tournament/swap/matches" onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
                                                     <input type="hidden" name="tournamentId" value="${tournament.id}">
                                                     <button type="submit" id="swapBtn" class="btn" disabled>
                                                         <paw:text size="l"><spring:message code="tournament.edit.swap"/></paw:text>
@@ -251,7 +251,7 @@
                                 </c:choose>
                             </c:if>
                             <c:if test="${!editMode}">
-                                <form method="post" action="${pageContext.request.contextPath}/tournament/startTournament">
+                                <form method="post" action="${pageContext.request.contextPath}/tournament/startTournament" onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
                                     <input type="hidden" name="tournamentId" value="${tournament.id}"/>
                                     <button type="submit" class="btn">
                                         <paw:text size="l"><spring:message code="tournament.startTournament"/></paw:text>
@@ -263,17 +263,17 @@
                 </c:choose>
                 <c:if test="${(isParticipant || isCreator) && tournament.tournamentStarted && !tournament.finished}">
                     <div class="cards-container">
-                        <c:if test="${tournament.serverName !=null}">
+                        <c:if test="${tournament.serverName != null and not empty tournament.serverName}">
                             <div class="card texture">
                                 <div class="copy-card-content-container">
                                     <paw:copy-field label="tournament.serverName" value="${tournament.serverName}" />
-                                    <c:if test="${tournament.serverPassword != null}">
+                                    <c:if test="${tournament.serverPassword != null and not empty tournament.serverPassword}">
                                         <paw:copy-field label="tournament.serverPassword" value="${tournament.serverPassword}" />
                                     </c:if>
                                 </div>
                             </div>
                         </c:if>
-                        <c:if test="${tournament.discordChannel != null}">
+                        <c:if test="${tournament.discordChannel != null and not empty tournament.discordChannel}">
                             <div class="discord-card texture">
                                 <paw:text type="title" size="l">
                                     <spring:message code="tournament.discordChannel.title"/>
@@ -313,6 +313,7 @@
                                         <c:set var="subActiveGroup" value="${param.group != null ? param.group : 1}"/>
                                         <paw:groups-navbar groups="${groups}" activeGroup="${subActiveGroup}" paramName="group"/>
                                         <c:forEach var="stageEntry" items="${matches}">
+                                            <c:if test="${not empty stageEntry.value}">
                                                 <paw:date-matches
                                                         dateNumber="${stageEntry.key}"
                                                         matches="${stageEntry.value}"
@@ -320,8 +321,8 @@
                                                         isCreator="${isCreator}"
                                                         tournamentStructure="${tournament.structure}"
                                                         groupStage="true"
-                                                        groupNumber="${subActiveGroup}"
-                                                        totalMatches="${stageEntry.value.size()}"/>
+                                                />
+                                            </c:if>
                                         </c:forEach>
                                     </c:otherwise>
                                 </c:choose>
@@ -422,7 +423,8 @@
     <paw:modal title="tournament.contactOwner.modalTitle" id="contactOwnerModal" returnUrl="${tournamentUrl}">
         <form:form method="post" modelAttribute="contactOwnerForm"
                    action="${contactOwnerUrl}"
-                   cssClass="form">
+                   cssClass="form"
+                   onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
             <input type="hidden" name="creatorId" value="${creator.id}"/>
             <input type="hidden" name="tournamentId" value="${tournament.id}"/>
             <div class="row">
@@ -439,7 +441,8 @@
     <paw:modal title="tournament.ratings.modalTitle" id="rateTournamentModal" returnUrl="${tournamentUrl}">
         <form:form method="post" modelAttribute="rateTournamentForm"
                    action="${rateTournamentUrl}"
-                   cssClass="form">
+                   cssClass="form"
+                   onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
             <input type="hidden" name="creatorId" value="${creator.id}"/>
             <input type="hidden" name="tournamentId" value="${tournament.id}"/>
             <div class="row center">
@@ -453,7 +456,7 @@
 </paw:layout>
 
 <paw:modal title="tournament.join.chooseTeam" id="chooseTeamModal" returnUrl="${tournamentUrl}">
-    <form:form method="post" modelAttribute="joinTeamForm" action="${pageContext.request.contextPath}/tournament/join/step1" cssClass="form">
+    <form:form method="post" modelAttribute="joinTeamForm" action="${pageContext.request.contextPath}/tournament/join/step1" cssClass="form" onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
         <form:hidden path="tournamentId" value="${tournament.id}"/>
         <c:choose>
             <c:when test="${userTeams.size() <= 0}">
@@ -461,7 +464,11 @@
                     <paw:text size="l"><spring:message code="tournament.join.noTeams" arguments="${teamSize}"/></paw:text>
                 </div>
                 <div class="row center">
-                    <paw:button onclick="window.location.href='${pageContext.request.contextPath}/team/create'; return false;" text="team.create.pageTitle"/>
+                    <c:url value="/team/create" var="createTeamUrl">
+                        <c:param name="returnUrl" value="/tournament/${tournamentId}" />
+                    </c:url>
+
+                    <paw:button onclick="window.location.href='${createTeamUrl}'; return false;" text="team.create.pageTitle"/>
                 </div>
             </c:when>
             <c:otherwise>
@@ -502,6 +509,7 @@
                onsubmit="this.querySelectorAll('button, input[type=submit]').forEach(el => el.disabled = true);">
         <input type="hidden" id="modalMatchId" name="matchId" value=""/>
         <input type="hidden" name="tournamentId" value="${tournament.id}"/>
+        <input type="hidden" name="group" value="${param.group}" />
         <div class="row">
             <paw:input path="localScore" label="tournament.setMatchResults.localScore" hasConstraint="true" inputType="number"/>
             <paw:input path="visitorScore" label="tournament.setMatchResults.visitorScore" hasConstraint="true" inputType="number"/>

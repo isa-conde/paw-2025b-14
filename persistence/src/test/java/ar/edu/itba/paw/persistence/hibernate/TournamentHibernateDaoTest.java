@@ -69,8 +69,6 @@ public class TournamentHibernateDaoTest {
 
     @Before
     public void setUp(){
-        System.out.println(Tournament.class.getName());
-        System.out.println(Tournament.class.getResource("Tournament.class"));
         jdbcTemplate = new JdbcTemplate(ds);
     }
 
@@ -426,20 +424,6 @@ public class TournamentHibernateDaoTest {
 
         Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"tournament",
                 "is_group_stage = true and id = " + ID));
-    }
-
-    @Test
-    public void testGetIsGroupStage(){
-        Boolean isGroupStage = tournamentHibernateDao.getIsGroupStage(ID);
-
-        Assert.assertTrue(isGroupStage);
-    }
-
-    @Test
-    public void testGetIsNotGroupStage(){
-        Boolean isGroupStage = tournamentHibernateDao.getIsGroupStage(ID+1);
-
-        Assert.assertFalse(isGroupStage);
     }
 
     @Test

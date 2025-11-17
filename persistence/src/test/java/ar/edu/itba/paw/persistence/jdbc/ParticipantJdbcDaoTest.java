@@ -206,7 +206,7 @@
 //
 //    @Test
 //    public void testUpdateGroupNumberUsers(){
-//        participantJdbcDao.updateGroupNumberForUsers(ID,3,List.of(ID,ID+1),1);
+//        participantJdbcDao.updateGroupNumberForUsers(ID,3,List.of(ID,ID+1));
 //
 //        Assert.assertEquals(2,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
 //                "groupNumber = 3 and user_id is not null"));
@@ -218,7 +218,7 @@
 //
 //    @Test
 //    public void testUpdateGroupNumberTeams(){
-//        participantJdbcDao.updateGroupNumberForUsers(ID+1, 3, List.of(ID, ID + 1), 2);
+//        participantJdbcDao.updateGroupNumberForUsers(ID+1, 3, List.of(ID, ID + 1));
 //
 //        Assert.assertEquals(2, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "participant",
 //                "groupNumber = 3 and team_id is not null"));
@@ -230,7 +230,7 @@
 //
 //    @Test
 //    public void testSwapGroups(){
-//        participantJdbcDao.swapGroups(ID,ID,ID+1,1,2,1);
+//        participantJdbcDao.swapGroups(ID,ID,ID+1,1,2);
 //
 //        Assert.assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
 //                "groupNumber = user_id"));
@@ -260,7 +260,7 @@
 //
 //    @Test
 //    public void testGetGroupNumberUser(){
-//        int ans = participantJdbcDao.getGroupNumber(ID,ID,1);
+//        int ans = participantJdbcDao.getGroupNumber(ID,ID);
 //
 //        Assert.assertEquals(1,ans);
 //    }
@@ -268,14 +268,14 @@
 //    @Test
 //    public void testGetNoGroupNumberUser(){
 //        jdbcTemplate.update("update participant set groupNumber = null");
-//        int ans = participantJdbcDao.getGroupNumber(ID,ID,1);
+//        int ans = participantJdbcDao.getGroupNumber(ID,ID);
 //
 //        Assert.assertEquals(0,ans);
 //    }
 //
 //    @Test
 //    public void testGetGroupNumberTeam(){
-//        int ans = participantJdbcDao.getGroupNumber(ID+1,ID,2);
+//        int ans = participantJdbcDao.getGroupNumber(ID+1,ID);
 //
 //        Assert.assertEquals(1,ans);
 //    }
@@ -283,7 +283,7 @@
 //    @Test
 //    public void testGetNoGroupNumberTeam(){
 //        jdbcTemplate.update("update participant set groupNumber = null");
-//        int ans = participantJdbcDao.getGroupNumber(ID+1,ID,2);
+//        int ans = participantJdbcDao.getGroupNumber(ID+1,ID);
 //
 //        Assert.assertEquals(0,ans);
 //    }

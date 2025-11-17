@@ -218,6 +218,7 @@ public class TournamentHibernateDao implements TournamentDao {
         Query topGamesQuery = em.createNativeQuery(
                 "SELECT game_id " +
                         "FROM tournament " +
+                        "WHERE open_inscriptions = true " +
                         "GROUP BY game_id " +
                         "ORDER BY COUNT(*) DESC"
         );
@@ -291,7 +292,6 @@ public class TournamentHibernateDao implements TournamentDao {
         return (int) Math.ceil((double) count / pageSize);
     }
 
-
     @Override
     public void updateTournamentInfo(long tournamentId, String name, LocalDate startDate, LocalDate endDate, Integer maxParticipants, String serverName, String serverPassword, String discordChannel) {
         Tournament t = em.find(Tournament.class, tournamentId);
@@ -333,12 +333,6 @@ public class TournamentHibernateDao implements TournamentDao {
         Tournament t = em.find(Tournament.class, tournamentId);
         t.setIsGroupStage(bool);
         em.persist(t);
-    }
-
-    @Override
-    public Boolean getIsGroupStage(long tournamentId) {
-        Tournament t = em.find(Tournament.class, tournamentId);
-        return t.getIsGroupStage();
     }
 
     @Override

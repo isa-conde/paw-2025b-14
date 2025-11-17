@@ -7,7 +7,6 @@
 <%@ attribute name="visitorScore" required="true" rtexprvalue="true" %>
 <%@ attribute name="winner" required="false" rtexprvalue="true" %>
 <%@ attribute name="isCreator" required="false" rtexprvalue="true" %>
-<%@ attribute name="groupNumber" required="false" rtexprvalue="true" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>

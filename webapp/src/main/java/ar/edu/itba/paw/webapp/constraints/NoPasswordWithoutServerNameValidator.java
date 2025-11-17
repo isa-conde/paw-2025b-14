@@ -22,6 +22,7 @@ public class NoPasswordWithoutServerNameValidator implements ConstraintValidator
 
             context.disableDefaultConstraintViolation();
             context.buildConstraintViolationWithTemplate("{error.tournamentForm.noServerName}")
+                    .addPropertyNode("serverPassword")
                     .addConstraintViolation();
         }
         return isValid;

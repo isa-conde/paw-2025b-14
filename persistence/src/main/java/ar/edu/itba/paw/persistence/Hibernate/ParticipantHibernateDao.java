@@ -144,24 +144,13 @@ public class ParticipantHibernateDao implements ParticipantDao{
     }
 
     @Override
-    public void updateGroupNumberForUsers(long tournamentId, int groupNumber, List<Long> userIds, int teamSize) {
-        String jpql;
-
-        if (teamSize > 1) {
-            jpql = """
+    public void updateGroupNumberForUsers(long tournamentId, int groupNumber, List<Long> userIds) {
+        String jpql = """
             UPDATE Participant p
             SET p.groupNumber = :groupNumber
             WHERE p.tournament.id = :tournamentId
-              AND p.team.id IN :ids
+              AND p.id IN :ids
         """;
-        } else {
-            jpql = """
-            UPDATE Participant p
-            SET p.groupNumber = :groupNumber
-            WHERE p.tournament.id = :tournamentId
-              AND p.user.id IN :ids
-        """;
-        }
 
         em.createQuery(jpql)
                 .setParameter("tournamentId", tournamentId)
@@ -171,19 +160,17 @@ public class ParticipantHibernateDao implements ParticipantDao{
     }
 
     @Override
-    public void swapGroups(long tournamentId, long user1, long user2, int group1, int group2, int teamSize) {
-        String idField = (teamSize > 1) ? "team.id" : "user.id";
-
-        String jpql = String.format("""
+    public void swapGroups(long tournamentId, long user1, long user2, int group1, int group2) {
+        String jpql = """
         UPDATE Participant p
         SET p.groupNumber = CASE
-            WHEN p.%s = :id1 THEN :group2
-            WHEN p.%s = :id2 THEN :group1
+            WHEN p.id = :id1 THEN :group2
+            WHEN p.id = :id2 THEN :group1
             ELSE p.groupNumber
         END
         WHERE p.tournament.id = :tournamentId
-          AND p.%s IN (:id1, :id2)
-        """, idField, idField, idField);
+          AND p.id IN (:id1, :id2)
+        """;
 
         em.createQuery(jpql)
                 .setParameter("id1", user1)
@@ -346,10 +333,8 @@ public class ParticipantHibernateDao implements ParticipantDao{
     }
 
     @Override
-    public Integer getGroupNumber(long tournamentId, long userId, int teamSize) {
-        String idField = (teamSize > 1) ? "p.team.id" : "p.user.id";
-
-        String jpql = "SELECT p.groupNumber FROM Participant p WHERE " + idField + " = :id AND p.tournament.id = :tournamentId";
+    public Integer getGroupNumber(long tournamentId, long userId) {
+        String jpql = "SELECT p.groupNumber FROM Participant p WHERE p.id = :id AND p.tournament.id = :tournamentId";
         TypedQuery<Integer> query = em.createQuery(jpql, Integer.class);
         query.setParameter("tournamentId", tournamentId);
         query.setParameter("id", userId);
