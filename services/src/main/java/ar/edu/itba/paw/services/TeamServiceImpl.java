@@ -45,6 +45,7 @@ public class TeamServiceImpl implements TeamService {
     @Transactional
     @Override
     public Team create(String name, byte[] pfp, byte[] banner, Long ownerId, List<String> members) {
+        User owner = userDao.findById(ownerId).orElseThrow(UserNotFoundException::new);
         Long pfpId = null;
         Long bannerId = null;
         if (pfp != null){
@@ -61,7 +62,6 @@ public class TeamServiceImpl implements TeamService {
             for (String s : members){
                 teamMemberDao.addMember(team.getId(), userDao.findByUsername(s).orElseThrow(UserNotFoundException::new).getId());
             }
-            User owner = userDao.findById(ownerId).orElseThrow(UserNotFoundException::new);
             if (!members.contains(owner.getUsername())) {
                 teamMemberDao.addMember(team.getId(), ownerId);
             }
