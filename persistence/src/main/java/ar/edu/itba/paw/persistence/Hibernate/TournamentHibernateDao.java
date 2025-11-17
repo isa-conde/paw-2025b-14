@@ -218,6 +218,7 @@ public class TournamentHibernateDao implements TournamentDao {
         Query topGamesQuery = em.createNativeQuery(
                 "SELECT game_id " +
                         "FROM tournament " +
+                        "WHERE open_inscriptions = true " +
                         "GROUP BY game_id " +
                         "ORDER BY COUNT(*) DESC"
         );
