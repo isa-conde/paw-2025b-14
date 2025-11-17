@@ -21,8 +21,6 @@ public interface TournamentDao {
                       String format, Structure structure, Integer maxParticipants, Long imageId, Boolean openInscriptions, Boolean isFinished,
                       Long formatId, Long rulesId, String serverName, String serverPassword, String discordChannel);
 
-    Structure getTournamentStructure(Long tournamentId);
-
     void setFinished(Long tournamentId);
 
     void closeInscriptions(Long tournamentId);
@@ -45,13 +43,9 @@ public interface TournamentDao {
 
     void setTournamentWinner(Long tournamentId, Long winnerId);
 
-    Boolean isTournamentStarted(Long tournamentId);
-
     void updateAllStartDates();
 
     void updateAllEndDates();
-
-    boolean isClosed(Long tournamentId);
 
     void updateTournamentRating(Long tournamentId, Float userRating);
 

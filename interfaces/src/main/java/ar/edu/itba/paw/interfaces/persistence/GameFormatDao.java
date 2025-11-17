@@ -7,12 +7,7 @@ import java.util.Optional;
 
 public interface GameFormatDao {
 
-    void insertFormat(GameFormat gameFormat);
-
     List<GameFormat> getFormats(Long gameId);
 
     Optional<GameFormat> findById(Long id);
-
-    Integer getPlayersPerTeam(Long id);
-
 }

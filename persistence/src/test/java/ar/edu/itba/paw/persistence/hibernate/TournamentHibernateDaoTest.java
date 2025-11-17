@@ -154,37 +154,6 @@ public class TournamentHibernateDaoTest {
 
         Assert.assertFalse(found.isPresent());
     }
-
-    @Test
-    public void testHasNotTournamentStarted(){
-        Boolean started = tournamentHibernateDao.isTournamentStarted(ID);
-
-        Assert.assertFalse(started);
-    }
-
-    @Test
-    public void testHasTournamentStarted(){
-        Boolean started = tournamentHibernateDao.isTournamentStarted(ID+1);
-
-        Assert.assertTrue(started);
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void testNoTournamentStarted(){
-        tournamentHibernateDao.isTournamentStarted(NO_ONE_ID);
-    }
-
-    @Test
-    public void testGetTournamentStructure(){
-        Structure structure = tournamentHibernateDao.getTournamentStructure(ID);
-
-        Assert.assertEquals(STRUCTURE, structure);
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void testGetTournamentStructureNotFound(){
-        tournamentHibernateDao.getTournamentStructure(NO_ONE_ID);
-    }
 //
 //    @Test
 //    public void testFindByCreatorNone(){
@@ -492,20 +461,6 @@ public class TournamentHibernateDaoTest {
                 "is_finished = false and end_date < '" + LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE) + "'"));
         Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"tournament",
                 "id = 102 and end_date = '" + LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE) + "'"));
-    }
-
-    @Test
-    public void testIsNotClosed(){
-        boolean closed = tournamentHibernateDao.isClosed(ID);
-
-        Assert.assertFalse(closed);
-    }
-
-    @Test
-    public void testIsClosed(){
-        boolean closed = tournamentHibernateDao.isClosed(ID+1);
-
-        Assert.assertTrue(closed);
     }
 //
 //    @Test

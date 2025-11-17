@@ -21,12 +21,10 @@ public class GameServiceImpl implements GameService {
 
     private final GameDao gameDao;
     private final GameFormatDao gameFormatDao;
-    private final ImageDao imageDao;
 
-    public GameServiceImpl(final GameDao gameDao, final GameFormatDao gameFormatDao, final ImageDao imageDao){
+    public GameServiceImpl(final GameDao gameDao, final GameFormatDao gameFormatDao){
         this.gameDao = gameDao;
         this.gameFormatDao = gameFormatDao;
-        this.imageDao = imageDao;
     }
 
     @Override
@@ -37,11 +35,6 @@ public class GameServiceImpl implements GameService {
     @Override
     public List<Game> searchByName(String name) {
         return gameDao.searchByName(name);
-    }
-
-    @Override
-    public List<Game> searchByGenre(Genre genre) {
-        return gameDao.searchByGenre(genre);
     }
 
     @Override
@@ -58,21 +51,10 @@ public class GameServiceImpl implements GameService {
         return gameDao.create(name, genre, imageId);
     }
 
-    @Transactional
-    @Override
-    public Game createWithFormats(String name, Genre genre, List<GameFormat> formats, byte[] image) {
-        Long imageId = imageDao.insertImage(image);
-        for (GameFormat f : formats){
-            gameFormatDao.insertFormat(f);
-        }
-        return gameDao.create(name, genre, imageId.intValue());
-    }
-
     @Override
     public List<GameFormat> getFormats(Long gameId) {
         return gameFormatDao.getFormats(gameId);
     }
-
 
     @Transactional
     @Override

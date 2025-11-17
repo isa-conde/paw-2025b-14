@@ -1,10 +1,12 @@
 package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.exception.TeamNotFoundException;
+import ar.edu.itba.paw.interfaces.exception.TournamentNotFoundException;
 import ar.edu.itba.paw.interfaces.exception.UserNotFoundException;
 import ar.edu.itba.paw.interfaces.persistence.*;
 import ar.edu.itba.paw.interfaces.services.TeamService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
+import ar.edu.itba.paw.model.Game.GameFormat;
 import ar.edu.itba.paw.model.Team;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.User;
@@ -124,11 +126,6 @@ public class TeamServiceImpl implements TeamService {
         teamDao.updateTeam(teamId, name, pfpId, bannerId);
     }
 
-    @Override
-    public Boolean isMember(Long teamId, Long userId) {
-        return teamMemberDao.isMember(teamId, userId);
-    }
-
     @Transactional
     @Override
     public List<User> getTeamMembers(Long teamId) {
@@ -142,7 +139,15 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public List<Team> getUserTeamsBySizeNotInTournament(Long userId, Long tournamentId) {
-        return teamDao.getUserTeamsBySizeNotInTournament(userId, tournamentId, (long)ts.getPlayersPerTeam(tournamentId));
+        Tournament tournament = ts.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
+        GameFormat format = tournament.getFormatEntity();
+        long teamSize;
+        if(format == null) {
+            teamSize = 1;
+        }else{
+            teamSize = format.getPlayersPerTeam();
+        }
+        return teamDao.getUserTeamsBySizeNotInTournament(userId, tournamentId, teamSize);
     }
 
     @Override

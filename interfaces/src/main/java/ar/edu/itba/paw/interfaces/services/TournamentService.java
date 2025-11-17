@@ -41,11 +41,9 @@ public interface TournamentService {
 
     void createBracketFromGroups(Long tournamentId);
 
-    Integer getPlayersPerTeam(Long tournamentId);
-
     void contactOwner(Long tournamentId, User currentUser, String subject, String body, Long creatorId);
 
-    void updateTouramentRating(Long tournamentId, Float userRating);
+    void updateTournamentRating(Long tournamentId, Float userRating);
 
     void notifyCreatorOfLeavingUser(User user, long tournamentId);
 

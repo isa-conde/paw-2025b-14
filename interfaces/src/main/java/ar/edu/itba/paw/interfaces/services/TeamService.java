@@ -25,8 +25,6 @@ public interface TeamService {
 
     void updateTeam(Long teamId, String name, byte[] pfp, byte[] banner, List<String> members);
 
-    Boolean isMember(Long teamId, Long userId);
-
     List<User> getTeamMembers(Long teamId);
 
     Boolean teamNameTaken(String name);

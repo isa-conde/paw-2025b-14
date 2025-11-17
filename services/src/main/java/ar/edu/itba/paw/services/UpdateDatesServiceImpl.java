@@ -24,8 +24,8 @@ public class UpdateDatesServiceImpl implements UpdateDatesService {
     @Override
     @Scheduled(cron = "0 10 3 * * *", zone = TZ)
     public void updateDates() {
-        tournamentDao.updateAllStartDates();
         tournamentDao.updateAllEndDates();
+        tournamentDao.updateAllStartDates();
         LOGGER.info("Tournament dates have been successfully updated");
     }
 }

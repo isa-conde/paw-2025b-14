@@ -247,47 +247,11 @@
 //    }
 //
 //    @Test
-//    public void testHasNotTournamentStarted(){
-//        Boolean started = tournamentJdbcDao.isTournamentStarted(OTHER_ID);
-//
-//        Assert.assertFalse(started);
-//    }
-//
-//    @Test
-//    public void testHasTournamentStarted(){
-//        jdbcTemplate.update("update tournament set tournament_started = true where id = "+OTHER_ID);
-//        Boolean started = tournamentJdbcDao.isTournamentStarted(OTHER_ID);
-//
-//        Assert.assertTrue(started);
-//    }
-//
-//    @Test
-//    public void testHasNonexistentTournamentStarted(){
-//        Boolean started = tournamentJdbcDao.isTournamentStarted((long)-1);
-//
-//        Assert.assertFalse(started);
-//    }
-//
-//    @Test
 //    public void testSetIsGroupStage(){
 //        tournamentJdbcDao.setIsGroupStage(OTHER_ID, true);
 //
 //        Boolean isGroupStage = jdbcTemplate.queryForObject("SELECT is_group_stage FROM tournament WHERE id = ?", Boolean.class, OTHER_ID);
 //        Assert.assertTrue(isGroupStage);
-//    }
-//
-//    @Test
-//    public void testGetTournamentStructure(){
-//        Structure structure = tournamentJdbcDao.getTournamentStructure(OTHER_ID);
-//
-//        Assert.assertEquals(STRUCTURE, structure);
-//    }
-//
-//    @Test
-//    public void testGetTournamentStructureNotFound(){
-//        Structure structure = tournamentJdbcDao.getTournamentStructure(-1L);
-//
-//        Assert.assertNull(structure);
 //    }
 //
 //    @Test
@@ -611,21 +575,6 @@
 //        Assert.assertEquals(LocalDate.now(), endDates.get(2));
 //        Assert.assertNotEquals(LocalDate.now().minusDays(1),endDates.get(2));
 //        Assert.assertEquals(END_DATE, endDates.get(0));
-//    }
-//
-//    @Test
-//    public void testIsNotClosed(){
-//        boolean closed = tournamentJdbcDao.isClosed(OTHER_ID);
-//
-//        Assert.assertFalse(closed);
-//    }
-//
-//    @Test
-//    public void testIsClosed(){
-//        jdbcTemplate.update("update tournament set open_inscriptions = false");
-//        boolean closed = tournamentJdbcDao.isClosed(OTHER_ID);
-//
-//        Assert.assertTrue(closed);
 //    }
 //
 //    @Test

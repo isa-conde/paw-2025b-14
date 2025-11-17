@@ -217,27 +217,27 @@ public class UserController {
 
         switch (section) {
             case Constants.TOURNAMENTS_OWNED -> {
-                totalPages1 = ts.countUserTournaments(profile.getId(), Constants.ONGOING, Constants.CREATOR, Constants.ALLTOURNEYS);
-                totalPages2 = ts.countUserTournaments(profile.getId(), Constants.FINISHED, Constants.CREATOR, Constants.ALLTOURNEYS);
+                totalPages1 = ts.countUserTournaments(profile.getId(), Constants.ONGOING, Constants.CREATOR, Constants.ALL_TOURNEYS);
+                totalPages2 = ts.countUserTournaments(profile.getId(), Constants.FINISHED, Constants.CREATOR, Constants.ALL_TOURNEYS);
 
                 page1 = adjustPage(page1, totalPages1);
                 page2 = adjustPage(page2, totalPages2);
 
-                List<Tournament> onGoingTournaments = ts.findUserTournaments(profile.getId(), Constants.ONGOING, Constants.CREATOR, Constants.ALLTOURNEYS, page1);
-                List<Tournament> finishedTournaments = ts.findUserTournaments(profile.getId(), Constants.FINISHED, Constants.CREATOR, Constants.ALLTOURNEYS, page2);
+                List<Tournament> onGoingTournaments = ts.findUserTournaments(profile.getId(), Constants.ONGOING, Constants.CREATOR, Constants.ALL_TOURNEYS, page1);
+                List<Tournament> finishedTournaments = ts.findUserTournaments(profile.getId(), Constants.FINISHED, Constants.CREATOR, Constants.ALL_TOURNEYS, page2);
 
                 mav.addObject("onGoingTournaments", onGoingTournaments);
                 mav.addObject("finishedTournaments", finishedTournaments);
             }
 
             case Constants.TOURNAMENTS_FINISHED -> {
-                totalPages1 = ts.countUserTournaments(profile.getId(), Constants.FINISHED, Constants.PARTICIPANT, Constants.ALLTOURNEYS);
+                totalPages1 = ts.countUserTournaments(profile.getId(), Constants.FINISHED, Constants.PARTICIPANT, Constants.ALL_TOURNEYS);
                 totalPages2 = ts.countUserTournaments(profile.getId(), Constants.FINISHED, Constants.PARTICIPANT, Constants.WON);
 
                 page1 = adjustPage(page1, totalPages1);
                 page2 = adjustPage(page2, totalPages2);
 
-                List<Tournament> pastTournaments = ts.findUserTournaments(profile.getId(), Constants.FINISHED, Constants.PARTICIPANT, Constants.ALLTOURNEYS, page1);
+                List<Tournament> pastTournaments = ts.findUserTournaments(profile.getId(), Constants.FINISHED, Constants.PARTICIPANT, Constants.ALL_TOURNEYS, page1);
                 List<Tournament> wonTournaments = ts.findUserTournaments(profile.getId(), Constants.FINISHED, Constants.PARTICIPANT, Constants.WON, page2);
 
                 mav.addObject("pastTournaments", pastTournaments);
@@ -245,10 +245,10 @@ public class UserController {
             }
 
             case Constants.TOURNAMENTS_ACTIVE -> {
-                totalPages1 = ts.countUserTournaments(profile.getId(), Constants.ONGOING, Constants.PARTICIPANT, Constants.ALLTOURNEYS);
+                totalPages1 = ts.countUserTournaments(profile.getId(), Constants.ONGOING, Constants.PARTICIPANT, Constants.ALL_TOURNEYS);
                 page1 = adjustPage(page1, totalPages1);
 
-                List<Tournament> joinedTournaments = ts.findUserTournaments(profile.getId(),  Constants.ONGOING, Constants.PARTICIPANT, Constants.ALLTOURNEYS, page1);
+                List<Tournament> joinedTournaments = ts.findUserTournaments(profile.getId(),  Constants.ONGOING, Constants.PARTICIPANT, Constants.ALL_TOURNEYS, page1);
                 mav.addObject("joinedTournaments", joinedTournaments);
             }
         }
@@ -382,7 +382,6 @@ public class UserController {
     @GetMapping(value = "/users/search", produces = "application/json")
     @ResponseBody
     public List<String> searchUsers(@RequestParam String name) {
-        System.out.println(us.searchByName(name));
         return us.searchByName(name)
                 .stream()
                 .map(User::getUsername)

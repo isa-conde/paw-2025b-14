@@ -13,13 +13,9 @@ public interface GameService {
 
     List<Game> searchByName(String name);
 
-    List<Game> searchByGenre(Genre genre);
-
     List<Game> findAll();
 
     Game create(String name, Genre genre, Integer imageId);
-
-    Game createWithFormats(String name, Genre genre, List<GameFormat> formats, byte[] image);
 
     List<GameFormat> getFormats(Long gameId);
 

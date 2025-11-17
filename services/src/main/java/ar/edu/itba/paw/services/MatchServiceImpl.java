@@ -7,6 +7,7 @@ import ar.edu.itba.paw.interfaces.persistence.ParticipantDao;
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
 import ar.edu.itba.paw.interfaces.services.MatchService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
+import ar.edu.itba.paw.model.Game.GameFormat;
 import ar.edu.itba.paw.model.Match.Match;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.enums.Structure;
@@ -69,15 +70,19 @@ public class MatchServiceImpl implements MatchService {
     @Transactional
     @Override
     public Map<Integer, List<Match>> getTournamentMatchesByStage(Long tournamentId){
-        List<Match> matches = matchDao.getTournamentMatches(tournamentId, ts.getPlayersPerTeam(tournamentId));
+        Tournament tournament = ts.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
+        GameFormat format = tournament.getFormatEntity();
+        int teamSize;
+        if(format == null) {
+            teamSize = 1;
+        }else{
+            teamSize = format.getPlayersPerTeam();
+        }
+        List<Match> matches = matchDao.getTournamentMatches(tournamentId, teamSize);
         if (matches.isEmpty()) {
             return Collections.emptyMap();
         }
         matches.sort(Comparator.comparingLong(Match::getId));
-        Integer teamSize = ts.getPlayersPerTeam(tournamentId);
-        if(teamSize == null){
-            teamSize = 1;
-        }
         Map<Integer, List<Match>> result = new TreeMap<>();
         Boolean isGroupStage = tournamentDao.getIsGroupStage(tournamentId);
         for (Match m : matches) {
@@ -96,7 +101,7 @@ public class MatchServiceImpl implements MatchService {
     @Override
     public void setMatchResults(Long matchId, Long tournamentId, Integer localScore, Integer visitorScore) {
         if (localScore == null || visitorScore == null) {
-            throw new IllegalArgumentException("Scores cannot be empty"); // TODO: custom handling
+            throw new IllegalArgumentException("Scores cannot be empty");
         }
         if(hasWinner(matchId, tournamentId)) {
             LOGGER.warn("Match with ID {} already has a winner", matchId);
@@ -104,18 +109,25 @@ public class MatchServiceImpl implements MatchService {
         }
 
         Tournament tournament = ts.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
+        GameFormat format = tournament.getFormatEntity();
+        int teamSize;
+        if(format == null) {
+            teamSize = 1;
+        }else{
+            teamSize = format.getPlayersPerTeam();
+        }
         Structure structure = tournament.getStructure();
         boolean isGroupStage = Boolean.TRUE.equals(tournament.getIsGroupStage());
         boolean isElimination = structure.equals(Structure.ELIMINATION) || ( structure.equals(Structure.HYBRID) && !isGroupStage);
 
         if(isElimination && localScore.equals(visitorScore)){
-            throw new IllegalArgumentException("Cannot draw in Elimination match"); // TODO: custom handling
+            throw new IllegalArgumentException("Cannot draw in Elimination match");
         }
         Match match = matchDao.getMatch(tournamentId, matchId);
         Long localId = match.getLocalId();
         Long visitorId = match.getVisitorId();
         if (localId == null || visitorId == null) {
-            throw new IllegalStateException("Cannot set winner for TBD matches"); // TODO: custom handling
+            throw new IllegalStateException("Cannot set winner for TBD matches");
         }
 
         int winner = (localScore > visitorScore) ? 1 : (localScore < visitorScore ? 2 : -1);
@@ -128,10 +140,10 @@ public class MatchServiceImpl implements MatchService {
             setNextMatchInfo(matchId, tournamentId, winnerId);
         }else if(structure.equals(Structure.LEAGUE) || ( structure.equals(Structure.HYBRID) && isGroupStage)){
             if(winner == -1) {
-                participantDao.sumPoints(tournamentId, localId, 1, scoreDifference, ts.getPlayersPerTeam(tournamentId));
-                participantDao.sumPoints(tournamentId, visitorId, 1, scoreDifference, ts.getPlayersPerTeam(tournamentId));
+                participantDao.sumPoints(tournamentId, localId, 1, scoreDifference, teamSize);
+                participantDao.sumPoints(tournamentId, visitorId, 1, scoreDifference, teamSize);
             }else {
-                participantDao.sumPoints(tournamentId, winnerId, 3, scoreDifference, ts.getPlayersPerTeam(tournamentId));
+                participantDao.sumPoints(tournamentId, winnerId, 3, scoreDifference, teamSize);
             }
         }
         if (structure.equals(Structure.HYBRID) && isGroupStage && isFinished) {

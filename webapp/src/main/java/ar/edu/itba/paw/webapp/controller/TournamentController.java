@@ -449,8 +449,6 @@ public class TournamentController {
             return newTournamentFormStep3(currentUser, form);
         }
 
-        System.out.println("ELO del form: '" + form.getElo() + "'");
-
         final Tournament t = ts.create(user.getId(), form.getName(), form.getGameId(),
                 form.getRegion(), form.getElo(), form.getStartDate(), form.getEndDate(),
                 null, form.getStructure(), form.getMaxParticipants(), form.getImageBytes(), true, false, form.getFormatId(),
@@ -482,7 +480,7 @@ public class TournamentController {
             mav.addObject("openModal", "'rateTournamentModal'");
             return mav;
         }
-        ts.updateTouramentRating(rateTournamentForm.getTournamentId(), rateTournamentForm.getRating());
+        ts.updateTournamentRating(rateTournamentForm.getTournamentId(), rateTournamentForm.getRating());
         ps.updateCreatorRating(rateTournamentForm.getTournamentId(), rateTournamentForm.getCreatorId(), currentUser.orElseThrow(UserNotAuthenticatedException::new).getPawUser().getId(), rateTournamentForm.getRating());
         return new ModelAndView("redirect:/tournament/" + rateTournamentForm.getTournamentId());
     }

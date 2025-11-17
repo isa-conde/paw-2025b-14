@@ -128,11 +128,6 @@ public class TournamentHibernateDao implements TournamentDao {
     }
 
     @Override
-    public Structure getTournamentStructure(Long tournamentId) {
-        Tournament t = em.find(Tournament.class, tournamentId);
-        return t.getStructure();
-    }
-    @Override
     public void setFinished(Long tournamentId) {
         Tournament t = em.find(Tournament.class, tournamentId);
         t.setIsFinished(true);
@@ -307,12 +302,6 @@ public class TournamentHibernateDao implements TournamentDao {
     }
 
     @Override
-    public Boolean isTournamentStarted(Long tournamentId) {
-        Tournament t = em.find(Tournament.class, tournamentId);
-        return t.getTournamentStarted();
-    }
-
-    @Override
     public void updateAllStartDates() {
         em.createQuery("""
         UPDATE Tournament t
@@ -330,12 +319,6 @@ public class TournamentHibernateDao implements TournamentDao {
         WHERE t.endDate < CURRENT_DATE
           AND COALESCE(t.isFinished, false) = false
     """).executeUpdate();
-    }
-
-    @Override
-    public boolean isClosed(Long tournamentId) {
-        Tournament t = em.find(Tournament.class, tournamentId);
-        return !t.getOpenInscriptions();
     }
 
     @Override

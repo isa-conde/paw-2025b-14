@@ -19,8 +19,5 @@ public final class Constants {
     public static final Boolean CREATOR = true;
     public static final Boolean PARTICIPANT = false;
     public static final Boolean WON = true;
-    public static final Boolean ALLTOURNEYS = false;
-
-
-
+    public static final Boolean ALL_TOURNEYS = false;
 }
