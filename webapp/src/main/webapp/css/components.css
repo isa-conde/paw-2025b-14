@@ -1748,6 +1748,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     border: 1px solid var(--secondary-details);
     margin-top: 15px;
     justify-content: center;
+    max-width: 180px;
+}
+
+.profile-left-column .main-text {
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .profile-left-column-button {

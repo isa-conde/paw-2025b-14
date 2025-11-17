@@ -33,9 +33,9 @@ public class TournamentServiceImplTest {
     private static final LocalDate START_DATE = LocalDate.of(2025, 2, 21);
     private static final LocalDate END_DATE = LocalDate.of(2026, 2, 21);
     private static final String FORMAT = "some format";
-    private static final Long ID = 1L;
-    private static final Long OTHER_ID = 2L;
-    private static final Integer MAX_PARTICIPANTS = 8;
+    private static final long ID = 1L;
+    private static final long OTHER_ID = 2L;
+    private static final int MAX_PARTICIPANTS = 8;
     private static final byte[] IMAGE = "0".repeat(16).getBytes(StandardCharsets.UTF_8);
 
     @Mock
@@ -62,10 +62,6 @@ public class TournamentServiceImplTest {
     @InjectMocks
     private TournamentServiceImpl tournamentService;
 
-//    create(Long creatorId, String name, Long gameId, Region region, Elo elo, LocalDate startDate, LocalDate endDate, String format,
-//           Structure structure, Integer maxParticipants, byte[] image, Boolean openInscriptions, Boolean isFinished, Long formatId,
-//           byte[] rules, String serverName, String serverPassword, String discordChannel)
-
     @Test
     public void testCreate(){
         User fakeUser = new User(ID,NAME,NAME,NAME,true,null,null,null,"");
@@ -80,8 +76,8 @@ public class TournamentServiceImplTest {
         Tournament ans = tournamentService.create(ID,NAME,ID,REGION,ELO,START_DATE,END_DATE,FORMAT,STRUCTURE,MAX_PARTICIPANTS,IMAGE,true,false,ID, IMAGE,NAME,NAME,NAME);
 
         Assert.assertNotNull(ans);
-        Assert.assertEquals(ID,ans.getId());
-        Assert.assertEquals(ID,ans.getCreatorId());
+        Assert.assertEquals(ID,ans.getId().longValue());
+        Assert.assertEquals(ID,ans.getCreatorId().longValue());
         Assert.assertEquals(NAME,ans.getName());
         Assert.assertEquals(ID,ans.getGameId());
         Assert.assertEquals(REGION,ans.getRegion());
@@ -91,26 +87,22 @@ public class TournamentServiceImplTest {
         Assert.assertEquals(FORMAT,ans.getFormat());
         Assert.assertEquals(STRUCTURE,ans.getStructure());
         Assert.assertEquals(MAX_PARTICIPANTS,ans.getMaxParticipants());
-        Assert.assertEquals(ID,ans.getImageId());
-        Assert.assertEquals(ID,ans.getRules().getId());
+        Assert.assertEquals(ID,ans.getImageId().longValue());
+        Assert.assertEquals(ID,ans.getRules().getId().longValue());
         Assert.assertTrue(ans.getOpenInscriptions());
         Assert.assertFalse(ans.getFinished());
         Assert.assertNull(ans.getTournamentWinner());
         Assert.assertNull(ans.getIsGroupStage());
         Assert.assertFalse(ans.getTournamentStarted());
-        Assert.assertEquals(ID,ans.getFormatId());
+        Assert.assertEquals(ID,ans.getFormatId().longValue());
         Assert.assertEquals(NAME,ans.getServerPassword());
         Assert.assertEquals(NAME,ans.getServerName());
         Assert.assertEquals(NAME,ans.getDiscordChannel());
     }
 
-//    Tournament(User creator, String name, Game game, Region region, LocalDate startDate, LocalDate endDate, String format,
-//               Structure structure, Integer maxParticipants, Long imageId, Boolean openInscriptions, Boolean isFinished,
-//               GameFormat formatEntity, String serverName, String serverPassword, String discordChannel)
-
     private Tournament createFakeTournament(User fakeUser){
         GameFormat fakeFormat = new GameFormat(ID,NAME,8);
-        Game fakeGame = new Game(NAME,GENRE,ID.intValue());
+        Game fakeGame = new Game(NAME,GENRE, (int) ID);
         fakeGame.setId(ID);
         Tournament fakeTournament = new Tournament(fakeUser,NAME,fakeGame,REGION,START_DATE,END_DATE,FORMAT,STRUCTURE,MAX_PARTICIPANTS,ID,true,false,fakeFormat,NAME,NAME,NAME);
         fakeTournament.setCreator(fakeUser);

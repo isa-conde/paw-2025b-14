@@ -67,7 +67,7 @@ public class UserServiceImplTest{
         Assert.assertEquals(USERNAME, maybeUser.getUsername());
         Assert.assertEquals(EMAIL,maybeUser.getEmail());
         Assert.assertEquals(PASSWORD,maybeUser.getPassword());
-        Assert.assertEquals(1L,maybeUser.getId());
+        Assert.assertEquals(1L,maybeUser.getId().longValue());
         Assert.assertEquals("es",maybeUser.getLocale());
     }
 

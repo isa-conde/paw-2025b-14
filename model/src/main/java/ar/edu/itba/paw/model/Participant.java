@@ -36,8 +36,8 @@ public class Participant {
     @JoinColumn(name = "tournament_id", nullable = false)
     private Tournament tournament;
 
-    @Column(name = "has_rated", nullable = false)
-    private boolean hasRated;
+    @Column(name = "has_rated")
+    private Boolean hasRated;
 
     @Transient
     private String name;
@@ -51,13 +51,14 @@ public class Participant {
     private List<Match> visitorMatch;
 
 
-    public Participant(final Long id, final String name, Integer points, Integer scoreDifference, Integer groupNumber, Long pfpId) {
+    public Participant(final Long id, final String name, Integer points, Integer scoreDifference, Integer groupNumber, Long pfpId, Boolean hasRated) {
         this.id = id;
         this.name = name;
         this.points = points;
         this.scoreDifference = scoreDifference;
         this.groupNumber = groupNumber;
         this.pfpId = pfpId;
+        this.hasRated = hasRated;
     }
 
     public Participant(Tournament tournament){
@@ -154,7 +155,7 @@ public class Participant {
         this.scoreDifference = scoreDifference;
     }
 
-    public boolean getHasRated() {
+    public Boolean getHasRated() {
         return hasRated;
     }
 

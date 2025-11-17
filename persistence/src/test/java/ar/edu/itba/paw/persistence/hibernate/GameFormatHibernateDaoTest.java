@@ -58,7 +58,7 @@ public class GameFormatHibernateDaoTest {
         Assert.assertNotNull(ans);
         Assert.assertEquals(1,ans.size());
         Assert.assertEquals("formi",ans.get(0).getName());
-        Assert.assertEquals(6,ans.get(0).getPlayersPerTeam().intValue());
+        Assert.assertEquals(6,ans.get(0).getPlayersPerTeam());
         Assert.assertEquals(ID, ans.get(0).getId());
         Assert.assertEquals(ID+3,ans.get(0).getGame().getId().longValue());
     }
@@ -70,7 +70,7 @@ public class GameFormatHibernateDaoTest {
         Assert.assertNotNull(ans);
         Assert.assertTrue(ans.isPresent());
         Assert.assertEquals("formi",ans.get().getName());
-        Assert.assertEquals(6,ans.get().getPlayersPerTeam().intValue());
+        Assert.assertEquals(6,ans.get().getPlayersPerTeam());
         Assert.assertEquals(ID, ans.get().getId());
         Assert.assertEquals(ID+3,ans.get().getGame().getId().longValue());
     }
