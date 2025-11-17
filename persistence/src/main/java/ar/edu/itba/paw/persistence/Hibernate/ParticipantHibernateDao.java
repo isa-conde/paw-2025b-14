@@ -260,7 +260,6 @@ public class ParticipantHibernateDao implements ParticipantDao{
         return toReturn;
     }
 
-
     @Override
     public PointsPair getTournamentMaxPointsPairGroup(long tournamentId, Integer group) {
         String jpql = "SELECT p.points, p.scoreDifference " +
