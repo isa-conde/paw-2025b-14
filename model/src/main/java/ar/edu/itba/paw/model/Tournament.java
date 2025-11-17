@@ -87,7 +87,7 @@ public class Tournament {
     private boolean tournamentStarted;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "format_id", nullable = false)
+    @JoinColumn(name = "format_id")
     private GameFormat formatEntity;
 
     @Column(name = "rating")

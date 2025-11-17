@@ -6,7 +6,6 @@
 <%@ attribute name="isCreator" required="false" rtexprvalue="true" %>
 <%@ attribute name="tournamentStructure" required="false" rtexprvalue="true" %>
 <%@ attribute name="groupStage" required="false" rtexprvalue="true" %>
-<%@ attribute name="groupNumber" required="false" rtexprvalue="true" %>
 <%@ attribute name="totalMatches" required="false" rtexprvalue="true" %>
 <%@ attribute name="setMatchResultsForm" required="false" type="ar.edu.itba.paw.webapp.form.SetMatchResultsForm" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -63,53 +62,50 @@
     <c:url value="/images/pencil.png" var="pencilUrl"/>
     <div class="matches-grid">
         <c:forEach var="match" items="${matches}">
-            <c:if test="${empty groupNumber or match.local.groupNumber eq groupNumber}">
-                <div class="match-row">
-                    <div class="left">
-                        <paw:match-card
-                                matchId="${match.id}"
-                                tournamentId="${tournamentId}"
-                                localPlayer="${match.local}"
-                                visitorPlayer="${match.visitor}"
-                                localScore="${match.localScore}"
-                                visitorScore="${match.visitorScore}"
-                                winner="${match.winner}"
-                                groupNumber="${groupNumber}"
-                                isCreator="${isCreator}"/>
-                    </div>
-                    <div class="right">
-                        <c:choose>
-                            <c:when test="${match.local == null || match.visitor == null}">
-                                <paw:text size="m" weight="semi-bold">-</paw:text>
-                            </c:when>
-                            <c:otherwise>
-                                <c:choose>
-                                    <c:when test="${match.localScore == null || match.visitorScore == null}">
-                                        <c:choose>
-                                            <c:when test="${isCreator}">
-                                                <paw:button onclick="openSetMatchModal(${match.id})" image="${pencilUrl}" size="m" secondary="true"/>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <paw:text size="m" weight="semi-bold"><spring:message code="tournament.match.notPlayed"/></paw:text>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <c:choose>
-                                            <c:when test="${match.date == null}">
-                                                <paw:text size="m" weight="thin"><spring:message code="tournament.match.noDate"/></paw:text>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <paw:datetime date="${match.date}" weight="semi-bold"/>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </c:otherwise>
-                                </c:choose>
-                            </c:otherwise>
-                        </c:choose>
-                    </div>
+            <div class="match-row">
+                <div class="left">
+                    <paw:match-card
+                            matchId="${match.id}"
+                            tournamentId="${tournamentId}"
+                            localPlayer="${match.local}"
+                            visitorPlayer="${match.visitor}"
+                            localScore="${match.localScore}"
+                            visitorScore="${match.visitorScore}"
+                            winner="${match.winner}"
+                            isCreator="${isCreator}"/>
                 </div>
-            </c:if>
+                <div class="right">
+                    <c:choose>
+                        <c:when test="${match.local == null || match.visitor == null}">
+                            <paw:text size="m" weight="semi-bold">-</paw:text>
+                        </c:when>
+                        <c:otherwise>
+                            <c:choose>
+                                <c:when test="${match.localScore == null || match.visitorScore == null}">
+                                    <c:choose>
+                                        <c:when test="${isCreator}">
+                                            <paw:button onclick="openSetMatchModal(${match.id})" image="${pencilUrl}" size="m" secondary="true"/>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <paw:text size="m" weight="semi-bold"><spring:message code="tournament.match.notPlayed"/></paw:text>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </c:when>
+                                <c:otherwise>
+                                    <c:choose>
+                                        <c:when test="${match.date == null}">
+                                            <paw:text size="m" weight="thin"><spring:message code="tournament.match.noDate"/></paw:text>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <paw:datetime date="${match.date}" weight="semi-bold"/>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </c:otherwise>
+                            </c:choose>
+                        </c:otherwise>
+                    </c:choose>
+                </div>
+            </div>
         </c:forEach>
     </div>
 </div>

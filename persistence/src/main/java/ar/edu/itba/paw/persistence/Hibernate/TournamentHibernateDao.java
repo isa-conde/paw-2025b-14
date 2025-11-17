@@ -335,12 +335,6 @@ public class TournamentHibernateDao implements TournamentDao {
     }
 
     @Override
-    public Boolean getIsGroupStage(long tournamentId) {
-        Tournament t = em.find(Tournament.class, tournamentId);
-        return t.getIsGroupStage();
-    }
-
-    @Override
     public void setTournamentWinner(long tournamentId, long winnerId) {
         Tournament t = em.find(Tournament.class, tournamentId);
         t.setWinner(em.getReference(Participant.class, winnerId));

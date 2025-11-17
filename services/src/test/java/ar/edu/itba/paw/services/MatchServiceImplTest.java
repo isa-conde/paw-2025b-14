@@ -36,12 +36,12 @@ public class MatchServiceImplTest {
 
     private static final Long ID = 1L;
 
-//    @Test(expected = TournamentNotFoundException.class)
-//    public void testGetMatchesNoTournament(){
-//        Mockito.when(tournamentDao.findById(ID)).thenReturn(Optional.empty());
-//
-//        matchService.getTournamentMatchesByStage(ID);
-//    }
+    @Test(expected = TournamentNotFoundException.class)
+    public void testGetMatchesNoTournament(){
+        Mockito.when(tournamentDao.findById(ID)).thenReturn(Optional.empty());
+
+        matchService.getTournamentMatchesByStage(ID, null);
+    }
 
     @Test
     public void testGetMatchesSimple() {
@@ -70,7 +70,6 @@ public class MatchServiceImplTest {
         matches.add(m1);
 
         Mockito.when(matchDao.getTournamentMatches(ID, 1)).thenReturn(matches);
-        Mockito.when(tournamentDao.getIsGroupStage(ID)).thenReturn(false);
 
         // Setup: Participants
         Participant p10 = Mockito.mock(Participant.class);
@@ -84,7 +83,7 @@ public class MatchServiceImplTest {
         Mockito.when(participantDao.getTournamentParticipantById(ID, 40L, 1)).thenReturn(p40);
 
         // Ejecutar el metodo
-        Map<Integer, List<Match>> result = matchService.getTournamentMatchesByStage(ID);
+        Map<Integer, List<Match>> result = matchService.getTournamentMatchesByStage(ID, null);
 
         // Verificaciones
         Assert.assertNotNull(result);

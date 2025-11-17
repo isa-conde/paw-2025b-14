@@ -263,17 +263,17 @@
                 </c:choose>
                 <c:if test="${(isParticipant || isCreator) && tournament.tournamentStarted && !tournament.finished}">
                     <div class="cards-container">
-                        <c:if test="${tournament.serverName !=null}">
+                        <c:if test="${tournament.serverName != null and not empty tournament.serverName}">
                             <div class="card texture">
                                 <div class="copy-card-content-container">
                                     <paw:copy-field label="tournament.serverName" value="${tournament.serverName}" />
-                                    <c:if test="${tournament.serverPassword != null}">
+                                    <c:if test="${tournament.serverPassword != null and not empty tournament.serverPassword}">
                                         <paw:copy-field label="tournament.serverPassword" value="${tournament.serverPassword}" />
                                     </c:if>
                                 </div>
                             </div>
                         </c:if>
-                        <c:if test="${tournament.discordChannel != null}">
+                        <c:if test="${tournament.discordChannel != null and not empty tournament.discordChannel}">
                             <div class="discord-card texture">
                                 <paw:text type="title" size="l">
                                     <spring:message code="tournament.discordChannel.title"/>
@@ -313,6 +313,7 @@
                                         <c:set var="subActiveGroup" value="${param.group != null ? param.group : 1}"/>
                                         <paw:groups-navbar groups="${groups}" activeGroup="${subActiveGroup}" paramName="group"/>
                                         <c:forEach var="stageEntry" items="${matches}">
+                                            <c:if test="${not empty stageEntry.value}">
                                                 <paw:date-matches
                                                         dateNumber="${stageEntry.key}"
                                                         matches="${stageEntry.value}"
@@ -320,8 +321,8 @@
                                                         isCreator="${isCreator}"
                                                         tournamentStructure="${tournament.structure}"
                                                         groupStage="true"
-                                                        groupNumber="${subActiveGroup}"
-                                                        totalMatches="${stageEntry.value.size()}"/>
+                                                />
+                                            </c:if>
                                         </c:forEach>
                                     </c:otherwise>
                                 </c:choose>
@@ -502,6 +503,7 @@
                onsubmit="this.querySelectorAll('button, input[type=submit]').forEach(el => el.disabled = true);">
         <input type="hidden" id="modalMatchId" name="matchId" value=""/>
         <input type="hidden" name="tournamentId" value="${tournament.id}"/>
+        <input type="hidden" name="group" value="${param.group}" />
         <div class="row">
             <paw:input path="localScore" label="tournament.setMatchResults.localScore" hasConstraint="true" inputType="number"/>
             <paw:input path="visitorScore" label="tournament.setMatchResults.visitorScore" hasConstraint="true" inputType="number"/>

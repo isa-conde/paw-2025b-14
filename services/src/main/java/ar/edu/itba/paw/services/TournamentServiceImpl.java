@@ -55,10 +55,6 @@ public class TournamentServiceImpl implements TournamentService {
     @Override
     public Optional<Tournament> findById(long id) {
         Optional<Tournament> toReturn = tournamentDao.findById(id);
-        if(toReturn.isEmpty()) {
-            LOGGER.error("Tournament with ID {} does not exist", id);
-            throw new TournamentNotFoundException();
-        }
         return toReturn;
     }
 

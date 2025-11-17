@@ -68,7 +68,7 @@ public class MatchServiceImpl implements MatchService {
 
     @Transactional
     @Override
-    public Map<Integer, List<Match>> getTournamentMatchesByStage(long tournamentId){
+    public Map<Integer, List<Match>> getTournamentMatchesByStage(long tournamentId, Integer group){
         Tournament tournament = ts.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
         GameFormat format = tournament.getFormatEntity();
         int teamSize;
@@ -77,13 +77,17 @@ public class MatchServiceImpl implements MatchService {
         }else{
             teamSize = format.getPlayersPerTeam();
         }
-        List<Match> matches = matchDao.getTournamentMatches(tournamentId, teamSize);
+        Integer selectedGroup = group;
+        if(group == null && tournament.getIsGroupStage() != null && tournament.getIsGroupStage() && tournament.getStructure().equals(Structure.HYBRID)) {
+            selectedGroup = 1;
+        }
+        List<Match> matches = matchDao.getTournamentMatches(tournamentId, selectedGroup);
         if (matches.isEmpty()) {
             return Collections.emptyMap();
         }
         matches.sort(Comparator.comparingLong(Match::getId));
         Map<Integer, List<Match>> result = new TreeMap<>();
-        Boolean isGroupStage = tournamentDao.getIsGroupStage(tournamentId);
+        Boolean isGroupStage = tournament.getIsGroupStage();
         for (Match m : matches) {
             m.setLocal(participantDao.getTournamentParticipantById(tournamentId, m.getLocalId(), teamSize));
             m.setVisitor(participantDao.getTournamentParticipantById(tournamentId, m.getVisitorId(), teamSize));
