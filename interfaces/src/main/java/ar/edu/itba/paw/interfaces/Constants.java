@@ -20,4 +20,8 @@ public final class Constants {
     public static final boolean PARTICIPANT = false;
     public static final boolean WON = true;
     public static final boolean ALL_TOURNEYS = false;
+    public static final int MIN_HYBRID_PARTICIPANTS = 9;
+    public static final int MIN_PARTICIPANTS_PER_GROUP = 3;
+    public static final int MAX_GROUPS = 16;
+
 }

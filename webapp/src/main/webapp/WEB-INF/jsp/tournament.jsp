@@ -423,7 +423,8 @@
     <paw:modal title="tournament.contactOwner.modalTitle" id="contactOwnerModal" returnUrl="${tournamentUrl}">
         <form:form method="post" modelAttribute="contactOwnerForm"
                    action="${contactOwnerUrl}"
-                   cssClass="form">
+                   cssClass="form"
+                   onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
             <input type="hidden" name="creatorId" value="${creator.id}"/>
             <input type="hidden" name="tournamentId" value="${tournament.id}"/>
             <div class="row">
@@ -440,7 +441,8 @@
     <paw:modal title="tournament.ratings.modalTitle" id="rateTournamentModal" returnUrl="${tournamentUrl}">
         <form:form method="post" modelAttribute="rateTournamentForm"
                    action="${rateTournamentUrl}"
-                   cssClass="form">
+                   cssClass="form"
+                   onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
             <input type="hidden" name="creatorId" value="${creator.id}"/>
             <input type="hidden" name="tournamentId" value="${tournament.id}"/>
             <div class="row center">
@@ -462,7 +464,11 @@
                     <paw:text size="l"><spring:message code="tournament.join.noTeams" arguments="${teamSize}"/></paw:text>
                 </div>
                 <div class="row center">
-                    <paw:button onclick="window.location.href='${pageContext.request.contextPath}/team/create'; return false;" text="team.create.pageTitle"/>
+                    <c:url value="/team/create" var="createTeamUrl">
+                        <c:param name="returnUrl" value="${tournamentUrl}" />
+                    </c:url>
+
+                    <paw:button onclick="window.location.href='${createTeamUrl}'; return false;" text="team.create.pageTitle"/>
                 </div>
             </c:when>
             <c:otherwise>

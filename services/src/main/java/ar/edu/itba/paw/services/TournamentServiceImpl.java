@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.*;
 
+import static ar.edu.itba.paw.interfaces.Constants.*;
+
 @Transactional(readOnly = true)
 @Service
 public class TournamentServiceImpl implements TournamentService {
@@ -377,7 +379,7 @@ public class TournamentServiceImpl implements TournamentService {
 
     private void createMatchesHybrid(Tournament t, List<Participant> participants) {
         int n = participants.size();
-        if (n > 8){
+        if (n >= MIN_HYBRID_PARTICIPANTS){
             tournamentDao.setIsGroupStage(t.getId(), true);
             int groupsCount = calculateGroups(n);
             List<Integer> distribution = distributeParticipants(n);
@@ -397,8 +399,8 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     private int calculateGroups(int n) {
-        int groups = Math.max(1, n / 3);   // min 3 participants per group
-        groups = Math.min(groups, 16);     // máx 16  groups
+        int groups = Math.max(1, n / MIN_PARTICIPANTS_PER_GROUP);
+        groups = Math.min(groups, MAX_GROUPS);
         return groups;
     }
 
@@ -546,6 +548,4 @@ public class TournamentServiceImpl implements TournamentService {
         Hibernate.initialize(t.getFormatEntity());
         return t.getFormatEntity();
     }
-
-
 }

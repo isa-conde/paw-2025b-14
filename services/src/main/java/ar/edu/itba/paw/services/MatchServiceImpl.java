@@ -44,6 +44,9 @@ public class MatchServiceImpl implements MatchService {
         if (m1 == null || m2 == null) {
             throw new MatchNotFoundException();
         }
+        if(match1 == match2){
+            return;
+        }
 
         boolean u1IsLocalM1 = m1.getLocalId() != null && m1.getLocalId().equals(user1);
         boolean u1IsVisitM1 = m1.getVisitorId() != null && m1.getVisitorId().equals(user1);

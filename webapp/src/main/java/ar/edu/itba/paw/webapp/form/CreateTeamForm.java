@@ -25,6 +25,8 @@ public class CreateTeamForm {
     @ExistingUsersContraint
     private List<String> members;
 
+    private String returnUrl;
+
     public String getName() {
         return name;
     }
@@ -60,4 +62,10 @@ public class CreateTeamForm {
         this.members = members;
     }
 
+    public String getReturnUrl() {
+        return returnUrl;
+    }
+    public void setReturnUrl(String returnUrl) {
+        this.returnUrl = returnUrl;
+    }
 }

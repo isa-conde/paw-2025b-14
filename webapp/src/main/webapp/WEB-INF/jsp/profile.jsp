@@ -4,7 +4,6 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
-<c:url var="profileUrl" value="/profile/${profile.id}"/>
 <c:url var="starUrl" value="/images/roundedStarOn.png"/>
 <c:url var="commentUrl" value="/profile/${profile.id}/comment"/>
 
@@ -144,7 +143,7 @@
                 </div>
             </c:forEach>
         </div>
-        <paw:pagination currentPage="${commentsCurrentPage}" totalPages="${commentsTotalPages}" url="${profileUrl}"/>
+        <paw:pagination currentPage="${commentsCurrentPage}" totalPages="${commentsTotalPages}" url="/profile/${profile.id}"/>
 
     </div>
 </paw:layout>
@@ -172,12 +171,13 @@
     </form:form>
 </paw:modal>
 
+<c:url var="deleteAccountUrl" value="/account/delete"/>
 <paw:modal title="profile.editAccount.title" id="editAccountsModal" returnUrl="${profileUrl}">
         <div class="user-account-modal">
             <c:choose>
                 <c:when test="${userAccounts.size() > 0}">
                     <c:forEach var="account" items="${userAccounts}" varStatus="status">
-                        <form method="post" action="/account/delete" class="user-account-modal-item">
+                        <form method="post" action="${deleteAccountUrl}" class="user-account-modal-item">
                             <input type="hidden" name="userId" value="${profile.id}">
                             <input type="hidden" name="platform" value="${account.platform}">
                                 <div class="user-account-left">
