@@ -423,7 +423,8 @@
     <paw:modal title="tournament.contactOwner.modalTitle" id="contactOwnerModal" returnUrl="${tournamentUrl}">
         <form:form method="post" modelAttribute="contactOwnerForm"
                    action="${contactOwnerUrl}"
-                   cssClass="form">
+                   cssClass="form"
+                   onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
             <input type="hidden" name="creatorId" value="${creator.id}"/>
             <input type="hidden" name="tournamentId" value="${tournament.id}"/>
             <div class="row">
@@ -440,7 +441,8 @@
     <paw:modal title="tournament.ratings.modalTitle" id="rateTournamentModal" returnUrl="${tournamentUrl}">
         <form:form method="post" modelAttribute="rateTournamentForm"
                    action="${rateTournamentUrl}"
-                   cssClass="form">
+                   cssClass="form"
+                   onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
             <input type="hidden" name="creatorId" value="${creator.id}"/>
             <input type="hidden" name="tournamentId" value="${tournament.id}"/>
             <div class="row center">
