@@ -291,7 +291,6 @@ public class TournamentHibernateDao implements TournamentDao {
         return (int) Math.ceil((double) count / pageSize);
     }
 
-
     @Override
     public void updateTournamentInfo(long tournamentId, String name, LocalDate startDate, LocalDate endDate, Integer maxParticipants, String serverName, String serverPassword, String discordChannel) {
         Tournament t = em.find(Tournament.class, tournamentId);

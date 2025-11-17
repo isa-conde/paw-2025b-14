@@ -206,7 +206,7 @@ public class TournamentController {
                     editTournamentForm.setDiscordChannel(t.getDiscordChannel());
                 }
             }
-            GameFormat gameFormat = t.getFormatEntity();
+            GameFormat gameFormat = ts.getFormat(tournamentId);
             int teamSize;
             if(gameFormat != null){
                 t.setFormat(gameFormat.getName());
