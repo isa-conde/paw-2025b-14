@@ -427,20 +427,6 @@ public class TournamentHibernateDaoTest {
     }
 
     @Test
-    public void testGetIsGroupStage(){
-        Boolean isGroupStage = tournamentHibernateDao.getIsGroupStage(ID);
-
-        Assert.assertTrue(isGroupStage);
-    }
-
-    @Test
-    public void testGetIsNotGroupStage(){
-        Boolean isGroupStage = tournamentHibernateDao.getIsGroupStage(ID+1);
-
-        Assert.assertFalse(isGroupStage);
-    }
-
-    @Test
     public void testUpdateAllStartDates(){
         jdbcTemplate.update("update tournament set end_date = '2027-02-21' where end_date = '2025-04-20'");
         tournamentHibernateDao.updateAllStartDates();

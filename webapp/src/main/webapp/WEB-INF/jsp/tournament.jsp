@@ -313,6 +313,7 @@
                                         <c:set var="subActiveGroup" value="${param.group != null ? param.group : 1}"/>
                                         <paw:groups-navbar groups="${groups}" activeGroup="${subActiveGroup}" paramName="group"/>
                                         <c:forEach var="stageEntry" items="${matches}">
+                                            <c:if test="${not empty stageEntry.value}">
                                                 <paw:date-matches
                                                         dateNumber="${stageEntry.key}"
                                                         matches="${stageEntry.value}"
@@ -320,8 +321,8 @@
                                                         isCreator="${isCreator}"
                                                         tournamentStructure="${tournament.structure}"
                                                         groupStage="true"
-                                                        groupNumber="${subActiveGroup}"
-                                                        totalMatches="${stageEntry.value.size()}"/>
+                                                />
+                                            </c:if>
                                         </c:forEach>
                                     </c:otherwise>
                                 </c:choose>
@@ -502,6 +503,7 @@
                onsubmit="this.querySelectorAll('button, input[type=submit]').forEach(el => el.disabled = true);">
         <input type="hidden" id="modalMatchId" name="matchId" value=""/>
         <input type="hidden" name="tournamentId" value="${tournament.id}"/>
+        <input type="hidden" name="group" value="${param.group}" />
         <div class="row">
             <paw:input path="localScore" label="tournament.setMatchResults.localScore" hasConstraint="true" inputType="number"/>
             <paw:input path="visitorScore" label="tournament.setMatchResults.visitorScore" hasConstraint="true" inputType="number"/>
