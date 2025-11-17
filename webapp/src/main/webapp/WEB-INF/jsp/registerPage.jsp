@@ -9,7 +9,7 @@
 
 <paw:form-layout pageTitle="${title}">
     <paw:text type="title">${title}</paw:text>
-    <form:form cssClass="form-container" modelAttribute="registerForm" action="${registerUrl}" method="post">
+    <form:form cssClass="form-container" modelAttribute="registerForm" action="${registerUrl}" method="post" onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
         <div>
             <paw:input path="username" label="register.username" hasConstraint="true"/>
         </div>

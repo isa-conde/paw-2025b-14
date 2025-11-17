@@ -10,7 +10,7 @@
             <img src="${pageContext.request.contextPath}/images/teamCreationImage.jpg" alt="Team Image" />
         </div>
         <div class="tournament-form-page__form">
-            <form:form cssClass="form center" modelAttribute="teamForm" action="${pageContext.request.contextPath}/team/create" method="post" enctype="multipart/form-data" id="teamForm">
+            <form:form cssClass="form center" modelAttribute="teamForm" action="${pageContext.request.contextPath}/team/create" method="post" enctype="multipart/form-data" id="teamForm" onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
                 <div>
                     <paw:text type="title" size="xl"><spring:message code="team.create.title"/></paw:text>
                     <div class="row center">
