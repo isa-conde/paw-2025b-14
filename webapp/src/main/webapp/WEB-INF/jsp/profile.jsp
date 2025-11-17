@@ -133,7 +133,7 @@
             <c:forEach var="comment" items="${comments}">
                 <div class="profile-comment">
                     <div class="profile-comment-header">
-                        <c:set var="commenterProfileUrl" value="/profile/${comment.commenter.id}"/>
+                        <c:url var="commenterProfileUrl" value="/profile/${comment.commenter.id}"/>
                         <a href="${commenterProfileUrl}" class="profile-comment-author"><c:out value="${comment.commenter.username}"/></a>
                         <span class="profile-comment-date"><c:out value="${comment.formattedDate}"/></span>
                     </div>
