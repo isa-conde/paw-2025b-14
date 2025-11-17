@@ -205,14 +205,19 @@ public class TournamentController {
                     editTournamentForm.setDiscordChannel(t.getDiscordChannel());
                 }
             }
-            GameFormat gameFormat = gs.findFormatById(t.getFormatId());
-            mav.addObject("format", gameFormat);
-            t.setFormat(gameFormat.getName());
-            List<Participant> participants = ps.getTournamentParticipants(tournamentId, gameFormat.getPlayersPerTeam());
+            GameFormat gameFormat = t.getFormatEntity();
+            int teamSize;
+            if(gameFormat != null){
+                t.setFormat(gameFormat.getName());
+                teamSize = gameFormat.getPlayersPerTeam();
+            }else{
+                teamSize = 1;
+            }
+            List<Participant> participants = ps.getTournamentParticipants(tournamentId, teamSize);
             int participantCount = participants.size();
             Game game = gs.findById(t.getGameId()).orElseThrow(GameNotFoundException::new);
             User creator = us.findById(t.getCreatorId()).orElseThrow(UserNotFoundException::new);
-            Boolean isIndividualTournament = gameFormat.getPlayersPerTeam() == 1;
+            Boolean isIndividualTournament = teamSize == 1;
             Boolean isParticipant = user != null && ps.hasJoined(user.getId(), tournamentId);
             Boolean hasRankedTournament = user != null && ps.participantHasRatedTournament(user.getId(), tournamentId);
             Float creatorRating = us.getUserRating(t.getCreatorId());
@@ -238,6 +243,7 @@ public class TournamentController {
             mav.addObject("joinTeamForm", joinTournamentTeamForm);
             mav.addObject("creatorRating", creatorRating);
             mav.addObject("hasRankedTournament", hasRankedTournament);
+            mav.addObject("teamSize", teamSize);
         }
         return mav;
     }

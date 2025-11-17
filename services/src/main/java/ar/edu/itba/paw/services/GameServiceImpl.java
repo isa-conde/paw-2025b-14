@@ -76,9 +76,4 @@ public class GameServiceImpl implements GameService {
     public Long getPageAmount(){
         return gameDao.getPageAmount();
     }
-
-    @Override
-    public GameFormat findFormatById(Long id) {
-        return gameFormatDao.findById(id).orElseThrow(GameFormatNotFoundException::new);
-    }
 }

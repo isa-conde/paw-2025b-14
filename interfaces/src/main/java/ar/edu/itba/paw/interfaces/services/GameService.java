@@ -26,6 +26,4 @@ public interface GameService {
     List<Game> findAllPaged(Long page);
 
     Long getPageAmount();
-
-    GameFormat findFormatById(Long id);
 }
