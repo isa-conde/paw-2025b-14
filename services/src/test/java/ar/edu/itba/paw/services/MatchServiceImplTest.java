@@ -45,21 +45,19 @@ public class MatchServiceImplTest {
 
     @Test
     public void testGetMatchesSimple() {
-        // Setup: Mock del torneo
         Tournament tournament = Mockito.mock(Tournament.class);
         Mockito.when(ts.findById(ID)).thenReturn(Optional.of(tournament));
         Mockito.when(tournament.getFormatEntity()).thenReturn(null); // teamSize=1 por default
 
-        // Setup: Matches desordenados por ID
         List<Match> matches = new ArrayList<>();
-        Match m1 = Mockito.mock(Match.class); // ID=1, stage=1
+        Match m1 = Mockito.mock(Match.class);
         Mockito.when(m1.getId()).thenReturn(1L);
         Mockito.when(m1.getLocalId()).thenReturn(10L);
         Mockito.when(m1.getVisitorId()).thenReturn(20L);
         Mockito.when(m1.getStage()).thenReturn(1);
         Mockito.when(m1.getIsGroupStage()).thenReturn(false);
 
-        Match m2 = Mockito.mock(Match.class); // ID=2, stage=2
+        Match m2 = Mockito.mock(Match.class);
         Mockito.when(m2.getId()).thenReturn(2L);
         Mockito.when(m2.getLocalId()).thenReturn(30L);
         Mockito.when(m2.getVisitorId()).thenReturn(40L);
@@ -82,20 +80,16 @@ public class MatchServiceImplTest {
         Mockito.when(participantDao.getTournamentParticipantById(ID, 30L, 1)).thenReturn(p30);
         Mockito.when(participantDao.getTournamentParticipantById(ID, 40L, 1)).thenReturn(p40);
 
-        // Ejecutar el metodo
         Map<Integer, List<Match>> result = matchService.getTournamentMatchesByStage(ID, null);
 
-        // Verificaciones
         Assert.assertNotNull(result);
-        Assert.assertEquals(2, result.size()); // Dos stages: 1 y 2
+        Assert.assertEquals(2, result.size());
 
-        // Stage 1: Debe tener m1 (ID=1), con local y visitor seteados
         List<Match> stage1Matches = result.get(1);
         Assert.assertNotNull(stage1Matches);
         Assert.assertEquals(1, stage1Matches.size());
         Assert.assertSame(m1, stage1Matches.getFirst());
 
-        // Stage 2: Debe tener m2 (ID=2), con local y visitor seteados
         List<Match> stage2Matches = result.get(2);
         Assert.assertNotNull(stage2Matches);
         Assert.assertEquals(1, stage2Matches.size());

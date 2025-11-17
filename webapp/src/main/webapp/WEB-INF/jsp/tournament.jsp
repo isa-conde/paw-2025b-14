@@ -456,7 +456,7 @@
 </paw:layout>
 
 <paw:modal title="tournament.join.chooseTeam" id="chooseTeamModal" returnUrl="${tournamentUrl}">
-    <form:form method="post" modelAttribute="joinTeamForm" action="${pageContext.request.contextPath}/tournament/join/step1" cssClass="form">
+    <form:form method="post" modelAttribute="joinTeamForm" action="${pageContext.request.contextPath}/tournament/join/step1" cssClass="form" onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
         <form:hidden path="tournamentId" value="${tournament.id}"/>
         <c:choose>
             <c:when test="${userTeams.size() <= 0}">
