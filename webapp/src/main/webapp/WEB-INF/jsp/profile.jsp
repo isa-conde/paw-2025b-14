@@ -4,7 +4,6 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
-<c:url var="profileUrl" value="/profile/${profile.id}"/>
 <c:url var="starUrl" value="/images/roundedStarOn.png"/>
 <c:url var="commentUrl" value="/profile/${profile.id}/comment"/>
 
@@ -144,7 +143,7 @@
                 </div>
             </c:forEach>
         </div>
-        <paw:pagination currentPage="${commentsCurrentPage}" totalPages="${commentsTotalPages}" url="${profileUrl}"/>
+        <paw:pagination currentPage="${commentsCurrentPage}" totalPages="${commentsTotalPages}" url="/profile/${profile.id}"/>
 
     </div>
 </paw:layout>
