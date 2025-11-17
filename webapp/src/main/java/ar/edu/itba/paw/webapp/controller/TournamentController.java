@@ -106,9 +106,8 @@ public class TournamentController {
 
         ps.swapGroups(tournamentId, user1, user2);
 
-        ra.addAttribute("tournamentId", tournamentId);
         ra.addAttribute("edit", true);
-        return new ModelAndView("redirect:/tournament");
+        return new ModelAndView("redirect:/tournament/" +  tournamentId);
     }
 
     @RequestMapping(value = "/tournament/swap/matches", method = RequestMethod.POST)

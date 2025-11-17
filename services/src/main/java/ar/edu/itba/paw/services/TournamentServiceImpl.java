@@ -183,7 +183,8 @@ public class TournamentServiceImpl implements TournamentService {
             teamSize = 1;
         }else{
             teamSize = format.getPlayersPerTeam();
-        }        List<Participant> participants;
+        }
+        List<Participant> participants;
         List<Participant> teams = new ArrayList<>();
         participants = participantDao.getTournamentParticipantUsers(tournamentId);
         if (teamSize > 1) {
@@ -379,7 +380,6 @@ public class TournamentServiceImpl implements TournamentService {
 
     private void createMatchesHybrid(Tournament t, List<Participant> participants) {
         int n = participants.size();
-        int teamSize = gameFormatDao.findById(t.getFormatId()).orElseThrow(GameFormatNotFoundException::new).getPlayersPerTeam();
         if (n > 8){
             tournamentDao.setIsGroupStage(t.getId(), true);
             int groupsCount = calculateGroups(n);
@@ -390,7 +390,7 @@ public class TournamentServiceImpl implements TournamentService {
                 List<Participant> group = new ArrayList<>(participants.subList(index, index + size));
                 Long[] ids = group.stream().map(Participant::getId).toArray(Long[]::new);
                 int groupNumber = g + 1;
-                participantDao.updateGroupNumberForUsers(t.getId(), groupNumber, Arrays.asList(ids), teamSize);
+                participantDao.updateGroupNumberForUsers(t.getId(), groupNumber, Arrays.asList(ids));
                 index += size;
             }
         }else{

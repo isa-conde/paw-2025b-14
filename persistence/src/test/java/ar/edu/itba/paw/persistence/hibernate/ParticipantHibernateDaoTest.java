@@ -169,7 +169,7 @@ public class ParticipantHibernateDaoTest {
 
     @Test
     public void testUpdateGroupNumberUsers(){
-        participantHibernateDao.updateGroupNumberForUsers(ID,3,List.of(ID),1);
+        participantHibernateDao.updateGroupNumberForUsers(ID,3,List.of(ID));
         em.flush();
 
         Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
@@ -178,7 +178,7 @@ public class ParticipantHibernateDaoTest {
 
     @Test
     public void testUpdateGroupNumberTeams(){
-        participantHibernateDao.updateGroupNumberForUsers(ID+1, 3, List.of(ID), 2);
+        participantHibernateDao.updateGroupNumberForUsers(ID+1, 3, List.of(ID));
         em.flush();
 
         Assert.assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "participant",
@@ -187,7 +187,7 @@ public class ParticipantHibernateDaoTest {
 
     @Test
     public void testSwapGroups(){
-        participantHibernateDao.swapGroups(ID,ID,ID+1,1,2,1);
+        participantHibernateDao.swapGroups(ID,ID,ID+1,1,2);
         em.flush();
 
         Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
@@ -215,7 +215,7 @@ public class ParticipantHibernateDaoTest {
 
     @Test
     public void testGetGroupNumberUser(){
-        Integer ans = participantHibernateDao.getGroupNumber(ID,ID,1);
+        Integer ans = participantHibernateDao.getGroupNumber(ID,ID);
 
         Assert.assertNotNull(ans);
         Assert.assertEquals(1,ans.intValue());
@@ -224,14 +224,14 @@ public class ParticipantHibernateDaoTest {
     @Test
     public void testGetNoGroupNumberUser(){
         jdbcTemplate.update("update participant set group_number = null");
-        Integer ans = participantHibernateDao.getGroupNumber(ID,ID,1);
+        Integer ans = participantHibernateDao.getGroupNumber(ID,ID);
 
         Assert.assertNull(ans);
     }
 
     @Test
     public void testGetGroupNumberTeam(){
-        Integer ans = participantHibernateDao.getGroupNumber(ID,ID,2);
+        Integer ans = participantHibernateDao.getGroupNumber(ID,ID);
 
         Assert.assertNotNull(ans);
         Assert.assertEquals(1,ans.intValue());
@@ -240,7 +240,7 @@ public class ParticipantHibernateDaoTest {
     @Test
     public void testGetNoGroupNumberTeam(){
         jdbcTemplate.update("update participant set group_number = null");
-        Integer ans = participantHibernateDao.getGroupNumber(ID,ID,2);
+        Integer ans = participantHibernateDao.getGroupNumber(ID,ID);
 
         Assert.assertNull(ans);
     }
