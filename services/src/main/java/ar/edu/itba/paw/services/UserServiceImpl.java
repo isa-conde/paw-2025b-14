@@ -102,6 +102,7 @@ public class UserServiceImpl implements UserService {
         if(optToken.isPresent()) {
             User user = optToken.get().getUser();
             userDao.changePassword(user.getId(), passwordEncoder.encode(newPassword));
+            tokenDao.markAsUsed(optToken.get().getId());
             LOGGER.info("User {} has successfully changed their password", user.getUsername());
             return true;
         } else return false;
@@ -139,6 +140,7 @@ public class UserServiceImpl implements UserService {
         findById(userId).orElseThrow(UserNotFoundException::new);
         if(optToken.isPresent()) {
             userDao.verifyUser(userId);
+            tokenDao.markAsUsed(optToken.get().getId());
             return true;
         }
         return false;
@@ -151,7 +153,6 @@ public class UserServiceImpl implements UserService {
         if(optToken.isPresent()) {
             Token foundToken = optToken.get();
             if(foundToken.getExpiryDate().isAfter(LocalDate.now()) && !foundToken.isUsed()) {
-                tokenDao.markAsUsed(foundToken.getId());
                 return optToken;
             } else {
                 LOGGER.warn("Attempted to use an expired or used token");

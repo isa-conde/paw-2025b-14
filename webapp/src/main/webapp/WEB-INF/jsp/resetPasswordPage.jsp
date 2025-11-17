@@ -12,7 +12,7 @@
     <c:choose>
         <c:when test="${validToken}">
             <paw:text type="title"><spring:message code="passwordReset.page.title"/></paw:text>
-            <form:form cssClass="form-container" modelAttribute="resetPasswordForm" action="${resetPasswordUrl}" method="post">
+            <form:form cssClass="form-container" modelAttribute="resetPasswordForm" action="${resetPasswordUrl}" method="post" onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
                 <input type="hidden" name="userId" value="${userId}"/>
                 <div>
                     <paw:input path="password" label="passwordReset.newPassword" inputType="password" hasConstraint="true"/>
