@@ -78,7 +78,7 @@ public class MatchServiceImpl implements MatchService {
             teamSize = format.getPlayersPerTeam();
         }
         Integer selectedGroup = group;
-        if(group == null && tournament.getIsGroupStage() && tournament.getStructure().equals(Structure.HYBRID)) {
+        if(group == null && tournament.getIsGroupStage() != null && tournament.getIsGroupStage() && tournament.getStructure().equals(Structure.HYBRID)) {
             selectedGroup = 1;
         }
         List<Match> matches = matchDao.getTournamentMatches(tournamentId, selectedGroup);
