@@ -16,6 +16,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -80,10 +81,21 @@ public class MatchHibernateDao implements MatchDao {
         match.setDate(date);
     }
 
-    @Override
-    public List<Match> getTournamentMatches(long tournamentId, int teamSize) {
+    public List<Match> getTournamentMatches(long tournamentId, Integer group) {
         Tournament tournament = em.find(Tournament.class, tournamentId);
-        return tournament.getMatches();
+
+        if (group == null || tournament.getIsGroupStage() == null || !tournament.getIsGroupStage() ) {
+            return new ArrayList<>(tournament.getMatches());
+        }
+
+        return new ArrayList<>(
+                tournament.getMatches()
+                        .stream()
+                        .filter(m -> m.getLocal() != null &&
+                                m.getLocal().getGroupNumber() != null &&
+                                m.getLocal().getGroupNumber().equals(group))
+                        .toList()
+        );
     }
 
     @Override
