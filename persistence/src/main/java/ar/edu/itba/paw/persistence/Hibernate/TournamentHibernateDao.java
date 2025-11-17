@@ -37,77 +37,94 @@ public class TournamentHibernateDao implements TournamentDao {
     }
 
     @Override
-    public List<Tournament> findTournaments(TournamentFilter tournamentFilter, long page) {
-        StringBuilder idJpql = new StringBuilder("SELECT DISTINCT t.id FROM Tournament t");
-        Map<String, Object> params = new HashMap<>();
+    public List<Tournament> findTournaments(TournamentFilter filter, long page) {
+        StringBuilder sql = new StringBuilder("SELECT DISTINCT t.* FROM tournament t");
+        Map<String, Object> params = new LinkedHashMap<>();
 
-        idJpql.append(buildTournamentFilterJpql(tournamentFilter, params));
+        // Decidir joins condicionales según filtros (mantenemos modularidad)
+        boolean joinGame = filter != null && filter.getGenre() != null;
+        boolean joinFormat = filter != null && filter.getPlayersPerTeam() != null;
 
-        TypedQuery<Long> idQuery = em.createQuery(idJpql.toString(), Long.class);
-        params.forEach(idQuery::setParameter);
+        if (joinGame) {
+            sql.append(" JOIN game g ON t.game_id = g.id");
+        }
+        if (joinFormat) {
+            sql.append(" JOIN game_format gf ON t.format_id = gf.id");
+        }
 
-        idQuery.setFirstResult((int) (page * PAGE_SIZE));
-        idQuery.setMaxResults(PAGE_SIZE);
+        // Construyo WHERE usando la función modular
+        String where = buildTournamentFilterSql(filter, params);
+        sql.append(where);
 
-        List<Long> tournamentIds = idQuery.getResultList();
+        sql.append(" ORDER BY t.start_date ASC");
 
-        if (tournamentIds.isEmpty()) return Collections.emptyList();
+        Query nativeQuery = em.createNativeQuery(sql.toString(), Tournament.class);
 
-        TypedQuery<Tournament> query = em.createQuery(
-                "SELECT DISTINCT t FROM Tournament t " +
-                        "WHERE t.id IN :ids " +
-                        "ORDER BY t.startDate ASC", Tournament.class
-        );
-        query.setParameter("ids", tournamentIds);
+        // Seteamos parámetros: convertir LocalDate a java.sql.Date por compatibilidad
+        for (Map.Entry<String, Object> e : params.entrySet()) {
+            Object value = e.getValue();
+            if (value instanceof LocalDate) {
+                nativeQuery.setParameter(e.getKey(), java.sql.Date.valueOf((LocalDate) value));
+            } else {
+                nativeQuery.setParameter(e.getKey(), value);
+            }
+        }
 
-        return query.getResultList();
+        nativeQuery.setFirstResult((int) (page * PAGE_SIZE));
+        nativeQuery.setMaxResults(PAGE_SIZE);
+
+        @SuppressWarnings("unchecked")
+        List<Tournament> result = nativeQuery.getResultList();
+        return result == null ? Collections.emptyList() : result;
     }
 
-    private String buildTournamentFilterJpql(TournamentFilter filter, Map<String, Object> params) {
-        StringBuilder jpql = new StringBuilder(" WHERE t.openInscriptions = true");
+    private String buildTournamentFilterSql(TournamentFilter filter, Map<String, Object> params) {
+        StringBuilder where = new StringBuilder(" WHERE t.open_inscriptions = true");
 
-        if (filter.getName() != null) {
-            jpql.append(" AND LOWER(t.name) LIKE LOWER(:name)");
+        if (filter == null) return where.toString();
+
+        if (filter.getName() != null && !filter.getName().isEmpty()) {
+            where.append(" AND LOWER(t.name) LIKE LOWER(:name)");
             params.put("name", "%" + filter.getName() + "%");
         }
         if (filter.getGameId() != null) {
-            jpql.append(" AND t.game.id = :gameId");
+            where.append(" AND t.game_id = :gameId");
             params.put("gameId", filter.getGameId());
         }
-        if (filter.getElo() != null) {
-            jpql.append(" AND t.elo = :elo");
-            params.put("elo", filter.getElo());
-        }
         if (filter.getRegion() != null) {
-            jpql.append(" AND t.region = :region");
-            params.put("region", filter.getRegion());
+            where.append(" AND t.region = CAST(:region AS region_enum)");
+            params.put("region", filter.getRegion().name());
         }
-        if (filter.getFormat() != null) {
-            jpql.append(" AND t.format = :formatId");
-            params.put("formatId", filter.getFormat());
+        if (filter.getElo() != null) {
+            where.append(" AND t.elo = CAST(:elo AS elo_enum)");
+            params.put("elo", filter.getElo().name());
+        }
+        if (filter.getFormat() != null && !filter.getFormat().isEmpty()) {
+            where.append(" AND t.format = :format");
+            params.put("format", filter.getFormat());
         }
         if (filter.getStructure() != null) {
-            jpql.append(" AND t.structure = :structure");
-            params.put("structure", filter.getStructure());
+            where.append(" AND t.structure = CAST(:structure AS structure_enum)");
+            params.put("structure", filter.getStructure().name());
         }
         if (filter.getStartDate() != null) {
-            jpql.append(" AND t.startDate <= :startDate");
+            where.append(" AND t.start_date >= :startDate");
             params.put("startDate", filter.getStartDate());
         }
         if (filter.getEndDate() != null) {
-            jpql.append(" AND t.endDate <= :endDate");
+            where.append(" AND t.end_date <= :endDate");
             params.put("endDate", filter.getEndDate());
         }
         if (filter.getPlayersPerTeam() != null) {
-            jpql.append(" AND t.formatEntity.playersPerTeam = :playersPerTeam");
+            where.append(" AND gf.players_per_team = :playersPerTeam");
             params.put("playersPerTeam", filter.getPlayersPerTeam());
         }
         if (filter.getGenre() != null) {
-            jpql.append(" AND t.game.genre = :genre");
-            params.put("genre", filter.getGenre());
+            where.append(" AND g.genre = CAST(:genre AS genre_enum)");
+            params.put("genre", filter.getGenre().name());
         }
 
-        return jpql.toString();
+        return where.toString();
     }
 
     @Override
@@ -232,22 +249,48 @@ public class TournamentHibernateDao implements TournamentDao {
 
     @Override
     public int getPageAmount(int pageSize, TournamentFilter tf) {
-        Map<String, Object> params = new HashMap<>();
-        StringBuilder jpql;
-        if (tf.isEmpty()){
-            jpql = new StringBuilder("SELECT COUNT(DISTINCT t.game.id) FROM Tournament t");
-        }else {
-            jpql = new StringBuilder("SELECT COUNT(DISTINCT t.id) FROM Tournament t");
+        if (pageSize <= 0) {
+            throw new IllegalArgumentException("pageSize must be > 0");
         }
-        jpql.append(buildTournamentFilterJpql(tf, params));
 
-        TypedQuery<Long> countQuery = em.createQuery(jpql.toString(), Long.class);
-        params.forEach(countQuery::setParameter);
+        Map<String, Object> params = new LinkedHashMap<>();
+        StringBuilder sql = new StringBuilder();
 
-        long count = countQuery.getSingleResult().longValue();
+        boolean joinGame = tf != null && tf.getGenre() != null;
+        boolean joinFormat = tf != null && tf.getPlayersPerTeam() != null;
 
+        if (tf == null || tf.isEmpty()) {
+            sql.append("SELECT COUNT(DISTINCT t.game_id) FROM tournament t");
+        } else {
+            sql.append("SELECT COUNT(DISTINCT t.id) FROM tournament t");
+        }
+        if (joinGame) {
+            sql.append(" JOIN game g ON t.game_id = g.id");
+        }
+        if (joinFormat) {
+            sql.append(" JOIN game_format gf ON t.format_id = gf.id");
+        }
+        String where = buildTournamentFilterSql(tf, params);
+        sql.append(where);
+
+        Query nativeQuery = em.createNativeQuery(sql.toString());
+
+        for (Map.Entry<String, Object> e : params.entrySet()) {
+            Object value = e.getValue();
+            if (value instanceof LocalDate) {
+                nativeQuery.setParameter(e.getKey(), java.sql.Date.valueOf((LocalDate) value));
+            } else {
+                nativeQuery.setParameter(e.getKey(), value);
+            }
+        }
+
+        Number countNumber = (Number) nativeQuery.getSingleResult();
+        long count = countNumber == null ? 0L : countNumber.longValue();
+
+        if (count == 0) return 0;
         return (int) Math.ceil((double) count / pageSize);
     }
+
 
     @Override
     public void updateTournamentInfo(long tournamentId, String name, LocalDate startDate, LocalDate endDate, Integer maxParticipants, String serverName, String serverPassword, String discordChannel) {
