@@ -97,7 +97,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/tournamentsPage", method = RequestMethod.GET)
-    public ModelAndView tournamentsPage(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @ModelAttribute("filterForm") FilterForm filterForm, TournamentFilter tf,  @RequestParam(defaultValue = "0") Long page) {
+    public ModelAndView tournamentsPage(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @ModelAttribute("filterForm") FilterForm filterForm, @ModelAttribute("tf") TournamentFilter tf,  @RequestParam(defaultValue = "0") Long page) {
         final ModelAndView mav = new ModelAndView("tournamentsPage");
         List<Game> allGames = gs.findAll();
 
@@ -127,6 +127,8 @@ public class UserController {
         tf.setElo(filterForm.getElo());
         tf.setPlayersPerTeam(filterForm.getPlayersPerTeam());
         tf.setGenre(filterForm.getGenre());
+        tf.setStartDate(filterForm.getStartDate());
+        tf.setEndDate(filterForm.getEndDate());
 
         boolean isFiltered = !tf.isEmpty();
 

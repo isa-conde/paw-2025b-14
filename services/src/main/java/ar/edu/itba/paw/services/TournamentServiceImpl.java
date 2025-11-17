@@ -13,6 +13,7 @@ import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
+import org.hibernate.Hibernate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -513,5 +514,14 @@ public class TournamentServiceImpl implements TournamentService {
     public int countUserTournaments(Long userId, Boolean isFinished, Boolean isCreator, Boolean won) {
         return tournamentDao.countUserTournaments(userId, isFinished, isCreator, won);
     }
+
+    @Transactional
+    @Override
+    public GameFormat getFormat(long tournamentId){
+        Tournament t = findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
+        Hibernate.initialize(t.getFormatEntity());
+        return t.getFormatEntity();
+    }
+
 
 }

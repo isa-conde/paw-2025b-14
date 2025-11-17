@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.interfaces.services;
 
 import ar.edu.itba.paw.model.Game.Game;
+import ar.edu.itba.paw.model.Game.GameFormat;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
@@ -52,6 +53,8 @@ public interface TournamentService {
     List<Tournament> findUserTournaments(Long userId, Boolean isFinished, Boolean isCreator, Boolean won, Long page);
 
     int countUserTournaments(Long userId, Boolean isFinished, Boolean isCreator, Boolean won);
+
+    GameFormat getFormat(long tournamentId);
 
 }
 

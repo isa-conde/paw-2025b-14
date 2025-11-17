@@ -92,7 +92,7 @@ public class TournamentHibernateDao implements TournamentDao {
             params.put("structure", filter.getStructure());
         }
         if (filter.getStartDate() != null) {
-            jpql.append(" AND t.startDate <= :startDate");
+            jpql.append(" AND t.startDate >= :startDate");
             params.put("startDate", filter.getStartDate());
         }
         if (filter.getEndDate() != null) {

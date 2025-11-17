@@ -24,15 +24,21 @@
             <paw:button onclick="${createTeamFunction}" text="tournaments.team.butText" size="l"/>
         </div>
       <form:form cssClass="form" modelAttribute="filterForm" method="get">
-        <div class="filter-container">
-          <paw:input path="gameId" label="tournaments.game" inputType="select" items="${games}" itemValue="id" itemLabel="name" emptyOption="${allGames}" inline="true"/>
-          <paw:input path="region" label="tournaments.region" inputType="select" items="${regions}" emptyOption="${allRegions}" inline="true"/>
-          <paw:input path="elo" label="tournaments.skillLevel" inputType="select" itemMap="${elos}" emptyOption="${allLevels}" inline="true"/>
-          <paw:input path="genre" label="tournaments.genre" inputType="select" items="${genres}" emptyOption="${allGenres}" inline="true"/>
-          <paw:input path="playersPerTeam" label="tournaments.playerAmount" inputType="select" items="${teamSizes}" emptyOption="${allSizes}" inline="true"/>
-          <paw:input path="" label="tournaments.filter" inputType="submit" inline="true"/>
-          <paw:refresh-button disabled="${!isFiltered}"/>
-        </div>
+          <div class="filter-container">
+              <div class="filter-container">
+                  <paw:input path="gameId" label="tournaments.game" inputType="select" items="${games}" itemValue="id" itemLabel="name" emptyOption="${allGames}" inline="true"/>
+                  <paw:input path="region" label="tournaments.region" inputType="select" items="${regions}" emptyOption="${allRegions}" inline="true"/>
+                  <paw:input path="elo" label="tournaments.skillLevel" inputType="select" itemMap="${elos}" emptyOption="${allLevels}" inline="true"/>
+                  <paw:input path="genre" label="tournaments.genre" inputType="select" items="${genres}" emptyOption="${allGenres}" inline="true"/>
+              </div>
+              <div class="filter-container">
+                  <paw:input path="playersPerTeam" label="tournaments.playerAmount" inputType="select" items="${teamSizes}" emptyOption="${allSizes}" inline="true"/>
+                  <paw:input path="startDate" label="createTournament.startDate"  inputType="date" inline="true"/>
+                  <paw:input path="endDate" label="createTournament.endDate" inputType="date" inline="true"/>
+                  <paw:input path="" label="tournaments.filter" inputType="submit" inline="true"/>
+                  <paw:refresh-button disabled="${!isFiltered}"/>
+              </div>
+          </div>
       </form:form>
 
       <c:if test="${isFiltered}">
