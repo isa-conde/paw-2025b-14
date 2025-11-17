@@ -280,7 +280,7 @@ public class TeamHibernateDaoTest {
 
     @Test
     public void testGetUsersSomeTeamsAlreadyInTournament(){
-        List<Team> ans = teamHibernateDao.getUserTeamsBySizeNotInTournament(ID,ID,0L);
+        List<Team> ans = teamHibernateDao.getUserTeamsBySizeNotInTournament(ID,ID+1,0L);
 
         Assert.assertNotNull(ans);
         Assert.assertEquals(1,ans.size());

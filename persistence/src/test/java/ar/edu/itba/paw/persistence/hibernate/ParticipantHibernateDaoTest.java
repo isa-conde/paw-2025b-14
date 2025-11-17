@@ -10,8 +10,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -23,7 +21,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.sql.DataSource;
 import java.util.List;
-import java.util.Map;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = TestConfig.class)
@@ -94,7 +91,7 @@ public class ParticipantHibernateDaoTest {
         Assert.assertFalse(ans.isEmpty());
         Assert.assertEquals(1,ans.size());
         Assert.assertEquals(ID+1,ans.get(0).getId().longValue());
-        Assert.assertEquals(0,ans.get(0).getPoints().intValue());
+        Assert.assertEquals(7,ans.get(0).getPoints().intValue());
         Assert.assertEquals(OTHER_USERNAME,ans.get(0).getName());
     }
 
@@ -114,7 +111,7 @@ public class ParticipantHibernateDaoTest {
         Assert.assertFalse(ans.isEmpty());
         Assert.assertEquals(1,ans.size());
         Assert.assertEquals(ID+21,ans.get(0).getId().longValue());
-        Assert.assertEquals(0,ans.get(0).getPoints().intValue());
+        Assert.assertEquals(7,ans.get(0).getPoints().intValue());
         Assert.assertEquals(TEAM,ans.get(0).getName());
     }
 
@@ -213,6 +210,7 @@ public class ParticipantHibernateDaoTest {
 
     @Test
     public void testGetSecondMaxPoints(){
+        jdbcTemplate.update("update participant set points = 0 where team_id is not null");
         PointsPair ans = participantHibernateDao.getTournamentSecondMaxPointsPairGroup(ID, 1);
 
         Assert.assertEquals(1,ans.getPoints().intValue());

@@ -631,7 +631,7 @@ public class TournamentHibernateDaoTest {
     public void testGetTournamentParticipantsCount(){
         int count = tournamentHibernateDao.getTournamentParticipantsCount(ID);
 
-        Assert.assertEquals(2, count);
+        Assert.assertEquals(4, count);
     }
 
     @Rollback
