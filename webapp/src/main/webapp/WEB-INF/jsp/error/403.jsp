@@ -6,8 +6,8 @@
 <c:url value="/verify?userId=${user.id}" var="resendVerificationUrl"/>
 <c:url value="/" var="homeUrl"/>
 
-
-<paw:form-layout pageTitle="error403Page.pageTitle">
+<spring:message code="error403Page.pageTitle" var="pageTitle"/>
+<paw:form-layout pageTitle="${pageTitle}">
     <paw:text type="title"><spring:message code="error403Page.pageTitle"/></paw:text>
     <c:choose>
         <c:when test="${!user.verified}">

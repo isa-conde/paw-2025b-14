@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS tournament(
     is_finished BOOLEAN ,
     tournament_winner integer,
     is_group_stage boolean,
-    tournament_started boolean,
+    tournament_started boolean default false not null,
     format_id integer,
     rating float,
     rules_id integer,
@@ -92,7 +92,7 @@ create table if not exists participant(
     points integer default 0 not null ,
     score_difference integer,
     group_number integer,
-    has_rated boolean,
+    has_rated boolean default false not null,
     constraint participant_user_or_team_chk check (
         user_id is not null or team_id is not null
 ));

@@ -39,7 +39,7 @@ public class NoTieOnEliminationValidator implements ConstraintValidator<NoTieOnE
         Structure structure = tournament.getStructure();
         Boolean isGroupStage = tournamentDao.getIsGroupStage(tournamentId);
         if(isGroupStage == null && !structure.equals(Structure.LEAGUE)) {
-            throw new StageIsNotSetException();
+            return true;
         }
         if (structure.equals(Structure.ELIMINATION) || (structure.equals(Structure.HYBRID) && isGroupStage.equals(Boolean.TRUE))) {
             boolean tie = local.equals(visitor);
