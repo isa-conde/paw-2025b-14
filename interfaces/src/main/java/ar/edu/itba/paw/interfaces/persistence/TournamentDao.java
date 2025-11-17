@@ -21,19 +21,13 @@ public interface TournamentDao {
                       String format, Structure structure, Integer maxParticipants, Long imageId, Boolean openInscriptions, Boolean isFinished,
                       Long formatId, Long rulesId, String serverName, String serverPassword, String discordChannel);
 
-    Structure getTournamentStructure(Long tournamentId);
-
-    List<Tournament> findByCreator(Long creatorId, Long page, Boolean isFinished);
-
     void setFinished(Long tournamentId);
-
-    List<Tournament> findUserActiveTournaments(Long userId, Long page);
-
-    List<Tournament> findUserPastTournaments(Long userId, Long page);
 
     void closeInscriptions(Long tournamentId);
 
-    List<Tournament> searchByName(String name);
+    List<Tournament> searchByName(String name, Long page);
+
+    int countSearchByName(String name);
 
     void startTournament(Long tournamentId);
 
@@ -51,25 +45,13 @@ public interface TournamentDao {
 
     void setTournamentWinner(Long tournamentId, Long winnerId);
 
-    Boolean isTournamentStarted(Long tournamentId);
-
     void updateAllStartDates();
 
     void updateAllEndDates();
 
-    boolean isClosed(Long tournamentId);
-
-    Integer getUserPastTournamentsPages(Long userId);
-
-    Integer getUserActiveTournamentsPages(Long userId);
-
-    Integer getCreatedAndOngoingTournamentsPages(Long userId);
-
-    Integer getCreatedAndFinishedTournamentsPages(Long userId);
-
     void updateTournamentRating(Long tournamentId, Float userRating);
 
-    List <Tournament> getUserWonTournament(Long userId, Long page);
+    List<Tournament> findUserTournaments(Long userId, Boolean isFinished, Boolean isCreator, Boolean won, Long page);
 
-    Integer getUserWonTournamentPages(Long userId);
+    int countUserTournaments(Long userId, Boolean isFinished, Boolean isCreator, Boolean won);
 }

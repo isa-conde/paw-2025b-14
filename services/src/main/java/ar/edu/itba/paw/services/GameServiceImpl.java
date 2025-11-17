@@ -21,12 +21,10 @@ public class GameServiceImpl implements GameService {
 
     private final GameDao gameDao;
     private final GameFormatDao gameFormatDao;
-    private final ImageDao imageDao;
 
-    public GameServiceImpl(final GameDao gameDao, final GameFormatDao gameFormatDao, final ImageDao imageDao){
+    public GameServiceImpl(final GameDao gameDao, final GameFormatDao gameFormatDao){
         this.gameDao = gameDao;
         this.gameFormatDao = gameFormatDao;
-        this.imageDao = imageDao;
     }
 
     @Override
@@ -35,13 +33,13 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public List<Game> searchByName(String name) {
-        return gameDao.searchByName(name);
+    public List<Game> searchByName(String name, Long page) {
+        return gameDao.searchByName(name, page);
     }
 
     @Override
-    public List<Game> searchByGenre(Genre genre) {
-        return gameDao.searchByGenre(genre);
+    public int countSearchByNameGame(String name) {
+        return gameDao.countSearchByNameGame(name);
     }
 
     @Override
@@ -56,19 +54,6 @@ public class GameServiceImpl implements GameService {
             throw new NameAlreadyUsedException(name);
         }
         return gameDao.create(name, genre, imageId);
-    }
-
-    @Transactional
-    @Override
-    public Game createWithFormats(String name, Genre genre, List<GameFormat> formats, byte[] image) {
-        if(gameDao.checkNameExists(name)){
-            throw new NameAlreadyUsedException(name);
-        }
-        Long imageId = imageDao.insertImage(image);
-        for (GameFormat f : formats){
-            gameFormatDao.insertFormat(f);
-        }
-        return gameDao.create(name, genre, imageId.intValue());
     }
 
     @Override
@@ -90,10 +75,5 @@ public class GameServiceImpl implements GameService {
     @Override
     public Long getPageAmount(){
         return gameDao.getPageAmount();
-    }
-
-    @Override
-    public GameFormat findFormatById(Long id) {
-        return gameFormatDao.findById(id).orElseThrow(GameFormatNotFoundException::new);
     }
 }

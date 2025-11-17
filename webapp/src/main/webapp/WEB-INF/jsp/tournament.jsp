@@ -16,7 +16,6 @@
 <c:set var="cornerModal" value="${null}"/>
 <c:set var="cornerIcon" value="${null}"/>
 <c:set var="cornerText" value="${null}"/>
-<c:set var="playersPerTeam" value="${empty format.playersPerTeam ? 1 : format.playersPerTeam}"/>
 
 <c:choose>
     <c:when test="${isCreator && !tournament.finished}">
@@ -89,11 +88,10 @@
             <c:when test="${activeSection == 'overview'}">
                 <div class="icon-card-container">
                     <c:set var="countText" value="${tournament.openInscriptions ? tournament.maxParticipants : participantCount}"/>
-                    <c:set var="teamSizeNorm" value="${empty format or empty format.playersPerTeam ? 1 : format.playersPerTeam}"/>
 
                     <spring:message code="tournament.participants" var="teams">
                         <spring:argument value="${countText}"/>
-                        <spring:argument value="${teamSizeNorm}"/>
+                        <spring:argument value="${teamSize}"/>
                     </spring:message>
                     <c:if test="${tournament.openInscriptions}">
                         <c:set var="subtext" value="${participantCount} / "/>
@@ -460,7 +458,7 @@
         <c:choose>
             <c:when test="${userTeams.size() <= 0}">
                 <div class="row center">
-                    <paw:text size="l"><spring:message code="tournament.join.noTeams" arguments="${format.playersPerTeam}"/></paw:text>
+                    <paw:text size="l"><spring:message code="tournament.join.noTeams" arguments="${teamSize}"/></paw:text>
                 </div>
                 <div class="row center">
                     <paw:button onclick="window.location.href='${pageContext.request.contextPath}/team/create'; return false;" text="team.create.pageTitle"/>
@@ -481,14 +479,14 @@
     </form:form>
 </paw:modal>
 <paw:modal title="tournament.join.chooseMembers" id="chooseTeamMembersModal" returnUrl="${tournamentUrl}">
-    <form:form method="post" modelAttribute="joinTeamForm" action="${pageContext.request.contextPath}/tournament/join/step2" cssClass="form" data-required-members="${format.playersPerTeam}">
+    <form:form method="post" modelAttribute="joinTeamForm" action="${pageContext.request.contextPath}/tournament/join/step2" cssClass="form" data-required-members="${teamSize}">
         <form:hidden path="tournamentId" value="${tournament.id}"/>
         <form:hidden path="teamId" value="${selectedTeamId}"/>
-        <c:if test="${teamMembers.size() > format.playersPerTeam}">
-            <paw:text size="l"><spring:message code="tournament.join.requiredSize" arguments="${format.playersPerTeam}"/></paw:text>
+        <c:if test="${teamMembers.size() > teamSize}">
+            <paw:text size="l"><spring:message code="tournament.join.requiredSize" arguments="${teamSize}"/></paw:text>
         </c:if>
         <div class="teams-list-container">
-            <paw:member-list members="${teamMembers}" requiredSize="${format.playersPerTeam}"/>
+            <paw:member-list members="${teamMembers}" requiredSize="${teamSize}"/>
         </div>
         <div class="join-team-error">
             <form:errors path="members" cssClass="form-error" element="h1"/>

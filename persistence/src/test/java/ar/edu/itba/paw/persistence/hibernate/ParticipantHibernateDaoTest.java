@@ -32,12 +32,8 @@ public class ParticipantHibernateDaoTest {
     private EntityManager em;
     
     private static final Long ID = 100L;
-    private static final String USERNAME = "johndoe";
     private static final String OTHER_USERNAME = "janedoe";
     private static final String TEAM = "Grupo 14";
-    private static final String OTHER_EMAIL = "another@mail.com";
-    private static final String EMAIL = "some@mail.com";
-    private static final String PASSWORD = "1234567890";
     
     @Autowired
     private DataSource ds;
@@ -370,38 +366,6 @@ public class ParticipantHibernateDaoTest {
     @Test
     public void testLeaveNoTeam(){
         participantHibernateDao.leaveTournamentTeam(ID+2,ID);
-
-        Assert.assertEquals(44,JdbcTestUtils.countRowsInTable(jdbcTemplate,"participant"));
-    }
-
-    @Test
-    public void testRemoveTeam(){
-        participantHibernateDao.removeTournamentParticipantTeam(ID,ID+20);
-
-        Assert.assertEquals(43,JdbcTestUtils.countRowsInTable(jdbcTemplate,"participant"));
-        Assert.assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
-                "tournament_id = team_id and team_id = " + ID));
-    }
-
-    @Test
-    public void testRemoveNoTeam(){
-        participantHibernateDao.removeTournamentParticipantTeam(ID, 0L);
-
-        Assert.assertEquals(44,JdbcTestUtils.countRowsInTable(jdbcTemplate,"participant"));
-    }
-
-    @Test
-    public void testRemoveUser(){
-        participantHibernateDao.removeTournamentParticipantUser(ID,ID);
-
-        Assert.assertEquals(43,JdbcTestUtils.countRowsInTable(jdbcTemplate,"participant"));
-        Assert.assertEquals(0,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"participant",
-                "tournament_id = team_id and user_id = " + ID));
-    }
-
-    @Test
-    public void testRemoveNoUser(){
-        participantHibernateDao.removeTournamentParticipantUser(ID, 0L);
 
         Assert.assertEquals(44,JdbcTestUtils.countRowsInTable(jdbcTemplate,"participant"));
     }

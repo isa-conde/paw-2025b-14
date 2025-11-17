@@ -32,12 +32,6 @@ public class GameServiceImplTest {
     @Mock
     private GameDao mockDao;
 
-    @Mock
-    private ImageDao imageDao;
-
-    @Mock
-    private GameFormatDao gameFormatDao;
-
     @InjectMocks
     private GameServiceImpl gameService;
 
@@ -60,12 +54,5 @@ public class GameServiceImplTest {
         Mockito.when(mockDao.checkNameExists(NAME)).thenReturn(true);
 
         gameService.create(NAME,GENRE,1);
-    }
-
-    @Test(expected = GameFormatNotFoundException.class)
-    public void testFormatNotFound(){
-        Mockito.when(gameFormatDao.findById(ID)).thenReturn(Optional.empty());
-
-        gameService.findFormatById(ID);
     }
 }

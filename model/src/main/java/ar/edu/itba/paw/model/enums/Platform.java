@@ -10,5 +10,10 @@ public enum Platform {
     NINTENDO,
     BATTLE_NET,
     UBISOFT_CONNECT,
-    ROCKSTAR
+    ROCKSTAR;
+
+    public String getLabel() {
+        String normal = this.name().toLowerCase().replace("_", " ");
+        return normal.substring(0, 1).toUpperCase() + normal.substring(1);
+    }
 }

@@ -28,16 +28,14 @@ public class ParticipantServiceImpl implements ParticipantService {
     private final UserDao userDao;
     private final TeamDao teamDao;
     private final MailService ms;
-    private final GameFormatDao gameFormatDao;
 
-    public ParticipantServiceImpl(ParticipantDao participantDao, TournamentDao tournamentDao, TournamentService ts, GameFormatDao gameFormatDao, UserDao userDao, TeamDao teamDao, MailService ms){
+    public ParticipantServiceImpl(ParticipantDao participantDao, TournamentDao tournamentDao, TournamentService ts, UserDao userDao, TeamDao teamDao, MailService ms){
         this.participantDao = participantDao;
         this.tournamentDao = tournamentDao;
         this.ts = ts;
         this.userDao = userDao;
         this.teamDao = teamDao;
         this.ms = ms;
-        this.gameFormatDao = gameFormatDao;
     }
 
     @Transactional
@@ -94,13 +92,18 @@ public class ParticipantServiceImpl implements ParticipantService {
     @Transactional
     @Override
     public void leaveTournament(Long userId, Long tournamentId) {
-        Integer playersPerTeam = ts.getPlayersPerTeam(tournamentId);
-        if(playersPerTeam != null){
-            if(playersPerTeam > 1){
-                participantDao.leaveTournamentTeam(userId, tournamentId);
-            }else{
-                participantDao.leaveTournamentUser(userId, tournamentId);
-            }
+        Tournament tournament = ts.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
+        GameFormat format = tournament.getFormatEntity();
+        int teamSize;
+        if(format == null) {
+            teamSize = 1;
+        }else{
+            teamSize = format.getPlayersPerTeam();
+        }
+        if(teamSize > 1){
+            participantDao.leaveTournamentTeam(userId, tournamentId);
+        }else{
+            participantDao.leaveTournamentUser(userId, tournamentId);
         }
         LOGGER.info("User with ID {} has successfully left tournament with ID {}", userId, tournamentId);
     }
@@ -108,11 +111,17 @@ public class ParticipantServiceImpl implements ParticipantService {
     @Transactional
     @Override
     public void swapGroups(Long tournamentId, Long user1, Long user2){
-        if (tournamentDao.isTournamentStarted(tournamentId)) {
-            throw new IllegalStateException("Members cannot be swapped after the tournament has started"); // TODO: custom handling
-        }
         Tournament tournament = tournamentDao.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
-        Integer teamSize = gameFormatDao.findById(tournament.getFormatId()).orElseThrow(GameFormatNotFoundException::new).getPlayersPerTeam();
+        if (tournament.getTournamentStarted()) {
+            throw new IllegalStateException("Members cannot be swapped after the tournament has started");
+        }
+        GameFormat format = tournament.getFormatEntity();
+        int teamSize;
+        if(format == null) {
+            teamSize = 1;
+        }else{
+            teamSize = format.getPlayersPerTeam();
+        }
 
         Integer g1 = participantDao.getGroupNumber(tournamentId, user1, teamSize);
         Integer g2 = participantDao.getGroupNumber(tournamentId, user2, teamSize);
@@ -139,7 +148,14 @@ public class ParticipantServiceImpl implements ParticipantService {
                 throw new UserAlreadyJoinedException();
             }
         }
-        List<Participant> currentParticipants = getTournamentParticipants(tournamentId, ts.getPlayersPerTeam(tournamentId));
+        GameFormat format = tournament.getFormatEntity();
+        int teamSize;
+        if(format == null) {
+            teamSize = 1;
+        }else{
+            teamSize = format.getPlayersPerTeam();
+        }
+        List<Participant> currentParticipants = getTournamentParticipants(tournamentId, teamSize);
         for(Long p : participants){
             participantDao.joinTournamentUserWithTeam(p, tournamentId, teamId);
             User user = userDao.findById(p).orElseThrow(UserNotFoundException::new);

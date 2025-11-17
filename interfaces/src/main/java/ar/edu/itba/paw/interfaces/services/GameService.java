@@ -11,15 +11,13 @@ public interface GameService {
 
     Optional<Game> findById(long id);
 
-    List<Game> searchByName(String name);
+    List<Game> searchByName(String name, Long page);
 
-    List<Game> searchByGenre(Genre genre);
+    int countSearchByNameGame(String name);
 
     List<Game> findAll();
 
     Game create(String name, Genre genre, Integer imageId);
-
-    Game createWithFormats(String name, Genre genre, List<GameFormat> formats, byte[] image);
 
     List<GameFormat> getFormats(Long gameId);
 
@@ -28,6 +26,4 @@ public interface GameService {
     List<Game> findAllPaged(Long page);
 
     Long getPageAmount();
-
-    GameFormat findFormatById(Long id);
 }
