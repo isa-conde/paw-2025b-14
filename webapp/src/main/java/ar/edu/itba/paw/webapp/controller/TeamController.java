@@ -38,7 +38,6 @@ public class TeamController {
             User user = currentUser.get().getPawUser();
             mav.addObject("user", user);
         }
-        mav.addObject("allUsers", us.findAll());
         return mav;
     }
 

@@ -29,7 +29,7 @@ public interface MatchDao {
 
     List<Long> getStageMatchIds(int stage, long tournamentId);
 
-    Integer getTournamentMaxStage(long tournamentId);
+    int getTournamentMaxStage(long tournamentId);
 
-    Integer getTournamentGroupMaxStage(Long tournamentId, Integer groupNumber);
+    int getTournamentGroupMaxStage(long tournamentId, int groupNumber);
 }

@@ -55,7 +55,7 @@ public class MailServiceImpl implements MailService {
     private static final String CROWN_CID = "crown";
     private static final String CROWN_CLASSPATH = "images/crown.png";
     private static final String DISCORD_CID = "discord";
-    private static final String DISCORD_CLASSPATH = "images/crown.png";
+    private static final String DISCORD_CLASSPATH = "images/discord.png";
 
     @Async
     @Override

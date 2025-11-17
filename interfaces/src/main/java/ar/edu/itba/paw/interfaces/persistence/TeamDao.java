@@ -25,7 +25,9 @@ public interface TeamDao {
 
     boolean teamNameTaken(String name);
 
-    List<Team> searchByName(String name);
+    List<Team> searchByName(String name, long page);
 
     List<Team> getUserTeamsBySizeNotInTournament(long userId, long tournamentId, long minSize);
+
+    int countSearchByNameTeam(String name);
 }

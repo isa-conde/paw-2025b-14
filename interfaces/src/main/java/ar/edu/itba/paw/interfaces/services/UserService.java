@@ -36,17 +36,13 @@ public interface UserService {
 
     boolean verifyEmail(long token, long userId);
 
-    void authenticateVerifiedUser(long userId);
-
     void updateProfileInfo(long userId, String username, String bio, byte[] pfp, byte[] banner);
 
-    List<User> searchByName(String name);
+    List<User> searchByName(String name, Long page);
 
-    void updateUserLocale(Locale locale, long userId);
+    List<User> findAllByName(String name);
 
-    void updateUserRating(long userId, float rating);
-
-    List<User> findAll();
+    int countSearchByNameUser(String name);
 
     Float getUserRating(long userId);
 

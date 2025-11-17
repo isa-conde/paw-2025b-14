@@ -23,10 +23,6 @@ public interface ParticipantDao {
 
     void leaveTournamentTeam(long teamId, long tournamentId);
 
-    void removeTournamentParticipantUser(Long tournamentId, Long participantId);
-
-    void removeTournamentParticipantTeam(Long tournamentId, Long participantId);
-
     void updateGroupNumberForUsers(long tournamentId, int groupNumber, List<Long> userIds, int teamSize);
 
     void swapGroups(long tournamentId, long user1, long user2, int group1, int group2, int teamSize);
@@ -43,7 +39,7 @@ public interface ParticipantDao {
 
     Integer getGroupNumber(long tournamentId, long userId, int teamSize);
 
-    void sumPoints(long tournamentId, Long userId, int points, int scoreDifference, int teamSize);
+    void sumPoints(long tournamentId, long userId, int points, int scoreDifference, int teamSize);
 
     List<Participant> getTournamentParticipantTeams(long tournamentId);
 

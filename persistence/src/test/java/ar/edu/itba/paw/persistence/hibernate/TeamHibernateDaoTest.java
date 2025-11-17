@@ -216,7 +216,7 @@ public class TeamHibernateDaoTest {
 
     @Test
     public void testSearchByName(){
-        List<Team> foundTeams = teamHibernateDao.searchByName("14");
+        List<Team> foundTeams = teamHibernateDao.searchByName("14", 0L);
 
         Assert.assertNotNull(foundTeams);
         Assert.assertFalse(foundTeams.isEmpty());
@@ -232,7 +232,7 @@ public class TeamHibernateDaoTest {
 
     @Test
     public void testSearchByNameNoOne(){
-        List<Team> foundTeams = teamHibernateDao.searchByName("nada");
+        List<Team> foundTeams = teamHibernateDao.searchByName("nada", 0L);
 
         Assert.assertNotNull(foundTeams);
         Assert.assertTrue(foundTeams.isEmpty());

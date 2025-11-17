@@ -6,6 +6,7 @@ import ar.edu.itba.paw.interfaces.exception.UserNotFoundException;
 import ar.edu.itba.paw.interfaces.persistence.*;
 import ar.edu.itba.paw.interfaces.services.TeamService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
+import ar.edu.itba.paw.model.Game.GameFormat;
 import ar.edu.itba.paw.model.Team;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.User;
@@ -125,11 +126,6 @@ public class TeamServiceImpl implements TeamService {
         teamDao.updateTeam(teamId, name, pfpId, bannerId);
     }
 
-    @Override
-    public boolean isMember(long teamId, long userId) {
-        return teamMemberDao.isMember(teamId, userId);
-    }
-
     @Transactional
     @Override
     public List<User> getTeamMembers(Long teamId) {
@@ -146,12 +142,25 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public List<Team> getUserTeamsBySizeNotInTournament(long userId, long tournamentId) {
-        return teamDao.getUserTeamsBySizeNotInTournament(userId, tournamentId, ts.getPlayersPerTeam(tournamentId));
+        Tournament tournament = ts.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
+        GameFormat format = tournament.getFormatEntity();
+        long teamSize;
+        if(format == null) {
+            teamSize = 1;
+        }else{
+            teamSize = format.getPlayersPerTeam();
+        }
+        return teamDao.getUserTeamsBySizeNotInTournament(userId, tournamentId, teamSize);
     }
 
     @Override
-    public List<Team> searchByName(String name) {
-        return teamDao.searchByName(name);
+    public int countSearchByNameTeam(String name) {
+        return teamDao.countSearchByNameTeam(name);
+    }
+
+    @Override
+    public List<Team> searchByName(String name, long page) {
+        return teamDao.searchByName(name, page);
     }
 
     private List<Tournament> getTournamentsFromIds(List<Long> tournamentIds) {

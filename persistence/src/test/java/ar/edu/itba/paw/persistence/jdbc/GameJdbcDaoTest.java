@@ -297,16 +297,4 @@
 //            Assert.assertEquals(USED_IDS.get(i), favourites.get(i).getId());
 //        }
 //    }
-//
-//    @Test
-//    public void testGetPlayersPerTeam(){
-//        SimpleJdbcInsert formatJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
-//                .usingGeneratedKeyColumns("id")
-//                .withTableName("game_format");
-//        Long id = formatJdbcInsert.executeAndReturnKey(Map.of("name", NAME, "players_per_team", 1, "game_id", 1)).longValue();
-//        Integer ans = gameJdbcDao.getPlayersPerTeam(id);
-//
-//        Assert.assertNotNull(ans);
-//        Assert.assertEquals(1,ans.intValue());
-//    }
 //}

@@ -1,12 +1,10 @@
 package ar.edu.itba.paw.services;
 
-import ar.edu.itba.paw.interfaces.exception.GameFormatNotFoundException;
 import ar.edu.itba.paw.interfaces.exception.GameNotFoundException;
 import ar.edu.itba.paw.interfaces.exception.ImageNotFoundException;
 import ar.edu.itba.paw.interfaces.exception.NameAlreadyUsedException;
 import ar.edu.itba.paw.interfaces.persistence.GameDao;
 import ar.edu.itba.paw.interfaces.persistence.GameFormatDao;
-import ar.edu.itba.paw.interfaces.persistence.ImageDao;
 import ar.edu.itba.paw.interfaces.services.GameService;
 import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.Game.GameFormat;
@@ -23,12 +21,10 @@ public class GameServiceImpl implements GameService {
 
     private final GameDao gameDao;
     private final GameFormatDao gameFormatDao;
-    private final ImageDao imageDao;
 
-    public GameServiceImpl(final GameDao gameDao, final GameFormatDao gameFormatDao, final ImageDao imageDao){
+    public GameServiceImpl(final GameDao gameDao, final GameFormatDao gameFormatDao){
         this.gameDao = gameDao;
         this.gameFormatDao = gameFormatDao;
-        this.imageDao = imageDao;
     }
 
     @Override
@@ -37,13 +33,13 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public List<Game> searchByName(String name) {
-        return gameDao.searchByName(name);
+    public List<Game> searchByName(String name, long page) {
+        return gameDao.searchByName(name, page);
     }
 
     @Override
-    public List<Game> searchByGenre(Genre genre) {
-        return gameDao.searchByGenre(genre);
+    public int countSearchByNameGame(String name) {
+        return gameDao.countSearchByNameGame(name);
     }
 
     @Override
@@ -63,19 +59,6 @@ public class GameServiceImpl implements GameService {
         return gameDao.create(name, genre, imageId);
     }
 
-    @Transactional
-    @Override
-    public Game createWithFormats(String name, Genre genre, List<GameFormat> formats, byte[] image) {
-        Long imageId = imageDao.insertImage(image);
-        if(imageId == null) {
-            throw new ImageNotFoundException();
-        }
-        for (GameFormat f : formats){
-            gameFormatDao.insertFormat(f);
-        }
-        return gameDao.create(name, genre, imageId.intValue());
-    }
-
     @Override
     public List<GameFormat> getFormats(Long gameId) {
         if(gameId == null) {
@@ -83,7 +66,6 @@ public class GameServiceImpl implements GameService {
         }
         return gameFormatDao.getFormats(gameId);
     }
-
 
     @Transactional
     @Override
@@ -99,13 +81,5 @@ public class GameServiceImpl implements GameService {
     @Override
     public long getPageAmount(){
         return gameDao.getPageAmount();
-    }
-
-    @Override
-    public GameFormat findFormatById(Long id) {
-        if(id == null) {
-            throw new GameFormatNotFoundException();
-        }
-        return gameFormatDao.findById(id).orElseThrow(GameFormatNotFoundException::new);
     }
 }

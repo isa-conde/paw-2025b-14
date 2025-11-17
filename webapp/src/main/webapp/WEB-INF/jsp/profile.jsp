@@ -210,7 +210,7 @@
                enctype="multipart/form-data" cssClass="form">
         <input type="hidden" value="${profile.id}" name="userId">
         <div class="add-account-modal">
-            <paw:input path="platform" inputType="select" label="profile.modal.platform" items="${availablePlatforms}"/>
+            <paw:input path="platform" inputType="select" label="profile.modal.platform" items="${availablePlatforms}" itemValue="name" itemLabel="label"/>
             <paw:input path="username" label="profile.modal.username" hasConstraint="true"/>
         </div>
         <paw:input path="" inputType="submit" label="profile.modal.addusername"/>

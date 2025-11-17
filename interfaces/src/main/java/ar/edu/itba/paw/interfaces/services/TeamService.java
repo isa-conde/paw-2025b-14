@@ -25,13 +25,13 @@ public interface TeamService {
 
     void updateTeam(long teamId, String name, byte[] pfp, byte[] banner, List<String> members);
 
-    boolean isMember(long teamId, long userId);
-
     List<User> getTeamMembers(Long teamId);
 
     boolean teamNameTaken(String name);
 
     List<Team> getUserTeamsBySizeNotInTournament(long userId, long tournamentId);
 
-    List<Team> searchByName(String name);
+    List<Team> searchByName(String name, long page);
+
+    int countSearchByNameTeam(String name);
 }

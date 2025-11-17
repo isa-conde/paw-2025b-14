@@ -34,6 +34,7 @@ public class ParticipantHibernateDao implements ParticipantDao{
         Participant participant = new Participant(em.getReference(Tournament.class, tournamentId));
         participant.setUser(em.getReference(User.class, userId));
         participant.setTeam(em.getReference(Team.class, teamId));
+        participant.setPoints(0);
         em.persist(participant);
     }
 
@@ -138,26 +139,6 @@ public class ParticipantHibernateDao implements ParticipantDao{
                 .setParameter("teamId", teamId)
                 .setParameter("tournamentId", tournamentId)
                 .executeUpdate();
-    }
-
-    @Override
-    public void removeTournamentParticipantTeam(Long tournamentId, Long participantId){
-        String jpql = """
-        DELETE FROM Participant p
-        WHERE p.tournament.id = :tournamentId
-        AND p.id = :participantId
-        """;
-        em.createQuery(jpql).setParameter("tournamentId", tournamentId).setParameter("participantId", participantId).executeUpdate();
-    }
-
-    @Override
-    public void removeTournamentParticipantUser(Long tournamentId, Long participantId){
-        String jpql = """
-        DELETE FROM Participant p
-        WHERE p.tournament.id = :tournamentId
-        AND p.id = :participantId
-        """;
-        em.createQuery(jpql).setParameter("tournamentId", tournamentId).setParameter("participantId", participantId).executeUpdate();
     }
 
     @Override
@@ -375,7 +356,7 @@ public class ParticipantHibernateDao implements ParticipantDao{
     }
 
     @Override
-    public void sumPoints(long tournamentId, Long userId, int points, int scoreDifference, int teamSize) {
+    public void sumPoints(long tournamentId, long userId, int points, int scoreDifference, int teamSize) {
         String jpql;
 
         if (teamSize > 1) {

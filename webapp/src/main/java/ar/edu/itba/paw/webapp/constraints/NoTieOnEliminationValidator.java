@@ -1,7 +1,9 @@
 package ar.edu.itba.paw.webapp.constraints;
 
 import ar.edu.itba.paw.interfaces.exception.StageIsNotSetException;
+import ar.edu.itba.paw.interfaces.exception.TournamentNotFoundException;
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
+import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.webapp.form.SetMatchResultsForm;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +35,8 @@ public class NoTieOnEliminationValidator implements ConstraintValidator<NoTieOnE
             return true;
         }
 
-        Structure structure = tournamentDao.getTournamentStructure(tournamentId);
+        Tournament tournament = tournamentDao.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
+        Structure structure = tournament.getStructure();
         Boolean isGroupStage = tournamentDao.getIsGroupStage(tournamentId);
         if(isGroupStage == null && !structure.equals(Structure.LEAGUE)) {
             throw new StageIsNotSetException();

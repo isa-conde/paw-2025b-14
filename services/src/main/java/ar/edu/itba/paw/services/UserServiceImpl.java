@@ -14,11 +14,6 @@ import ar.edu.itba.paw.model.UserAccount;
 import ar.edu.itba.paw.model.enums.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -149,19 +144,6 @@ public class UserServiceImpl implements UserService {
         return false;
     }
 
-    @Override
-    public void authenticateVerifiedUser(long userId) {
-        User user = findById(userId).orElseThrow(UserNotFoundException::new);
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
-        authorities.add(new SimpleGrantedAuthority("ROLE_VERIFIED"));
-
-        Authentication authentication = new UsernamePasswordAuthenticationToken(user.getUsername(), null, authorities);
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        LOGGER.debug("User has been verified and authenticated");
-    }
-
     @Transactional
     @Override
     public Optional<Token> checkTokenValidity(long token) {
@@ -212,30 +194,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> searchByName(String name) {
-        return userDao.searchByName(name);
-    }
-
-    @Transactional
-    @Override
-    public void updateUserLocale(Locale locale, long userId) {
-        String language = locale.getLanguage();
-        userDao.updateUserLocale(language, userId);
+    public List<User> searchByName(String name, Long page) {
+        return userDao.searchByName(name, page);
     }
 
     @Override
-    public List<User> findAll() {
-        return userDao.findAll();
+    public List<User> findAllByName(String name) {
+        return userDao.findAllByName(name);
     }
 
-    @Transactional
     @Override
-    public void updateUserRating(long userId, float rating) {
-        User user = findById(userId).orElseThrow(UserNotFoundException::new);
-        Float currentRating = user.getRating();
-        float newRating = (currentRating == null) ? rating : (currentRating + rating) / 2;
-        userDao.updateUserRating(userId, newRating);
-        LOGGER.debug("User {} rating updated to {}", user.getUsername(), newRating);
+    public int countSearchByNameUser(String name) {
+        return userDao.countSearchByNameUser(name);
     }
 
     @Override

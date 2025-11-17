@@ -3,10 +3,11 @@
 <%@ attribute name="headerElements" required="false" type="java.util.List" %>
 <%@ attribute name="isGame" required="false" rtexprvalue="true" description="game or [tournament] carrousel" %>
 <%@ attribute name="id" required="true" rtexprvalue="true" %>
+<%@ attribute name="isUser" required="false" type="java.lang.Boolean" %>
+<%@ attribute name="isTeam" required="false" type="java.lang.Boolean" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="paw" tagdir="/WEB-INF/tags" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
-
 <c:set var="tournamentGame" value=""/>
 <c:set var="hasHeader" value="${not empty headerElements}"/>
 
@@ -28,6 +29,12 @@
                                     title="${e.name}"
                                     id="${e.id}"
                                     isGame="true"/>
+                    </c:when>
+                    <c:when test="${isUser}">
+                        <paw:profile-card isUser="${true}" userProfile="${e}"/>
+                    </c:when>
+                    <c:when test="${isTeam}">
+                        <paw:profile-card isTeam="${true}" teamProfile="${e}"/>
                     </c:when>
                     <c:otherwise>
                             <c:if test="${hasHeader}">
