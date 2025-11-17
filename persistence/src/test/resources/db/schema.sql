@@ -184,4 +184,19 @@ insert into match (id, tournament_id, local_id, visitor_id, winner, local_score,
     VALUES (5, 100, 102, 103, 2, 4, 5, true, 1);
 
 insert into match (id, tournament_id, is_group_stage)
-VALUES (0, 102, true);
+    VALUES (0, 102, true);
+
+insert into comments (id, commenter_id, receiver_id, comment, created_at)
+    values (100, 101, 100, 'First','2025-11-16 22:04:01');
+insert into comments (id, commenter_id, receiver_id, comment, created_at)
+values (101, 101, 100, 'First','2025-11-16 22:04:02');
+insert into comments (id, commenter_id, receiver_id, comment, created_at)
+values (102, 101, 100, 'First','2025-11-16 22:04:03');
+insert into comments (id, commenter_id, receiver_id, comment, created_at)
+values (103, 101, 100, 'First','2025-11-16 22:04:04');
+insert into comments (id, commenter_id, receiver_id, comment, created_at)
+values (104, 101, 100, 'First','2025-11-16 22:04:05');
+insert into comments (id, commenter_id, receiver_id, comment, created_at)
+values (105, 101, 100, 'First','2025-11-16 22:04:06');
+insert into comments (id, commenter_id, receiver_id, comment, created_at)
+values (106, 101, 100, 'First','2025-11-16 22:04:07');

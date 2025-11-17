@@ -113,8 +113,15 @@ create table if not exists match(
 
 create table if not exists  rules(
    id integer identity not null,
-   file varbinary(1000000),
+   file varbinary(1000000)
+);
 
+create table if not exists comments(
+    id integer identity not null ,
+    commenter_id integer not null ,
+    receiver_id integer not null ,
+    comment varchar(250) not null ,
+    created_at datetime not null
 );
 
 CREATE SEQUENCE if not exists users_userid_seq START WITH 1 INCREMENT BY 1;
@@ -126,3 +133,4 @@ CREATE SEQUENCE if not exists team_id_seq START WITH 1 INCREMENT BY 1;
 create sequence if not exists rules_id_seq start with 1 increment by 1;
 create sequence if not exists participant_user_id_seq start with 1 increment by 1;
 create sequence if not exists game_format_id_seq start with 1 increment by 1;
+create sequence if not exists comments_id_seq start with 1 increment by 1;

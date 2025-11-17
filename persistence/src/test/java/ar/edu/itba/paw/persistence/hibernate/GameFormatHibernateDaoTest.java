@@ -104,4 +104,16 @@ public class GameFormatHibernateDaoTest {
         Assert.assertNotNull(ans);
         Assert.assertTrue(ans.isEmpty());
     }
+
+    @Test
+    public void testGetPPT(){
+        int ans = gameFormatHibernateDao.getPlayersPerTeam(ID);
+
+        Assert.assertEquals(6,ans);
+    }
+
+    @Test(expected = Exception.class)
+    public void testGetNoPPT(){
+        int ans = gameFormatHibernateDao.getPlayersPerTeam(0L);
+    }
 }
