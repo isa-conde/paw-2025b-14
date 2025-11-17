@@ -106,9 +106,8 @@ public class TournamentController {
 
         ps.swapGroups(tournamentId, user1, user2);
 
-        ra.addAttribute("tournamentId", tournamentId);
         ra.addAttribute("edit", true);
-        return new ModelAndView("redirect:/tournament");
+        return new ModelAndView("redirect:/tournament/" +  tournamentId);
     }
 
     @RequestMapping(value = "/tournament/swap/matches", method = RequestMethod.POST)
@@ -204,7 +203,7 @@ public class TournamentController {
                     editTournamentForm.setDiscordChannel(t.getDiscordChannel());
                 }
             }
-            GameFormat gameFormat = t.getFormatEntity();
+            GameFormat gameFormat = ts.getFormat(tournamentId);
             int teamSize;
             if(gameFormat != null){
                 t.setFormat(gameFormat.getName());

@@ -54,8 +54,6 @@ public class MailServiceImpl implements MailService {
 
     private static final String CROWN_CID = "crown";
     private static final String CROWN_CLASSPATH = "images/crown.png";
-    private static final String DISCORD_CID = "discord";
-    private static final String DISCORD_CLASSPATH = "images/discord.png";
 
     @Async
     @Override
@@ -76,7 +74,7 @@ public class MailServiceImpl implements MailService {
                 new Object[]{tournamentName},
                 locale
         );
-        sendEmail(recipient, subject, body, false);
+        sendEmail(recipient, subject, body);
     }
 
     @Async
@@ -99,7 +97,7 @@ public class MailServiceImpl implements MailService {
                 new Object[]{tournamentName},
                 locale);
 
-        sendEmail(recipient, subject, body, false);
+        sendEmail(recipient, subject, body);
     }
 
     @Async
@@ -123,7 +121,7 @@ public class MailServiceImpl implements MailService {
                 locale
         );
 
-        sendEmail(recipientOwnerEmail, subject, body, false);
+        sendEmail(recipientOwnerEmail, subject, body);
     }
 
     @Async
@@ -147,7 +145,7 @@ public class MailServiceImpl implements MailService {
                 locale
         );
 
-        sendEmail(recipientOwnerEmail, subject, body, false);
+        sendEmail(recipientOwnerEmail, subject, body);
     }
 
 
@@ -169,7 +167,7 @@ public class MailServiceImpl implements MailService {
                 null,
                 locale);
 
-        sendEmail(recipient, subject, body, false);
+        sendEmail(recipient, subject, body);
     }
 
     @Async
@@ -189,7 +187,7 @@ public class MailServiceImpl implements MailService {
                 null,
                 locale);
 
-        sendEmail(recipient, subject, body, false);
+        sendEmail(recipient, subject, body);
     }
 
     @Async
@@ -215,7 +213,7 @@ public class MailServiceImpl implements MailService {
                 new Object[]{tournament.getName()},
                 locale);
 
-        sendEmail(recipient, subject, body, false);
+        sendEmail(recipient, subject, body);
     }
 
     @Async
@@ -237,7 +235,7 @@ public class MailServiceImpl implements MailService {
                 new Object[]{tournamentName},
                 locale);
 
-        sendEmail(recipient, subject, body, false);
+        sendEmail(recipient, subject, body);
     }
 
     @Async
@@ -259,7 +257,7 @@ public class MailServiceImpl implements MailService {
                 new Object[]{tournamentName},
                 locale);
 
-        sendEmail(recipient, subject, body, false);
+        sendEmail(recipient, subject, body);
     }
 
     @Async
@@ -284,7 +282,7 @@ public class MailServiceImpl implements MailService {
                 new Object[]{tournament.getName()},
                 locale);
 
-        sendEmail(creator.getEmail(), subject, body, false);
+        sendEmail(creator.getEmail(), subject, body);
     }
 
     @Async
@@ -309,7 +307,7 @@ public class MailServiceImpl implements MailService {
                 new Object[]{tournament.getName()},
                 locale);
 
-        sendEmail(creator.getEmail(), subject, body, false);
+        sendEmail(creator.getEmail(), subject, body);
     }
 
     @Async
@@ -331,7 +329,7 @@ public class MailServiceImpl implements MailService {
                 new Object[]{tournamentName},
                 locale);
 
-        sendEmail(recipient, subject, body, false);
+        sendEmail(recipient, subject, body);
     }
 
     @Async
@@ -352,7 +350,7 @@ public class MailServiceImpl implements MailService {
                 new Object[]{tournament.getName()},
                 locale);
 
-        sendEmail(recipient, subject, body, false);
+        sendEmail(recipient, subject, body);
     }
 
     @Async
@@ -375,7 +373,7 @@ public class MailServiceImpl implements MailService {
                 locale);
 
         LOGGER.debug("Information for tournament abandoned email has correctly been set");
-        sendEmail(creator.getEmail(), subject, body, false);
+        sendEmail(creator.getEmail(), subject, body);
     }
 
     @Async
@@ -389,7 +387,6 @@ public class MailServiceImpl implements MailService {
         String tournamentLink = baseUrl + "/tournament/" + tournament.getId();
         ctx.setVariable("tournamentLink", tournamentLink);
         ctx.setVariable("crownCid", "cid:" + CROWN_CID);
-        ctx.setVariable("discordCid", "cid:" + DISCORD_CID);
 
         String body = templateEngine.process("discord-channel-updated", ctx);
 
@@ -398,11 +395,11 @@ public class MailServiceImpl implements MailService {
                 new Object[]{tournament.getName()},
                 locale);
 
-        sendEmail(recipient, subject, body, true);
+        sendEmail(recipient, subject, body);
     }
 
 
-    private void sendEmail(String recipient, String subject, String body, boolean hasDiscordLogo) {
+    private void sendEmail(String recipient, String subject, String body) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, StandardCharsets.UTF_8.name());
@@ -410,9 +407,6 @@ public class MailServiceImpl implements MailService {
             helper.setSubject(subject);
             helper.setText(body, true);
             attachCrownInline(helper);
-            if(hasDiscordLogo){
-                attachDiscordInline(helper);
-            }
             mailSender.send(mimeMessage);
         } catch (MessagingException e) {
             throw new RuntimeException("Failed to build email", e);
@@ -435,20 +429,6 @@ public class MailServiceImpl implements MailService {
             helper.addInline(CROWN_CID, crown, "image/png");
         } catch (MessagingException e) {
             LOGGER.warn("Failed to attach crown inline image: {}", e.getMessage());
-        }
-    }
-
-    private void attachDiscordInline(MimeMessageHelper helper) {
-        org.springframework.core.io.ClassPathResource discord =
-                new org.springframework.core.io.ClassPathResource(DISCORD_CLASSPATH);
-        if (!discord.exists()) {
-            LOGGER.warn("Discord image not found in classpath at {}", DISCORD_CLASSPATH);
-            return;
-        }
-        try {
-            helper.addInline(DISCORD_CID, discord, "image/png");
-        } catch (MessagingException e) {
-            LOGGER.warn("Failed to attach discord inline image: {}", e.getMessage());
         }
     }
 }

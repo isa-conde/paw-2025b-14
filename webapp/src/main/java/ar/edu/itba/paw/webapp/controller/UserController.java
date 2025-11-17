@@ -132,6 +132,8 @@ public class UserController {
         tf.setElo(filterForm.getElo());
         tf.setPlayersPerTeam(filterForm.getPlayersPerTeam());
         tf.setGenre(filterForm.getGenre());
+        tf.setStartDate(filterForm.getStartDate());
+        tf.setEndDate(filterForm.getEndDate());
 
         boolean isFiltered = !tf.isEmpty();
 

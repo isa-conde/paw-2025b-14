@@ -8,7 +8,7 @@
 
 <div class="grid users">
     <c:forEach var="p" items="${members}">
-        <c:set value="/profile/${p.id}" var="url"/>
+        <c:url value="/profile/${p.id}" var="url"/>
         <paw:profileButton text="${p.username}" onclick="window.location.href='${url}'" isNotSafe="true" size="l" fill="false" imageId="${p.pfpId}"/>
     </c:forEach>
 </div>
