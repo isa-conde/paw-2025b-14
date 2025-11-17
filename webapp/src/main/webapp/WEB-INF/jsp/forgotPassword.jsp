@@ -10,7 +10,7 @@
 <paw:form-layout pageTitle="${pageTitle}">
     <paw:text type="title">${title}</paw:text>
     <paw:text><spring:message code="forgotPassword.text"/></paw:text>
-    <form:form cssClass="form-container" modelAttribute="emailForm" action="${forgotPasswordUrl}" method="post">
+    <form:form cssClass="form-container" modelAttribute="emailForm" action="${forgotPasswordUrl}" method="post" onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
         <div>
             <paw:input path="email" label="forgotPassword.email" inputType="email" hasConstraint="true"/>
         </div>
