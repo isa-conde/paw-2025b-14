@@ -38,7 +38,7 @@ public interface UserService {
 
     void updateProfileInfo(long userId, String username, String bio, byte[] pfp, byte[] banner);
 
-    List<User> searchByName(String name, Long page);
+    List<User> searchByName(String name, long page);
 
     List<User> findAllByName(String name);
 

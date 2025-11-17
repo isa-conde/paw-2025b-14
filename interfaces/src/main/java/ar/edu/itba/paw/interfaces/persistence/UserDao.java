@@ -26,7 +26,7 @@ public interface UserDao {
 
     void updateProfileInfo(long userId, String username, String bio, Long pfp, Long banner);
 
-    List<User> searchByName(String name, Long page);
+    List<User> searchByName(String name, long page);
 
     int countSearchByNameUser(String name);
 

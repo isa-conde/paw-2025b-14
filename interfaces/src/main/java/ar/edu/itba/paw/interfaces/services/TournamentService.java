@@ -49,9 +49,9 @@ public interface TournamentService {
 
     void notifyCreatorOfLeavingUser(User user, long tournamentId);
 
-    List<Tournament> findUserTournaments(Long userId, Boolean isFinished, Boolean isCreator, Boolean won, Long page);
+    List<Tournament> findUserTournaments(long userId, boolean isFinished, boolean isCreator, boolean won, long page);
 
-    int countUserTournaments(Long userId, Boolean isFinished, Boolean isCreator, Boolean won);
+    int countUserTournaments(long userId, boolean isFinished, boolean isCreator, boolean won);
 
 }
 

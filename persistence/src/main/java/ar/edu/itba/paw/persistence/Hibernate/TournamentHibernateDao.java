@@ -334,7 +334,7 @@ public class TournamentHibernateDao implements TournamentDao {
     }
 
     @Override
-    public List<Tournament> findUserTournaments(Long userId, Boolean isFinished, Boolean isCreator, Boolean won, Long page) {
+    public List<Tournament> findUserTournaments(long userId, boolean isFinished, boolean isCreator, boolean won, long page) {
         Query nativeQuery;
 
         if (won) {
@@ -389,7 +389,8 @@ public class TournamentHibernateDao implements TournamentDao {
         return fullQuery.getResultList();
     }
 
-    public int countUserTournaments(Long userId, Boolean isFinished, Boolean isCreator, Boolean won) {
+    @Override
+    public int countUserTournaments(long userId, boolean isFinished, boolean isCreator, boolean won) {
         Long count;
 
         if (won) {

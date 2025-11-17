@@ -533,12 +533,12 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public List<Tournament> findUserTournaments(Long userId, Boolean isFinished, Boolean isCreator, Boolean won, Long page) {
+    public List<Tournament> findUserTournaments(long userId, boolean isFinished, boolean isCreator, boolean won, long page) {
         return tournamentDao.findUserTournaments(userId, isFinished, isCreator, won, page);
     }
 
     @Override
-    public int countUserTournaments(Long userId, Boolean isFinished, Boolean isCreator, Boolean won) {
+    public int countUserTournaments(long userId, boolean isFinished, boolean isCreator, boolean won) {
         return tournamentDao.countUserTournaments(userId, isFinished, isCreator, won);
     }
 

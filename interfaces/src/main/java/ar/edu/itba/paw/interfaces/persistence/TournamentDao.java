@@ -51,7 +51,7 @@ public interface TournamentDao {
 
     void updateTournamentRating(long tournamentId, float userRating);
 
-    List<Tournament> findUserTournaments(Long userId, Boolean isFinished, Boolean isCreator, Boolean won, Long page);
+    List<Tournament> findUserTournaments(long userId, boolean isFinished, boolean isCreator, boolean won, long page);
 
-    int countUserTournaments(long userId, Boolean isFinished, Boolean isCreator, Boolean won);
+    int countUserTournaments(long userId, boolean isFinished, boolean isCreator, boolean won);
 }

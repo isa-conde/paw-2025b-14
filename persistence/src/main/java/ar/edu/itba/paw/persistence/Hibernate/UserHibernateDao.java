@@ -107,7 +107,7 @@ public class UserHibernateDao implements UserDao {
     }
 
     @Override
-    public List<User> searchByName(String name, Long page) {
+    public List<User> searchByName(String name, long page) {
 
         Query idQuery = em.createNativeQuery(
                 "SELECT u.id " +
