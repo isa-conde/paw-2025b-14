@@ -8,7 +8,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -19,8 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.sql.DataSource;
-import java.util.List;
-import java.util.Map;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = TestConfig.class)
@@ -63,17 +60,15 @@ public class TeamMemberHibernateDaoTest {
 
     @Test
     public void testIsMember(){
-        Boolean isMember = teamMemberHibernateDao.isMember(ID, ID-1);
+        boolean isMember = teamMemberHibernateDao.isMember(ID, ID-1);
 
-        Assert.assertNotNull(isMember);
         Assert.assertTrue(isMember);
     }
 
     @Test
     public void testIsNotMember(){
-        Boolean isMember = teamMemberHibernateDao.isMember(ID, ID);
+        boolean isMember = teamMemberHibernateDao.isMember(ID, ID);
 
-        Assert.assertNotNull(isMember);
         Assert.assertFalse(isMember);
     }
 }

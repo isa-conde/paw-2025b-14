@@ -69,6 +69,8 @@ public class TournamentHibernateDaoTest {
 
     @Before
     public void setUp(){
+        System.out.println(Tournament.class.getName());
+        System.out.println(Tournament.class.getResource("Tournament.class"));
         jdbcTemplate = new JdbcTemplate(ds);
     }
 
@@ -542,7 +544,7 @@ public class TournamentHibernateDaoTest {
         Assert.assertNotNull(ans);
         Assert.assertFalse(ans.isEmpty());
         Assert.assertEquals(PAGE_SIZE,ans.size());
-        Assert.assertTrue(ans.stream().allMatch(t-> t.getWinner().getUser().getId() == ID));
+        Assert.assertTrue(ans.stream().allMatch(t-> Objects.equals(t.getWinner().getUser().getId(), ID)));
     }
 
     @Test

@@ -1,5 +1,7 @@
 package ar.edu.itba.paw.persistence.hibernate;
 
+import ar.edu.itba.paw.interfaces.exception.MatchNotFoundException;
+import ar.edu.itba.paw.interfaces.exception.MissingWinnerException;
 import ar.edu.itba.paw.model.Match.Match;
 import ar.edu.itba.paw.persistence.Hibernate.MatchHibernateDao;
 import ar.edu.itba.paw.persistence.TestConfig;
@@ -35,11 +37,6 @@ public class MatchHibernateDaoTest {
     private static final Long ID = 100L;
     private static final Long OTHER_ID = 101L;
     private static final Long UNDETERMINED_MATCH = 102L;
-    private static final String USERNAME = "johndoe";
-    private static final String OTHER_USERNAME = "janedoe";
-    private static final String OTHER_EMAIL = "another@mail.com";
-    private static final String EMAIL = "some@mail.com";
-    private static final String PASSWORD = "1234567890";
 
     @Autowired
     private DataSource ds;
@@ -72,12 +69,20 @@ public class MatchHibernateDaoTest {
         Assert.assertEquals(OTHER_ID,ans);
     }
 
-    @Test
+    @Test( expected = MatchNotFoundException.class)
     public void testGetNoWinner(){
         Long ans = matchHibernateDao.getMatchWinner(OTHER_ID,1L);
 
         Assert.assertNull(ans);
     }
+
+    @Test( expected = MissingWinnerException.class)
+    public void testGetNoMatchWinner(){
+        Long ans = matchHibernateDao.getMatchWinner(102L,0L);
+
+        Assert.assertNull(ans);
+    }
+
 
     @Test
     public void testGetTournamentMatches(){
@@ -171,17 +176,15 @@ public class MatchHibernateDaoTest {
 
     @Test
     public void testAllMatchesPlayed(){
-        Boolean ans = matchHibernateDao.allMatchesPlayed(ID);
+        boolean ans = matchHibernateDao.allMatchesPlayed(ID);
 
-        Assert.assertNotNull(ans);
         Assert.assertTrue(ans);
     }
 
     @Test
     public void testNotAllMatchesPlayed(){
-        Boolean ans = matchHibernateDao.allMatchesPlayed(UNDETERMINED_MATCH);
+        boolean ans = matchHibernateDao.allMatchesPlayed(UNDETERMINED_MATCH);
 
-        Assert.assertNotNull(ans);
         Assert.assertFalse(ans);
     }
 

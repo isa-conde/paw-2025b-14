@@ -27,22 +27,6 @@ public class GameFormatHibernateDaoTest {
 
     private static final Long ID = 100L;
 
-//
-//    @Test
-//    public void testInsertFormat(){
-//        Game game = new Game(ID,"Grand Theft Walrus MOBA", Genre.MOBA,ID.intValue());
-//        GameFormat gameFormat = new GameFormat();
-//        gameFormat.setGame(game);
-//        gameFormat.setName(FORMAT);
-//        gameFormat.setPlayersPerTeam(PPT);
-//        gameFormatHibernateDao.insertFormat(gameFormat);
-//        em.flush();
-//
-//        Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"game_format",
-//                "game_id = " + ID + " and players_per_team = " + PPT + " and " +
-//                        "name = '" + FORMAT + "'"));
-//    }
-
     @Test
     public void testGetNoFormats(){
         List<GameFormat> ans = gameFormatHibernateDao.getFormats(ID);
@@ -82,16 +66,4 @@ public class GameFormatHibernateDaoTest {
         Assert.assertNotNull(ans);
         Assert.assertTrue(ans.isEmpty());
     }
-//
-//    @Test
-//    public void testGetPPT(){
-//        int ans = gameFormatHibernateDao.getPlayersPerTeam(ID);
-//
-//        Assert.assertEquals(6,ans);
-//    }
-//
-//    @Test(expected = Exception.class)
-//    public void testGetNoPPT(){
-//        int ans = gameFormatHibernateDao.getPlayersPerTeam(0L);
-//    }
 }

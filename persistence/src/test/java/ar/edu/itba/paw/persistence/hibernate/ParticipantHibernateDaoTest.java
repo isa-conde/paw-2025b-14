@@ -325,7 +325,7 @@ public class ParticipantHibernateDaoTest {
     @Test
     public void testHasRated(){
         jdbcTemplate.update("update participant set has_rated = true");
-        Boolean ans = participantHibernateDao.hasRated(ID, ID);
+        boolean ans = participantHibernateDao.hasRated(ID, ID);
 
         Assert.assertTrue(ans);
     }
@@ -333,14 +333,7 @@ public class ParticipantHibernateDaoTest {
     @Test
     public void testHasNotRated(){
         jdbcTemplate.update("update participant set has_rated = false");
-        Boolean ans = participantHibernateDao.hasRated(ID, ID);
-
-        Assert.assertFalse(ans);
-    }
-
-    @Test
-    public void testHasNotRatedNull(){
-        Boolean ans = participantHibernateDao.hasRated(ID, ID);
+        boolean ans = participantHibernateDao.hasRated(ID, ID);
 
         Assert.assertFalse(ans);
     }

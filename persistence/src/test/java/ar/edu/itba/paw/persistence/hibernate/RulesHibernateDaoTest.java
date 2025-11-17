@@ -52,7 +52,7 @@ public class RulesHibernateDaoTest {
         em.flush();
 
         Assert.assertEquals(FILE, ans.getFile());
-        String hexImage = bytesToHex(FILE);
+        String hexImage = bytesToHex();
         Assert.assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"rules",
                 "id = " + ans.getId() + " and file = X'" + hexImage + "'"));
     }
@@ -79,14 +79,14 @@ public class RulesHibernateDaoTest {
         rulesHibernateDao.updateRules(ID,FILE);
         em.flush();
 
-        String hexImage = bytesToHex(FILE);
+        String hexImage = bytesToHex();
         Assert.assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "rules",
                 "id = " + ID + " and file = X'" + hexImage + "'"));
     }
 
-    private String bytesToHex(byte[] bytes) {
+    private String bytesToHex() {
         StringBuilder sb = new StringBuilder();
-        for (byte b : bytes) {
+        for (byte b : FILE) {
             sb.append(String.format("%02X", b & 0xFF));
         }
         return sb.toString();

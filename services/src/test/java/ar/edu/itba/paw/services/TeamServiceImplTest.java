@@ -55,8 +55,7 @@ public class TeamServiceImplTest {
         Mockito.when(userDao.findByUsername("member1")).thenReturn(Optional.of(member1));
         Mockito.when(userDao.findByUsername("member2")).thenReturn(Optional.of(member2));
         Mockito.when(userDao.findByUsername(NAME)).thenReturn(Optional.of(owner));
-
-        Team createdTeam = createMockTeam(ID, NAME, ID);
+        Team createdTeam = new Team(ID,NAME,null,null);
         Mockito.when(teamDao.create(NAME, null, null, ID)).thenReturn(createdTeam);
 
         List<String> members = Arrays.asList("member1", "member2", NAME);
@@ -66,7 +65,8 @@ public class TeamServiceImplTest {
 
         // Verificaciones
         Assert.assertNotNull(result);
-        Assert.assertEquals(createdTeam, result);
+        Assert.assertEquals(NAME, result.getName());
+        Assert.assertEquals(ID,result.getId());
     }
 
     @Test(expected = UserNotFoundException.class)
@@ -75,8 +75,8 @@ public class TeamServiceImplTest {
         User owner = createMockUser(ID, NAME);
         Mockito.when(userDao.findById(ID)).thenReturn(Optional.of(owner));
         User someone = createMockUser(2L, "validMember");
-        Team team = createMockTeam(ID,NAME,ID);
-        Mockito.when(teamDao.create(NAME,null,null,ID)).thenReturn(team);
+        Team createdTeam = new Team(ID,NAME,null,null);
+        Mockito.when(teamDao.create(NAME,null,null,ID)).thenReturn(createdTeam);
         Mockito.when(userDao.findByUsername("validMember")).thenReturn(Optional.of(someone));
         Mockito.when(userDao.findByUsername("invalidMember")).thenReturn(Optional.empty()); // Lanza exception
 
@@ -91,13 +91,5 @@ public class TeamServiceImplTest {
         Mockito.when(user.getId()).thenReturn(id);
         Mockito.when(user.getUsername()).thenReturn(username);
         return user;
-    }
-
-    private Team createMockTeam(Long id, String name, Long ownerId) {
-        Team team = Mockito.mock(Team.class);
-        Mockito.when(team.getId()).thenReturn(id);
-        Mockito.when(team.getName()).thenReturn(name);
-        // Agrega más getters si necesitas verificarlos
-        return team;
     }
 }

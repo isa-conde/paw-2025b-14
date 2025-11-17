@@ -45,6 +45,7 @@ public class ParticipantHibernateDao implements ParticipantDao{
         participant.setTeam(em.getReference(Team.class, teamId));
         participant.setPoints(0);
         participant.setScoreDifference(0);
+        participant.setHasRated(false);
         em.persist(participant);
     }
 

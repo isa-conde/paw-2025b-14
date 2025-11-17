@@ -38,7 +38,7 @@ public class MatchServiceImplTest {
 
     @Test(expected = TournamentNotFoundException.class)
     public void testGetMatchesNoTournament(){
-        Mockito.when(tournamentDao.findById(ID)).thenReturn(Optional.empty());
+        Mockito.when(ts.findById(ID)).thenReturn(Optional.empty());
 
         matchService.getTournamentMatchesByStage(ID);
     }

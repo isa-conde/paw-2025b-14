@@ -3,8 +3,6 @@ package ar.edu.itba.paw.persistence.hibernate;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.persistence.Hibernate.UserHibernateDao;
 import ar.edu.itba.paw.persistence.TestConfig;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,7 +45,6 @@ public class UserHibernateDaoTest {
     private static final String PASSWORD = "1234567890";
     private static final String LOCALE = "en";
     private final Long usedId = 100L;
-    private static final Log log = LogFactory.getLog(UserHibernateDaoTest.class);
 
     @Before
     public void setUp(){

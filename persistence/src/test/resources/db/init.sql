@@ -1,6 +1,22 @@
 set database sql syntax pgs true;
 set ignorecase true;
 
+drop domain if exists region_enum;
+CREATE DOMAIN region_enum AS VARCHAR(5)
+    CHECK (VALUE IN ('NA', 'LAS', 'LAN', 'BR', 'EUW', 'EUNE', 'OCE', 'ASIA'));
+
+drop domain if exists elo_enum;
+CREATE DOMAIN elo_enum AS VARCHAR(5)
+    CHECK (VALUE IN ('LOW', 'MID', 'HIGH', 'FREE'));
+
+drop domain if exists structure_enum;
+CREATE DOMAIN structure_enum AS VARCHAR(12)
+    CHECK (VALUE IN ('LEAGUE', 'ELIMINATION', 'HYBRID'));
+
+drop domain if exists genre_enum;
+create domain genre_enum as varchar(13)
+    check (value in ('MOBA', 'FPS', 'Fighting', 'TPS', 'BattleRoyale', 'RTS', 'Sports', 'DGC', 'MOBILE'));
+
 CREATE TABLE IF NOT EXISTS users(
     id INTEGER IDENTITY PRIMARY KEY ,
     email varchar(100) NOT NULL UNIQUE ,

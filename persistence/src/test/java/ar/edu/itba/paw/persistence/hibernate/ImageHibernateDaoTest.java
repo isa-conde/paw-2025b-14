@@ -8,7 +8,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
@@ -53,7 +52,7 @@ public class ImageHibernateDaoTest {
         em.flush();
 
         Assert.assertNotNull(ans);
-        String hexImage = bytesToHex(IMAGE);
+        String hexImage = bytesToHex();
         Assert.assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "image",
                 "id = " + ans + " and image = X'" + hexImage + "'"));
     }
@@ -69,7 +68,7 @@ public class ImageHibernateDaoTest {
 
     @Test
     public void testFindNothing(){
-        final Optional<byte[]> ans = imageHibernateDao.findById((long) 0);
+        final Optional<byte[]> ans = imageHibernateDao.findById(0);
 
         Assert.assertNotNull(ans);
         Assert.assertTrue(ans.isEmpty());
@@ -80,14 +79,14 @@ public class ImageHibernateDaoTest {
         imageHibernateDao.updateImage(firstUsedId,IMAGE);
         em.flush();
 
-        String hexImage = bytesToHex(IMAGE);
+        String hexImage = bytesToHex();
         Assert.assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate, "image",
                 "id = " + firstUsedId + " and image = X'" + hexImage + "'"));
     }
 
-    private String bytesToHex(byte[] bytes) {
+    private String bytesToHex() {
         StringBuilder sb = new StringBuilder();
-        for (byte b : bytes) {
+        for (byte b : IMAGE) {
             sb.append(String.format("%02X", b & 0xFF));
         }
         return sb.toString();
