@@ -14,11 +14,6 @@ import ar.edu.itba.paw.model.UserAccount;
 import ar.edu.itba.paw.model.enums.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,7 +56,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public User create(String username, String email, String password, Locale locale) throws BusinessException {
+    public User create(String username, String email, String password, Locale locale) {
         if (userDao.checkUsernameExists(username)){
             throw new UsernameAlreadyUsedException(username);
         }
@@ -102,7 +97,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public boolean resetPassword(Long token, String newPassword) {
+    public boolean resetPassword(long token, String newPassword) {
         Optional<Token> optToken = checkTokenValidity(token);
         if(optToken.isPresent()) {
             User user = optToken.get().getUser();
@@ -113,7 +108,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean sameAsOldPassword(String newPassword, Long userId) {
+    public boolean sameAsOldPassword(String newPassword, long userId) {
         String oldPassword = findById(userId).orElseThrow(UserNotFoundException::new).getPassword();
         if(oldPassword == null) return false;
         return passwordEncoder.matches(newPassword, oldPassword);
@@ -139,7 +134,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public boolean verifyEmail(Long token, Long userId) {
+    public boolean verifyEmail(long token, long userId) {
         Optional<Token> optToken = checkTokenValidity(token);
         findById(userId).orElseThrow(UserNotFoundException::new);
         if(optToken.isPresent()) {
@@ -151,7 +146,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public Optional<Token> checkTokenValidity(Long token) {
+    public Optional<Token> checkTokenValidity(long token) {
         Optional<Token> optToken = tokenDao.findByToken(token);
         if(optToken.isPresent()) {
             Token foundToken = optToken.get();
@@ -168,7 +163,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private Token generateToken(Long userId, int validityDays) {
+    private Token generateToken(long userId, int validityDays) {
         SecureRandom secureRandom = new SecureRandom();
         long tokenValue;
         Optional<Token> existingToken;
@@ -184,7 +179,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void updateProfileInfo(Long userId, String username, String bio, byte[] pfp, byte[] banner){
+    public void updateProfileInfo(long userId, String username, String bio, byte[] pfp, byte[] banner){
         Long bannerId = null;
         Long pfpId = null;
         if (pfp != null){
@@ -193,12 +188,13 @@ public class UserServiceImpl implements UserService {
         if (banner != null){
             bannerId = imageDao.insertImage(banner);
         }
+
         userDao.updateProfileInfo(userId, username, bio, pfpId, bannerId);
         LOGGER.info("Profile of user {} has been correctly updated", username);
     }
 
     @Override
-    public List<User> searchByName(String name, Long page) {
+    public List<User> searchByName(String name, long page) {
         return userDao.searchByName(name, page);
     }
 
@@ -213,7 +209,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Float getUserRating(Long userId) {
+    public Float getUserRating(long userId) {
         User user = findById(userId).orElseThrow(UserNotFoundException::new);
         Float userRating = user.getRating();
         if (userRating == null) {
@@ -223,7 +219,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findUserByToken(Long token) {
+    public User findUserByToken(long token) {
         Token tokenToReturn = tokenDao.findByToken(token).orElseThrow(TokenNotFoundException::new);
         return tokenToReturn.getUser();
     }

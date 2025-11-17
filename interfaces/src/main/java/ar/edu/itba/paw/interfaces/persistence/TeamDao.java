@@ -7,27 +7,27 @@ import java.util.Optional;
 
 public interface TeamDao {
 
-    Team create(String name, Long pfpId, Long bannerId, Long ownerId);
+    Team create(String name, Long pfpId, Long bannerId, long ownerId);
 
-    Optional<Team> findById(Long id);
+    Optional<Team> findById(long id);
 
-    List<Long> getPastTournaments(Long teamId, Integer page);
+    List<Long> getPastTournaments(long teamId, int page);
 
-    List<Long> getActiveTournaments(Long teamId, Integer page);
+    List<Long> getActiveTournaments(long teamId, int page);
 
-    Long getActivePages(Long teamId);
+    long getActivePages(long teamId);
 
-    Long getPastPages(Long teamId);
+    long getPastPages(long teamId);
 
-    List<Team> getUserTeams(Long userId);
+    List<Team> getUserTeams(long userId);
 
-    void updateTeam(Long teamId, String name, Long pfpId, Long bannerId);
+    void updateTeam(long teamId, String name, Long pfpId, Long bannerId);
 
-    Boolean teamNameTaken(String name);
+    boolean teamNameTaken(String name);
 
-    List<Team> searchByName(String name, Long page);
+    List<Team> searchByName(String name, long page);
 
-    List<Team> getUserTeamsBySizeNotInTournament(Long userId, Long tournamentId, Long minSize);
+    List<Team> getUserTeamsBySizeNotInTournament(long userId, long tournamentId, long minSize);
 
     int countSearchByNameTeam(String name);
 }

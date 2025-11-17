@@ -16,43 +16,43 @@ import java.util.Optional;
 
 public interface TournamentService {
 
-    Optional<Tournament> findById(Long id);
+    Optional<Tournament> findById(long id);
 
-    List<Tournament> findTournaments(TournamentFilter tournamentFilter, Long page);
+    List<Tournament> findTournaments(TournamentFilter tournamentFilter, long page);
 
-    Tournament create(Long creatorId, String name, Long gameId, Region region, Elo elo, LocalDate startDate, LocalDate endDate, String format,
-                      Structure structure, Integer maxParticipants, byte[] imageId, Boolean openInscriptions, Boolean isFinished,
-                      Long formatId, byte[] rulesId, String serverName, String serverPassword, String discordChannel);
+    Tournament create(long creatorId, String name, long gameId, Region region, Elo elo, LocalDate startDate, LocalDate endDate, String format,
+                      Structure structure, int maxParticipants, byte[] image, boolean openInscriptions, boolean isFinished, long formatId,
+                      byte[] rules, String serverName, String serverPassword, String discordChannel);
 
-    void setFinished(Long tournamentId, Long matchId);
+    void setFinished(long tournamentId, long matchId);
 
-    void closeInscriptions(Long tournamentId);
+    void closeInscriptions(long tournamentId);
 
-    List<Tournament> searchByName(String name, Long page);
+    List<Tournament> searchByName(String name, long page);
 
     int countSearchByName(String name);
 
-    void startTournament(Long tournamentId);
+    void startTournament(long tournamentId);
 
-    Map<Game,List<Tournament>> getUnfilteredTournamentPages(Long page);
+    Map<Game,List<Tournament>> getUnfilteredTournamentPages(long page);
 
-    Integer getPageAmount(Integer pageSize, TournamentFilter tf);
+    int getPageAmount(int pageSize, TournamentFilter tf);
 
-    void updateTournamentInfo(Long tournamentId, String name, LocalDate startDate, LocalDate endDate, Integer maxParticipants, byte[] image, String serverName, String serverPassword, String discordChannel);
+    void updateTournamentInfo(long tournamentId, String name, LocalDate startDate, LocalDate endDate, Integer maxParticipants, byte[] image, String serverName, String serverPassword, String discordChannel);
 
-    int getTournamentParticipantsCount(Long tournamentId);
+    int getTournamentParticipantsCount(long tournamentId);
 
-    void createBracketFromGroups(Long tournamentId);
+    void createBracketFromGroups(long tournamentId);
 
-    void contactOwner(Long tournamentId, User currentUser, String subject, String body, Long creatorId);
+    void contactOwner(long tournamentId, User currentUser, String subject, String body, long creatorId);
 
-    void updateTournamentRating(Long tournamentId, Float userRating);
+    void updateTournamentRating(long tournamentId, float userRating);
 
     void notifyCreatorOfLeavingUser(User user, long tournamentId);
 
-    List<Tournament> findUserTournaments(Long userId, Boolean isFinished, Boolean isCreator, Boolean won, Long page);
+    List<Tournament> findUserTournaments(long userId, boolean isFinished, boolean isCreator, boolean won, long page);
 
-    int countUserTournaments(Long userId, Boolean isFinished, Boolean isCreator, Boolean won);
+    int countUserTournaments(long userId, boolean isFinished, boolean isCreator, boolean won);
 
     GameFormat getFormat(long tournamentId);
 

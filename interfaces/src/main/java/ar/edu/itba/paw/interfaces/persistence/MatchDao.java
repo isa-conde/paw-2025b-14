@@ -7,29 +7,29 @@ import java.util.List;
 
 public interface MatchDao {
 
-    void insertMatch(Long id, Long tournamentId, Long localId, Long visitorId, Integer stage, Integer localScore, Integer visitorScore, Integer winner, Boolean isGroupStage);
+    void insertMatch(long id, long tournamentId, Long localId, Long visitorId, int stage, Integer localScore, Integer visitorScore, Integer winner, Boolean isGroupStage);
 
-    Long getMatchWinner(Long tournamentId, Long matchId);
+    Long getMatchWinner(long tournamentId, long matchId);
 
-    void setMatchResults(Long matchId, Long tournamentId, Integer localScore, Integer visitorScore, Integer winner, LocalDate date);
+    void setMatchResults(long matchId, long tournamentId, int localScore, int visitorScore, int winner, LocalDate date);
 
-    List<Match> getTournamentMatches(Long tournamentId, Integer teamSize);
+    List<Match> getTournamentMatches(long tournamentId, int teamSize);
 
     Match getMatch(long tournamentId, long matchId);
 
-    Long getMaxMatchId(Long tournamentId);
+    Long getMaxMatchId(long tournamentId);
 
-    void updateMatchLocal(Long tournamentId, Long matchId, Long userId);
+    void updateMatchLocal(long tournamentId, long matchId, Long userId);
 
-    void updateMatchVisitor(Long tournamentId, Long matchId, Long userId);
+    void updateMatchVisitor(long tournamentId, long matchId, Long userId);
 
-    Boolean allMatchesPlayed(Long tournamentId);
+    boolean allMatchesPlayed(long tournamentId);
 
-    Integer getMatchStage(Long tournamentId, Long matchId);
+    Integer getMatchStage(long tournamentId, long matchId);
 
-    List<Long> getStageMatchIds(Integer stage, Long tournamentId);
+    List<Long> getStageMatchIds(int stage, long tournamentId);
 
-    Integer getTournamentMaxStage(Long tournamentId);
+    int getTournamentMaxStage(long tournamentId);
 
-    Integer getTournamentGroupMaxStage(Long tournamentId, Integer groupNumber);
+    int getTournamentGroupMaxStage(long tournamentId, int groupNumber);
 }

@@ -2,8 +2,8 @@ package ar.edu.itba.paw.interfaces.persistence;
 
 public interface TeamMemberDao {
 
-    void addMember(Long teamId, Long userId);
+    void addMember(long teamId, long userId);
 
-    Boolean isMember(Long teamId, Long userId);
+    boolean isMember(long teamId, long userId);
 
 }

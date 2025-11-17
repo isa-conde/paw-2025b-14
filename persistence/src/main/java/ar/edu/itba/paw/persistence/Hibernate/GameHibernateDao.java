@@ -27,7 +27,7 @@ public class GameHibernateDao implements GameDao {
     }
 
     @Override
-    public List<Game> searchByName(String name, Long page) {
+    public List<Game> searchByName(String name, long page) {
 
         Query idQuery = em.createNativeQuery(
                 "SELECT g.id " +
@@ -88,7 +88,7 @@ public class GameHibernateDao implements GameDao {
     }
 
     @Override
-    public Game create(String name, Genre genre, Integer imageId) {
+    public Game create(String name, Genre genre, int imageId) {
         Game game = new Game(name, genre, imageId);
         em.persist(game);
         return game;
@@ -103,7 +103,7 @@ public class GameHibernateDao implements GameDao {
 
 
     @Override
-    public List<Game> getFavourites(Long userId) {
+    public List<Game> getFavourites(long userId) {
         TypedQuery<Game> q = em.createQuery("""
             SELECT g
             FROM Tournament t
@@ -121,7 +121,7 @@ public class GameHibernateDao implements GameDao {
     }
 
     @Override
-    public List<Game> findAllPaged(Long page) {
+    public List<Game> findAllPaged(long page) {
         int offset = (int) (page * PAGE_SIZE);
 
         Query idQuery = em.createNativeQuery("SELECT DISTINCT (id) FROM game ORDER BY id ASC ");
@@ -140,9 +140,9 @@ public class GameHibernateDao implements GameDao {
     }
 
     @Override
-    public Long getPageAmount() {
+    public long getPageAmount() {
         TypedQuery<Long> query = em.createQuery("SELECT COUNT(g) FROM Game g", Long.class);
-        Long totalGames = query.getSingleResult();
+        long totalGames = query.getSingleResult();
 
         return (long) Math.ceil((double) (totalGames) / PAGE_SIZE);
     }

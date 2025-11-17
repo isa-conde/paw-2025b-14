@@ -55,7 +55,7 @@ public class TokenHibernateDaoTest {
         em.flush();
 
         Assert.assertNotNull(ans);
-        Assert.assertEquals(Long.valueOf(3),ans.getToken());
+        Assert.assertEquals(Long.valueOf(3), (Long) ans.getToken());
         Assert.assertEquals(Long.valueOf(3),ans.getUserId());
         Assert.assertEquals(LocalDate.now().plusDays(1),ans.getExpiryDate());
         Assert.assertFalse(ans.isUsed());
@@ -79,7 +79,7 @@ public class TokenHibernateDaoTest {
         Assert.assertTrue(ans.isPresent());
         Assert.assertEquals(usedId, ans.get().getId());
         Assert.assertEquals(usedId, ans.get().getUserId());
-        Assert.assertEquals(usedId, ans.get().getToken());
+        Assert.assertEquals(usedId, (Long) ans.get().getToken());
         Assert.assertEquals(LocalDate.of(2003, Month.FEBRUARY,21),ans.get().getExpiryDate());
         Assert.assertFalse(ans.get().isUsed());
     }

@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.webapp.constraints;
 
+import ar.edu.itba.paw.interfaces.exception.TeamNotFoundException;
 import ar.edu.itba.paw.interfaces.exception.TournamentNotFoundException;
 import ar.edu.itba.paw.interfaces.services.TeamService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
@@ -71,7 +72,7 @@ public class MembersCountValidator implements ConstraintValidator<MembersCountCo
             String newName = form.getName();
             Long teamId = form.getTeamId();
 
-            if (newName == null || newName.isBlank()) return true;
+            if (newName == null || newName.isBlank() || teamId == null) return true;
 
             Optional<Team> currentTeamOpt = teamService.findById(teamId);
             if (currentTeamOpt.isEmpty()) return true;

@@ -26,7 +26,7 @@ public class UpdateUsernameTakenValidator implements ConstraintValidator<UpdateU
         String username = form.getUsername();
         Long userId = form.getUserId();
 
-        if (username == null || username.isBlank()) return true;
+        if (username == null || username.isBlank() || userId == null) return true;
 
         Optional<User> currentUserOpt = userService.findById(userId);
         if (currentUserOpt.isEmpty()) return true;

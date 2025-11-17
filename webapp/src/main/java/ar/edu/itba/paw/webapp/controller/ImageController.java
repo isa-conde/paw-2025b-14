@@ -27,7 +27,7 @@ public class ImageController {
      }
 
     @RequestMapping("/image/{id}")
-    public ResponseEntity<byte[]> getImage(@PathVariable Long id){
+    public ResponseEntity<byte[]> getImage(@PathVariable long id){
         Optional<byte[]> image = is.findById(id);
 
         if (image.isEmpty()){

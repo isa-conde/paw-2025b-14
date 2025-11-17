@@ -17,7 +17,7 @@ public class Token {
     private User user;
 
     @Column(name = "token", nullable = false)
-    private Long token;
+    private long token;
 
     @Column(name = "expiry_date", nullable = false)
     private LocalDate expiryDate;
@@ -27,13 +27,13 @@ public class Token {
 
     public Token(){}
 
-    public Token(User user, Long token, LocalDate expiryDate){
+    public Token(User user, long token, LocalDate expiryDate){
         this.user = user;
         this.token = token;
         this.expiryDate = expiryDate;
     }
 
-    public Token(final Long id, final Long userId, final Long token, final LocalDate expiryDate) {
+    public Token(final Long id, final Long userId, final long token, final LocalDate expiryDate) {
         this.id = id;
         this.token = token;
         this.expiryDate = expiryDate;
@@ -48,7 +48,7 @@ public class Token {
         return user.getId();
     }
 
-    public Long getToken() {
+    public long getToken() {
         return token;
     }
 
@@ -72,7 +72,7 @@ public class Token {
         this.expiryDate = expiryDate;
     }
 
-    public void setToken(Long token) {
+    public void setToken(long token) {
         this.token = token;
     }
 

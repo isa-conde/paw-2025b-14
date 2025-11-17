@@ -19,14 +19,14 @@ public class TokenHibernateDao implements TokenDao {
     private EntityManager em;
 
     @Override
-    public Token create(Long userId, Long token, LocalDate expiryDate) {
+    public Token create(long userId, long token, LocalDate expiryDate) {
         Token t = new Token(em.getReference(User.class, userId), token, expiryDate);
         em.persist(t);
         return t;
     }
 
     @Override
-    public Optional<Token> findByToken(Long token) {
+    public Optional<Token> findByToken(long token) {
         TypedQuery<Token> query = em.createQuery("SELECT t FROM Token t WHERE t.token = :token", Token.class);
         query.setParameter("token", token);
         Token result;
@@ -39,7 +39,7 @@ public class TokenHibernateDao implements TokenDao {
     }
 
     @Override
-    public void markAsUsed(Long tokenId) {
+    public void markAsUsed(long tokenId) {
         Token t = em.find(Token.class, tokenId);
         t.setUsed(true);
         em.persist(t);

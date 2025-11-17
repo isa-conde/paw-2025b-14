@@ -9,29 +9,29 @@ import java.util.Optional;
 
 public interface TeamService {
 
-    Team create(String name, byte[] pfp, byte[] banner, Long ownerId, List<String> members);
+    Team create(String name, byte[] pfp, byte[] banner, long ownerId, List<String> members);
 
-    Optional<Team> findById(Long id);
+    Optional<Team> findById(long id);
 
-    List<Tournament> getActiveTournaments(Long teamId, Integer page);
+    List<Tournament> getActiveTournaments(long teamId, int page);
 
-    List<Tournament> getPastTournaments(Long teamId, Integer page);
+    List<Tournament> getPastTournaments(long teamId, int page);
 
-    Long getActivePages(Long teamId);
+    long getActivePages(long teamId);
 
-    Long getPastPages(Long teamId);
+    long getPastPages(long teamId);
 
-    List<Team> getUserTeams(Long userId);
+    List<Team> getUserTeams(long userId);
 
-    void updateTeam(Long teamId, String name, byte[] pfp, byte[] banner, List<String> members);
+    void updateTeam(long teamId, String name, byte[] pfp, byte[] banner, List<String> members);
 
     List<User> getTeamMembers(Long teamId);
 
-    Boolean teamNameTaken(String name);
+    boolean teamNameTaken(String name);
 
-    List<Team> getUserTeamsBySizeNotInTournament(Long userId, Long tournamentId);
+    List<Team> getUserTeamsBySizeNotInTournament(long userId, long tournamentId);
 
-    List<Team> searchByName(String name, Long page);
+    List<Team> searchByName(String name, long page);
 
     int countSearchByNameTeam(String name);
 }

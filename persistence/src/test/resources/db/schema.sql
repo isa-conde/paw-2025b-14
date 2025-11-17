@@ -123,8 +123,8 @@ insert into team_member (user_id, team_id) values (100, 100);
 insert into team_member (user_id, team_id) values (101, 100);
 insert into team_member (user_id, team_id) values (100, 101);
 
-insert into participant (id, user_id, tournament_id, points) values (100,100,100, 0);
-insert into participant (id, user_id, tournament_id, points) values (101,100,101, 0);
+insert into participant (id, user_id, tournament_id, points, group_number, score_difference) values (100,100,100, 7, 1, 6);
+insert into participant (id, user_id, tournament_id, points, score_difference) values (101,100,101, 7, 6);
 insert into participant (id, user_id, tournament_id, points) values (102,100,102, 0);
 insert into participant (id, user_id, tournament_id, points) values (103,100,103, 0);
 insert into participant (id, user_id, tournament_id, points) values (104,100,104, 0);
@@ -143,8 +143,8 @@ insert into participant (id, user_id, tournament_id, points) values (116,100,116
 insert into participant (id, user_id, tournament_id, points) values (117,100,117, 0);
 insert into participant (id, user_id, tournament_id, points) values (118,100,118, 0);
 insert into participant (id, user_id, tournament_id, points) values (119,100,119, 0);
-insert into participant (id, team_id, tournament_id, points) values (120,100,100, 0);
-insert into participant (id, team_id, tournament_id, points) values (121,100,101, 0);
+insert into participant (id, team_id, tournament_id, points, group_number, score_difference) values (120,100,100, 7,1, 6);
+insert into participant (id, team_id, tournament_id, points,score_difference) values (121,100,101, 7,6);
 insert into participant (id, team_id, tournament_id, points) values (122,100,102, 0);
 insert into participant (id, team_id, tournament_id, points) values (123,100,103, 0);
 insert into participant (id, team_id, tournament_id, points) values (124,100,104, 0);
@@ -165,6 +165,8 @@ insert into participant (id, team_id, tournament_id, points) values (138,100,118
 insert into participant (id, team_id, tournament_id, points) values (139,100,119, 0);
 insert into participant (id, user_id, tournament_id, points) values (140,101,120, 0);
 insert into participant (id, team_id, tournament_id, points) values (141,101,120, 0);
+insert into participant (id, user_id, tournament_id, points, group_number, score_difference) values (142,101,100, 1, 1, -6);
+insert into participant (id, team_id, tournament_id, points) values (143,101,100, 0);
 
 insert into game_format (id, name, players_per_team, game_id) values (100, 'formi', 6, 103);
 
@@ -182,4 +184,19 @@ insert into match (id, tournament_id, local_id, visitor_id, winner, local_score,
     VALUES (5, 100, 102, 103, 2, 4, 5, true, 1);
 
 insert into match (id, tournament_id, is_group_stage)
-VALUES (0, 102, true);
+    VALUES (0, 102, true);
+
+insert into comments (id, commenter_id, receiver_id, comment, created_at)
+    values (100, 101, 100, 'First','2025-11-16 22:04:01');
+insert into comments (id, commenter_id, receiver_id, comment, created_at)
+values (101, 101, 100, 'First','2025-11-16 22:04:02');
+insert into comments (id, commenter_id, receiver_id, comment, created_at)
+values (102, 101, 100, 'First','2025-11-16 22:04:03');
+insert into comments (id, commenter_id, receiver_id, comment, created_at)
+values (103, 101, 100, 'First','2025-11-16 22:04:04');
+insert into comments (id, commenter_id, receiver_id, comment, created_at)
+values (104, 101, 100, 'First','2025-11-16 22:04:05');
+insert into comments (id, commenter_id, receiver_id, comment, created_at)
+values (105, 101, 100, 'First','2025-11-16 22:04:06');
+insert into comments (id, commenter_id, receiver_id, comment, created_at)
+values (106, 101, 100, 'First','2025-11-16 22:04:07');

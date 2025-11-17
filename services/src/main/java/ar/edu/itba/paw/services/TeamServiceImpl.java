@@ -44,7 +44,8 @@ public class TeamServiceImpl implements TeamService {
 
     @Transactional
     @Override
-    public Team create(String name, byte[] pfp, byte[] banner, Long ownerId, List<String> members) {
+    public Team create(String name, byte[] pfp, byte[] banner, long ownerId, List<String> members) {
+        User owner = userDao.findById(ownerId).orElseThrow(UserNotFoundException::new);
         Long pfpId = null;
         Long bannerId = null;
         if (pfp != null){
@@ -61,7 +62,6 @@ public class TeamServiceImpl implements TeamService {
             for (String s : members){
                 teamMemberDao.addMember(team.getId(), userDao.findByUsername(s).orElseThrow(UserNotFoundException::new).getId());
             }
-            User owner = userDao.findById(ownerId).orElseThrow(UserNotFoundException::new);
             if (!members.contains(owner.getUsername())) {
                 teamMemberDao.addMember(team.getId(), ownerId);
             }
@@ -73,38 +73,38 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public Optional<Team> findById(Long id) {
+    public Optional<Team> findById(long id) {
         return teamDao.findById(id);
     }
 
     @Override
-    public List<Tournament> getActiveTournaments(Long teamId, Integer page) {
+    public List<Tournament> getActiveTournaments(long teamId, int page) {
         return getTournamentsFromIds(teamDao.getActiveTournaments(teamId, page));
     }
 
     @Override
-    public List<Tournament> getPastTournaments(Long teamId, Integer page) {
+    public List<Tournament> getPastTournaments(long teamId, int page) {
         return getTournamentsFromIds(teamDao.getPastTournaments(teamId, page));
     }
 
     @Override
-    public Long getActivePages(Long teamId) {
+    public long getActivePages(long teamId) {
         return teamDao.getActivePages(teamId);
     }
 
     @Override
-    public Long getPastPages(Long teamId) {
+    public long getPastPages(long teamId) {
         return teamDao.getPastPages(teamId);
     }
 
     @Override
-    public List<Team> getUserTeams(Long userId) {
+    public List<Team> getUserTeams(long userId) {
         return teamDao.getUserTeams(userId);
     }
 
     @Transactional
     @Override
-    public void updateTeam(Long teamId, String name, byte[] pfp, byte[] banner, List<String> members) {
+    public void updateTeam(long teamId, String name, byte[] pfp, byte[] banner, List<String> members) {
         Long pfpId = null;
         Long bannerId = null;
         if (pfp != null){
@@ -116,7 +116,7 @@ public class TeamServiceImpl implements TeamService {
 
         if (members != null){
             for (String s : members){
-                Long userId =  userDao.findByUsername(s).orElseThrow(UserNotFoundException::new).getId();
+                long userId = userDao.findByUsername(s).orElseThrow(UserNotFoundException::new).getId();
                 if (!teamMemberDao.isMember(teamId, userId)){
                     teamMemberDao.addMember(teamId, userId);
                 }
@@ -129,16 +129,19 @@ public class TeamServiceImpl implements TeamService {
     @Transactional
     @Override
     public List<User> getTeamMembers(Long teamId) {
+        if(teamId == null) {
+            throw new TeamNotFoundException();
+        }
         return teamDao.findById(teamId).orElseThrow(TeamNotFoundException::new).getMembers();
     }
 
     @Override
-    public Boolean teamNameTaken(String name) {
+    public boolean teamNameTaken(String name) {
         return teamDao.teamNameTaken(name);
     }
 
     @Override
-    public List<Team> getUserTeamsBySizeNotInTournament(Long userId, Long tournamentId) {
+    public List<Team> getUserTeamsBySizeNotInTournament(long userId, long tournamentId) {
         Tournament tournament = ts.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
         GameFormat format = tournament.getFormatEntity();
         long teamSize;
@@ -156,13 +159,16 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public List<Team> searchByName(String name, Long page) {
+    public List<Team> searchByName(String name, long page) {
         return teamDao.searchByName(name, page);
     }
 
     private List<Tournament> getTournamentsFromIds(List<Long> tournamentIds) {
         List<Tournament> tournaments = new ArrayList<>();
         for (Long id : tournamentIds) {
+            if(id == null) {
+                throw new TournamentNotFoundException();
+            }
             tournamentDao.findById(id).ifPresent(tournaments::add);
         }
         return tournaments;

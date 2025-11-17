@@ -59,7 +59,8 @@ public class UserController {
     }
 
     @RequestMapping("/")
-    public ModelAndView index(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @ModelAttribute("tournamentForm") TournamentForm tournamentForm) {
+    public ModelAndView index(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                              @ModelAttribute("tournamentForm") TournamentForm tournamentForm) {
         final ModelAndView mav = new ModelAndView("index");
         List<Game> games = gs.findAllPaged(0L);
 
@@ -84,7 +85,8 @@ public class UserController {
 
 
     @RequestMapping("/gamesPage")
-    public ModelAndView gamesPage(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam(defaultValue = "0") Long page) {
+    public ModelAndView gamesPage(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                  @RequestParam(defaultValue = "0") long page) {
         final ModelAndView mav = new ModelAndView("gamesPage");
         List<Game> allGames = gs.findAllPaged(page);
         PawUserDetails userDetails = currentUser.orElse(null);
@@ -97,7 +99,10 @@ public class UserController {
     }
 
     @RequestMapping(value = "/tournamentsPage", method = RequestMethod.GET)
-    public ModelAndView tournamentsPage(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @ModelAttribute("filterForm") FilterForm filterForm, @ModelAttribute("tf") TournamentFilter tf,  @RequestParam(defaultValue = "0") Long page) {
+    public ModelAndView tournamentsPage(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                        @ModelAttribute("filterForm") FilterForm filterForm,
+                                        TournamentFilter tf,
+                                        @RequestParam(defaultValue = "0") long page) {
         final ModelAndView mav = new ModelAndView("tournamentsPage");
         List<Game> allGames = gs.findAll();
 
@@ -147,7 +152,7 @@ public class UserController {
     }
 
     @RequestMapping("/search")
-    public ModelAndView search(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam("q") final String q, @RequestParam(defaultValue = "0") Long page1, @RequestParam(defaultValue = "0") Long page2, @RequestParam(defaultValue = "0") Long page3, @RequestParam(defaultValue = "0") Long page4){
+    public ModelAndView search(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam("q") final String q, @RequestParam(defaultValue = "0") long page1, @RequestParam(defaultValue = "0") long page2, @RequestParam(defaultValue = "0") long page3, @RequestParam(defaultValue = "0") long page4){
         final ModelAndView mav = new ModelAndView("searchResults");
 
         int totalPages1 = gs.countSearchByNameGame(q);
@@ -182,9 +187,9 @@ public class UserController {
 
     @RequestMapping("/profile/{id}")
     public ModelAndView profile(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
-                                @PathVariable Long id,
+                                @PathVariable long id,
                                 @ModelAttribute("editProfileForm") EditProfileForm editProfileForm,
-                                @RequestParam(value = "page", defaultValue = "0") Long commentsPage,
+                                @RequestParam(value = "page", defaultValue = "0") long commentsPage,
                                 @ModelAttribute("addAccountForm") AddAccountForm addAccountForm){
         final ModelAndView mav = new ModelAndView("profile");
         User profile = us.findById(id).orElseThrow(UserNotFoundException::new);
@@ -192,13 +197,13 @@ public class UserController {
         int totalCommentPages = us.getCommentPages(id);
         commentsPage = adjustPage(commentsPage, totalCommentPages);
         List<Comment> comments = us.getCommentsReceived(id, commentsPage);
-        List<UserAccount> userAccounts =  us.getUserAccounts(profile.getId());
+        List<UserAccount> userAccounts =  us.getUserAccounts(id);
         User loggedUser = null;
         if(currentUser.isPresent()) {
             loggedUser = currentUser.get().getPawUser();
         }
         mav.addObject("user", loggedUser);
-        mav.addObject("isMyProfile", loggedUser != null && loggedUser.getId() == id);
+        mav.addObject("isMyProfile", loggedUser != null && Objects.equals(loggedUser.getId(), id));
         mav.addObject("profile", profile);
         mav.addObject("favouriteGames", gs.getFavourites(id));
         mav.addObject("activeTournaments", ts.findUserTournaments(id, false , false , false ,0L));
@@ -228,7 +233,11 @@ public class UserController {
 
 
     @RequestMapping("/profile/{id}/tournaments")
-    public ModelAndView profileTournaments(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @PathVariable Long id, @RequestParam(value = "section", required = false, defaultValue = "active") String section, @RequestParam(defaultValue = "0") Long page1, @RequestParam(defaultValue = "0") Long page2) {
+    public ModelAndView profileTournaments(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                           @PathVariable long id,
+                                           @RequestParam(value = "section", required = false, defaultValue = "active") String section,
+                                           @RequestParam(defaultValue = "0") long page1,
+                                           @RequestParam(defaultValue = "0") long page2) {
         final ModelAndView mav = new ModelAndView("myTournaments");
 
         User profile = us.findById(id).orElseThrow(UserNotFoundException::new);
@@ -240,38 +249,38 @@ public class UserController {
 
         switch (section) {
             case Constants.TOURNAMENTS_OWNED -> {
-                totalPages1 = ts.countUserTournaments(profile.getId(), Constants.ONGOING, Constants.CREATOR, Constants.ALL_TOURNEYS);
-                totalPages2 = ts.countUserTournaments(profile.getId(), Constants.FINISHED, Constants.CREATOR, Constants.ALL_TOURNEYS);
+                totalPages1 = ts.countUserTournaments(id, Constants.ONGOING, Constants.CREATOR, Constants.ALL_TOURNEYS);
+                totalPages2 = ts.countUserTournaments(id, Constants.FINISHED, Constants.CREATOR, Constants.ALL_TOURNEYS);
 
                 page1 = adjustPage(page1, totalPages1);
                 page2 = adjustPage(page2, totalPages2);
 
-                List<Tournament> onGoingTournaments = ts.findUserTournaments(profile.getId(), Constants.ONGOING, Constants.CREATOR, Constants.ALL_TOURNEYS, page1);
-                List<Tournament> finishedTournaments = ts.findUserTournaments(profile.getId(), Constants.FINISHED, Constants.CREATOR, Constants.ALL_TOURNEYS, page2);
+                List<Tournament> onGoingTournaments = ts.findUserTournaments(id, Constants.ONGOING, Constants.CREATOR, Constants.ALL_TOURNEYS, page1);
+                List<Tournament> finishedTournaments = ts.findUserTournaments(id, Constants.FINISHED, Constants.CREATOR, Constants.ALL_TOURNEYS, page2);
 
                 mav.addObject("onGoingTournaments", onGoingTournaments);
                 mav.addObject("finishedTournaments", finishedTournaments);
             }
 
             case Constants.TOURNAMENTS_FINISHED -> {
-                totalPages1 = ts.countUserTournaments(profile.getId(), Constants.FINISHED, Constants.PARTICIPANT, Constants.ALL_TOURNEYS);
-                totalPages2 = ts.countUserTournaments(profile.getId(), Constants.FINISHED, Constants.PARTICIPANT, Constants.WON);
+                totalPages1 = ts.countUserTournaments(id, Constants.FINISHED, Constants.PARTICIPANT, Constants.ALL_TOURNEYS);
+                totalPages2 = ts.countUserTournaments(id, Constants.FINISHED, Constants.PARTICIPANT, Constants.WON);
 
                 page1 = adjustPage(page1, totalPages1);
                 page2 = adjustPage(page2, totalPages2);
 
-                List<Tournament> pastTournaments = ts.findUserTournaments(profile.getId(), Constants.FINISHED, Constants.PARTICIPANT, Constants.ALL_TOURNEYS, page1);
-                List<Tournament> wonTournaments = ts.findUserTournaments(profile.getId(), Constants.FINISHED, Constants.PARTICIPANT, Constants.WON, page2);
+                List<Tournament> pastTournaments = ts.findUserTournaments(id, Constants.FINISHED, Constants.PARTICIPANT, Constants.ALL_TOURNEYS, page1);
+                List<Tournament> wonTournaments = ts.findUserTournaments(id, Constants.FINISHED, Constants.PARTICIPANT, Constants.WON, page2);
 
                 mav.addObject("pastTournaments", pastTournaments);
                 mav.addObject("wonTournaments", wonTournaments);
             }
 
             case Constants.TOURNAMENTS_ACTIVE -> {
-                totalPages1 = ts.countUserTournaments(profile.getId(), Constants.ONGOING, Constants.PARTICIPANT, Constants.ALL_TOURNEYS);
+                totalPages1 = ts.countUserTournaments(id, Constants.ONGOING, Constants.PARTICIPANT, Constants.ALL_TOURNEYS);
                 page1 = adjustPage(page1, totalPages1);
 
-                List<Tournament> joinedTournaments = ts.findUserTournaments(profile.getId(),  Constants.ONGOING, Constants.PARTICIPANT, Constants.ALL_TOURNEYS, page1);
+                List<Tournament> joinedTournaments = ts.findUserTournaments(id,  Constants.ONGOING, Constants.PARTICIPANT, Constants.ALL_TOURNEYS, page1);
                 mav.addObject("joinedTournaments", joinedTournaments);
             }
         }
@@ -285,11 +294,13 @@ public class UserController {
     }
 
     @RequestMapping("/profile/{id}/teams")
-    public ModelAndView profileTeams(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @PathVariable Long id, @ModelAttribute("editProfileForm") EditProfileForm editProfileForm){
+    public ModelAndView profileTeams(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                     @PathVariable long id,
+                                     @ModelAttribute("editProfileForm") EditProfileForm editProfileForm){
         final ModelAndView mav = new ModelAndView("profileTeams");
 
         User profile = us.findById(id).orElseThrow(UserNotFoundException::new);
-        Float userRating = us.getUserRating(profile.getId());
+        Float userRating = us.getUserRating(id);
         User loggedUser = null;
         if(currentUser.isPresent()) {
             loggedUser = currentUser.get().getPawUser();
@@ -334,7 +345,11 @@ public class UserController {
     }
 
     @RequestMapping(value = "/profile/update", method = { RequestMethod.POST })
-    public ModelAndView updateProfile(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam("userId") final long userId, @Valid @ModelAttribute("editProfileForm") final EditProfileForm form, final BindingResult result,  @ModelAttribute("addAccountForm") AddAccountForm addAccountForm){
+    public ModelAndView updateProfile(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                      @RequestParam("userId") final long userId,
+                                      @Valid @ModelAttribute("editProfileForm") final EditProfileForm form,
+                                      final BindingResult result,
+                                      @ModelAttribute("addAccountForm") AddAccountForm addAccountForm){
         if (currentUser.isPresent() && result.hasErrors()) {
             ModelAndView mav = profile(currentUser, userId, form, DEFAULT_PAGE, addAccountForm);
             mav.addObject("openModal", "'editProfileModal'");
@@ -366,7 +381,9 @@ public class UserController {
     }
 
     @RequestMapping(value = "/account/delete", method = { RequestMethod.POST })
-    public ModelAndView deleteUserAccount(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam("userId") final long userId, @RequestParam("platform") final Platform platform) {
+    public ModelAndView deleteUserAccount(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                          @RequestParam("userId") final long userId,
+                                          @RequestParam("platform") final Platform platform) {
 
         User user = currentUser.map(PawUserDetails::getPawUser).orElse(null);
         List<Platform> platforms = Arrays.stream(Platform.values()).toList();
@@ -382,7 +399,9 @@ public class UserController {
     }
 
     @RequestMapping(value = "/account/add", method = { RequestMethod.POST })
-    public ModelAndView addUserAccount(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @Valid @ModelAttribute("addAccountForm") final AddAccountForm form, final BindingResult result) {
+    public ModelAndView addUserAccount(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                       @Valid @ModelAttribute("addAccountForm") final AddAccountForm form,
+                                       final BindingResult result) {
 
         User user = currentUser.map(PawUserDetails::getPawUser).orElse(null);
 

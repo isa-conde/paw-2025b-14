@@ -30,7 +30,8 @@ public class TeamController {
     }
 
     @RequestMapping("/team/create")
-    public ModelAndView teamForm(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @ModelAttribute("teamForm") CreateTeamForm form){
+    public ModelAndView teamForm(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                 @ModelAttribute("teamForm") CreateTeamForm form){
         ModelAndView mav = new ModelAndView("createTeam");
 
         if (currentUser.isPresent()) {
@@ -41,7 +42,9 @@ public class TeamController {
     }
 
     @RequestMapping(value = "/team/create", method = { RequestMethod.POST })
-    public ModelAndView createTeam(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @Valid @ModelAttribute("teamForm") CreateTeamForm form, final BindingResult result){
+    public ModelAndView createTeam(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                   @Valid @ModelAttribute("teamForm") CreateTeamForm form,
+                                   final BindingResult result){
         if (result.hasErrors()){
             return teamForm(currentUser, form);
         }
@@ -71,7 +74,11 @@ public class TeamController {
     }
 
     @RequestMapping("/team/profile/{id}")
-    public ModelAndView teamProfile(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @PathVariable Long id, @ModelAttribute("teamForm") EditTeamForm editTeamForm, @RequestParam(defaultValue = "0") Integer page1, @RequestParam(defaultValue = "0") Integer page2){
+    public ModelAndView teamProfile(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                    @PathVariable long id,
+                                    @ModelAttribute("teamForm") EditTeamForm editTeamForm,
+                                    @RequestParam(defaultValue = "0") int page1,
+                                    @RequestParam(defaultValue = "0") int page2){
         final ModelAndView mav = new ModelAndView("teamProfile");
 
         if (currentUser.isPresent()) {
@@ -89,14 +96,17 @@ public class TeamController {
         mav.addObject("members", ts.getTeamMembers(id));
         mav.addObject("currentPage1", page1);
         mav.addObject("currentPage2", page2);
-        mav.addObject("totalPages1", ts.getActivePages(team.getId()));
-        mav.addObject("totalPages2", ts.getPastPages(team.getId()));
+        mav.addObject("totalPages1", ts.getActivePages(id));
+        mav.addObject("totalPages2", ts.getPastPages(id));
         editTeamForm.setName(team.getName());
         return mav;
     }
 
     @RequestMapping(value = "/team/update", method = { RequestMethod.POST })
-    public ModelAndView updateProfile(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam("teamId") final long teamId, @Valid @ModelAttribute("teamForm") final EditTeamForm form, final BindingResult result){
+    public ModelAndView updateProfile(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                      @RequestParam("teamId") final long teamId,
+                                      @Valid @ModelAttribute("teamForm") final EditTeamForm form,
+                                      final BindingResult result){
         if (currentUser.isPresent() && result.hasErrors()) {
             ModelAndView mav = teamProfile(currentUser, teamId, form, 0, 0);
             mav.addObject("openModal", "'editProfileModal'");

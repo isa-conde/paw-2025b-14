@@ -18,7 +18,7 @@ public class ImageServiceImpl implements ImageService {
 
     @Transactional(readOnly = true)
     @Override
-    public Optional<byte[]> findById(Long id) {
+    public Optional<byte[]> findById(long id) {
         return imageDao.findById(id);
     }
 }

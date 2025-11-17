@@ -1,7 +1,6 @@
 package ar.edu.itba.paw.interfaces.persistence;
 
 import ar.edu.itba.paw.model.Game.Game;
-import ar.edu.itba.paw.model.Game.GameFormat;
 import ar.edu.itba.paw.model.enums.Genre;
 
 import java.util.List;
@@ -11,7 +10,7 @@ public interface GameDao {
 
     Optional<Game> findById(long id);
 
-    List<Game> searchByName(String name, Long page);
+    List<Game> searchByName(String name, long page);
 
     int countSearchByNameGame(String name);
 
@@ -19,13 +18,13 @@ public interface GameDao {
 
     List<Game> findAll();
 
-    Game create(String name, Genre genre, Integer imageId);
+    Game create(String name, Genre genre, int imageId);
 
     boolean checkNameExists(String name);
 
-    List<Game> getFavourites(Long userId);
+    List<Game> getFavourites(long userId);
 
-    List<Game> findAllPaged(Long page);
+    List<Game> findAllPaged(long page);
 
-    Long getPageAmount();
+    long getPageAmount();
 }

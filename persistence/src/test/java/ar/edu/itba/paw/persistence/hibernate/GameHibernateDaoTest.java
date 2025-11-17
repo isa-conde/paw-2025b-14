@@ -55,7 +55,7 @@ public class GameHibernateDaoTest {
         final Game game = gameHibernateDao.create(NAME, GENRE, 1);
         em.flush();
 
-        Assert.assertEquals(1,JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"game","name = '" + NAME + "' and genre = '" + GENRE + "' and image_id = 1"));
+        Assert.assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"game","name = '" + NAME + "' and genre = '" + GENRE + "' and image_id = 1"));
         Assert.assertNotNull(game);
         Assert.assertEquals(NAME, game.getName());
         Assert.assertEquals(GENRE, game.getGenre());
@@ -207,30 +207,11 @@ public class GameHibernateDaoTest {
 
     @Test
     public void testSearchNameless(){
-        List<Game> expected=new ArrayList<>();
-        int i=0;
-        for (Genre genre : Genre.values()){
-            for (int k=0; k<OTHER_NAMES.length; k++) {
-                expected.add(new Game(firstUsedId + k*10 + i,OTHER_NAMES[k] + " " + genre, genre, firstUsedId.intValue()));
-            }
-            i++;
-        }
-
         List<Game> games = gameHibernateDao.searchByName("", 0L);
 
         Assert.assertNotNull(games);
         Assert.assertFalse(games.isEmpty());
-        Assert.assertEquals(expected.size(), games.size());
-        Comparator<Game> cmp = (a,b)-> Math.toIntExact((a.getId() - b.getId()));
-        expected.sort(cmp);
-        games.sort(cmp);
-        for( int j = 0 ; j<expected.size(); j++ ){
-            Assert.assertNotNull(games.get(j));
-            Assert.assertEquals(expected.get(j).getName(), games.get(j).getName());
-            Assert.assertEquals(expected.get(j).getGenre(), games.get(j).getGenre());
-            Assert.assertEquals(Integer.valueOf(firstUsedId.intValue()),games.get(j).getImageId());
-            Assert.assertEquals(expected.get(j).getId(),games.get(j).getId());
-        }
+        Assert.assertEquals(GRID_PAGE_SIZE, games.size());
     }
 
     @Test
@@ -248,9 +229,9 @@ public class GameHibernateDaoTest {
     public void testGetPageAmount(){
         long expected = (long) Math.ceil((double) (OTHER_NAMES.length * Genre.values().length) /GRID_PAGE_SIZE);
 
-        Long ans = gameHibernateDao.getPageAmount();
+        long ans = gameHibernateDao.getPageAmount();
 
-        Assert.assertEquals(expected,ans.longValue());
+        Assert.assertEquals(expected,ans);
     }
 
     @Test

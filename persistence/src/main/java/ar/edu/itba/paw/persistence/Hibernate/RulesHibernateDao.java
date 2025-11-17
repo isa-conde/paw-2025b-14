@@ -15,7 +15,7 @@ public class RulesHibernateDao implements RulesDao {
     private EntityManager em;
 
     @Override
-    public Optional<Rules> findById(Long id) {
+    public Optional<Rules> findById(long id) {
         return Optional.ofNullable(em.find(Rules.class, id));
     }
 
@@ -27,7 +27,7 @@ public class RulesHibernateDao implements RulesDao {
     }
 
     @Override
-    public void updateRules(Long id, byte[] file) {
+    public void updateRules(long id, byte[] file) {
         Rules r = em.find(Rules.class, id);
         r.setFile(file);
         em.persist(r);

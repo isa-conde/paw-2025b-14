@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface GameFormatDao {
 
-    List<GameFormat> getFormats(Long gameId);
+    List<GameFormat> getFormats(long gameId);
 
-    Optional<GameFormat> findById(Long id);
+    Optional<GameFormat> findById(long id);
 }

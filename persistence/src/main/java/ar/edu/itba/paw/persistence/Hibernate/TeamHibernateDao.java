@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.persistence.Hibernate;
 
+import ar.edu.itba.paw.interfaces.exception.UserNotFoundException;
 import ar.edu.itba.paw.interfaces.persistence.TeamDao;
 import ar.edu.itba.paw.model.Team;
 import ar.edu.itba.paw.model.User;
@@ -21,12 +22,11 @@ public class TeamHibernateDao implements TeamDao {
     private EntityManager em;
 
     @Override
-    public Team create(String name, Long pfpId, Long bannerId, Long ownerId) {
+    public Team create(String name, Long pfpId, Long bannerId, long ownerId) {
         User owner = em.find(User.class, ownerId);
         if (owner == null) {
-            throw new IllegalArgumentException();
+            throw new UserNotFoundException();
         }
-
         Team team = new Team(name, pfpId, bannerId);
         team.setOwner(owner);
         em.persist(team);
@@ -34,21 +34,21 @@ public class TeamHibernateDao implements TeamDao {
     }
 
     @Override
-    public Optional<Team> findById(Long id) {
+    public Optional<Team> findById(long id) {
         return Optional.ofNullable(em.find(Team.class, id));
     }
 
     @Override
-    public List<Long> getPastTournaments(Long teamId, Integer page) {
+    public List<Long> getPastTournaments(long teamId, int page) {
         return findTeamTournamentIds(teamId, true, page);
     }
 
     @Override
-    public List<Long> getActiveTournaments(Long teamId, Integer page) {
+    public List<Long> getActiveTournaments(long teamId, int page) {
         return findTeamTournamentIds(teamId, false, page);
     }
 
-    private List<Long> findTeamTournamentIds(Long teamId, Boolean isFinished, Integer page) {
+    private List<Long> findTeamTournamentIds(long teamId, boolean isFinished, int page) {
         String jpql = """
             SELECT DISTINCT p.tournament.id
             FROM Participant p
@@ -66,16 +66,16 @@ public class TeamHibernateDao implements TeamDao {
     }
 
     @Override
-    public Long getActivePages(Long teamId) {
+    public long getActivePages(long teamId) {
         return getTeamTournamentsPages(teamId, false);
     }
 
     @Override
-    public Long getPastPages(Long teamId) {
+    public long getPastPages(long teamId) {
         return getTeamTournamentsPages(teamId, true);
     }
 
-    private Long getTeamTournamentsPages(Long teamId, Boolean isFinished){
+    private long getTeamTournamentsPages(long teamId, boolean isFinished){
         String jpql = """
             SELECT DISTINCT COUNT (DISTINCT (p.tournament.id))
             FROM Participant p
@@ -92,25 +92,27 @@ public class TeamHibernateDao implements TeamDao {
     }
 
     @Override
-    public List<Team> getUserTeams(Long userId) {
+    public List<Team> getUserTeams(long userId) {
         return em.find(User.class, userId).getTeams();
     }
 
     @Override
-    public void updateTeam(Long teamId, String name, Long pfpId, Long bannerId) {
+    public void updateTeam(long teamId, String name, Long pfpId, Long bannerId) {
         Team team = em.find(Team.class, teamId);
         if (name != null){
             team.setName(name);
-        }if (pfpId != null){
+        }
+        if(pfpId != null) {
             team.setPfpId(pfpId);
-        }if (bannerId != null){
+        }
+        if(bannerId != null) {
             team.setBannerId(bannerId);
         }
         em.persist(team);
     }
 
     @Override
-    public Boolean teamNameTaken(String name) {
+    public boolean teamNameTaken(String name) {
         String jpql = "SELECT COUNT(t) FROM Team t WHERE t.name = :name";
         Long count = em.createQuery(jpql, Long.class)
                 .setParameter("name", name)
@@ -119,7 +121,7 @@ public class TeamHibernateDao implements TeamDao {
     }
 
     @Override
-    public List<Team> searchByName(String name, Long page) {
+    public List<Team> searchByName(String name, long page) {
 
         Query idQuery = em.createNativeQuery(
                 "SELECT t.id " +
@@ -168,7 +170,7 @@ public class TeamHibernateDao implements TeamDao {
 
 
     @Override
-    public List<Team> getUserTeamsBySizeNotInTournament(Long userId, Long tournamentId, Long minSize) {
+    public List<Team> getUserTeamsBySizeNotInTournament(long userId, long tournamentId, long minSize) {
         String jpql = """
         SELECT DISTINCT t
         FROM Team t

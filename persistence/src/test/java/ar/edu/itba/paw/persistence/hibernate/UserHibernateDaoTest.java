@@ -130,7 +130,7 @@ public class UserHibernateDaoTest {
         Assert.assertEquals(USED_USERNAME, ans.get().getUsername());
         Assert.assertEquals(USED_EMAIL, ans.get().getEmail());
         Assert.assertEquals(PASSWORD, ans.get().getPassword());
-        Assert.assertEquals(usedId.longValue(), ans.get().getId());
+        Assert.assertEquals(usedId.longValue(), (long) ans.get().getId());
         Assert.assertFalse(ans.get().isVerified());
     }
 
@@ -151,7 +151,7 @@ public class UserHibernateDaoTest {
         Assert.assertEquals(USED_USERNAME,ans.get().getUsername());
         Assert.assertEquals(USED_EMAIL, ans.get().getEmail());
         Assert.assertEquals(PASSWORD, ans.get().getPassword());
-        Assert.assertEquals(ans.get().getId(), usedId.longValue());
+        Assert.assertEquals((long) ans.get().getId(), usedId.longValue());
     }
 
     @Test
@@ -171,7 +171,7 @@ public class UserHibernateDaoTest {
         Assert.assertEquals(USED_USERNAME,ans.get().getUsername());
         Assert.assertEquals(USED_EMAIL, ans.get().getEmail());
         Assert.assertEquals(PASSWORD, ans.get().getPassword());
-        Assert.assertEquals(ans.get().getId(), usedId.longValue());
+        Assert.assertEquals((long) ans.get().getId(), usedId.longValue());
     }
 
     @Test

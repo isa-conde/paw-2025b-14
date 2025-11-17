@@ -6,9 +6,9 @@ import java.util.*;
 
 public interface MatchService {
 
-    void setMatchResults(Long matchId, Long tournamentId, Integer localScore, Integer visitorScore);
+    void setMatchResults(long matchId, long tournamentId, Integer localScore, Integer visitorScore);
 
-    void swapMatchesMembers(Long tournamentId, Long match1, Long match2, Long user1, Long user2);
+    void swapMatchesMembers(long tournamentId, long match1, long match2, long user1, long user2);
 
-    Map<Integer, List<Match>> getTournamentMatchesByStage(Long tournamentId);
+    Map<Integer, List<Match>> getTournamentMatchesByStage(long tournamentId);
 }

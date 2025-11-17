@@ -41,6 +41,15 @@
             color: #E6F7FF;
         }
 
+        .centered-link {
+            display: block;
+            text-align: center;
+            margin-top: 5px;
+            font-weight: bold;
+            color: #5865F2;
+            text-decoration: none;
+        }
+
         .btn {
             display: inline-block;
             margin-top: 20px;
@@ -73,18 +82,11 @@
         <br/>
         <p th:text="#{email.tournamentStartedNotification.serverName(${serverName})}">Server name</p>
         <p th:text="#{email.tournamentStartedNotification.serverPassword(${serverPassword})}">Server password</p>
-        <div class="row" style="display: flex; align-items: center; gap: 6px;">
-            <img alt="Discord"
-                 src="cid:discord"
-                 width="20" height="20"
-                 style="display:block;border:0;outline:none;">
-
-            <a th:href="${discordChannel}"
-               th:text="#{email.tournamentStartedNotification.discord}"
-               style="text-decoration: none; color: #5865F2; font-weight: bold;">
-                Discord Channel
-            </a>
-        </div>
+        <a th:href="${discordChannel}"
+           th:text="#{email.tournamentStartedNotification.discord}"
+           class="centered-link">
+            Discord Channel
+        </a>
         <br/>
         <p th:text="#{email.tournamentStartedNotification.advice(${creatorMail})}">Contact the creator with their email.</p>
         <a class="btn" th:href="${tournamentLink}" th:text="#{email.tournamentStartedNotification.buttonLabel}">Go to Tournament</a>

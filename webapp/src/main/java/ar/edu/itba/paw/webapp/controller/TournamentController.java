@@ -97,30 +97,29 @@ public class TournamentController {
     }
 
     @RequestMapping(value = "/tournament/swap/groups", method = RequestMethod.POST)
-    public ModelAndView swapGroups(@RequestParam("tournamentId") Long tournamentId,
+    public ModelAndView swapGroups(@RequestParam("tournamentId") long tournamentId,
                                    @RequestParam(name="selected", required=false) List<String> selected,
                                    RedirectAttributes ra) {
 
-        Long user1 = Long.valueOf(selected.get(0));
-        Long user2 = Long.valueOf(selected.get(1));
+        long user1 = Long.parseLong(selected.get(0));
+        long user2 = Long.parseLong(selected.get(1));
 
         ps.swapGroups(tournamentId, user1, user2);
 
-        ra.addAttribute("tournamentId", tournamentId);
         ra.addAttribute("edit", true);
-        return new ModelAndView("redirect:/tournament");
+        return new ModelAndView("redirect:/tournament/" +  tournamentId);
     }
 
     @RequestMapping(value = "/tournament/swap/matches", method = RequestMethod.POST)
     public ModelAndView swapMatchesMembers(
-            @RequestParam("tournamentId") Long tournamentId,
+            @RequestParam("tournamentId") long tournamentId,
             @RequestParam(name="selected", required=false) List<String> selected,
             RedirectAttributes ra) {
 
         String[] a = selected.get(0).split(":");
         String[] b = selected.get(1).split(":");
-        Long match1 = Long.valueOf(a[0]), user1 = Long.valueOf(a[1]);
-        Long match2 = Long.valueOf(b[0]), user2 = Long.valueOf(b[1]);
+        long match1 = Long.parseLong(a[0]), user1 = Long.parseLong(a[1]);
+        long match2 = Long.parseLong(b[0]), user2 = Long.parseLong(b[1]);
 
         ms.swapMatchesMembers(tournamentId, match1, match2, user1, user2);
 
@@ -184,8 +183,7 @@ public class TournamentController {
         Map<Integer, List<Match>> matches = ms.getTournamentMatchesByStage(tournamentId);
         long maxStage = matches != null ? matches.keySet().stream().max(Integer::compareTo).orElse(0) : 0L;
 
-        Integer groups = ps.getTournamentGroups(tournamentId);
-
+        int groups = ps.getTournamentGroups(tournamentId);
 
         if(optionalTournament.isPresent()) {
             Tournament t = optionalTournament.get();
@@ -217,9 +215,9 @@ public class TournamentController {
             int participantCount = participants.size();
             Game game = gs.findById(t.getGameId()).orElseThrow(GameNotFoundException::new);
             User creator = us.findById(t.getCreatorId()).orElseThrow(UserNotFoundException::new);
-            Boolean isIndividualTournament = teamSize == 1;
-            Boolean isParticipant = user != null && ps.hasJoined(user.getId(), tournamentId);
-            Boolean hasRankedTournament = user != null && ps.participantHasRatedTournament(user.getId(), tournamentId);
+            boolean isIndividualTournament = teamSize == 1;
+            boolean isParticipant = user != null && ps.hasJoined(user.getId(), tournamentId);
+            boolean hasRankedTournament = user != null && ps.participantHasRatedTournament(user.getId(), tournamentId);
             Float creatorRating = us.getUserRating(t.getCreatorId());
             if (user != null && !isIndividualTournament && !isParticipant){
                 mav.addObject("userTeams", tms.getUserTeamsBySizeNotInTournament(user.getId(), tournamentId));
@@ -287,14 +285,16 @@ public class TournamentController {
     }
 
     @RequestMapping(value = "/tournament/join", method = { RequestMethod.POST })
-    public ModelAndView joinTournament(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam("tournamentId") final long tournamentId) {
+    public ModelAndView joinTournament(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                       @RequestParam("tournamentId") final long tournamentId) {
         User user = currentUser.orElseThrow(UserNotAuthenticatedException::new).getPawUser(); // aca se manda una excepcion, pero no deberia llegar por Spring Security.
         ps.joinTournamentUser(user.getId(), tournamentId);
         return new ModelAndView("redirect:/tournament/" + tournamentId);
     }
 
     @RequestMapping(value = "/tournament/leave", method = { RequestMethod.POST })
-    public ModelAndView leaveTournament(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam("tournamentId") final long tournamentId) {
+    public ModelAndView leaveTournament(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                        @RequestParam("tournamentId") final long tournamentId) {
         User user = currentUser.orElseThrow(UserNotAuthenticatedException::new).getPawUser(); // idem a /tournament/join
         ps.leaveTournament(user.getId(), tournamentId);
         ts.notifyCreatorOfLeavingUser(user, tournamentId);
@@ -359,7 +359,8 @@ public class TournamentController {
     }
 
     @RequestMapping("/tournaments/new/step1")
-    public ModelAndView newTournamentFormStep1(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @ModelAttribute("tournamentForm") final TournamentForm form){
+    public ModelAndView newTournamentFormStep1(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                               @ModelAttribute("tournamentForm") final TournamentForm form){
         final ModelAndView mav = new ModelAndView("tournamentForm");
 
         User user = currentUser.orElseThrow(UserNotAuthenticatedException::new).getPawUser(); // idem a /tournament/join
@@ -373,7 +374,9 @@ public class TournamentController {
     }
 
     @RequestMapping(value = "/tournaments/new/step1", method = RequestMethod.POST)
-    public ModelAndView validateStep1(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @Validated(TournamentForm.StepOne.class) @ModelAttribute("tournamentForm") TournamentForm form, BindingResult result) {
+    public ModelAndView validateStep1(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                      @Validated(TournamentForm.StepOne.class) @ModelAttribute("tournamentForm") TournamentForm form,
+                                      BindingResult result) {
         if (result.hasErrors()) {
             return newTournamentFormStep1(currentUser, form);
         } else {
@@ -382,10 +385,11 @@ public class TournamentController {
     }
 
     @RequestMapping(value = "/tournaments/new/step2", method = { RequestMethod.GET })
-    public ModelAndView newTournamentFormStep2(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @ModelAttribute("tournamentForm") final TournamentForm form){
+    public ModelAndView newTournamentFormStep2(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                               @ModelAttribute("tournamentForm") final TournamentForm form){
         final ModelAndView mav = new ModelAndView("tournamentForm");
         List<GameFormat> formats = gs.getFormats(form.getGameId());
-        Integer playersPerTeamMax = formats.stream()
+        int playersPerTeamMax = formats.stream()
         .map(GameFormat::getPlayersPerTeam)
         .filter(java.util.Objects::nonNull)
         .max(Integer::compareTo)
@@ -409,7 +413,9 @@ public class TournamentController {
     }
 
     @RequestMapping(value = "/tournaments/new/step2", method = RequestMethod.POST)
-    public ModelAndView validateStep2(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @Validated(TournamentForm.StepTwo.class) @ModelAttribute("tournamentForm") TournamentForm form, BindingResult result) {
+    public ModelAndView validateStep2(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                      @Validated(TournamentForm.StepTwo.class) @ModelAttribute("tournamentForm") TournamentForm form,
+                                      BindingResult result) {
         try {
             if (form.getImage() != null && !form.getImage().isEmpty()) {
                 form.setImageBytes(form.getImage().getBytes());
@@ -428,7 +434,8 @@ public class TournamentController {
     }
 
     @RequestMapping(value = "/tournaments/new/step3", method = { RequestMethod.GET })
-    public ModelAndView newTournamentFormStep3(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @ModelAttribute("tournamentForm") final TournamentForm form){
+    public ModelAndView newTournamentFormStep3(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                               @ModelAttribute("tournamentForm") final TournamentForm form){
         final ModelAndView mav = new ModelAndView("tournamentForm");
 
         User user = currentUser.orElseThrow(UserNotAuthenticatedException::new).getPawUser();
@@ -439,7 +446,10 @@ public class TournamentController {
     }
 
     @RequestMapping(value = "/tournaments/new/step3", method = { RequestMethod.POST })
-    public ModelAndView createTournament(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @Validated(TournamentForm.StepThree.class) @ModelAttribute("tournamentForm") final TournamentForm form, final BindingResult result, SessionStatus status) {
+    public ModelAndView createTournament(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                         @Validated({TournamentForm.StepOne.class, TournamentForm.StepTwo.class, TournamentForm.StepThree.class}) @ModelAttribute("tournamentForm") final TournamentForm form,
+                                         final BindingResult result,
+                                         SessionStatus status) {
         if (result.hasErrors()) {
             return newTournamentFormStep3(currentUser, form);
         }

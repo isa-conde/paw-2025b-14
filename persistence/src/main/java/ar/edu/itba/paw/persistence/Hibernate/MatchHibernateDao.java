@@ -1,5 +1,7 @@
 package ar.edu.itba.paw.persistence.Hibernate;
 
+import ar.edu.itba.paw.interfaces.exception.MatchNotFoundException;
+import ar.edu.itba.paw.interfaces.exception.MissingWinnerException;
 import ar.edu.itba.paw.interfaces.persistence.MatchDao;
 import ar.edu.itba.paw.model.Match.Match;
 import ar.edu.itba.paw.model.Participant;
@@ -25,7 +27,7 @@ public class MatchHibernateDao implements MatchDao {
     private EntityManager em;
 
     @Override
-    public void insertMatch(Long id, Long tournamentId, Long localId, Long visitorId, Integer stage, Integer localScore, Integer visitorScore, Integer winner, Boolean isGroupStage) {
+    public void insertMatch(long id, long tournamentId, Long localId, Long visitorId, int stage, Integer localScore, Integer visitorScore, Integer winner, Boolean isGroupStage) {
         MatchId matchId = new MatchId(id, tournamentId);
         Match match = new Match(matchId, localScore, visitorScore, winner, stage, isGroupStage);
         match.setTournament(em.getReference(Tournament.class, matchId.getTournamentId()));
@@ -43,18 +45,18 @@ public class MatchHibernateDao implements MatchDao {
     }
 
     @Override
-    public Long getMatchWinner(Long tournamentId, Long matchId) {
+    public Long getMatchWinner(long tournamentId, long matchId) {
         em.flush();
         MatchId id = new MatchId(matchId, tournamentId);
         Match match = em.find(Match.class, id);
         if(match == null) {
             LOGGER.warn("Match not found for tournamentId={} matchId={}", tournamentId, matchId);
-            return null; //TODO: add custom excep
+            throw new MatchNotFoundException();
         }
         Integer winner = match.getWinner();
         if(winner == null) {
             LOGGER.warn("Match does not have a winner");
-            return null; // TODO: add custom excep
+            throw new MissingWinnerException();
         }
         if(winner == 1) {
             return match.getLocalId();
@@ -65,7 +67,7 @@ public class MatchHibernateDao implements MatchDao {
     }
 
     @Override
-    public void setMatchResults(Long matchId, Long tournamentId, Integer localScore, Integer visitorScore, Integer winner, LocalDate date) {
+    public void setMatchResults(long matchId, long tournamentId, int localScore, int visitorScore, int winner, LocalDate date) {
         MatchId id = new MatchId(matchId, tournamentId);
         Match match = em.find(Match.class, id);
         if (match == null) {
@@ -79,7 +81,7 @@ public class MatchHibernateDao implements MatchDao {
     }
 
     @Override
-    public List<Match> getTournamentMatches(Long tournamentId, Integer teamSize) {
+    public List<Match> getTournamentMatches(long tournamentId, int teamSize) {
         Tournament tournament = em.find(Tournament.class, tournamentId);
         return tournament.getMatches();
     }
@@ -91,14 +93,14 @@ public class MatchHibernateDao implements MatchDao {
     }
 
     @Override
-    public Long getMaxMatchId(Long tournamentId) {
+    public Long getMaxMatchId(long tournamentId) {
         TypedQuery<Long> query = em.createQuery("SELECT MAX(m.id.id) FROM Match m WHERE m.tournament = :tournament", Long.class);
         query.setParameter("tournament", em.getReference(Tournament.class, tournamentId));
         return query.getSingleResult();
     }
 
     @Override
-    public void updateMatchLocal(Long tournamentId, Long matchId, Long userId) {
+    public void updateMatchLocal(long tournamentId, long matchId, Long userId) {
         MatchId id = new MatchId(matchId, tournamentId);
         Query query = em.createQuery("UPDATE Match m SET m.local = :newLocal WHERE m.id = :id");
         Participant newLocal = em.find(Participant.class, userId);
@@ -107,7 +109,7 @@ public class MatchHibernateDao implements MatchDao {
     }
 
     @Override
-    public void updateMatchVisitor(Long tournamentId, Long matchId, Long userId) {
+    public void updateMatchVisitor(long tournamentId, long matchId, Long userId) {
         MatchId id = new MatchId(matchId, tournamentId);
         Query query = em.createQuery("UPDATE Match m SET m.visitor = :newVisitor WHERE m.id = :id");
         Participant newVisitor = em.find(Participant.class, userId);
@@ -116,7 +118,7 @@ public class MatchHibernateDao implements MatchDao {
     }
 
     @Override
-    public Boolean allMatchesPlayed(Long tournamentId) {
+    public boolean allMatchesPlayed(long tournamentId) {
         TypedQuery<Long> totalMatchesCountQuery = em.createQuery("SELECT COUNT(m) FROM Match m WHERE m.tournament = :tournament", Long.class);
         totalMatchesCountQuery.setParameter("tournament", em.getReference(Tournament.class, tournamentId));
         Long totalMatches = totalMatchesCountQuery.getSingleResult();
@@ -131,7 +133,7 @@ public class MatchHibernateDao implements MatchDao {
     }
 
     @Override
-    public Integer getMatchStage(Long tournamentId, Long matchId) {
+    public Integer getMatchStage(long tournamentId, long matchId) {
         MatchId id = new MatchId(matchId, tournamentId);
         TypedQuery<Integer> query = em.createQuery("SELECT m.stage FROM Match m WHERE m.id = :id", Integer.class);
         query.setParameter("id", id);
@@ -139,21 +141,21 @@ public class MatchHibernateDao implements MatchDao {
     }
 
     @Override
-    public List<Long> getStageMatchIds(Integer stage, Long tournamentId) {
+    public List<Long> getStageMatchIds(int stage, long tournamentId) {
         TypedQuery<Long> query = em.createQuery("SELECT m.id.id FROM Match m WHERE m.stage = :stage AND m.tournament = :tournament", Long.class);
         query.setParameter("stage", stage).setParameter("tournament", em.getReference(Tournament.class, tournamentId));
         return query.getResultList();
     }
 
     @Override
-    public Integer getTournamentMaxStage(Long tournamentId) {
+    public int getTournamentMaxStage(long tournamentId) {
         TypedQuery<Integer> query = em.createQuery("SELECT COALESCE(MAX(m.stage), 0) FROM Match m WHERE m.tournament = :tournament", Integer.class);
         query.setParameter("tournament", em.getReference(Tournament.class, tournamentId));
         return query.getSingleResult();
     }
 
     @Override
-    public Integer getTournamentGroupMaxStage(Long tournamentId, Integer groupNumber) {
+    public int getTournamentGroupMaxStage(long tournamentId, int groupNumber) {
         TypedQuery<Integer> query = em.createQuery("SELECT COALESCE(MAX(m.stage), 0) FROM Match m WHERE m.tournament = :tournament AND m.local.groupNumber = :groupNumber", Integer.class);
         query.setParameter("tournament", em.getReference(Tournament.class, tournamentId));
         query.setParameter("groupNumber", groupNumber);

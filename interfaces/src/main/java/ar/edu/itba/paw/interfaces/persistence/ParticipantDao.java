@@ -7,41 +7,41 @@ import java.util.List;
 
 public interface ParticipantDao {
 
-    void joinTournamentUser(Long userId, Long tournamentId);
+    void joinTournamentUser(long userId, long tournamentId);
 
-    void joinTournamentUserWithTeam(Long userId, Long tournamentId, Long teamId);
+    void joinTournamentUserWithTeam(long userId, long tournamentId, long teamId);
 
-    void joinTournamentTeam(Long tournamentId, Long teamId);
+    void joinTournamentTeam(long tournamentId, long teamId);
 
-    Participant getTournamentParticipantById(Long tournamentId, Long participantId, Integer teamSize);
+    Participant getTournamentParticipantById(long tournamentId, Long participantId, int teamSize);
 
-    Boolean hasJoined(Long userId, Long tournamentId);
+    boolean hasJoined(long userId, long tournamentId);
 
-    Boolean hasRated(Long userId, Long tournamentId);
+    boolean hasRated(long userId, long tournamentId);
 
-    void leaveTournamentUser(Long userId, Long tournamentId);
+    void leaveTournamentUser(long userId, long tournamentId);
 
-    void leaveTournamentTeam(Long teamId, Long tournamentId);
+    void leaveTournamentTeam(long teamId, long tournamentId);
 
-    void updateGroupNumberForUsers(long tournamentId, int groupNumber, List<Long> userIds, Integer teamSize);
+    void updateGroupNumberForUsers(long tournamentId, int groupNumber, List<Long> userIds);
 
-    void swapGroups(Long tournamentId, Long user1, Long user2, Integer group1, Integer group2, Integer teamSize);
+    void swapGroups(long tournamentId, long user1, long user2, int group1, int group2);
 
-    List<Participant> getTournamentParticipantsByPointsPair(Long tournamentId, Integer groupNumber, PointsPair pointsPair, Integer teamSize);
+    List<Participant> getTournamentParticipantsByPointsPair(long tournamentId, Integer groupNumber, PointsPair pointsPair, int teamSize);
 
-    PointsPair getTournamentMaxPointsPairGroup(Long tournamentId, Integer group);
+    PointsPair getTournamentMaxPointsPairGroup(long tournamentId, Integer group);
 
-    PointsPair getTournamentSecondMaxPointsPairGroup(Long tournamentId, Integer group);
+    PointsPair getTournamentSecondMaxPointsPairGroup(long tournamentId, Integer group);
 
-    Integer getTournamentGroups(Long tournamentId);
+    int getTournamentGroups(long tournamentId);
 
-    List<Participant> getTournamentParticipantUsers(Long tournamentId);
+    List<Participant> getTournamentParticipantUsers(long tournamentId);
 
-    Integer getGroupNumber(Long tournamentId, Long userId, Integer teamSize);
+    Integer getGroupNumber(long tournamentId, long userId);
 
-    void sumPoints(Long tournamentId, Long userId, Integer points, Integer scoreDifference, Integer teamSize);
+    void sumPoints(long tournamentId, long userId, int points, int scoreDifference, int teamSize);
 
-    List<Participant> getTournamentParticipantTeams(Long tournamentId);
+    List<Participant> getTournamentParticipantTeams(long tournamentId);
 
-    void updateHasRated(Long userId, Long tournamentId);
+    void updateHasRated(long userId, long tournamentId);
 }

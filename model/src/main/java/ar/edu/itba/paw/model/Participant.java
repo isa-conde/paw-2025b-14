@@ -16,7 +16,7 @@ public class Participant {
     private Long id;
 
     @Column(name = "points", nullable = false)
-    private Integer points;
+    private int points;
 
     @Column(name = "score_difference")
     private Integer scoreDifference;
@@ -51,13 +51,14 @@ public class Participant {
     private List<Match> visitorMatch;
 
 
-    public Participant(final Long id, final String name, Integer points, Integer scoreDifference, Integer groupNumber, Long pfpId) {
+    public Participant(final Long id, final String name, Integer points, Integer scoreDifference, Integer groupNumber, Long pfpId, Boolean hasRated) {
         this.id = id;
         this.name = name;
         this.points = points;
         this.scoreDifference = scoreDifference;
         this.groupNumber = groupNumber;
         this.pfpId = pfpId;
+        this.hasRated = hasRated;
     }
 
     public Participant(Tournament tournament){
@@ -74,11 +75,11 @@ public class Participant {
         return id;
     }
 
-    public Integer getPoints() {
+    public int getPoints() {
         return points;
     }
 
-    public void setPoints(Integer points) {
+    public void setPoints(int points) {
         this.points = points;
     }
 
@@ -158,7 +159,7 @@ public class Participant {
         return hasRated;
     }
 
-    public void setHasRated(Boolean hasRated) {
+    public void setHasRated(boolean hasRated) {
         this.hasRated = hasRated;
     }
 

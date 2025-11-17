@@ -4,7 +4,6 @@ import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Platform;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 public interface UserDao {
@@ -19,23 +18,23 @@ public interface UserDao {
 
     void changePassword(long userId, String newPassword);
 
-    Boolean checkUsernameExists(String username);
+    boolean checkUsernameExists(String username);
 
-    Boolean checkEmailExists(String email);
+    boolean checkEmailExists(String email);
 
     void verifyUser(long userId);
 
-    void updateProfileInfo(Long userId, String username, String bio, Long pfp, Long banner);
+    void updateProfileInfo(long userId, String username, String bio, Long pfp, Long banner);
 
-    List<User> searchByName(String name, Long page);
+    List<User> searchByName(String name, long page);
 
     int countSearchByNameUser(String name);
 
     List<User> findAllByName(String name);
 
-    void updateUserLocale(String locale, Long userId);
+    void updateUserLocale(String locale, long userId);
 
-    void updateUserRating(Long userId, Float rating);
+    void updateUserRating(long userId, float rating);
 
     void addUserAccount(long userId, Platform platform, String username);
 

@@ -18,11 +18,11 @@ public class GameForm {
 
     private Genre genre;
 
-    private List<GameFormat> formats = new ArrayList<>(Arrays.asList(
-            new GameFormat(null, null, null),
-            new GameFormat(null, null, null),
-            new GameFormat(null, null, null)
-    ));
+//    private List<GameFormat> formats = new ArrayList<>(Arrays.asList(
+//            new GameFormat(null, null, null),
+//            new GameFormat(null, null, null),
+//            new GameFormat(null, null, null)
+//    ));
 
     private MultipartFile image;
 
@@ -42,12 +42,12 @@ public class GameForm {
         this.genre = genre;
     }
 
-    public List<GameFormat> getFormats() {
-        return formats;
-    }
-    public void setFormats(List<GameFormat> formats) {
-        this.formats = formats;
-    }
+//    public List<GameFormat> getFormats() {
+//        return formats;
+//    }
+//    public void setFormats(List<GameFormat> formats) {
+//        this.formats = formats;
+//    }
 
     public MultipartFile getImage() {
         return image;

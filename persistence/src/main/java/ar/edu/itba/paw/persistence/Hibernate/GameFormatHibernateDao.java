@@ -17,13 +17,13 @@ public class GameFormatHibernateDao implements GameFormatDao {
     private EntityManager em;
 
     @Override
-    public List<GameFormat> getFormats(Long gameId) {
+    public List<GameFormat> getFormats(long gameId) {
         Game g = em.find(Game.class, gameId);
         return g.getFormats();
     }
 
     @Override
-    public Optional<GameFormat> findById(Long id) {
-        return Optional.of(em.find(GameFormat.class, id));
+    public Optional<GameFormat> findById(long id) {
+        return Optional.ofNullable(em.find(GameFormat.class, id));
     }
 }

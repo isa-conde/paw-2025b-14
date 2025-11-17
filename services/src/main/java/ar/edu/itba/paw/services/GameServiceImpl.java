@@ -1,10 +1,10 @@
 package ar.edu.itba.paw.services;
 
-import ar.edu.itba.paw.interfaces.exception.GameFormatNotFoundException;
+import ar.edu.itba.paw.interfaces.exception.GameNotFoundException;
+import ar.edu.itba.paw.interfaces.exception.ImageNotFoundException;
 import ar.edu.itba.paw.interfaces.exception.NameAlreadyUsedException;
 import ar.edu.itba.paw.interfaces.persistence.GameDao;
 import ar.edu.itba.paw.interfaces.persistence.GameFormatDao;
-import ar.edu.itba.paw.interfaces.persistence.ImageDao;
 import ar.edu.itba.paw.interfaces.services.GameService;
 import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.Game.GameFormat;
@@ -33,7 +33,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public List<Game> searchByName(String name, Long page) {
+    public List<Game> searchByName(String name, long page) {
         return gameDao.searchByName(name, page);
     }
 
@@ -53,27 +53,33 @@ public class GameServiceImpl implements GameService {
         if(gameDao.checkNameExists(name)){
             throw new NameAlreadyUsedException(name);
         }
+        if(imageId == null) {
+            throw new ImageNotFoundException();
+        }
         return gameDao.create(name, genre, imageId);
     }
 
     @Override
     public List<GameFormat> getFormats(Long gameId) {
+        if(gameId == null) {
+            throw new GameNotFoundException();
+        }
         return gameFormatDao.getFormats(gameId);
     }
 
     @Transactional
     @Override
-    public List<Game> getFavourites(Long userId) {
+    public List<Game> getFavourites(long userId) {
         return gameDao.getFavourites(userId);
     }
 
     @Override
-    public List<Game> findAllPaged(Long page){
+    public List<Game> findAllPaged(long page){
         return gameDao.findAllPaged(page);
     }
 
     @Override
-    public Long getPageAmount(){
+    public long getPageAmount(){
         return gameDao.getPageAmount();
     }
 }

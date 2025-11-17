@@ -15,7 +15,7 @@ public class ImageHibernateDao implements ImageDao {
     private EntityManager em;
 
     @Override
-    public Optional<byte[]> findById(Long id) {
+    public Optional<byte[]> findById(long id) {
         Image img = em.find(Image.class,id);
         if(img == null){
             return Optional.empty();
@@ -31,7 +31,7 @@ public class ImageHibernateDao implements ImageDao {
     }
 
     @Override
-    public void updateImage(Long id, byte[] image) {
+    public void updateImage(long id, byte[] image) {
         Image i = em.find(Image.class, id);
         i.setImage(image);
         em.persist(i);
