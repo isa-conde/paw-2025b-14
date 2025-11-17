@@ -58,8 +58,7 @@
             </c:if>
         </c:forEach>
       </c:if>
-        <c:url value="/tournamentsPage" var="url"/>
-        <paw:pagination currentPage="${currentPage}" totalPages="${totalPages}" url="${url}"/>
+        <paw:pagination currentPage="${currentPage}" totalPages="${totalPages}" url="/tournamentsPage"/>
     </div>
 </paw:layout>
 
