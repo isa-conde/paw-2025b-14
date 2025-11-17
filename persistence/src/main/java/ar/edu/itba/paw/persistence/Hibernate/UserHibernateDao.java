@@ -189,9 +189,9 @@ public class UserHibernateDao implements UserDao {
 
     @Override
     public void deleteUserAccount(long userId, Platform platform) {
-        em.createNativeQuery("DELETE FROM user_account WHERE user_id = ?1 AND platform = CAST(?2 AS platform)")
-                .setParameter(1, userId)
-                .setParameter(2, platform.name())
+        em.createQuery("DELETE FROM UserAccount u WHERE u.id.userId = :userId AND u.id.platform = :platform")
+                .setParameter("userId", userId)
+                .setParameter("platform", platform)
                 .executeUpdate();
     }
 }

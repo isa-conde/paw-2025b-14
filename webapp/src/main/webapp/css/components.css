@@ -1783,6 +1783,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     align-items: center;
     gap: 15px;
     flex-direction: row;
+    max-width: 200px;
+}
+
+.user-account-left .main-text {
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 .user-account-modal-item {
