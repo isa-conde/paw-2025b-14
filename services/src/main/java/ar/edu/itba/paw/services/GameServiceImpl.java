@@ -61,6 +61,9 @@ public class GameServiceImpl implements GameService {
     @Transactional
     @Override
     public Game createWithFormats(String name, Genre genre, List<GameFormat> formats, byte[] image) {
+        if(gameDao.checkNameExists(name)){
+            throw new NameAlreadyUsedException(name);
+        }
         Long imageId = imageDao.insertImage(image);
         for (GameFormat f : formats){
             gameFormatDao.insertFormat(f);
@@ -72,7 +75,6 @@ public class GameServiceImpl implements GameService {
     public List<GameFormat> getFormats(Long gameId) {
         return gameFormatDao.getFormats(gameId);
     }
-
 
     @Transactional
     @Override

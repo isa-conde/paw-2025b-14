@@ -19,6 +19,7 @@ import org.mockito.stubbing.Answer;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
+import java.util.Locale;
 import java.util.Optional;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -26,6 +27,7 @@ public class UserServiceImplTest{
     private static final String USERNAME="johndoe";
     private static final String EMAIL="some@mail.com";
     private static final String PASSWORD="1234567890";
+    private static final Locale LOCALE = Locale.of("es");
     private final static int RESET_PASSWORD_DAYS_DURATION = 1;
     private final static int VERIFICATION_DAYS_DURATION = 2;
 
@@ -44,48 +46,48 @@ public class UserServiceImplTest{
     @InjectMocks
     private UserServiceImpl userService;
 
-//    @Test
-//    public void testCreate(){
-//        Mockito.when(passwordEncoder.encode(PASSWORD))
-//                .thenReturn(PASSWORD);
-//        Mockito.when(mockUserDao.checkUsernameExists(USERNAME))
-//                .thenReturn(false);
-//        Mockito.when(mockUserDao.checkEmailExists(EMAIL))
-//                .thenReturn(false);
-//        Mockito.when(mockUserDao.create(Mockito.eq(USERNAME),Mockito.eq(EMAIL),Mockito.eq(PASSWORD)))
-//                .thenReturn(new User(1L,USERNAME,EMAIL,PASSWORD, false, null, 1L, 1L,""));
-//        Mockito.when(mockTokenDao.findByToken(ArgumentMatchers.anyLong()))
-//                .thenReturn(Optional.empty());
-//        Mockito.when(mockTokenDao.create(ArgumentMatchers.eq(1L),ArgumentMatchers.anyLong(),ArgumentMatchers.eq(LocalDate.now().plusDays(VERIFICATION_DAYS_DURATION))))
-//                .thenReturn(new Token(1L,1L,1L,LocalDate.now().plusDays(VERIFICATION_DAYS_DURATION)));
-//
-//        User maybeUser = userService.create(USERNAME,EMAIL,PASSWORD);
-//
-//        Assert.assertNotNull(maybeUser);
-//        Assert.assertEquals(USERNAME, maybeUser.getUsername());
-//        Assert.assertEquals(EMAIL,maybeUser.getEmail());
-//        Assert.assertEquals(PASSWORD,maybeUser.getPassword());
-//        Assert.assertEquals(1L,maybeUser.getId());
-//        Assert.assertEquals("",maybeUser.getLocale());
-//    }
-//
-//    @Test(expected = UsernameAlreadyUsedException.class)
-//    public void testUsernameExists(){
-//        Mockito.when(mockUserDao.checkUsernameExists(USERNAME))
-//                .thenReturn(true);
-//
-//        User maybeUser = userService.create(USERNAME,EMAIL,PASSWORD);
-//    }
-//
-//    @Test(expected = EmailAlreadyUsedException.class)
-//    public void testEmailExists(){
-//        Mockito.when(mockUserDao.checkUsernameExists(USERNAME))
-//                .thenReturn(false);
-//        Mockito.when(mockUserDao.checkEmailExists(EMAIL))
-//                .thenReturn(true);
-//
-//        User maybeUser = userService.create(USERNAME,EMAIL,PASSWORD);
-//    }
+    @Test
+    public void testCreate(){
+        Mockito.when(passwordEncoder.encode(PASSWORD))
+                .thenReturn(PASSWORD);
+        Mockito.when(mockUserDao.checkUsernameExists(USERNAME))
+                .thenReturn(false);
+        Mockito.when(mockUserDao.checkEmailExists(EMAIL))
+                .thenReturn(false);
+        Mockito.when(mockUserDao.create(Mockito.eq(USERNAME),Mockito.eq(EMAIL),Mockito.eq(PASSWORD),Mockito.eq(LOCALE.getLanguage())))
+                .thenReturn(new User(1L,USERNAME,EMAIL,PASSWORD, false, null, 1L, 1L,"es"));
+        Mockito.when(mockTokenDao.findByToken(ArgumentMatchers.anyLong()))
+                .thenReturn(Optional.empty());
+        Mockito.when(mockTokenDao.create(ArgumentMatchers.eq(1L),ArgumentMatchers.anyLong(),ArgumentMatchers.eq(LocalDate.now().plusDays(VERIFICATION_DAYS_DURATION))))
+                .thenReturn(new Token(1L,1L,1L,LocalDate.now().plusDays(VERIFICATION_DAYS_DURATION)));
+
+        User maybeUser = userService.create(USERNAME,EMAIL,PASSWORD,LOCALE);
+
+        Assert.assertNotNull(maybeUser);
+        Assert.assertEquals(USERNAME, maybeUser.getUsername());
+        Assert.assertEquals(EMAIL,maybeUser.getEmail());
+        Assert.assertEquals(PASSWORD,maybeUser.getPassword());
+        Assert.assertEquals(1L,maybeUser.getId());
+        Assert.assertEquals("es",maybeUser.getLocale());
+    }
+
+    @Test(expected = UsernameAlreadyUsedException.class)
+    public void testUsernameExists(){
+        Mockito.when(mockUserDao.checkUsernameExists(USERNAME))
+                .thenReturn(true);
+
+         userService.create(USERNAME,EMAIL,PASSWORD,LOCALE);
+    }
+
+    @Test(expected = EmailAlreadyUsedException.class)
+    public void testEmailExists(){
+        Mockito.when(mockUserDao.checkUsernameExists(USERNAME))
+                .thenReturn(false);
+        Mockito.when(mockUserDao.checkEmailExists(EMAIL))
+                .thenReturn(true);
+
+        userService.create(USERNAME,EMAIL,PASSWORD,LOCALE);
+    }
 
     @Test
     public void testSameAsOldPassword(){

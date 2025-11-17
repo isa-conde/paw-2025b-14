@@ -1,17 +1,23 @@
 package ar.edu.itba.paw.services;
 
+import ar.edu.itba.paw.interfaces.exception.GameFormatNotFoundException;
 import ar.edu.itba.paw.interfaces.exception.NameAlreadyUsedException;
 import ar.edu.itba.paw.interfaces.persistence.GameDao;
+import ar.edu.itba.paw.interfaces.persistence.GameFormatDao;
+import ar.edu.itba.paw.interfaces.persistence.ImageDao;
 import ar.edu.itba.paw.model.Game.Game;
+import ar.edu.itba.paw.model.Game.GameFormat;
 import ar.edu.itba.paw.model.enums.Genre;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Answers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -20,9 +26,17 @@ import java.util.Optional;
 public class GameServiceImplTest {
     private static final String NAME = "Sumo Slammers";
     private static final Genre GENRE = Genre.Fighting;
+    private static final byte[] IMAGE = "9".repeat(64).getBytes(StandardCharsets.UTF_8);
+    private static final Long ID = 100L;
 
     @Mock
     private GameDao mockDao;
+
+    @Mock
+    private ImageDao imageDao;
+
+    @Mock
+    private GameFormatDao gameFormatDao;
 
     @InjectMocks
     private GameServiceImpl gameService;
@@ -46,5 +60,12 @@ public class GameServiceImplTest {
         Mockito.when(mockDao.checkNameExists(NAME)).thenReturn(true);
 
         gameService.create(NAME,GENRE,1);
+    }
+
+    @Test(expected = GameFormatNotFoundException.class)
+    public void testFormatNotFound(){
+        Mockito.when(gameFormatDao.findById(ID)).thenReturn(Optional.empty());
+
+        gameService.findFormatById(ID);
     }
 }
