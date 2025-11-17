@@ -23,7 +23,7 @@
       <paw:text type="title">${failedTitle}</paw:text>
       <paw:text size="l"><spring:message code="verification.failed.text"/></paw:text>
       <br>
-      <form:form method="post" action="${resendVerificationUrl}">
+      <form:form method="post" action="${resendVerificationUrl}" onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
         <paw:input path="" label="verification.resend" inputType="submit"/>
       </form:form>
     </paw:form-layout>
