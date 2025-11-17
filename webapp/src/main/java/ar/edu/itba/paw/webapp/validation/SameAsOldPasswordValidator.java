@@ -22,7 +22,7 @@ public class SameAsOldPasswordValidator implements ConstraintValidator<SameAsOld
             context.disableDefaultConstraintViolation();
 
             context.buildConstraintViolationWithTemplate("{passwordReset.error.sameAsOld}")
-                    .addPropertyNode("newPassword")
+                    .addPropertyNode("password")
                     .addConstraintViolation();
         }
 
