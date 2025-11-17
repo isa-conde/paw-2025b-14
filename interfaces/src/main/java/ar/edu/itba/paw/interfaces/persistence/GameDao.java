@@ -11,7 +11,9 @@ public interface GameDao {
 
     Optional<Game> findById(long id);
 
-    List<Game> searchByName(String name);
+    List<Game> searchByName(String name, Long page);
+
+    int countSearchByNameGame(String name);
 
     List<Game> searchByGenre(Genre genre);
 

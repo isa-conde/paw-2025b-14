@@ -40,7 +40,11 @@ public interface UserService {
 
     void updateProfileInfo(Long userId, String username, String bio, byte[] pfp, byte[] banner);
 
-    List<User> searchByName(String name);
+    List<User> searchByName(String name, Long page);
+
+    List<User> findAllByName(String name);
+
+    int countSearchByNameUser(String name);
 
     void updateUserLocale(Locale locale, Long userId);
 

@@ -147,10 +147,52 @@ public class TournamentHibernateDao implements TournamentDao {
     }
 
     @Override
-    public List<Tournament> searchByName(String name) {
-        TypedQuery<Tournament> query = em.createQuery("SELECT t FROM Tournament t WHERE LOWER(t.name) LIKE CONCAT('%', LOWER(:name), '%') AND t.tournamentStarted = false", Tournament.class);
-        query.setParameter("name", name);
-        return query.getResultList();
+    public List<Tournament> searchByName(String name, Long page) {
+
+        Query idQuery = em.createNativeQuery(
+                "SELECT t.id " +
+                        "FROM tournament t " +
+                        "WHERE LOWER(t.name) LIKE CONCAT('%', LOWER(?1), '%') " +
+                        "  AND t.tournament_started = false " +
+                        "ORDER BY t.start_date ASC"
+        );
+
+        idQuery.setParameter(1, name);
+        idQuery.setFirstResult((int) (page * PAGE_SIZE));
+        idQuery.setMaxResults(PAGE_SIZE);
+
+        @SuppressWarnings("unchecked")
+        List<Number> ids = idQuery.getResultList();
+        if (ids.isEmpty()) return Collections.emptyList();
+
+        TypedQuery<Tournament> fullQuery = em.createQuery(
+                "SELECT DISTINCT t FROM Tournament t " +
+                        "WHERE t.id IN :ids " +
+                        "ORDER BY t.startDate ASC",
+                Tournament.class
+        );
+
+        fullQuery.setParameter("ids",
+                ids.stream().map(Number::longValue).toList()
+        );
+
+        return fullQuery.getResultList();
+    }
+
+    @Override
+    public int countSearchByName(String name) {
+
+        TypedQuery<Long> countQuery = em.createQuery(
+                "SELECT COUNT(t) FROM Tournament t " +
+                        "WHERE LOWER(t.name) LIKE CONCAT('%', LOWER(:name), '%') " +
+                        "AND t.tournamentStarted = false",
+                Long.class
+        );
+
+        countQuery.setParameter("name", name);
+        long total = countQuery.getSingleResult();
+
+        return (int) Math.ceil((double) total / PAGE_SIZE);
     }
 
     @Override
@@ -186,48 +228,11 @@ public class TournamentHibernateDao implements TournamentDao {
             tournamentIdsQuery.setParameter("id", game.longValue());
             tournamentIdsQuery.setMaxResults(TOURNAMENTS_PER_GAME);
             List<Tournament> tournaments = tournamentIdsQuery.getResultList();
-            ans.put(game.longValue(),tournaments);
+            if (!tournaments.isEmpty()){
+                ans.put(game.longValue(),tournaments);
+
+            }
         }
-
-//        Query tournamentIdsQuery = em.createNativeQuery(
-//                "SELECT t.id " +
-//                        "FROM Tournament t " +
-//                        "WHERE t.game_id IN ?1 " +
-//                        "AND t.open_inscriptions = true " +
-//                        "ORDER BY t.game_id, t.start_date ASC ");
-//        tournamentIdsQuery.setParameter(1, topGameIds.stream().map(Number::longValue).toList());
-//        tournamentIdsQuery.setMaxResults(TOURNAMENTS_PER_GAME);
-//
-//        @SuppressWarnings("unchecked")
-//        List<Number> tournamentIds = tournamentIdsQuery.getResultList();
-//        if (tournamentIds.isEmpty()) return Collections.emptyMap();
-//
-//        TypedQuery<Tournament> fullQuery = em.createQuery(
-//                "SELECT DISTINCT t FROM Tournament t " +
-//                        "LEFT JOIN FETCH t.game g " +
-//                        "WHERE t.id IN :ids " +
-//                        "ORDER BY t.game.id, t.startDate ASC",
-//                Tournament.class
-//        );
-//        fullQuery.setParameter("ids", tournamentIds.stream().map(Number::longValue).toList());
-//
-//        List<Tournament> tournaments = fullQuery.getResultList();
-//
-//        Map<Long, List<Tournament>> grouped = tournaments.stream()
-//                .collect(Collectors.groupingBy(
-//                        t -> t.getGame().getId(),
-//                        LinkedHashMap::new,
-//                        Collectors.toList()
-//                ));
-//
-//        Map<Long, List<Tournament>> orderedMap = new LinkedHashMap<>();
-//        for (Number gameId : topGameIds) {
-//            Long gid = gameId.longValue();
-//            if (grouped.containsKey(gid)) {
-//                orderedMap.put(gid, grouped.get(gid));
-//            }
-//        }
-
         return ans;
     }
 

@@ -169,8 +169,13 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public List<Tournament> searchByName(String name){
-        return tournamentDao.searchByName(name);
+    public List<Tournament> searchByName(String name, Long page){
+        return tournamentDao.searchByName(name, page);
+    }
+
+    @Override
+    public int countSearchByName(String name) {
+        return tournamentDao.countSearchByName(name);
     }
 
     @Transactional

@@ -27,7 +27,11 @@ public interface UserDao {
 
     void updateProfileInfo(Long userId, String username, String bio, Long pfp, Long banner);
 
-    List<User> searchByName(String name);
+    List<User> searchByName(String name, Long page);
+
+    int countSearchByNameUser(String name);
+
+    List<User> findAllByName(String name);
 
     void updateUserLocale(String locale, Long userId);
 

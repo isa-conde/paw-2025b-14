@@ -146,8 +146,13 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public List<Team> searchByName(String name) {
-        return teamDao.searchByName(name);
+    public int countSearchByNameTeam(String name) {
+        return teamDao.countSearchByNameTeam(name);
+    }
+
+    @Override
+    public List<Team> searchByName(String name, Long page) {
+        return teamDao.searchByName(name, page);
     }
 
     private List<Tournament> getTournamentsFromIds(List<Long> tournamentIds) {

@@ -8,11 +8,14 @@ import org.hibernate.query.NativeQuery;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.*;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public class UserHibernateDao implements UserDao {
+
+    private static final int PAGE_SIZE = 9;
 
     @PersistenceContext
     private EntityManager em;
@@ -106,11 +109,59 @@ public class UserHibernateDao implements UserDao {
     }
 
     @Override
-    public List<User> searchByName(String name) {
+    public List<User> searchByName(String name, Long page) {
+
+        Query idQuery = em.createNativeQuery(
+                "SELECT u.id " +
+                        "FROM users u " +
+                        "WHERE LOWER(u.username) LIKE CONCAT('%', LOWER(?1), '%') " +
+                        "ORDER BY u.username ASC"
+        );
+
+        idQuery.setParameter(1, name);
+        idQuery.setFirstResult((int) (page * PAGE_SIZE));
+        idQuery.setMaxResults(PAGE_SIZE);
+
+        @SuppressWarnings("unchecked")
+        List<Number> ids = idQuery.getResultList();
+        if (ids.isEmpty()) return Collections.emptyList();
+
+        TypedQuery<User> fullQuery = em.createQuery(
+                "SELECT DISTINCT u FROM User u " +
+                        "WHERE u.id IN :ids " +
+                        "ORDER BY u.username ASC",
+                User.class
+        );
+
+        fullQuery.setParameter("ids",
+                ids.stream().map(Number::longValue).toList()
+        );
+
+        return fullQuery.getResultList();
+    }
+
+    public int countSearchByNameUser(String name) {
+
+        TypedQuery<Long> countQuery = em.createQuery(
+                "SELECT COUNT(u) FROM User u " +
+                        "WHERE LOWER(u.username) LIKE CONCAT('%', LOWER(:username), '%')",
+                Long.class
+        );
+
+        countQuery.setParameter("username", name);
+
+        long total = countQuery.getSingleResult();
+
+        return (int) Math.ceil((double) total / PAGE_SIZE);
+    }
+
+    @Override
+    public List<User> findAllByName(String name) {
         final TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE LOWER(u.username) LIKE CONCAT('%', LOWER(:username), '%')", User.class);
         query.setParameter("username", name);
         return query.getResultList();
     }
+
 
     @Override
     public void updateUserLocale(String locale, Long userId) {
@@ -136,18 +187,18 @@ public class UserHibernateDao implements UserDao {
 
     @Override
     public void addUserAccount(long userId, Platform platform, String username) {
-        em.createNativeQuery("INSERT INTO user_account (user_id, platform, username) VALUES (:userId, CAST(:platform AS platform), :username)")
-                .setParameter("userId", userId)
-                .setParameter("platform", platform.name())
-                .setParameter("username", username)
+        em.createNativeQuery("INSERT INTO user_account (user_id, platform, username) VALUES (?1, CAST(?2 AS platform), ?3)")
+                .setParameter(1, userId)
+                .setParameter(2, platform.name())
+                .setParameter(3, username)
                 .executeUpdate();
     }
 
     @Override
     public void deleteUserAccount(long userId, Platform platform) {
-        em.createNativeQuery("DELETE FROM user_account WHERE user_id = :userId AND platform = CAST(:platform AS platform)")
-                .setParameter("userId", userId)
-                .setParameter("platform", platform.name())
+        em.createNativeQuery("DELETE FROM user_account WHERE user_id = ?1 AND platform = CAST(?2 AS platform)")
+                .setParameter(1, userId)
+                .setParameter(2, platform.name())
                 .executeUpdate();
     }
 }

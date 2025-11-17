@@ -43,6 +43,7 @@
     <c:set var="navbarLabels" value="${[activeLabel, finishedLabel, ownedLabel]}"/>
     <c:set var="activeSection" value="${param.section != null ? param.section : 'active'}"/>
 
+
     <paw:profile-navbar user="${profile}" activeSection="tournaments"/>
     <paw:navbar sections="${navbarSections}" labels="${navbarLabels}" activeSection="${activeSection}"/>
 

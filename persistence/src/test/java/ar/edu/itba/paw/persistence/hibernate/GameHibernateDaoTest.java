@@ -179,7 +179,7 @@ public class GameHibernateDaoTest {
             j++;
         }
 
-        List<Game> games = gameHibernateDao.searchByName(OTHER_NAMES[0]);
+        List<Game> games = gameHibernateDao.searchByName(OTHER_NAMES[0], 0L);
 
         Assert.assertNotNull(games);
         Assert.assertFalse(games.isEmpty());
@@ -199,7 +199,7 @@ public class GameHibernateDaoTest {
     @Rollback
     @Test
     public void testSearchByNameNoOne(){
-        List<Game> games = gameHibernateDao.searchByName(NAME);
+        List<Game> games = gameHibernateDao.searchByName(NAME, 0L);
 
         Assert.assertNotNull(games);
         Assert.assertTrue(games.isEmpty());
@@ -216,7 +216,7 @@ public class GameHibernateDaoTest {
             i++;
         }
 
-        List<Game> games = gameHibernateDao.searchByName("");
+        List<Game> games = gameHibernateDao.searchByName("", 0L);
 
         Assert.assertNotNull(games);
         Assert.assertFalse(games.isEmpty());
