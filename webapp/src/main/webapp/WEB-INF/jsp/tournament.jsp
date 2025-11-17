@@ -263,17 +263,17 @@
                 </c:choose>
                 <c:if test="${(isParticipant || isCreator) && tournament.tournamentStarted && !tournament.finished}">
                     <div class="cards-container">
-                        <c:if test="${tournament.serverName !=null}">
+                        <c:if test="${tournament.serverName != null and not empty tournament.serverName}">
                             <div class="card texture">
                                 <div class="copy-card-content-container">
                                     <paw:copy-field label="tournament.serverName" value="${tournament.serverName}" />
-                                    <c:if test="${tournament.serverPassword != null}">
+                                    <c:if test="${tournament.serverPassword != null and not empty tournament.serverPassword}">
                                         <paw:copy-field label="tournament.serverPassword" value="${tournament.serverPassword}" />
                                     </c:if>
                                 </div>
                             </div>
                         </c:if>
-                        <c:if test="${tournament.discordChannel != null}">
+                        <c:if test="${tournament.discordChannel != null and not empty tournament.discordChannel}">
                             <div class="discord-card texture">
                                 <paw:text type="title" size="l">
                                     <spring:message code="tournament.discordChannel.title"/>

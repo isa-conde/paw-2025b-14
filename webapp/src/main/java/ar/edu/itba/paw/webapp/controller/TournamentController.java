@@ -123,9 +123,8 @@ public class TournamentController {
 
         ms.swapMatchesMembers(tournamentId, match1, match2, user1, user2);
 
-        ra.addAttribute("tournamentId", tournamentId);
         ra.addAttribute("edit", true);
-        return new ModelAndView("redirect:/tournament");
+        return new ModelAndView("redirect:/tournament/" + tournamentId);
     }
 
     @RequestMapping(value = "/tournament/update/{tournamentId}", method = RequestMethod.POST)
