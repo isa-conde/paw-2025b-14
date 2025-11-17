@@ -78,7 +78,7 @@ public class ParticipantHibernateDao implements ParticipantDao{
     }
 
     @Override
-    public boolean hasJoined(Long userId, long tournamentId) {
+    public boolean hasJoined(long userId, long tournamentId) {
         String jpql = """
         SELECT COUNT(p)
         FROM Participant p
@@ -161,10 +161,10 @@ public class ParticipantHibernateDao implements ParticipantDao{
     }
 
     @Override
-    public void updateGroupNumberForUsers(long tournamentId, int groupNumber, List<Long> userIds, Integer teamSize) {
+    public void updateGroupNumberForUsers(long tournamentId, int groupNumber, List<Long> userIds, int teamSize) {
         String jpql;
 
-        if (teamSize != null && teamSize > 1) {
+        if (teamSize > 1) {
             jpql = """
             UPDATE Participant p
             SET p.groupNumber = :groupNumber

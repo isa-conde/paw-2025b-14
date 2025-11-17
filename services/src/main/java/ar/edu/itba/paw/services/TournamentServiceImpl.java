@@ -98,7 +98,7 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Transactional
     @Override
-    public void setFinished(long tournamentId, long lastMatchId) { // TODO: check for possible error handling
+    public void setFinished(long tournamentId, long lastMatchId) {
         Tournament tournament = findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
         Long winner;
         if (tournament.getStructure() == Structure.LEAGUE) {
@@ -121,9 +121,9 @@ public class TournamentServiceImpl implements TournamentService {
             winner = tops.getFirst().getId();
         } else {
             winner = matchDao.getMatchWinner(tournamentId, lastMatchId);
-            if(winner == null) {
-                throw new MissingWinnerException();
-            }
+        }
+        if(winner == null) {
+            throw new MissingWinnerException();
         }
         tournamentDao.setTournamentWinner(tournamentId, winner);
         LOGGER.info("User with ID {} has won the tournament with ID {}", winner, tournamentId);
@@ -139,6 +139,9 @@ public class TournamentServiceImpl implements TournamentService {
                     winnerTeam = team.getTeam().getId();
                     break;
                 }
+            }
+            if(winnerTeam == null) {
+                throw new MissingWinnerException();
             }
             for(Participant p : participantUsers){
                 User user = userDao.findById(p.getUser().getId()).orElseThrow(UserNotFoundException::new);
@@ -234,6 +237,9 @@ public class TournamentServiceImpl implements TournamentService {
         Map<Long, List<Tournament>> mapWithGameIdAsKey = tournamentDao.getUnfilteredTournamentPages(page);
         Map<Game, List<Tournament>> mapWithGameAsKey = new HashMap<>();
         for(Long gameId : mapWithGameIdAsKey.keySet()) {
+            if(gameId == null) {
+                throw new GameNotFoundException();
+            }
             mapWithGameAsKey.putIfAbsent(gameDao.findById(gameId).orElseThrow(GameNotFoundException::new), mapWithGameIdAsKey.get(gameId));
         }
         return mapWithGameAsKey;
@@ -281,7 +287,7 @@ public class TournamentServiceImpl implements TournamentService {
 
     private void createMatches(long tournamentId, List<Participant> participants) {
         Tournament tournament = findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
-        if (!participants.isEmpty()) { // TODO: no participant error handling
+        if (!participants.isEmpty()) {
             if(tournament.getStructure().equals(Structure.ELIMINATION)) {
                 createMatchesBracket(tournament, participants, 1L, null);
             } else if (tournament.getStructure().equals(Structure.HYBRID)) {
@@ -297,7 +303,7 @@ public class TournamentServiceImpl implements TournamentService {
         createMatchesLeague(t, participants, 1L, 1, null);
     }
 
-    private void createMatchesLeague(Tournament t, List<Participant> participants, long firstMatchId, Integer firstStage, Boolean isGroupStage) {
+    private void createMatchesLeague(Tournament t, List<Participant> participants, long firstMatchId, int firstStage, Boolean isGroupStage) {
         int n = participants.size();
 
         if (n % 2 != 0) {
@@ -373,7 +379,7 @@ public class TournamentServiceImpl implements TournamentService {
 
     private void createMatchesHybrid(Tournament t, List<Participant> participants) {
         int n = participants.size();
-        Integer teamSize = gameFormatDao.findById(t.getFormatId()).orElseThrow(GameFormatNotFoundException::new).getPlayersPerTeam();
+        int teamSize = gameFormatDao.findById(t.getFormatId()).orElseThrow(GameFormatNotFoundException::new).getPlayersPerTeam();
         if (n > 8){
             tournamentDao.setIsGroupStage(t.getId(), true);
             int groupsCount = calculateGroups(n);
@@ -419,7 +425,7 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Transactional
     @Override
-    public void createBracketFromGroups(long tournamentId) { // TODO: error handling here?
+    public void createBracketFromGroups(long tournamentId) {
         int groups = participantDao.getTournamentGroups(tournamentId);
         Tournament tournament = findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
         List<Participant> classified = new ArrayList<>(groups * 2);

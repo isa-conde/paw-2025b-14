@@ -1,6 +1,5 @@
 package ar.edu.itba.paw.services;
 
-import ar.edu.itba.paw.interfaces.exception.ImageNotFoundException;
 import ar.edu.itba.paw.interfaces.exception.TeamNotFoundException;
 import ar.edu.itba.paw.interfaces.exception.TournamentNotFoundException;
 import ar.edu.itba.paw.interfaces.exception.UserNotFoundException;
@@ -127,7 +126,7 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public boolean isMember(Long teamId, Long userId) {
+    public boolean isMember(long teamId, long userId) {
         return teamMemberDao.isMember(teamId, userId);
     }
 

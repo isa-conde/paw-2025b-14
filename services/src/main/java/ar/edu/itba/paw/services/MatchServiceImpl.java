@@ -105,13 +105,13 @@ public class MatchServiceImpl implements MatchService {
         boolean isElimination = structure.equals(Structure.ELIMINATION) || ( structure.equals(Structure.HYBRID) && !isGroupStage);
 
         if(isElimination && localScore.equals(visitorScore)){
-            throw new IllegalArgumentException("Cannot draw in Elimination match"); // TODO: custom handling
+            throw new DrawInEliminationMatchException();
         }
         Match match = matchDao.getMatch(tournamentId, matchId);
         Long localId = match.getLocalId();
         Long visitorId = match.getVisitorId();
         if (localId == null || visitorId == null) {
-            throw new IllegalStateException("Cannot set winner for TBD matches"); // TODO: custom handling
+            throw new SettingWinnerForTBDException();
         }
 
         int winner = (localScore > visitorScore) ? 1 : (localScore < visitorScore ? 2 : -1);
@@ -165,7 +165,7 @@ public class MatchServiceImpl implements MatchService {
         }
     }
 
-    private boolean hasWinner(Long matchId, Long tournamentId) {
+    private boolean hasWinner(long matchId, long tournamentId) {
         Match match = matchDao.getMatch(tournamentId, matchId);
         return match.getWinner() != null;
     }

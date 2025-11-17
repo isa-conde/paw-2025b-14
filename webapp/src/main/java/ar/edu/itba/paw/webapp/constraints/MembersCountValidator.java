@@ -32,7 +32,7 @@ public class MembersCountValidator implements ConstraintValidator<MembersCountCo
     public boolean isValid(JoinTournamentTeamForm form, ConstraintValidatorContext ctx) {
         if (form == null || form.getTournamentId() == null || form.getMembers() == null) return true;
 
-        int required = Optional.ofNullable(tournamentService.getPlayersPerTeam(form.getTournamentId()))
+        int required = Optional.of(tournamentService.getPlayersPerTeam(form.getTournamentId()))
                 .orElse(1);
         int actual = (int) form.getMembers().stream().filter(Objects::nonNull).distinct().count();
 

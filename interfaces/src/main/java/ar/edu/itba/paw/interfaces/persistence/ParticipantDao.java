@@ -15,7 +15,7 @@ public interface ParticipantDao {
 
     Participant getTournamentParticipantById(long tournamentId, Long participantId, int teamSize);
 
-    boolean hasJoined(Long userId, long tournamentId);
+    boolean hasJoined(long userId, long tournamentId);
 
     boolean hasRated(long userId, long tournamentId);
 
@@ -27,7 +27,7 @@ public interface ParticipantDao {
 
     void removeTournamentParticipantTeam(Long tournamentId, Long participantId);
 
-    void updateGroupNumberForUsers(long tournamentId, int groupNumber, List<Long> userIds, Integer teamSize);
+    void updateGroupNumberForUsers(long tournamentId, int groupNumber, List<Long> userIds, int teamSize);
 
     void swapGroups(long tournamentId, long user1, long user2, int group1, int group2, int teamSize);
 

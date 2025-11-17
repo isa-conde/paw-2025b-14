@@ -59,7 +59,8 @@ public class UserController {
     }
 
     @RequestMapping("/")
-    public ModelAndView index(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @ModelAttribute("tournamentForm") TournamentForm tournamentForm) {
+    public ModelAndView index(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                              @ModelAttribute("tournamentForm") TournamentForm tournamentForm) {
         final ModelAndView mav = new ModelAndView("index");
         List<Game> games = gs.findAllPaged(0L);
 
@@ -84,7 +85,8 @@ public class UserController {
 
 
     @RequestMapping("/gamesPage")
-    public ModelAndView gamesPage(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam(defaultValue = "0") long page) {
+    public ModelAndView gamesPage(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                  @RequestParam(defaultValue = "0") long page) {
         final ModelAndView mav = new ModelAndView("gamesPage");
         List<Game> allGames = gs.findAllPaged(page);
 
@@ -97,7 +99,10 @@ public class UserController {
     }
 
     @RequestMapping(value = "/tournamentsPage", method = RequestMethod.GET)
-    public ModelAndView tournamentsPage(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @ModelAttribute("filterForm") FilterForm filterForm, TournamentFilter tf,  @RequestParam(defaultValue = "0") long page) {
+    public ModelAndView tournamentsPage(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                        @ModelAttribute("filterForm") FilterForm filterForm,
+                                        TournamentFilter tf,
+                                        @RequestParam(defaultValue = "0") long page) {
         final ModelAndView mav = new ModelAndView("tournamentsPage");
         List<Game> allGames = gs.findAll();
 
@@ -145,7 +150,8 @@ public class UserController {
     }
 
     @RequestMapping("/search")
-    public ModelAndView search(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam("q") final String q){
+    public ModelAndView search(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                               @RequestParam("q") final String q){
         final ModelAndView mav = new ModelAndView("searchResults");
 
         mav.addObject("user", currentUser.orElse(null));
@@ -161,7 +167,7 @@ public class UserController {
     public ModelAndView profile(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
                                 @PathVariable long id,
                                 @ModelAttribute("editProfileForm") EditProfileForm editProfileForm,
-                                @RequestParam(value = "page", defaultValue = "0") Long commentsPage,
+                                @RequestParam(value = "page", defaultValue = "0") long commentsPage,
                                 @ModelAttribute("addAccountForm") AddAccountForm addAccountForm){
         final ModelAndView mav = new ModelAndView("profile");
         User profile = us.findById(id).orElseThrow(UserNotFoundException::new);
@@ -317,7 +323,11 @@ public class UserController {
     }
 
     @RequestMapping(value = "/profile/update", method = { RequestMethod.POST })
-    public ModelAndView updateProfile(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam("userId") final long userId, @Valid @ModelAttribute("editProfileForm") final EditProfileForm form, final BindingResult result,  @ModelAttribute("addAccountForm") AddAccountForm addAccountForm){
+    public ModelAndView updateProfile(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                      @RequestParam("userId") final long userId,
+                                      @Valid @ModelAttribute("editProfileForm") final EditProfileForm form,
+                                      final BindingResult result,
+                                      @ModelAttribute("addAccountForm") AddAccountForm addAccountForm){
         if (currentUser.isPresent() && result.hasErrors()) {
             ModelAndView mav = profile(currentUser, userId, form, DEFAULT_PAGE, addAccountForm);
             mav.addObject("openModal", "'editProfileModal'");
@@ -349,7 +359,9 @@ public class UserController {
     }
 
     @RequestMapping(value = "/account/delete", method = { RequestMethod.POST })
-    public ModelAndView deleteUserAccount(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam("userId") final long userId, @RequestParam("platform") final Platform platform) {
+    public ModelAndView deleteUserAccount(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                          @RequestParam("userId") final long userId,
+                                          @RequestParam("platform") final Platform platform) {
 
         User user = currentUser.map(PawUserDetails::getPawUser).orElse(null);
         List<Platform> platforms = Arrays.stream(Platform.values()).toList();
@@ -365,7 +377,9 @@ public class UserController {
     }
 
     @RequestMapping(value = "/account/add", method = { RequestMethod.POST })
-    public ModelAndView addUserAccount(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @Valid @ModelAttribute("addAccountForm") final AddAccountForm form, final BindingResult result) {
+    public ModelAndView addUserAccount(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                       @Valid @ModelAttribute("addAccountForm") final AddAccountForm form,
+                                       final BindingResult result) {
 
         User user = currentUser.map(PawUserDetails::getPawUser).orElse(null);
 
@@ -388,7 +402,6 @@ public class UserController {
     @GetMapping(value = "/users/search", produces = "application/json")
     @ResponseBody
     public List<String> searchUsers(@RequestParam String name) {
-        System.out.println(us.searchByName(name));
         return us.searchByName(name)
                 .stream()
                 .map(User::getUsername)

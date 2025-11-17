@@ -59,13 +59,13 @@ public class MailServiceImpl implements MailService {
 
     @Async
     @Override
-    public void sendTournamentCreatedEmail(Long tournamentId, String userName, String tournamentName, String recipient) {
+    public void sendTournamentCreatedEmail(long tournamentId, String userName, String tournamentName, String recipient) {
         User user = userDao.findByUsername(userName).orElseThrow(UserNotFoundException::new);
         Locale locale = toLocale(user.getLocale());
         Context ctx = new Context(locale);
         ctx.setVariable("userName", userName);
         ctx.setVariable("tournamentName", tournamentName);
-        String tournamentLink = baseUrl + "/tournament/" + tournamentId.toString();
+        String tournamentLink = baseUrl + "/tournament/" + tournamentId;
         ctx.setVariable("tournamentLink", tournamentLink);
         ctx.setVariable("crownCid", "cid:" + CROWN_CID);
 
@@ -81,7 +81,7 @@ public class MailServiceImpl implements MailService {
 
     @Async
     @Override
-    public void sendTournamentJoinedEmail(Long tournamentId, String userName, String tournamentName, String recipient, String creatorMail) {
+    public void sendTournamentJoinedEmail(long tournamentId, String userName, String tournamentName, String recipient, String creatorMail) {
         User user = userDao.findByUsername(userName).orElseThrow(UserNotFoundException::new);
         Locale locale = toLocale(user.getLocale());
         Context ctx = new Context(locale);
@@ -104,7 +104,7 @@ public class MailServiceImpl implements MailService {
 
     @Async
     @Override
-    public void sendTournamentJoinedOwnerEmail(Long tournamentId, String ownerUsername, String joinerUsername, String tournamentName, String recipientOwnerEmail) {
+    public void sendTournamentJoinedOwnerEmail(long tournamentId, String ownerUsername, String joinerUsername, String tournamentName, String recipientOwnerEmail) {
 
         User user = userDao.findByUsername(ownerUsername).orElseThrow(UserNotFoundException::new);
         Locale locale = toLocale(user.getLocale());
@@ -128,7 +128,7 @@ public class MailServiceImpl implements MailService {
 
     @Async
     @Override
-    public void sendTournamentTeamJoinedOwnerEmail(Long tournamentId, String ownerUsername, String teamName, String tournamentName, String recipientOwnerEmail) {
+    public void sendTournamentTeamJoinedOwnerEmail(long tournamentId, String ownerUsername, String teamName, String tournamentName, String recipientOwnerEmail) {
 
         User user = userDao.findByUsername(ownerUsername).orElseThrow(UserNotFoundException::new);
         Locale locale = toLocale(user.getLocale());
@@ -153,12 +153,12 @@ public class MailServiceImpl implements MailService {
 
     @Async
     @Override
-    public void sendVerificationEmail(Long userId, String userName, long token, String recipient) {
+    public void sendVerificationEmail(long userId, String userName, long token, String recipient) {
         User user = userDao.findByUsername(userName).orElseThrow(UserNotFoundException::new);
         Locale locale = toLocale(user.getLocale());
         Context ctx = new Context(locale);
         ctx.setVariable("userName", userName);
-        String verificationUrl = baseUrl + "/verify/confirm?token=" + token + "&userId=" + userId.toString();
+        String verificationUrl = baseUrl + "/verify/confirm?token=" + token + "&userId=" + userId;
         ctx.setVariable("verificationUrl", verificationUrl);
         ctx.setVariable("crownCid", "cid:" + CROWN_CID);
 
@@ -220,7 +220,7 @@ public class MailServiceImpl implements MailService {
 
     @Async
     @Override
-    public void sendTournamentEndedEmail(Long tournamentId, String username, String tournamentName, String recipient) {
+    public void sendTournamentEndedEmail(long tournamentId, String username, String tournamentName, String recipient) {
         User user = userDao.findByUsername(username).orElseThrow(UserNotFoundException::new);
         Locale locale = toLocale(user.getLocale());
         Context ctx = new Context(locale);
@@ -242,7 +242,7 @@ public class MailServiceImpl implements MailService {
 
     @Async
     @Override
-    public void sendTournamentWinnerEmail(Long tournamentId, String username, String tournamentName, String recipient) {
+    public void sendTournamentWinnerEmail(long tournamentId, String username, String tournamentName, String recipient) {
         User user = userDao.findByUsername(username).orElseThrow(UserNotFoundException::new);
         Locale locale = toLocale(user.getLocale());
         Context ctx = new Context(locale);
@@ -314,13 +314,8 @@ public class MailServiceImpl implements MailService {
 
     @Async
     @Override
-    public void sendRemovedFromTournamentEmail(Long tournamentId, String userName, String tournamentName, String recipient){
-        Optional<User> optionalUser = userDao.findByUsername(userName);
-        if (optionalUser.isEmpty()){
-            LOGGER.warn("User {} not found", userName);
-            return;
-        }
-        User user = optionalUser.get();
+    public void sendRemovedFromTournamentEmail(long tournamentId, String userName, String tournamentName, String recipient){
+        User user = userDao.findByUsername(userName).orElseThrow(UserNotFoundException::new);
         Locale locale = toLocale(user.getLocale());
         Context ctx = new Context(locale);
         ctx.setVariable("userName", userName);
@@ -342,12 +337,7 @@ public class MailServiceImpl implements MailService {
     @Async
     @Override
     public void sendServerInfoUpdated(Tournament tournament, String userName, String recipient){
-        Optional<User> optionalUser = userDao.findByUsername(userName);
-        if (optionalUser.isEmpty()){
-            LOGGER.warn("User {} not found", userName);
-            return;
-        }
-        User user = optionalUser.get();
+        User user = userDao.findByUsername(userName).orElseThrow(UserNotFoundException::new);
         Locale locale = toLocale(user.getLocale());
         Context ctx = new Context(locale);
         ctx.setVariable("userName", userName);
@@ -391,12 +381,7 @@ public class MailServiceImpl implements MailService {
     @Async
     @Override
     public void sendDiscordLinkUpdated(Tournament tournament, String userName, String recipient){
-        Optional<User> optionalUser = userDao.findByUsername(userName);
-        if (optionalUser.isEmpty()){
-            LOGGER.warn("User {} not found", userName);
-            return;
-        }
-        User user = optionalUser.get();
+        User user = userDao.findByUsername(userName).orElseThrow(UserNotFoundException::new);
         Locale locale = toLocale(user.getLocale());
         Context ctx = new Context(locale);
         ctx.setVariable("userName", userName);
@@ -417,7 +402,7 @@ public class MailServiceImpl implements MailService {
     }
 
 
-    private void sendEmail(String recipient, String subject, String body, Boolean hasDiscordLogo) {
+    private void sendEmail(String recipient, String subject, String body, boolean hasDiscordLogo) {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         try {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, StandardCharsets.UTF_8.name());

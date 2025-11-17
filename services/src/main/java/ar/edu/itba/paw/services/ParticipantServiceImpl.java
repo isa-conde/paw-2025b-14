@@ -69,7 +69,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
-    public List<Participant> getTournamentParticipants(long tournamentId, Integer teamSize) {
+    public List<Participant> getTournamentParticipants(long tournamentId, int teamSize) {
         List<Participant> participants;
         if (teamSize > 1){
             participants = participantDao.getTournamentParticipantTeams(tournamentId);
@@ -86,7 +86,10 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
-    public boolean hasJoined(Long userId, Long tournamentId) {
+    public boolean hasJoined(Long userId, long tournamentId) {
+        if(userId == null) {
+            throw new ParticipantNotFoundException();
+        }
         return participantDao.hasJoined(userId, tournamentId);
     }
 
@@ -176,7 +179,9 @@ public class ParticipantServiceImpl implements ParticipantService {
 
     @Transactional
     @Override
-    public void removeParticipant(long tournamentId, Long participantId){
+    public void removeParticipant(Long tournamentId, Long participantId){
+        if(tournamentId == null) throw new TournamentNotFoundException();
+        if(participantId == null) throw new ParticipantNotFoundException();
         Tournament tournament = tournamentDao.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
         if(!tournament.getOpenInscriptions()){
             LOGGER.warn("Cannot remove participant from a closed tournament");
