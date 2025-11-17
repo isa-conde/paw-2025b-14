@@ -465,7 +465,7 @@
                 </div>
                 <div class="row center">
                     <c:url value="/team/create" var="createTeamUrl">
-                        <c:param name="returnUrl" value="${tournamentUrl}" />
+                        <c:param name="returnUrl" value="/tournament/${tournamentId}" />
                     </c:url>
 
                     <paw:button onclick="window.location.href='${createTeamUrl}'; return false;" text="team.create.pageTitle"/>
