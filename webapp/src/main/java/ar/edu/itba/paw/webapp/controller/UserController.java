@@ -87,8 +87,8 @@ public class UserController {
     public ModelAndView gamesPage(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam(defaultValue = "0") Long page) {
         final ModelAndView mav = new ModelAndView("gamesPage");
         List<Game> allGames = gs.findAllPaged(page);
-
-        mav.addObject("user", currentUser.orElse(null));
+        PawUserDetails userDetails = currentUser.orElse(null);
+        mav.addObject("user", userDetails != null ? userDetails.getPawUser() : null);
         mav.addObject("games", allGames);
         mav.addObject("totalPages", gs.getPageAmount());
         mav.addObject("currentPage", page);
@@ -145,14 +145,35 @@ public class UserController {
     }
 
     @RequestMapping("/search")
-    public ModelAndView search(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam("q") final String q){
+    public ModelAndView search(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam("q") final String q, @RequestParam(defaultValue = "0") Long page1, @RequestParam(defaultValue = "0") Long page2, @RequestParam(defaultValue = "0") Long page3, @RequestParam(defaultValue = "0") Long page4){
         final ModelAndView mav = new ModelAndView("searchResults");
 
-        mav.addObject("user", currentUser.orElse(null));
-        mav.addObject("games", gs.searchByName(q));
-        mav.addObject("tournaments", ts.searchByName(q));
-        mav.addObject("users", us.searchByName(q));
-        mav.addObject("teams", tms.searchByName(q));
+        int totalPages1 = gs.countSearchByNameGame(q);
+        page1 = adjustPage(page1, totalPages1);
+
+        int totalPages2 = ts.countSearchByName(q);
+        page2 = adjustPage(page2, totalPages2);
+
+        int totalPages3 = us.countSearchByNameUser(q);
+        page3 = adjustPage(page3, totalPages3);
+
+        int totalPages4 = tms.countSearchByNameTeam(q);
+        page4 = adjustPage(page4, totalPages4);
+
+        mav.addObject("user", currentUser.orElse(null) != null ? currentUser.get().getPawUser() : null);
+        mav.addObject("games", gs.searchByName(q, page1));
+        mav.addObject("tournaments", ts.searchByName(q, page2));
+        mav.addObject("users", us.searchByName(q, page3));
+        mav.addObject("teams", tms.searchByName(q, page4));
+
+        mav.addObject("page1", page1);
+        mav.addObject("totalPages1", totalPages1);
+        mav.addObject("page2", page2);
+        mav.addObject("totalPages2", totalPages2);
+        mav.addObject("page3", page3);
+        mav.addObject("totalPages3", totalPages3);
+        mav.addObject("page4", page4);
+        mav.addObject("totalPages4", totalPages4);
 
         return mav;
     }
@@ -382,7 +403,7 @@ public class UserController {
     @GetMapping(value = "/users/search", produces = "application/json")
     @ResponseBody
     public List<String> searchUsers(@RequestParam String name) {
-        return us.searchByName(name)
+        return us.findAllByName(name)
                 .stream()
                 .map(User::getUsername)
                 .collect(Collectors.toList());

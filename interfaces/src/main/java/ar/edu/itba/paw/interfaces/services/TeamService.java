@@ -31,5 +31,7 @@ public interface TeamService {
 
     List<Team> getUserTeamsBySizeNotInTournament(Long userId, Long tournamentId);
 
-    List<Team> searchByName(String name);
+    List<Team> searchByName(String name, Long page);
+
+    int countSearchByNameTeam(String name);
 }

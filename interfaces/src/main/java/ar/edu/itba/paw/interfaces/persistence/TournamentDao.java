@@ -25,7 +25,9 @@ public interface TournamentDao {
 
     void closeInscriptions(Long tournamentId);
 
-    List<Tournament> searchByName(String name);
+    List<Tournament> searchByName(String name, Long page);
+
+    int countSearchByName(String name);
 
     void startTournament(Long tournamentId);
 

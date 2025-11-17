@@ -7,13 +7,15 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public class TeamHibernateDao implements TeamDao {
-    private static final int GRID_PAGE_SIZE = 9;
+    private static final int PAGE_SIZE = 9;
 
     @PersistenceContext
     private EntityManager em;
@@ -58,8 +60,8 @@ public class TeamHibernateDao implements TeamDao {
         return em.createQuery(jpql, Long.class)
                 .setParameter("teamId", teamId)
                 .setParameter("isFinished", isFinished)
-                .setMaxResults(GRID_PAGE_SIZE)
-                .setFirstResult(page*GRID_PAGE_SIZE)
+                .setMaxResults(PAGE_SIZE)
+                .setFirstResult(page*PAGE_SIZE)
                 .getResultList();
     }
 
@@ -86,7 +88,7 @@ public class TeamHibernateDao implements TeamDao {
                 .setParameter("teamId", teamId)
                 .setParameter("isFinished", isFinished)
                 .getSingleResult();
-        return (long) Math.ceil((double) total / GRID_PAGE_SIZE);
+        return (long) Math.ceil((double) total / PAGE_SIZE);
     }
 
     @Override
@@ -117,14 +119,53 @@ public class TeamHibernateDao implements TeamDao {
     }
 
     @Override
-    public List<Team> searchByName(String name) {
-        TypedQuery<Team> query = em.createQuery(
-                "SELECT t FROM Team t WHERE LOWER(t.name) LIKE CONCAT('%', LOWER(:name), '%')",
+    public List<Team> searchByName(String name, Long page) {
+
+        Query idQuery = em.createNativeQuery(
+                "SELECT t.id " +
+                        "FROM team t " +
+                        "WHERE LOWER(t.name) LIKE CONCAT('%', LOWER(?1), '%') " +
+                        "ORDER BY t.name ASC"
+        );
+
+        idQuery.setParameter(1, name);
+        idQuery.setFirstResult((int) (page * PAGE_SIZE));
+        idQuery.setMaxResults(PAGE_SIZE);
+
+        @SuppressWarnings("unchecked")
+        List<Number> ids = idQuery.getResultList();
+        if (ids.isEmpty()) return Collections.emptyList();
+
+        TypedQuery<Team> fullQuery = em.createQuery(
+                "SELECT DISTINCT t FROM Team t " +
+                        "WHERE t.id IN :ids " +
+                        "ORDER BY t.name ASC",
                 Team.class
         );
-        query.setParameter("name", name);
-        return query.getResultList();
+
+        fullQuery.setParameter("ids",
+                ids.stream().map(Number::longValue).toList()
+        );
+
+        return fullQuery.getResultList();
     }
+
+    public int countSearchByNameTeam(String name) {
+
+        TypedQuery<Long> countQuery = em.createQuery(
+                "SELECT COUNT(t) FROM Team t " +
+                        "WHERE LOWER(t.name) LIKE CONCAT('%', LOWER(:name), '%')",
+                Long.class
+        );
+
+        countQuery.setParameter("name", name);
+
+        long total = countQuery.getSingleResult();
+
+        return (int) Math.ceil((double) total / PAGE_SIZE);
+    }
+
+
 
     @Override
     public List<Team> getUserTeamsBySizeNotInTournament(Long userId, Long tournamentId, Long minSize) {

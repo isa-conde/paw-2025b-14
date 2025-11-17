@@ -198,8 +198,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> searchByName(String name) {
-        return userDao.searchByName(name);
+    public List<User> searchByName(String name, Long page) {
+        return userDao.searchByName(name, page);
+    }
+
+    @Override
+    public List<User> findAllByName(String name) {
+        return userDao.findAllByName(name);
+    }
+
+    @Override
+    public int countSearchByNameUser(String name) {
+        return userDao.countSearchByNameUser(name);
     }
 
     @Override

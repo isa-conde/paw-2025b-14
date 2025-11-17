@@ -329,7 +329,7 @@ public class TournamentHibernateDaoTest {
 
     @Test
     public void testSearchByNameAll(){
-        List<Tournament> tournaments = tournamentHibernateDao.searchByName("");
+        List<Tournament> tournaments = tournamentHibernateDao.searchByName("", 0L);
 
         Assert.assertNotNull(tournaments);
         Assert.assertEquals(OPEN_WITH_ID, tournaments.size());
@@ -338,7 +338,7 @@ public class TournamentHibernateDaoTest {
 
     @Test
     public void testSearchByNameSome(){
-        List<Tournament> tournaments = tournamentHibernateDao.searchByName("open");
+        List<Tournament> tournaments = tournamentHibernateDao.searchByName("open", 0L);
 
         Assert.assertNotNull(tournaments);
         Assert.assertEquals(OPEN_WITH_ID, tournaments.size());
@@ -347,7 +347,7 @@ public class TournamentHibernateDaoTest {
 
     @Test
     public void testSearchByNameOne(){
-        List<Tournament> tournaments = tournamentHibernateDao.searchByName("open x");
+        List<Tournament> tournaments = tournamentHibernateDao.searchByName("open x", 0L);
 
         Assert.assertNotNull(tournaments);
         Assert.assertEquals(1, tournaments.size());
@@ -357,7 +357,7 @@ public class TournamentHibernateDaoTest {
 
     @Test
     public void testSearchByNameNone(){
-        List<Tournament> tournaments = tournamentHibernateDao.searchByName("NonExistent");
+        List<Tournament> tournaments = tournamentHibernateDao.searchByName("NonExistent", 0L);
 
         Assert.assertNotNull(tournaments);
         Assert.assertTrue(tournaments.isEmpty());

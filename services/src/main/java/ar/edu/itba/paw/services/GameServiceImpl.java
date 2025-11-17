@@ -33,8 +33,13 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public List<Game> searchByName(String name) {
-        return gameDao.searchByName(name);
+    public List<Game> searchByName(String name, Long page) {
+        return gameDao.searchByName(name, page);
+    }
+
+    @Override
+    public int countSearchByNameGame(String name) {
+        return gameDao.countSearchByNameGame(name);
     }
 
     @Override
