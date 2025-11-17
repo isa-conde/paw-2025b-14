@@ -13,32 +13,29 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-
 @ControllerAdvice
 public class CustomExceptionHandler {
 
+    private ModelAndView buildExceptionModelAndView(final String messageKey, final String titleKey) {
+        ModelAndView mav = new ModelAndView("error/exception");
+        mav.addObject("message", messageKey);
+        mav.addObject("title", titleKey);
+        return mav;
+    }
+
     @ExceptionHandler(UserNotFoundException.class)
     public ModelAndView handleUserNotFoundException() {
-        ModelAndView mav = new ModelAndView("error/exception");
-        mav.addObject("message", "errorExceptionPage.userNotFound.description");
-        mav.addObject("title", "errorExceptionPage.userNotFound.title");
-        return mav;
+        return buildExceptionModelAndView("errorExceptionPage.userNotFound.description", "errorExceptionPage.userNotFound.title");
     }
 
     @ExceptionHandler(TournamentNotFoundException.class)
     public ModelAndView handleTournamentNotFoundException() {
-        ModelAndView mav = new ModelAndView("error/exception");
-        mav.addObject("message", "errorExceptionPage.tournamentNotFound.description");
-        mav.addObject("title", "errorExceptionPage.tournamentNotFound.title");
-        return mav;
+        return buildExceptionModelAndView("errorExceptionPage.tournamentNotFound.description", "errorExceptionPage.tournamentNotFound.title");
     }
 
     @ExceptionHandler(GameNotFoundException.class)
     public ModelAndView handleGameNotFoundException() {
-        ModelAndView mav = new ModelAndView("error/exception");
-        mav.addObject("message", "errorExceptionPage.gameNotFound.description");
-        mav.addObject("title", "errorExceptionPage.gameNotFound.title");
-        return mav;
+        return buildExceptionModelAndView("errorExceptionPage.gameNotFound.description", "errorExceptionPage.gameNotFound.title");
     }
 
     @ExceptionHandler({
@@ -58,26 +55,17 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler(UserAlreadyJoinedException.class)
     public ModelAndView handleUserAlreadyJoinedException() {
-        ModelAndView mav = new ModelAndView("error/exception");
-        mav.addObject("message", "errorExceptionPage.userAlreadyJoined.description");
-        mav.addObject("title", "errorExceptionPage.userAlreadyJoined.title");
-        return mav;
+        return buildExceptionModelAndView("errorExceptionPage.userAlreadyJoined.description", "errorExceptionPage.userAlreadyJoined.title");
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)
     public ModelAndView handleNotFoundException() {
-        ModelAndView mav = new ModelAndView("error/exception");
-        mav.addObject("message", "error404Page.description");
-        mav.addObject("title", "error404Page.title");
-        return mav;
+        return buildExceptionModelAndView("errorExceptionPage.tournamentAlreadyClosed.description", "errorExceptionPage.tournamentAlreadyClosed.title");
     }
 
     @ExceptionHandler(TournamentAlreadyClosedException.class)
     public ModelAndView handleTournamentAlreadyJoined() {
-        ModelAndView mav = new ModelAndView("error/exception");
-        mav.addObject("message", "errorExceptionPage.tournamentAlreadyClosed.description");
-        mav.addObject("title", "errorExceptionPage.tournamentAlreadyClosed.title");
-        return mav;
+        return buildExceptionModelAndView("errorExceptionPage.tournamentAlreadyClosed.description", "errorExceptionPage.tournamentAlreadyClosed.title");
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
@@ -87,26 +75,130 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler(MatchWinnerAlreadySetException.class)
     public ModelAndView handleMatchWinnerAlreadySet() {
-        ModelAndView mav = new ModelAndView("error/exception");
-        mav.addObject("message", "errorExceptionPage.matchWinnerAlreadySet.description");
-        mav.addObject("title", "errorExceptionPage.matchWinnerAlreadySet.title");
-        return mav;
+        return buildExceptionModelAndView("errorExceptionPage.matchWinnerAlreadySet.description", "errorExceptionPage.matchWinnerAlreadySet.title");
     }
 
     @ExceptionHandler(TournamentAlreadyStartedException.class)
     public ModelAndView handleTournamentAlreadyStartedException() {
-        ModelAndView mav = new ModelAndView("error/exception");
-        mav.addObject("message", "errorExceptionPage.tournamentAlreadyStarted.description");
-        mav.addObject("title", "errorExceptionPage.tournamentAlreadyStarted.title");
-        return mav;
+        return buildExceptionModelAndView("errorExceptionPage.tournamentAlreadyStarted.description", "errorExceptionPage.tournamentAlreadyStarted.title");
     }
 
-//    @ExceptionHandler(Exception.class)
-//    public ModelAndView handleGeneralException() {
-//        ModelAndView mav = new ModelAndView("error/exception");
-//        mav.addObject("message", "errorExceptionPage.general.description");
-//        mav.addObject("title", "errorExceptionPage.general.title");
-//        return mav;
-//    }
+    @ExceptionHandler(BusinessException.class)
+    public ModelAndView handleBusinessException() {
+        return buildExceptionModelAndView("errorExceptionPage.business.description", "errorExceptionPage.business.title");
+    }
+
+    @ExceptionHandler(DrawInEliminationMatchException.class)
+    public ModelAndView handleDrawInEliminationMatchException() {
+        return buildExceptionModelAndView("errorExceptionPage.drawInEliminationMatch.description", "errorExceptionPage.drawInEliminationMatch.title");
+    }
+
+    @ExceptionHandler(EmailAlreadyUsedException.class)
+    public ModelAndView handleEmailAlreadyUsedException() {
+        return buildExceptionModelAndView("errorExceptionPage.emailAlreadyUsed.description", "errorExceptionPage.emailAlreadyUsed.title");
+    }
+
+    @ExceptionHandler(GameFormatNotFoundException.class)
+    public ModelAndView handleGameFormatNotFoundException() {
+        return buildExceptionModelAndView("errorExceptionPage.gameFormatNotFound.description", "errorExceptionPage.gameFormatNotFound.title");
+    }
+
+    @ExceptionHandler(ImageNotFoundException.class)
+    public ModelAndView handleImageNotFoundException() {
+        return buildExceptionModelAndView("errorExceptionPage.imageNotFound.description", "errorExceptionPage.imageNotFound.title");
+    }
+
+    @ExceptionHandler(InvalidCommentException.class)
+    public ModelAndView handleInvalidCommentException() {
+        return buildExceptionModelAndView("errorExceptionPage.invalidComment.description", "errorExceptionPage.invalidComment.title");
+    }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    public ModelAndView handleInvalidTokenException() {
+        return buildExceptionModelAndView("errorExceptionPage.invalidToken.description", "errorExceptionPage.invalidToken.title");
+    }
+
+    @ExceptionHandler(MatchNotFoundException.class)
+    public ModelAndView handleMatchNotFoundException() {
+        return buildExceptionModelAndView("errorExceptionPage.matchNotFound.description", "errorExceptionPage.matchNotFound.title");
+    }
+
+    @ExceptionHandler(MissingGroupNumberException.class)
+    public ModelAndView handleMissingGroupNumberException() {
+        return buildExceptionModelAndView("errorExceptionPage.missingGroupNumber.description", "errorExceptionPage.missingGroupNumber.title");
+    }
+
+    @ExceptionHandler(MissingWinnerException.class)
+    public ModelAndView handleMissingWinnerException() {
+        return buildExceptionModelAndView("errorExceptionPage.missingWinner.description", "errorExceptionPage.missingWinner.title");
+    }
+
+    @ExceptionHandler(NameAlreadyUsedException.class)
+    public ModelAndView handleNameAlreadyUsedException() {
+        return buildExceptionModelAndView("errorExceptionPage.nameAlreadyUsed.description", "errorExceptionPage.nameAlreadyUsed.title");
+    }
+
+    @ExceptionHandler(ParticipantAlreadyRatedException.class)
+    public ModelAndView handleParticipantAlreadyRatedException() {
+        return buildExceptionModelAndView("errorExceptionPage.participantAlreadyRated.description", "errorExceptionPage.participantAlreadyRated.title");
+    }
+
+    @ExceptionHandler(ParticipantNotFoundException.class)
+    public ModelAndView handleParticipantNotFoundException() {
+        return buildExceptionModelAndView("errorExceptionPage.participantNotFound.description", "errorExceptionPage.participantNotFound.title");
+    }
+
+    @ExceptionHandler(ParticipantNotInMatchException.class)
+    public ModelAndView handleParticipantNotInMatchException() {
+        return buildExceptionModelAndView("errorExceptionPage.participantNotInMatch.description", "errorExceptionPage.participantNotInMatch.title");
+    }
+
+    @ExceptionHandler(RulesNotFoundException.class)
+    public ModelAndView handleRulesNotFoundException() {
+        return buildExceptionModelAndView("errorExceptionPage.rulesNotFound.description", "errorExceptionPage.rulesNotFound.title");
+    }
+
+    @ExceptionHandler(ScoresInvalidException.class)
+    public ModelAndView handleScoresInvalidException() {
+        return buildExceptionModelAndView("errorExceptionPage.scoresInvalid.description", "errorExceptionPage.scoresInvalid.title");
+    }
+
+    @ExceptionHandler(SettingWinnerForTBDException.class)
+    public ModelAndView handleSettingWinnerForTBDException() {
+        return buildExceptionModelAndView("errorExceptionPage.settingWinnerForTBD.description", "errorExceptionPage.settingWinnerForTBD.title");
+    }
+
+    @ExceptionHandler(StageIsNotSetException.class)
+    public ModelAndView handleStageIsNotSetException() {
+        return buildExceptionModelAndView("errorExceptionPage.stageIsNotSet.description", "errorExceptionPage.stageIsNotSet.title");
+    }
+
+    @ExceptionHandler(TeamNotFoundException.class)
+    public ModelAndView handleTeamNotFoundException() {
+        return buildExceptionModelAndView("errorExceptionPage.teamNotFound.description", "errorExceptionPage.teamNotFound.title");
+    }
+
+    @ExceptionHandler(TokenNotFoundException.class)
+    public ModelAndView handleTokenNotFoundException() {
+        return buildExceptionModelAndView("errorExceptionPage.tokenNotFound.description", "errorExceptionPage.tokenNotFound.title");
+    }
+
+    @ExceptionHandler(UserNotAuthenticatedException.class)
+    public ModelAndView handleUserNotAuthenticatedException() {
+        return buildExceptionModelAndView("errorExceptionPage.userNotAuthenticated.description", "errorExceptionPage.userNotAuthenticated.title");
+    }
+
+    @ExceptionHandler(UsernameAlreadyUsedException.class)
+    public ModelAndView handleUsernameAlreadyUsedException() {
+        return buildExceptionModelAndView("errorExceptionPage.usernameAlreadyUsed.description", "errorExceptionPage.usernameAlreadyUsed.title");
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ModelAndView handleGeneralException() {
+        ModelAndView mav = new ModelAndView("error/exception");
+        mav.addObject("message", "errorExceptionPage.general.description");
+        mav.addObject("title", "errorExceptionPage.general.title");
+        return mav;
+    }
 
 }

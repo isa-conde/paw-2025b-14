@@ -116,7 +116,7 @@
             <div class="profile-comments-form">
                 <spring:message code="profile.comments.placeholder" var="commentPlaceholder"/>
                 <spring:message code="profile.comments.submit" var="commentSubmit"/>
-                <form:form method="post" modelAttribute="commentForm" action="${commentUrl}" cssClass="comment-form">
+                <form:form method="post" modelAttribute="commentForm" action="${commentUrl}" cssClass="comment-form" onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
                     <form:textarea path="comment" cssClass="input textarea comment-textarea" placeholder="${commentPlaceholder}"/>
                     <form:errors path="comment" cssClass="form-error" element="span"/>
                     <button type="submit" class="btn comment-submit">${commentSubmit}</button>

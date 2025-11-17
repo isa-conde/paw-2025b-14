@@ -85,7 +85,8 @@
 <paw:modal title="team.profile.edit.title" id="editProfileModal" returnUrl="${teamUrl}">
     <form:form method="post" modelAttribute="teamForm"
                action="${pageContext.request.contextPath}/team/update"
-               enctype="multipart/form-data" cssClass="form">
+               enctype="multipart/form-data" cssClass="form"
+               onsubmit="this.querySelector('button, input[type=submit]').disabled=true;">
         <input type="hidden" name="teamId" value="${team.id}"/>
         <div class="row">
             <paw:input path="name" label="team.profile.edit.name" hasConstraint="true"/>

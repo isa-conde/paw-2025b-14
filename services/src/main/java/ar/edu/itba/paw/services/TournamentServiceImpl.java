@@ -485,7 +485,19 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     private void createGroupStageMatches(Tournament t){
-        Map<Integer, List<Participant>> groupedParticipants = getGroupedParticipants(participantDao.getTournamentParticipantUsers(t.getId()));
+        GameFormat format = t.getFormatEntity();
+        int teamSize;
+        if(format == null) {
+            teamSize = 1;
+        }else {
+            teamSize = format.getPlayersPerTeam();
+        }
+        Map<Integer, List<Participant>> groupedParticipants;
+        if(teamSize > 1){
+            groupedParticipants = getGroupedParticipants(participantDao.getTournamentParticipantTeams(t.getId()));
+        }else{
+            groupedParticipants = getGroupedParticipants(participantDao.getTournamentParticipantUsers(t.getId()));
+        }
         if(groupedParticipants != null){
             long nextId = 1L;
             for(List<Participant> participants : groupedParticipants.values()){
