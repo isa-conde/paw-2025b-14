@@ -3,6 +3,7 @@ package ar.edu.itba.paw.webapp.constraints;
 
 import ar.edu.itba.paw.interfaces.services.ParticipantService;
 import ar.edu.itba.paw.interfaces.persistence.UserDao;
+import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.webapp.form.JoinTournamentTeamForm;
 import org.springframework.context.MessageSource;
@@ -18,14 +19,14 @@ import java.util.stream.Collectors;
 public class MembersNotInTournamentValidator implements ConstraintValidator<MembersNotInTournamentConstraint, JoinTournamentTeamForm> {
 
     private final ParticipantService participantService;
-    private final UserDao userDao;
+    private final UserService userService;
     private final MessageSource messageSource;
 
     public MembersNotInTournamentValidator(ParticipantService participantService,
-                                           UserDao userDao,
+                                           UserService userService,
                                            MessageSource messageSource) {
         this.participantService = participantService;
-        this.userDao = userDao;
+        this.userService = userService;
         this.messageSource = messageSource;
     }
 
@@ -56,7 +57,8 @@ public class MembersNotInTournamentValidator implements ConstraintValidator<Memb
 
         Map<Long, String> namesById = new HashMap<>();
         for (Long uid : alreadyIn) {
-            Optional<User> u = userDao.findById(uid);
+            if(uid == null) return true;
+            Optional<User> u = userService.findById(uid);
             namesById.put(uid, u.map(User::getUsername).orElse("#" + uid));
         }
         String joinedNames = alreadyIn.stream()

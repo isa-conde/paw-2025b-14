@@ -3,7 +3,6 @@ package ar.edu.itba.paw.interfaces.services;
 import ar.edu.itba.paw.model.Participant;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.User;
-import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
 
@@ -25,7 +24,7 @@ public interface MailService {
 
     void sendVerificationEmail(Long userId, String userName, long token, String recipient);
 
-    void sendResetPasswordEmail(Long userId, long token, String recipient);
+    void sendResetPasswordEmail(long userId, long token, String recipient);
 
     void sendContactOwnerEmail(Tournament tournament, User user, String emailSubject, String emailBody, User creator);
 
@@ -35,7 +34,7 @@ public interface MailService {
 
     void sendDiscordLinkUpdated(Tournament tournament, String userName, String recipient);
 
-    void sendListEmail(Long tournamentId, List<Participant> participantList);
+    void sendListEmail(long tournamentId, List<Participant> participantList);
 
     void sendTournamentAbandonedEmail(User creator, User participant, Tournament tournament);
 }

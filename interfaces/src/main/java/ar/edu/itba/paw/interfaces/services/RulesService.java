@@ -6,10 +6,10 @@ import java.util.Optional;
 
 public interface RulesService {
 
-    Optional<Rules> findById(Long id);
+    Optional<Rules> findById(long id);
 
     Rules insertRules(byte[] file);
 
-    void updateRules(Long tournamentId, byte[] file);
+    void updateRules(long tournamentId, byte[] file);
 
 }

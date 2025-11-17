@@ -22,7 +22,7 @@ public class RulesController {
     }
 
     @RequestMapping("/rules/{id}")
-    public ResponseEntity<byte[]> getRules(@PathVariable Long id){
+    public ResponseEntity<byte[]> getRules(@PathVariable long id){
         Optional<Rules> rulesOpt = rs.findById(id);
 
         if (rulesOpt.isEmpty()) {

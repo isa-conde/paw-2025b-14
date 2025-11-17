@@ -10,19 +10,19 @@ public interface ParticipantService {
 
     boolean hasJoined(Long userId, Long tournamentId);
 
-    void leaveTournament(Long userId, Long tournamentId);
+    void leaveTournament(long userId, long tournamentId);
 
-    void swapGroups(Long tournamentId, Long user1, Long user2);
+    void swapGroups(long tournamentId, long user1, long user2);
 
-    List<Participant> getTournamentParticipants(Long tournamentId, Integer teamSize);
+    List<Participant> getTournamentParticipants(long tournamentId, Integer teamSize);
 
-    int getTournamentGroups(Long tournamentId);
+    int getTournamentGroups(long tournamentId);
 
     void joinTournamentTeam(long tournamentId, long teamId, List<Long> participants);
 
-    boolean participantHasRatedTournament(Long tournamentId, Long userId);
+    boolean participantHasRatedTournament(long userId, long tournamentId);
 
-    void updateCreatorRating(Long tournamentId, Long creatorId, Long reviewerId, Float rating);
+    void updateCreatorRating(long tournamentId, long creatorId, long reviewerId, float rating);
 
     void removeParticipant(long tournamentId, Long participantId);
 }

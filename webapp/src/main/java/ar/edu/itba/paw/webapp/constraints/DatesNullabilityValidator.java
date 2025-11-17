@@ -22,7 +22,7 @@ public class DatesNullabilityValidator implements ConstraintValidator<DatesNulla
 
     @Override
     public boolean isValid(EditTournamentForm form, ConstraintValidatorContext ctx) {
-        if (form == null) return true;
+        if (form == null || form.getTournamentId() == null) return true;
         ctx.disableDefaultConstraintViolation();
 
         Optional<Tournament> optTournament = tournamentService.findById(form.getTournamentId());

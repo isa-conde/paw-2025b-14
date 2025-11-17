@@ -72,7 +72,7 @@ public class TeamController {
     }
 
     @RequestMapping("/team/profile/{id}")
-    public ModelAndView teamProfile(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @PathVariable Long id, @ModelAttribute("teamForm") EditTeamForm editTeamForm, @RequestParam(defaultValue = "0") Integer page1, @RequestParam(defaultValue = "0") Integer page2){
+    public ModelAndView teamProfile(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @PathVariable long id, @ModelAttribute("teamForm") EditTeamForm editTeamForm, @RequestParam(defaultValue = "0") int page1, @RequestParam(defaultValue = "0") int page2){
         final ModelAndView mav = new ModelAndView("teamProfile");
 
         if (currentUser.isPresent()) {
@@ -90,8 +90,8 @@ public class TeamController {
         mav.addObject("members", ts.getTeamMembers(id));
         mav.addObject("currentPage1", page1);
         mav.addObject("currentPage2", page2);
-        mav.addObject("totalPages1", ts.getActivePages(team.getId()));
-        mav.addObject("totalPages2", ts.getPastPages(team.getId()));
+        mav.addObject("totalPages1", ts.getActivePages(id));
+        mav.addObject("totalPages2", ts.getPastPages(id));
         editTeamForm.setName(team.getName());
         return mav;
     }

@@ -64,12 +64,12 @@ public class ParticipantServiceImpl implements ParticipantService {
         LOGGER.info("Tournament joined notification email correctly sent to tournament owner with address {}", creator.getEmail());
     }
 
-    private List<Participant> getTournamentParticipantUsers(Long tournamentId) {
+    private List<Participant> getTournamentParticipantUsers(long tournamentId) {
         return participantDao.getTournamentParticipantUsers(tournamentId);
     }
 
     @Override
-    public List<Participant> getTournamentParticipants(Long tournamentId, Integer teamSize) {
+    public List<Participant> getTournamentParticipants(long tournamentId, Integer teamSize) {
         List<Participant> participants;
         if (teamSize > 1){
             participants = participantDao.getTournamentParticipantTeams(tournamentId);
@@ -81,7 +81,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
-    public int getTournamentGroups(Long tournamentId){
+    public int getTournamentGroups(long tournamentId){
         return participantDao.getTournamentGroups(tournamentId);
     }
 
@@ -92,38 +92,34 @@ public class ParticipantServiceImpl implements ParticipantService {
 
     @Transactional
     @Override
-    public void leaveTournament(Long userId, Long tournamentId) {
-        Integer playersPerTeam = ts.getPlayersPerTeam(tournamentId);
-        if(playersPerTeam != null){
-            if(playersPerTeam > 1){
-                participantDao.leaveTournamentTeam(userId, tournamentId);
-            }else{
-                participantDao.leaveTournamentUser(userId, tournamentId);
-            }
+    public void leaveTournament(long userId, long tournamentId) {
+        int playersPerTeam = ts.getPlayersPerTeam(tournamentId);
+        if (playersPerTeam > 1) {
+            participantDao.leaveTournamentTeam(userId, tournamentId);
+        } else {
+            participantDao.leaveTournamentUser(userId, tournamentId);
         }
         LOGGER.info("User with ID {} has successfully left tournament with ID {}", userId, tournamentId);
     }
 
     @Transactional
     @Override
-    public void swapGroups(Long tournamentId, Long user1, Long user2){
+    public void swapGroups(long tournamentId, long user1, long user2){
         if (tournamentDao.isTournamentStarted(tournamentId)) {
             throw new TournamentAlreadyStartedException();
         }
         Tournament tournament = tournamentDao.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
-        Integer teamSize = gameFormatDao.findById(tournament.getFormatId()).orElseThrow(GameFormatNotFoundException::new).getPlayersPerTeam();
+        int teamSize = gameFormatDao.findById(tournament.getFormatId()).orElseThrow(GameFormatNotFoundException::new).getPlayersPerTeam();
 
         Integer g1 = participantDao.getGroupNumber(tournamentId, user1, teamSize);
         Integer g2 = participantDao.getGroupNumber(tournamentId, user2, teamSize);
         if(g1 == null || g2 == null) {
             throw new MissingGroupNumberException();
         }
-
         if (g1.equals(g2)) {
             LOGGER.warn("Cannot swap users within the same group");
             return;
         }
-
         participantDao.swapGroups(tournamentId, user1, user2, g1, g2, teamSize);
         LOGGER.info("Users with IDs {} and {} have successfully swapped groups", user1, user2);
     }
@@ -143,6 +139,9 @@ public class ParticipantServiceImpl implements ParticipantService {
         }
         List<Participant> currentParticipants = getTournamentParticipants(tournamentId, ts.getPlayersPerTeam(tournamentId));
         for(Long p : participants){
+            if(p == null) {
+                throw new ParticipantNotFoundException();
+            }
             participantDao.joinTournamentUserWithTeam(p, tournamentId, teamId);
             User user = userDao.findById(p).orElseThrow(UserNotFoundException::new);
             ms.sendTournamentJoinedEmail(tournamentId, user.getUsername(), tournament.getName(), user.getEmail(), creator.getEmail());
@@ -158,20 +157,20 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
-    public boolean participantHasRatedTournament(Long tournamentId, Long userId) {
-        return participantDao.hasRated(tournamentId, userId);
+    public boolean participantHasRatedTournament(long userId, long tournamentId) {
+        return participantDao.hasRated(userId, tournamentId);
     }
 
     @Transactional
     @Override
-    public void updateCreatorRating(Long tournamentId, Long creatorId, Long reviewerId, Float rating) {
-        if(participantDao.hasRated(tournamentId, reviewerId)) {
-            throw new UserNotFoundException();
+    public void updateCreatorRating(long tournamentId, long creatorId, long reviewerId, float rating) {
+        if(participantDao.hasRated(reviewerId, tournamentId)) {
+            throw new ParticipantAlreadyRatedException();
         }
         participantDao.updateHasRated(reviewerId, tournamentId);
         User user = userDao.findById(creatorId).orElseThrow(UserNotFoundException::new);
         Float currentRating = user.getRating();
-        Float newRating = (currentRating == null) ? rating : (currentRating + rating) / 2;
+        float newRating = (currentRating == null) ? rating : (currentRating + rating) / 2;
         userDao.updateUserRating(creatorId, newRating);
     }
 

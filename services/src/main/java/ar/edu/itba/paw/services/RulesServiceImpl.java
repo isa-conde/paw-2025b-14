@@ -23,7 +23,7 @@ public class RulesServiceImpl implements RulesService {
     }
 
     @Override
-    public Optional<Rules> findById(Long id) {
+    public Optional<Rules> findById(long id) {
         return rulesDao.findById(id);
     }
 
@@ -35,7 +35,7 @@ public class RulesServiceImpl implements RulesService {
 
     @Transactional
     @Override
-    public void updateRules(Long tournamentId, byte[] file) {
+    public void updateRules(long tournamentId, byte[] file) {
         Tournament tournament = tournamentDao.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
         Rules r = tournament.getRules();
         if (r != null){

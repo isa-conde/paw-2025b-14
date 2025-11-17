@@ -44,7 +44,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Transactional
     @Override
-    public Team create(String name, byte[] pfp, byte[] banner, Long ownerId, List<String> members) {
+    public Team create(String name, byte[] pfp, byte[] banner, long ownerId, List<String> members) {
         Long pfpId = null;
         Long bannerId = null;
         if (pfp != null){
@@ -52,10 +52,6 @@ public class TeamServiceImpl implements TeamService {
         }
         if (banner != null){
             bannerId = imageDao.insertImage(banner);
-        }
-
-        if(pfpId == null || bannerId == null) {
-            throw new ImageNotFoundException();
         }
 
         Team team = teamDao.create(name, pfpId, bannerId, ownerId);
@@ -77,38 +73,38 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public Optional<Team> findById(Long id) {
+    public Optional<Team> findById(long id) {
         return teamDao.findById(id);
     }
 
     @Override
-    public List<Tournament> getActiveTournaments(Long teamId, Integer page) {
+    public List<Tournament> getActiveTournaments(long teamId, int page) {
         return getTournamentsFromIds(teamDao.getActiveTournaments(teamId, page));
     }
 
     @Override
-    public List<Tournament> getPastTournaments(Long teamId, Integer page) {
+    public List<Tournament> getPastTournaments(long teamId, int page) {
         return getTournamentsFromIds(teamDao.getPastTournaments(teamId, page));
     }
 
     @Override
-    public long getActivePages(Long teamId) {
+    public long getActivePages(long teamId) {
         return teamDao.getActivePages(teamId);
     }
 
     @Override
-    public long getPastPages(Long teamId) {
+    public long getPastPages(long teamId) {
         return teamDao.getPastPages(teamId);
     }
 
     @Override
-    public List<Team> getUserTeams(Long userId) {
+    public List<Team> getUserTeams(long userId) {
         return teamDao.getUserTeams(userId);
     }
 
     @Transactional
     @Override
-    public void updateTeam(Long teamId, String name, byte[] pfp, byte[] banner, List<String> members) {
+    public void updateTeam(long teamId, String name, byte[] pfp, byte[] banner, List<String> members) {
         Long pfpId = null;
         Long bannerId = null;
         if (pfp != null){
@@ -118,13 +114,9 @@ public class TeamServiceImpl implements TeamService {
             bannerId = imageDao.insertImage(banner);
         }
 
-        if(pfpId == null || bannerId == null) {
-            throw new ImageNotFoundException();
-        }
-
         if (members != null){
             for (String s : members){
-                Long userId =  userDao.findByUsername(s).orElseThrow(UserNotFoundException::new).getId();
+                long userId = userDao.findByUsername(s).orElseThrow(UserNotFoundException::new).getId();
                 if (!teamMemberDao.isMember(teamId, userId)){
                     teamMemberDao.addMember(teamId, userId);
                 }
@@ -142,6 +134,9 @@ public class TeamServiceImpl implements TeamService {
     @Transactional
     @Override
     public List<User> getTeamMembers(Long teamId) {
+        if(teamId == null) {
+            throw new TeamNotFoundException();
+        }
         return teamDao.findById(teamId).orElseThrow(TeamNotFoundException::new).getMembers();
     }
 
@@ -151,8 +146,8 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public List<Team> getUserTeamsBySizeNotInTournament(Long userId, Long tournamentId) {
-        return teamDao.getUserTeamsBySizeNotInTournament(userId, tournamentId, (long)ts.getPlayersPerTeam(tournamentId));
+    public List<Team> getUserTeamsBySizeNotInTournament(long userId, long tournamentId) {
+        return teamDao.getUserTeamsBySizeNotInTournament(userId, tournamentId, ts.getPlayersPerTeam(tournamentId));
     }
 
     @Override

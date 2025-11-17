@@ -117,7 +117,7 @@ public class MatchServiceImpl implements MatchService {
         int winner = (localScore > visitorScore) ? 1 : (localScore < visitorScore ? 2 : -1);
         matchDao.setMatchResults(matchId, tournamentId, localScore, visitorScore, winner, LocalDate.now());
         Long winnerId = (winner == 1) ? localId : (winner == 2 ? visitorId : null);
-        Integer scoreDifference = (winner == 1) ? localScore - visitorScore : (winner == 2 ? visitorScore - localScore : 0);
+        int scoreDifference = (winner == 1) ? localScore - visitorScore : (winner == 2 ? visitorScore - localScore : 0);
 
         boolean isFinished = matchDao.allMatchesPlayed(tournamentId);
         if(!isFinished && isElimination) {

@@ -15,53 +15,53 @@ import java.util.Optional;
 
 public interface TournamentService {
 
-    Optional<Tournament> findById(Long id);
+    Optional<Tournament> findById(long id);
 
-    List<Tournament> findTournaments(TournamentFilter tournamentFilter, Long page);
+    List<Tournament> findTournaments(TournamentFilter tournamentFilter, long page);
 
-    Tournament create(Long creatorId, String name, Long gameId, Region region, Elo elo, LocalDate startDate, LocalDate endDate, String format,
-                      Structure structure, Integer maxParticipants, byte[] imageId, Boolean openInscriptions, Boolean isFinished,
-                      Long formatId, byte[] rulesId, String serverName, String serverPassword, String discordChannel);
+    Tournament create(long creatorId, String name, long gameId, Region region, Elo elo, LocalDate startDate, LocalDate endDate, String format,
+                      Structure structure, int maxParticipants, byte[] image, boolean openInscriptions, boolean isFinished, long formatId,
+                      byte[] rules, String serverName, String serverPassword, String discordChannel);
 
-    List<Tournament> findByCreator(Long creatorId, Long page, Boolean isFinished);
+    List<Tournament> findByCreator(long creatorId, long page, boolean isFinished);
 
     void setFinished(long tournamentId, long matchId);
 
-    void closeInscriptions(Long tournamentId);
+    void closeInscriptions(long tournamentId);
 
-    List<Tournament> findUserActiveTournaments(Long userId, Long page);
+    List<Tournament> findUserActiveTournaments(long userId, long page);
 
-    List<Tournament> findUserPastTournaments(Long userId, Long page);
+    List<Tournament> findUserPastTournaments(long userId, long page);
 
     List<Tournament> searchByName(String name);
 
-    void startTournament(Long tournamentId);
+    void startTournament(long tournamentId);
 
-    Map<Game,List<Tournament>> getUnfilteredTournamentPages(Long page);
+    Map<Game,List<Tournament>> getUnfilteredTournamentPages(long page);
 
     int getPageAmount(int pageSize, TournamentFilter tf);
 
-    void updateTournamentInfo(Long tournamentId, String name, LocalDate startDate, LocalDate endDate, Integer maxParticipants, byte[] image, String serverName, String serverPassword, String discordChannel);
+    void updateTournamentInfo(long tournamentId, String name, LocalDate startDate, LocalDate endDate, Integer maxParticipants, byte[] image, String serverName, String serverPassword, String discordChannel);
 
-    int getTournamentParticipantsCount(Long tournamentId);
+    int getTournamentParticipantsCount(long tournamentId);
 
     void createBracketFromGroups(long tournamentId);
 
-    List<Tournament> getCreatedAndFinishedTournaments(Long userId, Long page);
+    List<Tournament> getCreatedAndFinishedTournaments(long userId, long page);
 
-    List<Tournament> getCreatedAndOngoingTournaments(Long userId, Long page);
+    List<Tournament> getCreatedAndOngoingTournaments(long userId, long page);
 
-    int getPlayersPerTeam(Long tournamentId);
+    int getPlayersPerTeam(long tournamentId);
 
-    int getPagesBySection(Long userId, String section);
+    int getPagesBySection(long userId, String section);
 
-    List <Tournament> getUserWonTournament(Long userId, Long page);
+    List <Tournament> getUserWonTournament(long userId, long page);
 
-    int getUserWonTournamentPages(Long userId);
+    int getUserWonTournamentPages(long userId);
 
-    void contactOwner(Long tournamentId, User currentUser, String subject, String body, Long creatorId);
+    void contactOwner(long tournamentId, User currentUser, String subject, String body, long creatorId);
 
-    void updateTournamentRating(Long tournamentId, Float userRating);
+    void updateTournamentRating(long tournamentId, float userRating);
 
     void notifyCreatorOfLeavingUser(User user, long tournamentId);
 }

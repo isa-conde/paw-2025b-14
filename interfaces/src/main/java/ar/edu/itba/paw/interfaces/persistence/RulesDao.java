@@ -6,10 +6,10 @@ import java.util.Optional;
 
 public interface RulesDao {
 
-    Optional<Rules> findById(Long id);
+    Optional<Rules> findById(long id);
 
     Rules insertRules(byte[] file);
 
-    void updateRules(Long id, byte[] file);
+    void updateRules(long id, byte[] file);
 
 }

@@ -97,12 +97,12 @@ public class TournamentController {
     }
 
     @RequestMapping(value = "/tournament/swap/groups", method = RequestMethod.POST)
-    public ModelAndView swapGroups(@RequestParam("tournamentId") Long tournamentId,
+    public ModelAndView swapGroups(@RequestParam("tournamentId") long tournamentId,
                                    @RequestParam(name="selected", required=false) List<String> selected,
                                    RedirectAttributes ra) {
 
-        Long user1 = Long.valueOf(selected.get(0));
-        Long user2 = Long.valueOf(selected.get(1));
+        long user1 = Long.valueOf(selected.get(0));
+        long user2 = Long.valueOf(selected.get(1));
 
         ps.swapGroups(tournamentId, user1, user2);
 
@@ -432,7 +432,10 @@ public class TournamentController {
     }
 
     @RequestMapping(value = "/tournaments/new/step3", method = { RequestMethod.POST })
-    public ModelAndView createTournament(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @Validated(TournamentForm.StepThree.class) @ModelAttribute("tournamentForm") final TournamentForm form, final BindingResult result, SessionStatus status) {
+    public ModelAndView createTournament(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                                         @Validated({TournamentForm.StepOne.class, TournamentForm.StepTwo.class, TournamentForm.StepThree.class}) @ModelAttribute("tournamentForm") final TournamentForm form,
+                                         final BindingResult result,
+                                         SessionStatus status) {
         if (result.hasErrors()) {
             return newTournamentFormStep3(currentUser, form);
         }

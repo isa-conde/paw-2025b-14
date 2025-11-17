@@ -174,7 +174,7 @@ public class MailServiceImpl implements MailService {
 
     @Async
     @Override
-    public void sendResetPasswordEmail(Long userId, long token, String recipient) {
+    public void sendResetPasswordEmail(long userId, long token, String recipient) {
         User user = userDao.findById(userId).orElseThrow(UserNotFoundException::new);
         Locale locale = toLocale(user.getLocale());
         Context ctx = new Context(locale);
@@ -289,7 +289,7 @@ public class MailServiceImpl implements MailService {
 
     @Async
     @Override
-    public void sendListEmail(Long tournamentId, List<Participant> participantList) {
+    public void sendListEmail(long tournamentId, List<Participant> participantList) {
         Tournament tournament = tournamentDao.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
         User creator = userDao.findById(tournament.getCreatorId()).orElseThrow(UserNotFoundException::new);
         Locale locale = toLocale(creator.getLocale());

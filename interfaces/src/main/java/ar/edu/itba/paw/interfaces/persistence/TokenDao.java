@@ -7,11 +7,11 @@ import java.util.Optional;
 
 public interface TokenDao {
 
-    Token create(Long userId, Long token, LocalDate expiryDate);
+    Token create(long userId, long token, LocalDate expiryDate);
 
-    Optional<Token> findByToken(Long token);
+    Optional<Token> findByToken(long token);
 
-    void markAsUsed(Long tokenId);
+    void markAsUsed(long tokenId);
 
     void deleteExpiredTokens();
 

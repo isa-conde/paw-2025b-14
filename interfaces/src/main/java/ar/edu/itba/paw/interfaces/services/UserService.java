@@ -24,33 +24,33 @@ public interface UserService {
 
     void resendVerification(User user);
 
-    Optional<Token> checkTokenValidity(Long token);
+    Optional<Token> checkTokenValidity(long token);
 
-    boolean resetPassword(Long token, String newPassword);
+    boolean resetPassword(long token, String newPassword);
 
-    boolean sameAsOldPassword(String newPassword, Long userId);
+    boolean sameAsOldPassword(String newPassword, long userId);
 
     boolean usernameIsTaken(String username);
 
     boolean emailIsTaken(String email);
 
-    boolean verifyEmail(Long token, Long userId);
+    boolean verifyEmail(long token, long userId);
 
-    void authenticateVerifiedUser(Long userId);
+    void authenticateVerifiedUser(long userId);
 
-    void updateProfileInfo(Long userId, String username, String bio, byte[] pfp, byte[] banner);
+    void updateProfileInfo(long userId, String username, String bio, byte[] pfp, byte[] banner);
 
     List<User> searchByName(String name);
 
-    void updateUserLocale(Locale locale, Long userId);
+    void updateUserLocale(Locale locale, long userId);
 
-    void updateUserRating(Long userId, Float rating);
+    void updateUserRating(long userId, float rating);
 
     List<User> findAll();
 
-    Float getUserRating(Long userId);
+    Float getUserRating(long userId);
 
-    User findUserByToken(Long token);
+    User findUserByToken(long token);
 
     void commentOnProfile(User commenter, long receiverId, String comment);
 

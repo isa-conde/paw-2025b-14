@@ -2,9 +2,7 @@ package ar.edu.itba.paw.persistence.Hibernate;
 
 import ar.edu.itba.paw.interfaces.persistence.UserDao;
 import ar.edu.itba.paw.model.User;
-import ar.edu.itba.paw.model.UserAccount;
 import ar.edu.itba.paw.model.enums.Platform;
-import org.hibernate.query.NativeQuery;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.*;
@@ -88,7 +86,7 @@ public class UserHibernateDao implements UserDao {
     }
 
     @Override
-    public void updateProfileInfo(Long userId, String username, String bio, Long pfp, Long banner) {
+    public void updateProfileInfo(long userId, String username, String bio, Long pfp, Long banner) {
         User user = em.find(User.class, userId);
 
         if (user != null){
@@ -113,7 +111,7 @@ public class UserHibernateDao implements UserDao {
     }
 
     @Override
-    public void updateUserLocale(String locale, Long userId) {
+    public void updateUserLocale(String locale, long userId) {
         User user = em.find(User.class, userId);
         if (user != null) {
             user.setLocale(locale);
@@ -122,7 +120,7 @@ public class UserHibernateDao implements UserDao {
     }
 
     @Override
-    public void updateUserRating(Long userId, Float rating) {
+    public void updateUserRating(long userId, float rating) {
         em.createQuery("UPDATE User u SET u.rating = :rating WHERE u.id = :userId")
                 .setParameter("rating", rating)
                 .setParameter("userId", userId)

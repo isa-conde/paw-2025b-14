@@ -88,7 +88,7 @@ public class AuthController {
     }
 
     @RequestMapping("/verify/confirm")
-    public ModelAndView confirmedVerificationPage(@RequestParam("token") Long token,
+    public ModelAndView confirmedVerificationPage(@RequestParam("token") long token,
                                                   @RequestParam("userId") long userId,
                                                   HttpServletRequest request,
                                                   HttpServletResponse response) {
@@ -127,7 +127,7 @@ public class AuthController {
     }
 
     @RequestMapping(value = "/forgotPassword/reset", method = RequestMethod.GET)
-    public ModelAndView resetPasswordPage(@RequestParam("token") Long token,
+    public ModelAndView resetPasswordPage(@RequestParam("token") long token,
                                           @ModelAttribute("resetPasswordForm") ResetPasswordForm resetPasswordForm) {
         ModelAndView mav = new ModelAndView("resetPasswordPage");
         Optional<Token> validToken = us.checkTokenValidity(token);
@@ -142,7 +142,7 @@ public class AuthController {
     }
 
     @RequestMapping(value = "/forgotPassword/reset", method = RequestMethod.POST)
-    public ModelAndView resetPassword(@RequestParam("token") Long token,
+    public ModelAndView resetPassword(@RequestParam("token") long token,
                                       @Valid @ModelAttribute("resetPasswordForm") ResetPasswordForm resetPasswordForm,
                                       BindingResult result,
                                       HttpServletRequest request,
@@ -164,7 +164,7 @@ public class AuthController {
         return new ModelAndView("resetPasswordSuccess");
     }
 
-    private void authenticateUser(Long userId, HttpServletRequest request, HttpServletResponse response){
+    private void authenticateUser(long userId, HttpServletRequest request, HttpServletResponse response){
         us.findById(userId).ifPresent(user -> {
             UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
 

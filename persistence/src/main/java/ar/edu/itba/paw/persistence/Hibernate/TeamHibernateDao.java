@@ -20,7 +20,7 @@ public class TeamHibernateDao implements TeamDao {
     private EntityManager em;
 
     @Override
-    public Team create(String name, Long pfpId, Long bannerId, Long ownerId) {
+    public Team create(String name, Long pfpId, Long bannerId, long ownerId) {
         User owner = em.find(User.class, ownerId);
         if (owner == null) {
             throw new UserNotFoundException();
@@ -32,21 +32,21 @@ public class TeamHibernateDao implements TeamDao {
     }
 
     @Override
-    public Optional<Team> findById(Long id) {
+    public Optional<Team> findById(long id) {
         return Optional.ofNullable(em.find(Team.class, id));
     }
 
     @Override
-    public List<Long> getPastTournaments(Long teamId, Integer page) {
+    public List<Long> getPastTournaments(long teamId, int page) {
         return findTeamTournamentIds(teamId, true, page);
     }
 
     @Override
-    public List<Long> getActiveTournaments(Long teamId, Integer page) {
+    public List<Long> getActiveTournaments(long teamId, int page) {
         return findTeamTournamentIds(teamId, false, page);
     }
 
-    private List<Long> findTeamTournamentIds(Long teamId, Boolean isFinished, Integer page) {
+    private List<Long> findTeamTournamentIds(long teamId, boolean isFinished, int page) {
         String jpql = """
             SELECT DISTINCT p.tournament.id
             FROM Participant p
@@ -64,16 +64,16 @@ public class TeamHibernateDao implements TeamDao {
     }
 
     @Override
-    public long getActivePages(Long teamId) {
+    public long getActivePages(long teamId) {
         return getTeamTournamentsPages(teamId, false);
     }
 
     @Override
-    public long getPastPages(Long teamId) {
+    public long getPastPages(long teamId) {
         return getTeamTournamentsPages(teamId, true);
     }
 
-    private long getTeamTournamentsPages(Long teamId, boolean isFinished){
+    private long getTeamTournamentsPages(long teamId, boolean isFinished){
         String jpql = """
             SELECT DISTINCT COUNT (DISTINCT (p.tournament.id))
             FROM Participant p
@@ -86,22 +86,25 @@ public class TeamHibernateDao implements TeamDao {
                 .setParameter("teamId", teamId)
                 .setParameter("isFinished", isFinished)
                 .getSingleResult();
+
         return (long) Math.ceil((double) total / GRID_PAGE_SIZE);
     }
 
     @Override
-    public List<Team> getUserTeams(Long userId) {
+    public List<Team> getUserTeams(long userId) {
         return em.find(User.class, userId).getTeams();
     }
 
     @Override
-    public void updateTeam(Long teamId, String name, Long pfpId, Long bannerId) {
+    public void updateTeam(long teamId, String name, Long pfpId, Long bannerId) {
         Team team = em.find(Team.class, teamId);
         if (name != null){
             team.setName(name);
-        }if (pfpId != null){
+        }
+        if(pfpId != null) {
             team.setPfpId(pfpId);
-        }if (bannerId != null){
+        }
+        if(bannerId != null) {
             team.setBannerId(bannerId);
         }
         em.persist(team);
@@ -127,7 +130,7 @@ public class TeamHibernateDao implements TeamDao {
     }
 
     @Override
-    public List<Team> getUserTeamsBySizeNotInTournament(Long userId, Long tournamentId, Long minSize) {
+    public List<Team> getUserTeamsBySizeNotInTournament(long userId, long tournamentId, long minSize) {
         String jpql = """
         SELECT DISTINCT t
         FROM Team t

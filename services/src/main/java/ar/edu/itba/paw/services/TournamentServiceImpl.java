@@ -51,7 +51,7 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public Optional<Tournament> findById(Long id) { // TODO: this should return Tournament. Check for uses of this function throughout
+    public Optional<Tournament> findById(long id) {
         Optional<Tournament> toReturn = tournamentDao.findById(id);
         if(toReturn.isEmpty()) {
             LOGGER.error("Tournament with ID {} does not exist", id);
@@ -61,7 +61,7 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public List<Tournament> findTournaments(TournamentFilter tournamentFilter, Long page) {
+    public List<Tournament> findTournaments(TournamentFilter tournamentFilter, long page) {
         Long gameId = tournamentFilter.getGameId();
         if(gameId != null && gameDao.findById(gameId).isEmpty()) {
             LOGGER.error("Game with ID {} does not exist", gameId);
@@ -72,8 +72,8 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Transactional
     @Override
-    public Tournament create(Long creatorId, String name, Long gameId, Region region, Elo elo, LocalDate startDate, LocalDate endDate, String format,
-                             Structure structure, Integer maxParticipants, byte[] image, Boolean openInscriptions, Boolean isFinished, Long formatId,
+    public Tournament create(long creatorId, String name, long gameId, Region region, Elo elo, LocalDate startDate, LocalDate endDate, String format,
+                             Structure structure, int maxParticipants, byte[] image, boolean openInscriptions, boolean isFinished, long formatId,
                              byte[] rules, String serverName, String serverPassword, String discordChannel) {
         Long imageId = imageDao.insertImage(image);
         if(imageId == null) {
@@ -92,7 +92,7 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public List<Tournament> findByCreator(Long creatorId, Long page, Boolean isFinished) {
+    public List<Tournament> findByCreator(long creatorId, long page, boolean isFinished) {
         return tournamentDao.findByCreator(creatorId, page, isFinished);
     }
 
@@ -130,7 +130,7 @@ public class TournamentServiceImpl implements TournamentService {
         tournamentDao.setFinished(tournamentId);
         LOGGER.info("Tournament with ID {} has successfully ended", tournamentId);
         List<Participant> participantUsers = participantDao.getTournamentParticipantUsers(tournamentId);
-        Integer teamSize = getPlayersPerTeam(tournamentId);
+        int teamSize = getPlayersPerTeam(tournamentId);
         if(teamSize > 1) {
             List<Participant> participantTeams = participantDao.getTournamentParticipantTeams(tournamentId);
             Long winnerTeam = null;
@@ -160,7 +160,7 @@ public class TournamentServiceImpl implements TournamentService {
         }
     }
 
-    private List<Participant> getLeagueTournamentTopPositions(Long tournamentId){
+    private List<Participant> getLeagueTournamentTopPositions(long tournamentId){
         Tournament tournament = tournamentDao.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
         PointsPair maxPoints = participantDao.getTournamentMaxPointsPairGroup(tournamentId, null);
         if (maxPoints == null) return java.util.Collections.emptyList();
@@ -169,12 +169,12 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Transactional
     @Override
-    public void closeInscriptions(Long tournamentId){
+    public void closeInscriptions(long tournamentId){
         if(tournamentDao.isClosed(tournamentId)) {
             LOGGER.warn("The inscriptions for the tournament with ID {} have already been closed", tournamentId);
             throw new TournamentAlreadyClosedException();
         }
-        Integer teamSize = getPlayersPerTeam(tournamentId);
+        int teamSize = getPlayersPerTeam(tournamentId);
         List<Participant> participants;
         List<Participant> teams = new ArrayList<>();
         participants = participantDao.getTournamentParticipantUsers(tournamentId);
@@ -188,12 +188,12 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public List<Tournament> findUserActiveTournaments(Long userId, Long page) {
+    public List<Tournament> findUserActiveTournaments(long userId, long page) {
         return tournamentDao.findUserActiveTournaments(userId, page);
     }
 
     @Override
-    public List<Tournament> findUserPastTournaments(Long userId, Long page) {
+    public List<Tournament> findUserPastTournaments(long userId, long page) {
         return tournamentDao.findUserPastTournaments(userId, page);
     }
 
@@ -204,7 +204,7 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Transactional
     @Override
-    public void startTournament(Long tournamentId){
+    public void startTournament(long tournamentId){
         Tournament tournament = findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
         if(tournament.getTournamentStarted()) {
             LOGGER.warn("The tournament with ID {} has already started", tournamentId);
@@ -230,7 +230,7 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Transactional
     @Override
-    public Map<Game, List<Tournament>> getUnfilteredTournamentPages(Long page) {
+    public Map<Game, List<Tournament>> getUnfilteredTournamentPages(long page) {
         Map<Long, List<Tournament>> mapWithGameIdAsKey = tournamentDao.getUnfilteredTournamentPages(page);
         Map<Game, List<Tournament>> mapWithGameAsKey = new HashMap<>();
         for(Long gameId : mapWithGameIdAsKey.keySet()) {
@@ -246,7 +246,7 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Transactional
     @Override
-    public void updateTournamentInfo(Long tournamentId, String name, LocalDate startDate, LocalDate endDate, Integer maxParticipants, byte[] image, String serverName, String serverPassword, String discordChannel){
+    public void updateTournamentInfo(long tournamentId, String name, LocalDate startDate, LocalDate endDate, Integer maxParticipants, byte[] image, String serverName, String serverPassword, String discordChannel){
         Tournament t = findById(tournamentId).orElse(null);
         if(t != null){
             if(image != null){
@@ -275,11 +275,11 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public int getTournamentParticipantsCount(Long tournamentId) {
+    public int getTournamentParticipantsCount(long tournamentId) {
     	return tournamentDao.getTournamentParticipantsCount(tournamentId);
     }
 
-    private void createMatches(Long tournamentId, List<Participant> participants) {
+    private void createMatches(long tournamentId, List<Participant> participants) {
         Tournament tournament = findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
         if (!participants.isEmpty()) { // TODO: no participant error handling
             if(tournament.getStructure().equals(Structure.ELIMINATION)) {
@@ -454,14 +454,14 @@ public class TournamentServiceImpl implements TournamentService {
         createMatchesBracket(tournament, classified, finalMaxMatchId + 1, false);
     }
 
-    private Map<Integer, List<Participant>> getGroupTopPositions(Long tournamentId, Integer groupNumber){
+    private Map<Integer, List<Participant>> getGroupTopPositions(long tournamentId, int groupNumber){
         Map<Integer, List<Participant>> out = new HashMap<>();
         Optional<Tournament> optTournament = tournamentDao.findById(tournamentId);
         if(optTournament.isEmpty()) {
             return out;
         }
         Tournament tournament = optTournament.get();
-        Integer teamSize;
+        int teamSize;
         if(tournament.getFormatId() != null){
             teamSize = gameFormatDao.findById(optTournament.get().getFormatId()).orElseThrow(GameFormatNotFoundException::new).getPlayersPerTeam();
         }else{
@@ -495,7 +495,7 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public int getPlayersPerTeam(Long tournamentId){
+    public int getPlayersPerTeam(long tournamentId){
         Tournament tournament = findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
         if(tournament.getFormatId() != null){
             return gameFormatDao.getPlayersPerTeam(tournament.getFormatId());
@@ -503,7 +503,7 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public int getPagesBySection(Long userId, String section) {
+    public int getPagesBySection(long userId, String section) {
         if (Objects.equals(section, "active")){
             return tournamentDao.getUserActiveTournamentsPages(userId);
         }if (Objects.equals(section, "finished")){
@@ -517,28 +517,28 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     @Override
-    public List<Tournament> getUserWonTournament(Long userId, Long page) {
+    public List<Tournament> getUserWonTournament(long userId, long page) {
         return tournamentDao.getUserWonTournament(userId, page);
     }
 
     @Override
-    public int getUserWonTournamentPages(Long userId) {
+    public int getUserWonTournamentPages(long userId) {
         return tournamentDao.getUserWonTournamentPages(userId);
     }
 
 
     @Override
-    public List<Tournament> getCreatedAndFinishedTournaments(Long userId, Long page) {
+    public List<Tournament> getCreatedAndFinishedTournaments(long userId, long page) {
         return findByCreator(userId, page, true);
     }
 
     @Override
-    public List<Tournament> getCreatedAndOngoingTournaments(Long userId, Long page) {
+    public List<Tournament> getCreatedAndOngoingTournaments(long userId, long page) {
         return findByCreator(userId, page, false);
     }
 
     @Override
-    public void contactOwner(Long tournamentId, User currentUser, String subject, String body, Long creatorId) {
+    public void contactOwner(long tournamentId, User currentUser, String subject, String body, long creatorId) {
         Tournament tournament = findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
         User creator = userDao.findById(creatorId).orElseThrow(TournamentNotFoundException::new);
         ms.sendContactOwnerEmail(tournament, currentUser, subject, body, creator);
@@ -546,11 +546,11 @@ public class TournamentServiceImpl implements TournamentService {
 
     @Transactional
     @Override
-    public void updateTournamentRating(Long tournamentId, Float userRating) {
+    public void updateTournamentRating(long tournamentId, float userRating) {
         Tournament tournament = findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
         Float currentRating = tournament.getRating();
 
-        Float newRating = (currentRating == null) ? userRating : (currentRating + userRating) / 2;
+        float newRating = (currentRating == null) ? userRating : (currentRating + userRating) / 2;
 
         tournamentDao.updateTournamentRating(tournamentId, newRating);
         LOGGER.debug("Tournament {} rating updated to {}", tournament.getName(), newRating);
