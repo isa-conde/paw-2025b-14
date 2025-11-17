@@ -150,12 +150,12 @@ public class UserServiceImpl implements UserService {
         Optional<Token> optToken = tokenDao.findByToken(token);
         if(optToken.isPresent()) {
             Token foundToken = optToken.get();
-            if(foundToken.getExpiryDate().isAfter(LocalDate.now())) {
+            if(foundToken.getExpiryDate().isAfter(LocalDate.now()) && !foundToken.isUsed()) {
                 tokenDao.markAsUsed(foundToken.getId());
                 return optToken;
             } else {
-                LOGGER.warn("Attempted to use an expired token");
-                throw new ExpiredTokenException();
+                LOGGER.warn("Attempted to use an expired or used token");
+                throw new InvalidTokenException();
             }
         } else {
             LOGGER.warn("Attempted to use an inexistent token");

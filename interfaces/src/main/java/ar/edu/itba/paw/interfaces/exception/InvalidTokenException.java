@@ -1,7 +1,7 @@
 package ar.edu.itba.paw.interfaces.exception;
 
-public class ExpiredTokenException extends RuntimeException {
-    public ExpiredTokenException() {
+public class InvalidTokenException extends RuntimeException {
+    public InvalidTokenException() {
         super("errorExceptionPage.message.invalidToken");
     }
 }

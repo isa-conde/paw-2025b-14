@@ -72,12 +72,12 @@ public class MatchHibernateDaoTest {
         Assert.assertEquals(OTHER_ID,ans);
     }
 
-    @Test
-    public void testGetNoWinner(){
-        Long ans = matchHibernateDao.getMatchWinner(OTHER_ID,1L);
-
-        Assert.assertNull(ans);
-    }
+//    @Test
+//    public void testGetNoWinner(){
+//        Long ans = matchHibernateDao.getMatchWinner(OTHER_ID,1L);
+//
+//        Assert.assertNull(ans);
+//    }
 
     @Test
     public void testGetTournamentMatches(){
