@@ -1,0 +1,18 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: RankUp REST API
+  description: ''
+tags:
+  - name: users
+    description: Manages the users of the RankUp application.
+paths:
+  /users:
+    post:
+      tags:
+        - users
+      summary: Create a user.
+      description: Create a RankUp user.
+      responses:
+        '200':
+          description: Successful operation
