@@ -7,29 +7,7 @@
          
          metadata-complete="false">
 
-  <display-name>PAW test application</display-name>
-
-  <!-- Front Controller de Spring -->
-  <servlet>
-    <servlet-name>dispatcher</servlet-name>
-    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-    <!-- Contexto del Dispatcher basado en anotaciones -->
-    <init-param>
-      <param-name>contextClass</param-name>
-      <param-value>
-        org.springframework.web.context.support.AnnotationConfigWebApplicationContext
-      </param-value>
-    </init-param>
-    <init-param>
-      <param-name>contextConfigLocation</param-name>
-      <param-value>
-        ar.edu.itba.paw.webapp.config.WebConfig,
-        ar.edu.itba.paw.webapp.config.WebAuthConfig
-      </param-value>
-    </init-param>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-
+  <display-name>PAW 2025b-14</display-name>
 
   <filter>
     <filter-name>openEntityManagerInViewFilter</filter-name>
@@ -53,10 +31,19 @@
     <url-pattern>/*</url-pattern>
   </filter-mapping>
 
-  <servlet-mapping>
-    <servlet-name>dispatcher</servlet-name>
-    <url-pattern>/</url-pattern>
-  </servlet-mapping>
+  <filter>
+    <filter-name>jersey</filter-name>
+    <filter-class>org.glassfish.jersey.servlet.ServletContainer</filter-class>
+    <init-param>
+      <param-name>jersey.config.server.provider.packages</param-name>
+      <param-value>ar.edu.itba.paw.webapp.controller</param-value>
+    </init-param>
+    <!-- pass to next filter if Jersey/App returns 404 -->
+    <init-param>
+      <param-name>jersey.config.servlet.filter.forwardOn404</param-name>
+      <param-value>true</param-value>
+    </init-param>
+  </filter>
 
   <!-- Favicon mapping -->
   <servlet-mapping>
@@ -87,5 +74,10 @@
     <error-code>404</error-code>
     <location>/WEB-INF/jsp/error/404.jsp</location>
   </error-page>
+
+  <filter-mapping>
+    <url-pattern>/*</url-pattern>
+    <filter-name>jersey</filter-name>
+  </filter-mapping>
 
 </web-app>
