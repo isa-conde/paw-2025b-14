@@ -14,6 +14,7 @@ import ar.edu.itba.paw.model.UserAccount;
 import ar.edu.itba.paw.model.enums.Platform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,14 +57,14 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public User create(String username, String email, String password, Locale locale) {
+    public User create(String username, String email, String password) {
         if (userDao.checkUsernameExists(username)){
             throw new UsernameAlreadyUsedException(username);
         }
         if (userDao.checkEmailExists(email)){
             throw new EmailAlreadyUsedException(email);
         }
-        String finalLocale = locale.getLanguage();
+        String finalLocale = LocaleContextHolder.getLocale().getLanguage();
         LOGGER.info("The user {} has been created with email {}", username, email);
         if (!Objects.equals(finalLocale, "es")){
             finalLocale = "en";

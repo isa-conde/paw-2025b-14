@@ -48,7 +48,7 @@ public class AuthController {
         if (result.hasErrors()) {
             return registerPage(form);
         }
-        User user = us.create(form.getUsername(), form.getEmail(), form.getPassword(), LocaleContextHolder.getLocale());
+        User user = us.create(form.getUsername(), form.getEmail(), form.getPassword());
         return new ModelAndView("redirect:/verify?userId=" + user.getId());
     }
 
