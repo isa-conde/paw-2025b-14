@@ -152,7 +152,10 @@ public class UserController {
     }
 
     @RequestMapping("/search")
-    public ModelAndView search(@ModelAttribute("user") Optional<PawUserDetails> currentUser, @RequestParam("q") final String q, @RequestParam(defaultValue = "0") long page1, @RequestParam(defaultValue = "0") long page2, @RequestParam(defaultValue = "0") long page3, @RequestParam(defaultValue = "0") long page4){
+    public ModelAndView search(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+                               @RequestParam("q") final String q, @RequestParam(defaultValue = "0") long page1,
+                               @RequestParam(defaultValue = "0") long page2, @RequestParam(defaultValue = "0") long page3,
+                               @RequestParam(defaultValue = "0") long page4){
         final ModelAndView mav = new ModelAndView("searchResults");
 
         int totalPages1 = gs.countSearchByNameGame(q);

@@ -128,33 +128,29 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void resendVerification(User user) {
+    public Token resendVerification(User user) {
         Token token = generateToken(user.getId(), VERIFICATION_DAYS_DURATION);
         ms.sendVerificationEmail(user.getId(), user.getUsername(), token.getToken(), user.getEmail());
         LOGGER.info("The verification email has been successfully resent to the address {}", user.getEmail());
+        return token;
     }
 
     @Transactional
     @Override
-    public boolean verifyEmail(long token, long userId) {
-        Optional<Token> optToken = checkTokenValidity(token);
-        findById(userId).orElseThrow(UserNotFoundException::new);
-        if(optToken.isPresent()) {
-            userDao.verifyUser(userId);
-            tokenDao.markAsUsed(optToken.get().getId());
-            return true;
-        }
-        return false;
+    public void verifyEmail(long token, long userId) {
+        Token validToken = checkTokenValidity(token);
+        userDao.verifyUser(userId);
+        tokenDao.markAsUsed(validToken.getId());
     }
 
     @Transactional
     @Override
-    public Optional<Token> checkTokenValidity(long token) {
+    public Token checkTokenValidity(long token) {
         Optional<Token> optToken = tokenDao.findByToken(token);
         if(optToken.isPresent()) {
             Token foundToken = optToken.get();
             if(foundToken.getExpiryDate().isAfter(LocalDate.now()) && !foundToken.isUsed()) {
-                return optToken;
+                return foundToken;
             } else {
                 LOGGER.warn("Attempted to use an expired or used token");
                 throw new InvalidTokenException();

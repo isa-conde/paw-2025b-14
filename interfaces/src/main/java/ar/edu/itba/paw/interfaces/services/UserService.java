@@ -7,7 +7,6 @@ import ar.edu.itba.paw.model.UserAccount;
 import ar.edu.itba.paw.model.enums.Platform;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 
 public interface UserService {
@@ -22,9 +21,9 @@ public interface UserService {
 
     void requestPasswordReset(String email);
 
-    void resendVerification(User user);
+    Token resendVerification(User user);
 
-    Optional<Token> checkTokenValidity(long token);
+    Token checkTokenValidity(long token);
 
     boolean resetPassword(long token, String newPassword);
 
@@ -34,7 +33,7 @@ public interface UserService {
 
     boolean emailIsTaken(String email);
 
-    boolean verifyEmail(long token, long userId);
+    void verifyEmail(long token, long userId);
 
     void updateProfileInfo(long userId, String username, String bio, byte[] pfp, byte[] banner);
 
