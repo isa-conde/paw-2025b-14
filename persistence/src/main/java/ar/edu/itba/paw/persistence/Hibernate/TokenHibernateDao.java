@@ -10,6 +10,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -53,5 +54,12 @@ public class TokenHibernateDao implements TokenDao {
         """)
                 .setParameter("today", LocalDate.now())
                 .executeUpdate();
+    }
+
+    @Override
+    public List<Token> findAssignedTokens(User user) {
+        final TypedQuery<Token> query = em.createQuery("SELECT t FROM Token t WHERE t.user = :user", Token.class);
+        query.setParameter("user", user);
+        return query.getResultList();
     }
 }

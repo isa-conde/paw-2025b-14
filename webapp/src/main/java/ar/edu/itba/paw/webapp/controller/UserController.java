@@ -33,6 +33,8 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
+// TODO: make authentication work. Research JWT
 @Controller
 public class UserController {
 

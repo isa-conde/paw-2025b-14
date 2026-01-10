@@ -19,13 +19,13 @@ public interface UserService {
 
     Optional<User> findByEmail(String email);
 
-    void requestPasswordReset(String email);
+    Token requestPasswordReset(String email);
 
     Token resendVerification(User user);
 
     Token checkTokenValidity(long token);
 
-    boolean resetPassword(long token, String newPassword);
+    void resetPassword(long token, String newPassword);
 
     boolean sameAsOldPassword(String newPassword, long userId);
 
@@ -60,4 +60,8 @@ public interface UserService {
     void deleteUserAccount(long userId, Platform platform);
 
     List<Platform> getAvailablePlatforms(List<UserAccount> accounts);
+
+    Optional<Token> findToken(long token);
+
+    List<Token> findAssignedTokens(long userId);
 }

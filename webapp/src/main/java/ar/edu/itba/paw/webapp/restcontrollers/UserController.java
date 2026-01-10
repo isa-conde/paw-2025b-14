@@ -2,14 +2,10 @@
 package ar.edu.itba.paw.webapp.restcontrollers;
 
 import ar.edu.itba.paw.interfaces.exception.UserNotFoundException;
-import ar.edu.itba.paw.interfaces.services.MailService;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.Token;
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.webapp.dto.entities.UserDTO;
-import ar.edu.itba.paw.webapp.dto.params.VerifyEmailParams;
-import ar.edu.itba.paw.webapp.dto.requests.CreateUserRequest;
-import ar.edu.itba.paw.webapp.form.UserForm;
 import ar.edu.itba.paw.webapp.dto.params.ListUsersByNameParams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,7 +15,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
+
+// TODO: general. We have to check if the logic behind profile that is in the old controller makes any sense here, taking into consideration that there's a hyperlink to user tournaments, favorite games, etc etc etc
 
 @Path("users")
 @Component
@@ -28,73 +25,101 @@ public class UserController {
     @Autowired
     private UserService us;
 
-    @Autowired
-    private MailService ms;
-
     @Context
     private UriInfo uriInfo;
 
     @GET
-    @Produces(value = {"application/vnd.userlist.v1+json"})
+    @Produces(value = {Vendor.APPLICATION_USER_SEARCH_LIST})
     public Response listUsersByName(@Valid @BeanParam ListUsersByNameParams params) {
         String name = params.getName();
         int totalPages = us.countSearchByNameUser(name);
         params.setPage(adjustPage(params.getPage(), totalPages));
 
-        final List<UserDTO> users = us.searchByName(name, params.getPage()).stream().map(UserDTO.mapper(uriInfo)).toList();
+        List<UserDTO> users = us.searchByName(name, params.getPage()).stream().map(UserDTO.mapper(uriInfo)).toList();
 
         return Response.ok(new GenericEntity<>(users) {}).build();
     }
 
     @GET
     @Path("/{id}")
-    @Produces(value = {"application/vnd.user.v1+json"})
-    public Response getUser(@PathParam("id") final int id) {
+    @Produces(value = {Vendor.APPLICATION_USER})
+    public Response getUser(@PathParam("id") long id) {
         User user = us.findById(id).orElseThrow(UserNotFoundException::new);
 
         return Response.ok(UserDTO.fromUser(uriInfo, user)).build();
     }
 
-
     @POST
     @Consumes(value = {MediaType.APPLICATION_JSON})
-    @Produces(value = {"application/vnd.user.v1+json"})
+    @Produces(value = {Vendor.APPLICATION_USER})
     public Response createUser(@Valid UserDTO userDto) {
-        final User user = us.create(userDto.getUsername(), userDto.getEmail(), userDto.getPassword());
+        User user = us.create(userDto.getUsername(), userDto.getEmail(), userDto.getPassword());
 
-        final URI uri = uriInfo.getAbsolutePathBuilder()
+        URI uri = uriInfo.getAbsolutePathBuilder()
                 .path(String.valueOf(user.getId())).build();
 
         return Response.created(uri).build();
     }
 
+    @POST
+    @Path("/verifications")
+    @Consumes(value = {MediaType.APPLICATION_JSON})
+    @Produces(value = {Vendor.APPLICATION_TOKEN})
+    public Response resendVerificationEmail(@Valid UserDTO userDto) {
+        User user = us.findByEmail(userDto.getEmail()).orElseThrow(UserNotFoundException::new);
+
+        Token token = us.resendVerification(user);
+
+        URI uri = uriInfo.getAbsolutePathBuilder()
+                // TODO: check if this happens in the context of /users or /users/verifications. Is it a GET on that resource? If so, make it
+                .path(String.valueOf(token.getId()))
+                .build();
+
+        // TODO: need to see how this ends up working. How does it know to return the structure of the DTO and not the model? Does/Should it return a JSON?
+        return Response.created(uri).build();
+    }
+
     @PUT
     @Path("/verifications")
-    @Produces(value = {"application/vnd.user.v1+json"})
-    public Response verifyUser(@Valid @BeanParam VerifyEmailParams params) {
-        final User user = us.findById(params.getUserId()).orElseThrow(UserNotFoundException::new);
+    @Produces(value = {Vendor.APPLICATION_USER})
+    public Response verifyUser(@QueryParam("token") long token) {
+        User user = us.findUserByToken(token);
 
-        us.verifyEmail(params.getToken(), params.getUserId());
+        us.verifyEmail(token, user.getId());
 
         return Response.ok(UserDTO.fromUser(uriInfo, user)).build();
     }
 
+    // TODO: do the same for this function as mentioned in resendVerificationEmail
     @POST
-    @Path("/verifications")
+    @Path("/password-requests")
     @Consumes(value = {MediaType.APPLICATION_JSON})
-    @Produces(value = {"application/vnd.token.v1+json"})
-    public Response sendVerificationEmail(@Valid UserDTO userDto) {
-        final User user = us.findByEmail(userDto.getEmail()).orElseThrow(UserNotFoundException::new);
+    @Produces(value = {Vendor.APPLICATION_TOKEN})
+    public Response requestPasswordReset(@Valid UserDTO userDto) {
+        String userEmail = userDto.getEmail();
 
-        final Token token = us.resendVerification(user);
+        Token token = us.requestPasswordReset(userEmail);
 
-        final URI uri = uriInfo.getAbsolutePathBuilder()
-                // TODO: check if this happens in the context of /users or /users/verifications
+        URI uri = uriInfo.getAbsolutePathBuilder()
                 .path(String.valueOf(token.getId()))
                 .build();
 
         return Response.created(uri).build();
     }
+
+    @PUT
+    @Path("/password-requests")
+    @Consumes(value = {MediaType.APPLICATION_JSON})
+    @Produces(value = {Vendor.APPLICATION_USER})
+    public Response resetPassword(@Valid UserDTO userDto, @QueryParam("token") long token) {
+        us.resetPassword(token, userDto.getPassword()); // TODO: check if this works by only populating the 'password' field of UserDTO
+
+        User user = us.findUserByToken(token);
+
+        return Response.ok(UserDTO.fromUser(uriInfo, user)).build();
+    }
+
+
 
     private int adjustPage(int page, int totalPages) {
         if (totalPages <= 0) return 0;

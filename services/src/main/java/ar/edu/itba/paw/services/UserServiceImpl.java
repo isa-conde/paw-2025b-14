@@ -88,25 +88,23 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void requestPasswordReset(String email) {
+    public Token requestPasswordReset(String email) {
         User user = findByEmail(email).orElseThrow(UserNotFoundException::new);
         long userId = user.getId();
         Token token = generateToken(userId, RESET_PASSWORD_DAYS_DURATION);
         ms.sendResetPasswordEmail(userId, token.getToken(), email);
         LOGGER.info("Reset Password email correctly sent to the address {}", email);
+        return token;
     }
 
     @Transactional
     @Override
-    public boolean resetPassword(long token, String newPassword) {
-        Optional<Token> optToken = checkTokenValidity(token);
-        if(optToken.isPresent()) {
-            User user = optToken.get().getUser();
-            userDao.changePassword(user.getId(), passwordEncoder.encode(newPassword));
-            tokenDao.markAsUsed(optToken.get().getId());
-            LOGGER.info("User {} has successfully changed their password", user.getUsername());
-            return true;
-        } else return false;
+    public void resetPassword(long token, String newPassword) {
+        Token validToken = checkTokenValidity(token);
+        User user = validToken.getUser();
+        userDao.changePassword(user.getId(), passwordEncoder.encode(newPassword));
+        tokenDao.markAsUsed(validToken.getId());
+        LOGGER.info("User {} has successfully changed their password", user.getUsername());
     }
 
     @Override
@@ -276,4 +274,17 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
 
     }
+
+    @Override
+    public Optional<Token> findToken(long token) {
+        return tokenDao.findByToken(token);
+    }
+
+    // TODO: should this be paginated?
+    @Override
+    public List<Token> findAssignedTokens(long userId) {
+        User user = findById(userId).orElseThrow(UserNotFoundException::new);
+        return tokenDao.findAssignedTokens(user);
+    }
+
 }

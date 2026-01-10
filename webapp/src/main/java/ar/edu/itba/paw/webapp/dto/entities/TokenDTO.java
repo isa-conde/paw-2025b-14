@@ -5,12 +5,17 @@ import ar.edu.itba.paw.model.User;
 
 import javax.ws.rs.core.UriInfo;
 import java.time.LocalDate;
+import java.util.function.Function;
 
 public class TokenDTO {
 
     private User user;
     private long token;
     private LocalDate expiryDate;
+
+    public static Function<Token, TokenDTO> mapper(UriInfo uriInfo) {
+        return (t) -> fromToken(uriInfo, t);
+    }
 
     public static TokenDTO fromToken(final UriInfo uriInfo, final Token token) {
         final TokenDTO toReturn = new TokenDTO();

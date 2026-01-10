@@ -160,7 +160,6 @@ public class UserHibernateDao implements UserDao {
         return query.getResultList();
     }
 
-
     @Override
     public void updateUserLocale(String locale, long userId) {
         User user = em.find(User.class, userId);
