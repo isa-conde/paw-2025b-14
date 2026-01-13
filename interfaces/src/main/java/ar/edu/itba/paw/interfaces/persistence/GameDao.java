@@ -10,7 +10,7 @@ public interface GameDao {
 
     Optional<Game> findById(long id);
 
-    List<Game> searchByName(String name, long page);
+    List<Game> searchByName(String name, int page);
 
     int countSearchByNameGame(String name);
 
@@ -26,5 +26,5 @@ public interface GameDao {
 
     List<Game> findAllPaged(long page);
 
-    long getPageAmount();
+    int getPageAmount();
 }

@@ -9,5 +9,5 @@ public interface GameFormatDao {
 
     List<GameFormat> getFormats(long gameId);
 
-    Optional<GameFormat> findById(long id);
+    GameFormat findById(long id);
 }

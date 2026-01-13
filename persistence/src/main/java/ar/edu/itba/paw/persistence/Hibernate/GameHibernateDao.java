@@ -27,7 +27,7 @@ public class GameHibernateDao implements GameDao {
     }
 
     @Override
-    public List<Game> searchByName(String name, long page) {
+    public List<Game> searchByName(String name, int page) {
 
         Query idQuery = em.createNativeQuery(
                 "SELECT g.id " +
@@ -140,11 +140,11 @@ public class GameHibernateDao implements GameDao {
     }
 
     @Override
-    public long getPageAmount() {
+    public int getPageAmount() {
         TypedQuery<Long> query = em.createQuery("SELECT COUNT(g) FROM Game g", Long.class);
         long totalGames = query.getSingleResult();
 
-        return (long) Math.ceil((double) (totalGames) / PAGE_SIZE);
+        return (int) Math.ceil((double) (totalGames) / PAGE_SIZE);
     }
 
 }
