@@ -3,21 +3,18 @@ package ar.edu.itba.paw.webapp.restcontrollers;
 import ar.edu.itba.paw.interfaces.services.GameService;
 import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.Game.GameFormat;
+import ar.edu.itba.paw.webapp.dto.entities.ErrorDTO;
 import ar.edu.itba.paw.webapp.dto.entities.GameDTO;
 import ar.edu.itba.paw.webapp.dto.entities.GameFormatDTO;
 import ar.edu.itba.paw.webapp.dto.params.FavouriteParams;
 import ar.edu.itba.paw.webapp.dto.params.PaginationParams;
 import ar.edu.itba.paw.webapp.dto.params.SearchNameParams;
+import org.eclipse.persistence.internal.codegen.NonreflectiveMethodDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.BeanParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
 import java.util.List;
 
 @Path(("games"))
@@ -32,13 +29,17 @@ public class GameController {
 
     //TODO AGREGAR HEADERS DE PAGINACION
     @GET
-    public Response getGames(@BeanParam PaginationParams paginationParams, @BeanParam SearchNameParams searchNameParams, @BeanParam FavouriteParams favouriteParams){
+    @Consumes(value = {MediaType.APPLICATION_JSON})
+    @Produces(value = {Vendor.APPLICATION_GAME_LIST})
+    public Response getGames(@BeanParam PaginationParams paginationParams, @BeanParam SearchNameParams searchNameParams, @BeanParam FavouriteParams favouriteParams) {
         List<GameDTO> games;
-        if (!searchNameParams.isEmpty() && !favouriteParams.isEmpty()){
-            return Response.status(Response.Status.BAD_REQUEST).build();
+        if (!searchNameParams.isEmpty() && !favouriteParams.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(
+                    ErrorDTO.of(Response.Status.BAD_REQUEST,
+                            "Query parameters 'name' and 'favouritedBy' cannot be used together")).build();
         }
 
-        if (!searchNameParams.isEmpty()){
+        if (!searchNameParams.isEmpty()) {
             int totalPages = gs.countSearchByNameGame(searchNameParams.getName());
             int page = adjustPage(totalPages, paginationParams.getPage());
             games = gs.searchByName(searchNameParams.getName(), page).stream().map(GameDTO.mapper(uriInfo)).toList();
@@ -56,7 +57,9 @@ public class GameController {
 
     @GET
     @Path("/{gameId}/formats")
-    public Response getFormats(@PathParam("gameId") long gameId){
+    @Consumes(value = {MediaType.APPLICATION_JSON})
+    @Produces(value = {Vendor.APPLICATION_GAME_FORMAT_LIST})
+    public Response getFormats(@PathParam("gameId") long gameId) {
         if (gameId <= 0) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
@@ -67,6 +70,8 @@ public class GameController {
 
     @GET
     @Path("/{gameId}/formats/{formatId}")
+    @Consumes(value = {MediaType.APPLICATION_JSON})
+    @Produces(value = {Vendor.APPLICATION_GAME_FORMAT})
     public Response getFormat(@PathParam("gameId") long gameId, @PathParam("formatId") long formatId){
         if (gameId <= 0 || formatId <= 0) {
             return Response.status(Response.Status.BAD_REQUEST).build();

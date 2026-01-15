@@ -7,6 +7,7 @@ import java.util.function.Function;
 
 public class UserDTO {
 
+    private long id;
     private String username;
     private String email;
     private boolean verified;
@@ -35,6 +36,7 @@ public class UserDTO {
     public static UserDTO fromUser(final UriInfo uriInfo, final User user) {
         final UserDTO toReturn = new UserDTO();
 
+        toReturn.id = user.getId();
         toReturn.username = user.getUsername();
         toReturn.email = user.getEmail();
         toReturn.verified = user.isVerified();
@@ -115,4 +117,11 @@ public class UserDTO {
         this.password = password;
     }
 
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
 }

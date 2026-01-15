@@ -30,7 +30,7 @@ public class UserController {
 
     //TODO AGREGAR HEADERS DE PAGINACION
     @GET
-    @Produces(value = {Vendor.APPLICATION_USER_SEARCH_LIST})
+    @Produces(value = {Vendor.APPLICATION_USER_LIST})
     public Response listUsersByName(@Valid @BeanParam ListUsersByNameParams params) {
         String name = params.getName();
         int totalPages = us.countSearchByNameUser(name);
