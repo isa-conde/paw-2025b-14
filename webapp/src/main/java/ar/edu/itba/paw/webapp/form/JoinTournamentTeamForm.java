@@ -1,8 +1,8 @@
 package ar.edu.itba.paw.webapp.form;
 
-import ar.edu.itba.paw.webapp.constraints.MembersBelongToTeamConstraint;
-import ar.edu.itba.paw.webapp.constraints.MembersCountConstraint;
-import ar.edu.itba.paw.webapp.constraints.MembersNotInTournamentConstraint;
+import ar.edu.itba.paw.webapp.validation.MembersBelongToTeamConstraint;
+import ar.edu.itba.paw.webapp.validation.MembersCountConstraint;
+import ar.edu.itba.paw.webapp.validation.MembersNotInTournamentConstraint;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;

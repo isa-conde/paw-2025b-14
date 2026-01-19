@@ -4,11 +4,11 @@ import ar.edu.itba.paw.model.enums.Elo;
 import ar.edu.itba.paw.model.enums.Region;
 import ar.edu.itba.paw.model.enums.Structure;
 import ar.edu.itba.paw.interfaces.Constants;
-import ar.edu.itba.paw.webapp.constraints.DatesConstraint;
-import ar.edu.itba.paw.webapp.constraints.DiscordUrlConstraint;
-import ar.edu.itba.paw.webapp.constraints.ImageConstraint;
-import ar.edu.itba.paw.webapp.constraints.ValidPDF;
-import ar.edu.itba.paw.webapp.constraints.NoPasswordWithoutServerNameConstraint;
+import ar.edu.itba.paw.webapp.validation.DatesConstraint;
+import ar.edu.itba.paw.webapp.validation.DiscordUrlConstraint;
+import ar.edu.itba.paw.webapp.validation.ImageConstraint;
+import ar.edu.itba.paw.webapp.validation.ValidPDF;
+import ar.edu.itba.paw.webapp.validation.NoPasswordWithoutServerNameConstraint;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 

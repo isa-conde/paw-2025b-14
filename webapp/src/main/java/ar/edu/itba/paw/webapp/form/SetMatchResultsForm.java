@@ -1,6 +1,6 @@
 package ar.edu.itba.paw.webapp.form;
 
-import ar.edu.itba.paw.webapp.constraints.NoTieOnEliminationConstraint;
+import ar.edu.itba.paw.webapp.validation.NoTieOnEliminationConstraint;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;

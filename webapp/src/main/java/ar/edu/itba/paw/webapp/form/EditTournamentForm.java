@@ -1,7 +1,7 @@
 package ar.edu.itba.paw.webapp.form;
 
 import ar.edu.itba.paw.interfaces.Constants;
-import ar.edu.itba.paw.webapp.constraints.*;
+import ar.edu.itba.paw.webapp.validation.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 

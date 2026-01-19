@@ -1,9 +1,9 @@
 package ar.edu.itba.paw.webapp.form;
 
 import ar.edu.itba.paw.interfaces.Constants;
-import ar.edu.itba.paw.webapp.constraints.ExistingUsersContraint;
-import ar.edu.itba.paw.webapp.constraints.ImageConstraint;
-import ar.edu.itba.paw.webapp.constraints.TeamNameNotTakenConstraint;
+import ar.edu.itba.paw.webapp.validation.ExistingUsersContraint;
+import ar.edu.itba.paw.webapp.validation.ImageConstraint;
+import ar.edu.itba.paw.webapp.validation.TeamNameNotTakenConstraint;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;

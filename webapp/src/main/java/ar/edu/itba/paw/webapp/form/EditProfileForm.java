@@ -1,8 +1,8 @@
 package ar.edu.itba.paw.webapp.form;
 
 import ar.edu.itba.paw.interfaces.Constants;
-import ar.edu.itba.paw.webapp.constraints.ImageConstraint;
-import ar.edu.itba.paw.webapp.constraints.UpdateUsernameTakenConstraint;
+import ar.edu.itba.paw.webapp.validation.ImageConstraint;
+import ar.edu.itba.paw.webapp.validation.UpdateUsernameTakenConstraint;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.*;
