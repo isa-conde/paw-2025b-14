@@ -23,7 +23,7 @@ public class GameFormatHibernateDao implements GameFormatDao {
     }
 
     @Override
-    public Optional<GameFormat> findById(long id) {
-        return Optional.ofNullable(em.find(GameFormat.class, id));
+    public GameFormat findById(long id) {
+        return em.find(GameFormat.class, id);
     }
 }

@@ -11,6 +11,8 @@ public interface TeamService {
 
     Team create(String name, byte[] pfp, byte[] banner, long ownerId, List<String> members);
 
+    Team create(String name, long pfpId, long bannerId, long ownerId);
+
     Optional<Team> findById(long id);
 
     List<Tournament> getActiveTournaments(long teamId, int page);
@@ -31,7 +33,10 @@ public interface TeamService {
 
     List<Team> getUserTeamsBySizeNotInTournament(long userId, long tournamentId);
 
-    List<Team> searchByName(String name, long page);
+    List<Team> searchByName(String name, int page);
 
     int countSearchByNameTeam(String name);
+
+    void updateTeam(long teamId, String name);
+
 }

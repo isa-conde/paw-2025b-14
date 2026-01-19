@@ -33,7 +33,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public List<Game> searchByName(String name, long page) {
+    public List<Game> searchByName(String name, int page) {
         return gameDao.searchByName(name, page);
     }
 
@@ -79,7 +79,12 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public long getPageAmount(){
+    public int getPageAmount(){
         return gameDao.getPageAmount();
+    }
+
+    @Override
+    public GameFormat getFormat(Long formatId){
+        return gameFormatDao.findById(formatId);
     }
 }

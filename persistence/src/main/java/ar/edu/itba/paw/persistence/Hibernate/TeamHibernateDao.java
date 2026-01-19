@@ -121,7 +121,7 @@ public class TeamHibernateDao implements TeamDao {
     }
 
     @Override
-    public List<Team> searchByName(String name, long page) {
+    public List<Team> searchByName(String name, int page) {
 
         Query idQuery = em.createNativeQuery(
                 "SELECT t.id " +

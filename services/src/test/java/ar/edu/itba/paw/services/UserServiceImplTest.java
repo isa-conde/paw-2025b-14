@@ -61,7 +61,7 @@ public class UserServiceImplTest{
         Mockito.when(mockTokenDao.create(ArgumentMatchers.eq(1L),ArgumentMatchers.anyLong(),ArgumentMatchers.eq(LocalDate.now().plusDays(VERIFICATION_DAYS_DURATION))))
                 .thenReturn(new Token(1L,1L,1L,LocalDate.now().plusDays(VERIFICATION_DAYS_DURATION)));
 
-        User maybeUser = userService.create(USERNAME,EMAIL,PASSWORD,LOCALE);
+        User maybeUser = userService.create(USERNAME,EMAIL,PASSWORD);
 
         Assert.assertNotNull(maybeUser);
         Assert.assertEquals(USERNAME, maybeUser.getUsername());
@@ -129,10 +129,9 @@ public class UserServiceImplTest{
         Mockito.when(mockTokenDao.findByToken(1L))
                 .thenReturn(Optional.of(fakeToken));
 
-        Optional<Token> ans = userService.checkTokenValidity(1L);
+        Token ans = userService.checkTokenValidity(1L);
 
-        Assert.assertTrue(ans.isPresent());
-        Assert.assertEquals(Long.valueOf(1L), ans.get().getUserId());
+        Assert.assertEquals(Long.valueOf(1L), ans.getUserId());
     }
 
 }

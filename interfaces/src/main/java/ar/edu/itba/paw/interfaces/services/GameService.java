@@ -11,7 +11,7 @@ public interface GameService {
 
     Optional<Game> findById(long id);
 
-    List<Game> searchByName(String name, long page);
+    List<Game> searchByName(String name, int page);
 
     int countSearchByNameGame(String name);
 
@@ -25,5 +25,7 @@ public interface GameService {
 
     List<Game> findAllPaged(long page);
 
-    long getPageAmount();
+    GameFormat getFormat(Long formatId);
+
+    int getPageAmount();
 }

@@ -159,7 +159,7 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public List<Team> searchByName(String name, long page) {
+    public List<Team> searchByName(String name, int page) {
         return teamDao.searchByName(name, page);
     }
 
@@ -172,5 +172,10 @@ public class TeamServiceImpl implements TeamService {
             tournamentDao.findById(id).ifPresent(tournaments::add);
         }
         return tournaments;
+    }
+
+    @Override
+    public Team create(String name, long pfpId, long bannerId, long ownerId){
+        return teamDao.create(name, pfpId, bannerId, ownerId);
     }
 }
