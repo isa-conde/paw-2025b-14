@@ -4,14 +4,16 @@ import ar.edu.itba.paw.model.Token;
 import ar.edu.itba.paw.model.User;
 
 import javax.ws.rs.core.UriInfo;
+import java.net.URI;
 import java.time.LocalDate;
 import java.util.function.Function;
 
 public class TokenDTO {
 
-    private User user;
     private long token;
     private LocalDate expiryDate;
+
+    private URI assignedTo;
 
     public static Function<Token, TokenDTO> mapper(UriInfo uriInfo) {
         return (t) -> fromToken(uriInfo, t);
@@ -20,19 +22,13 @@ public class TokenDTO {
     public static TokenDTO fromToken(final UriInfo uriInfo, final Token token) {
         final TokenDTO toReturn = new TokenDTO();
 
-        toReturn.user = token.getUser();
         toReturn.token = token.getToken();
         toReturn.expiryDate = token.getExpiryDate();
 
+        toReturn.assignedTo = uriInfo.getAbsolutePathBuilder().path("users")
+                .path("/" + token.getUserId()).build();
+
         return toReturn;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     public long getToken() {

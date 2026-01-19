@@ -27,6 +27,7 @@ public class UserDTO {
     private URI banner;
     private URI profilePicture;
     private URI assignedTokens;
+    private URI userAccounts;
 
     public static Function<User, UserDTO> mapper(final UriInfo uriInfo) {
         return (u) -> fromUser(uriInfo, u);
@@ -46,7 +47,7 @@ public class UserDTO {
         toReturn.createdTournaments = uriInfo.getAbsolutePathBuilder().path("tournaments")
                 .queryParam("createdBy", user.getId()).build();
         toReturn.favoriteGames = uriInfo.getAbsolutePathBuilder().path("games")
-                .queryParam("favoritedBy", user.getId()).build();
+                .queryParam("favouritedBy", user.getId()).build();
         toReturn.tournamentsParticipatedIn = uriInfo.getAbsolutePathBuilder().path("tournaments")
                 .queryParam("hasUser", user.getId()).build();
         toReturn.commentsReceived = uriInfo.getAbsolutePathBuilder().path("comments")
@@ -58,11 +59,13 @@ public class UserDTO {
         toReturn.partOfTeam = uriInfo.getAbsolutePathBuilder().path("teams")
                 .queryParam("hasUser", user.getId()).build();
         toReturn.profilePicture = uriInfo.getAbsolutePathBuilder().path("images")
-                .path(String.valueOf(user.getPfpId())).build();
+                .path("/" + user.getPfpId()).build();
         toReturn.banner = uriInfo.getAbsolutePathBuilder().path("images")
-                .path(String.valueOf(user.getBannerId())).build();
+                .path("/" + user.getBannerId()).build();
         toReturn.assignedTokens = uriInfo.getAbsolutePathBuilder().path("tokens")
                 .queryParam("assignedTo", user.getId()).build();
+        toReturn.userAccounts = uriInfo.getAbsolutePathBuilder().path("user-accounts")
+                .queryParam("ofUser", user.getId()).build();
 
         return toReturn;
     }

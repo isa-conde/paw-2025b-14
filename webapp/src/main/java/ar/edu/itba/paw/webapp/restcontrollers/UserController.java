@@ -29,7 +29,7 @@ public class UserController {
     private UriInfo uriInfo;
 
     @GET
-    @Produces(value = {Vendor.APPLICATION_USER_SEARCH_LIST})
+    @Produces(value = {Vendor.APPLICATION_USER_LIST})
     public Response listUsersByName(@Valid @BeanParam ListUsersByNameParams params) {
         String name = params.getName();
         int totalPages = us.countSearchByNameUser(name);
