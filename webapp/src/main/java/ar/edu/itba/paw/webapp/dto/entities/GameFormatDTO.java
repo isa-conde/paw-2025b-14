@@ -1,10 +1,10 @@
 package ar.edu.itba.paw.webapp.dto.entities;
 
-import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.Game.GameFormat;
 
 import javax.ws.rs.core.UriInfo;
-import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
 public class GameFormatDTO {
@@ -13,26 +13,34 @@ public class GameFormatDTO {
     private String name;
     private int playersPerTeam;
 
-    private URI self;
-    private URI game;
+    private List<LinkDTO> links = new ArrayList<>();
 
     public static Function<GameFormat, GameFormatDTO> mapper(final UriInfo uriInfo) {
         return (g) -> fromGameFormat(uriInfo, g);
     }
 
-    public static GameFormatDTO fromGameFormat(UriInfo uriInfo, GameFormat gameFormat){
+    public static GameFormatDTO fromGameFormat(final UriInfo uriInfo, final GameFormat gameFormat) {
         GameFormatDTO toReturn = new GameFormatDTO();
 
-        toReturn.setId(gameFormat.getId());
-        toReturn.setName(gameFormat.getName());
-        toReturn.setPlayersPerTeam(gameFormat.getPlayersPerTeam());
+        toReturn.id = gameFormat.getId();
+        toReturn.name = gameFormat.getName();
+        toReturn.playersPerTeam = gameFormat.getPlayersPerTeam();
 
-        toReturn.setSelf(uriInfo.getAbsolutePathBuilder().path("games")
-                .path(gameFormat.getGameId().toString()).path("formats").path(gameFormat.getId().toString()).build());
-        toReturn.setGame(uriInfo.getAbsolutePathBuilder().path("games")
-                .path(gameFormat.getGameId().toString()).build());
+        toReturn.addLink("self", uriInfo.getAbsolutePathBuilder().path("games")
+                .path(String.valueOf(gameFormat.getGameId()))
+                .path("formats")
+                .path(String.valueOf(gameFormat.getId()))
+                .build().toString());
+
+        toReturn.addLink("game", uriInfo.getAbsolutePathBuilder().path("games")
+                .path(String.valueOf(gameFormat.getGameId()))
+                .build().toString());
 
         return toReturn;
+    }
+
+    private void addLink(String rel, String href) {
+        links.add(new LinkDTO(rel, href));
     }
 
     public long getId() {
@@ -59,19 +67,11 @@ public class GameFormatDTO {
         this.playersPerTeam = playersPerTeam;
     }
 
-    public URI getSelf() {
-        return self;
+    public List<LinkDTO> getLinks() {
+        return links;
     }
 
-    public void setSelf(URI self) {
-        this.self = self;
-    }
-
-    public URI getGame() {
-        return game;
-    }
-
-    public void setGame(URI game) {
-        this.game = game;
+    public void setLinks(List<LinkDTO> links) {
+        this.links = links;
     }
 }

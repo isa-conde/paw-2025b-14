@@ -1,8 +1,10 @@
 package ar.edu.itba.paw.webapp.dto.entities;
 
 import ar.edu.itba.paw.model.User;
+
 import javax.ws.rs.core.UriInfo;
-import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
 public class UserDTO {
@@ -14,21 +16,9 @@ public class UserDTO {
     private String bio;
     private Float rating;
 
-    // WRITE ONLY
     private String password;
 
-    private URI self;
-    private URI createdTournaments;
-    private URI favoriteGames;
-    private URI tournamentsParticipatedIn;
-    private URI commentsReceived;
-    private URI matchesParticipatedIn;
-    private URI teamsCreated;
-    private URI partOfTeam;
-    private URI banner;
-    private URI profilePicture;
-    private URI assignedTokens;
-    private URI userAccounts;
+    private List<LinkDTO> links = new ArrayList<>();
 
     public static Function<User, UserDTO> mapper(final UriInfo uriInfo) {
         return (u) -> fromUser(uriInfo, u);
@@ -44,32 +34,59 @@ public class UserDTO {
         toReturn.bio = user.getBio();
         toReturn.rating = user.getRating();
 
-        toReturn.self = uriInfo.getAbsolutePathBuilder().path("users")
-                .path(String.valueOf(user.getId())).build();
-        toReturn.createdTournaments = uriInfo.getAbsolutePathBuilder().path("tournaments")
-                .queryParam("createdBy", user.getId()).build();
-        toReturn.favoriteGames = uriInfo.getAbsolutePathBuilder().path("games")
-                .queryParam("favouritedBy", user.getId()).build();
-        toReturn.tournamentsParticipatedIn = uriInfo.getAbsolutePathBuilder().path("tournaments")
-                .queryParam("hasUser", user.getId()).build();
-        toReturn.commentsReceived = uriInfo.getAbsolutePathBuilder().path("comments")
-                .queryParam("receivedBy", user.getId()).build();
-        toReturn.matchesParticipatedIn = uriInfo.getAbsolutePathBuilder().path("matches")
-                .queryParam("hasUser", user.getId()).build();
-        toReturn.matchesParticipatedIn = uriInfo.getAbsolutePathBuilder().path("teams")
-                .queryParam("createdBy", user.getId()).build();
-        toReturn.partOfTeam = uriInfo.getAbsolutePathBuilder().path("teams")
-                .queryParam("hasUser", user.getId()).build();
-        toReturn.profilePicture = uriInfo.getAbsolutePathBuilder().path("images")
-                .path("/" + user.getPfpId()).build();
-        toReturn.banner = uriInfo.getAbsolutePathBuilder().path("images")
-                .path("/" + user.getBannerId()).build();
-        toReturn.assignedTokens = uriInfo.getAbsolutePathBuilder().path("tokens")
-                .queryParam("assignedTo", user.getId()).build();
-        toReturn.userAccounts = uriInfo.getAbsolutePathBuilder().path("user-accounts")
-                .queryParam("ofUser", user.getId()).build();
+        toReturn.addLink("self", uriInfo.getAbsolutePathBuilder().path("users")
+                .path(String.valueOf(user.getId()))
+                .build().toString());
+
+        toReturn.addLink("createdTournaments", uriInfo.getAbsolutePathBuilder().path("tournaments")
+                .queryParam("createdBy", user.getId())
+                .build().toString());
+
+        toReturn.addLink("favoriteGames", uriInfo.getAbsolutePathBuilder().path("games")
+                .queryParam("favouritedBy", user.getId())
+                .build().toString());
+
+        toReturn.addLink("tournamentsParticipatedIn", uriInfo.getAbsolutePathBuilder().path("tournaments")
+                .queryParam("hasUser", user.getId())
+                .build().toString());
+
+        toReturn.addLink("commentsReceived", uriInfo.getAbsolutePathBuilder().path("comments")
+                .queryParam("receivedBy", user.getId())
+                .build().toString());
+
+        toReturn.addLink("matchesParticipatedIn", uriInfo.getAbsolutePathBuilder().path("matches")
+                .queryParam("hasUser", user.getId())
+                .build().toString());
+
+        toReturn.addLink("teamsCreated", uriInfo.getAbsolutePathBuilder().path("teams")
+                .queryParam("createdBy", user.getId())
+                .build().toString());
+
+        toReturn.addLink("partOfTeam", uriInfo.getAbsolutePathBuilder().path("teams")
+                .queryParam("hasUser", user.getId())
+                .build().toString());
+
+        toReturn.addLink("profilePicture", uriInfo.getAbsolutePathBuilder().path("images")
+                .path(String.valueOf(user.getPfpId()))
+                .build().toString());
+
+        toReturn.addLink("banner", uriInfo.getAbsolutePathBuilder().path("images")
+                .path(String.valueOf(user.getBannerId()))
+                .build().toString());
+
+        toReturn.addLink("assignedTokens", uriInfo.getAbsolutePathBuilder().path("tokens")
+                .queryParam("assignedTo", user.getId())
+                .build().toString());
+
+        toReturn.addLink("userAccounts", uriInfo.getAbsolutePathBuilder().path("user-accounts")
+                .queryParam("ofUser", user.getId())
+                .build().toString());
 
         return toReturn;
+    }
+
+    private void addLink(String rel, String href) {
+        links.add(new LinkDTO(rel, href));
     }
 
     public String getUsername() {
@@ -126,5 +143,13 @@ public class UserDTO {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public List<LinkDTO> getLinks() {
+        return links;
+    }
+
+    public void setLinks(List<LinkDTO> links) {
+        this.links = links;
     }
 }

@@ -1,0 +1,433 @@
+package ar.edu.itba.paw.webapp.restcontrollers;
+
+import ar.edu.itba.paw.interfaces.services.MatchService;
+import ar.edu.itba.paw.interfaces.services.ParticipantService;
+import ar.edu.itba.paw.interfaces.services.RulesService;
+import ar.edu.itba.paw.interfaces.services.TournamentService;
+import ar.edu.itba.paw.model.Game.GameFormat;
+import ar.edu.itba.paw.model.Match.Match;
+import ar.edu.itba.paw.model.Participant;
+import ar.edu.itba.paw.model.Tournament;
+import ar.edu.itba.paw.model.filters.TournamentFilter;
+import ar.edu.itba.paw.webapp.dto.entities.ErrorDTO;
+import ar.edu.itba.paw.webapp.dto.entities.MatchDTO;
+import ar.edu.itba.paw.webapp.dto.entities.MatchStageDTO;
+import ar.edu.itba.paw.webapp.dto.entities.ParticipantDTO;
+import ar.edu.itba.paw.webapp.dto.entities.TournamentDTO;
+import ar.edu.itba.paw.webapp.dto.params.PaginationParams;
+import ar.edu.itba.paw.webapp.dto.params.TournamentFilterParams;
+import ar.edu.itba.paw.webapp.dto.requests.CreateTournamentRequest;
+import ar.edu.itba.paw.webapp.dto.requests.JoinTournamentTeamRequest;
+import ar.edu.itba.paw.webapp.dto.requests.JoinTournamentUserRequest;
+import ar.edu.itba.paw.webapp.dto.requests.SetMatchResultsRequest;
+import ar.edu.itba.paw.webapp.dto.requests.TournamentStatusRequest;
+import ar.edu.itba.paw.webapp.dto.requests.UpdateTournamentRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.validation.Valid;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.BeanParam;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+@Path("tournaments")
+@Component
+public class TournamentController {
+
+    private static final int PAGE_SIZE = 9;
+
+    @Autowired
+    private TournamentService tournamentService;
+
+    @Autowired
+    private RulesService rulesService;
+
+    @Autowired
+    private ParticipantService participantService;
+
+    @Autowired
+    private MatchService matchService;
+
+    @Context
+    private UriInfo uriInfo;
+
+    @GET
+    @Produces(value = {Vendor.APPLICATION_TOURNAMENT_LIST})
+    public Response listTournaments(@BeanParam TournamentFilterParams filterParams,
+                                    @BeanParam PaginationParams paginationParams) {
+        if (filterParams.getGameId() != null && filterParams.getGameId() <= 0) {
+            return badRequest("Invalid gameId");
+        }
+
+        if (filterParams.getPlayersPerTeam() != null && filterParams.getPlayersPerTeam() <= 0) {
+            return badRequest("playersPerTeam must be greater than 0");
+        }
+
+        TournamentFilter filter;
+        try {
+            filter = filterParams.toFilter();
+        } catch (IllegalArgumentException ex) {
+            return badRequest(ex.getMessage());
+        }
+
+        int totalPages = tournamentService.getPageAmount(PAGE_SIZE, filter);
+        int page = adjustPage(paginationParams.getPage(), totalPages);
+
+        List<TournamentDTO> tournaments = tournamentService.findTournaments(filter, page).stream()
+                .map(TournamentDTO.mapper(uriInfo))
+                .toList();
+
+        Response.ResponseBuilder responseBuilder = Response.ok(new GenericEntity<>(tournaments) {});
+        addPaginationLinks(responseBuilder, page, totalPages);
+        return responseBuilder.build();
+    }
+
+    @POST
+    @Consumes(value = {Vendor.APPLICATION_TOURNAMENT_CREATE})
+    @Produces(value = {Vendor.APPLICATION_TOURNAMENT})
+    public Response createTournament(@Valid CreateTournamentRequest request) {
+        byte[] image = decodeBase64(request.getImageBase64());
+        byte[] rules = decodeBase64(request.getRulesBase64());
+
+        if (image == null && hasPayload(request.getImageBase64())) {
+            return badRequest("Invalid imageBase64 payload");
+        }
+
+        if (rules == null && hasPayload(request.getRulesBase64())) {
+            return badRequest("Invalid rulesBase64 payload");
+        }
+
+        Tournament tournament = tournamentService.create(
+                request.getCreatorId(),
+                request.getName(),
+                request.getGameId(),
+                request.getRegion(),
+                request.getElo(),
+                request.getStartDate(),
+                request.getEndDate(),
+                null,
+                request.getStructure(),
+                request.getMaxParticipants(),
+                image,
+                true,
+                false,
+                request.getFormatId(),
+                rules,
+                request.getServerName(),
+                request.getServerPassword(),
+                request.getDiscordChannel()
+        );
+
+        URI location = uriInfo.getAbsolutePathBuilder()
+                .path(String.valueOf(tournament.getId()))
+                .build();
+
+        return Response.created(location).entity(TournamentDTO.fromTournament(uriInfo, tournament)).build();
+    }
+
+    @GET
+    @Path("/{id}")
+    @Produces(value = {Vendor.APPLICATION_TOURNAMENT})
+    public Response getTournament(@PathParam("id") long id) {
+        if (id <= 0) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
+        Optional<Tournament> tournament = tournamentService.findById(id);
+        if (tournament.isEmpty()) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        return Response.ok(TournamentDTO.fromTournament(uriInfo, tournament.get())).build();
+    }
+
+    @PUT
+    @Path("/{id}")
+    @Consumes(value = {Vendor.APPLICATION_TOURNAMENT_UPDATE})
+    @Produces(value = {Vendor.APPLICATION_TOURNAMENT})
+    public Response updateTournament(@PathParam("id") long id, @Valid UpdateTournamentRequest request) {
+        if (id <= 0) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
+        Optional<Tournament> tournament = tournamentService.findById(id);
+        if (tournament.isEmpty()) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        byte[] image = decodeBase64(request.getImageBase64());
+        byte[] rules = decodeBase64(request.getRulesBase64());
+
+        if (image == null && hasPayload(request.getImageBase64())) {
+            return badRequest("Invalid imageBase64 payload");
+        }
+
+        if (rules == null && hasPayload(request.getRulesBase64())) {
+            return badRequest("Invalid rulesBase64 payload");
+        }
+
+        tournamentService.updateTournamentInfo(
+                id,
+                request.getName(),
+                request.getStartDate(),
+                request.getEndDate(),
+                request.getMaxParticipants(),
+                image,
+                request.getServerName(),
+                request.getServerPassword(),
+                request.getDiscordChannel()
+        );
+
+        if (rules != null) {
+            rulesService.updateRules(id, rules);
+        }
+
+        Optional<Tournament> updated = tournamentService.findById(id);
+        if (updated.isEmpty()) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        return Response.ok(TournamentDTO.fromTournament(uriInfo, updated.get())).build();
+    }
+
+    @GET
+    @Path("/{id}/participants")
+    @Produces(value = {Vendor.APPLICATION_PARTICIPANT_LIST})
+    public Response getParticipants(@PathParam("id") long id, @QueryParam("teamSize") Integer teamSize) {
+        if (id <= 0) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
+        int resolvedTeamSize = resolveTeamSize(id, teamSize);
+        List<ParticipantDTO> participants = participantService.getTournamentParticipants(id, resolvedTeamSize)
+                .stream()
+                .map(ParticipantDTO.mapper(uriInfo))
+                .toList();
+
+        return Response.ok(new GenericEntity<>(participants) {}).build();
+    }
+
+    @POST
+    @Path("/{id}/participants/users")
+    @Consumes(value = {Vendor.APPLICATION_TOURNAMENT_JOIN_USER})
+    public Response joinTournamentUser(@PathParam("id") long id, @Valid JoinTournamentUserRequest request) {
+        if (id <= 0) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
+        participantService.joinTournamentUser(request.getUserId(), id);
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @POST
+    @Path("/{id}/participants/teams")
+    @Consumes(value = {Vendor.APPLICATION_TOURNAMENT_JOIN_TEAM})
+    public Response joinTournamentTeam(@PathParam("id") long id, @Valid JoinTournamentTeamRequest request) {
+        if (id <= 0) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
+        participantService.joinTournamentTeam(id, request.getTeamId(), request.getMembers());
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @DELETE
+    @Path("/{id}/participants/{participantId}")
+    public Response removeParticipant(@PathParam("id") long id, @PathParam("participantId") long participantId) {
+        if (id <= 0 || participantId <= 0) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
+        participantService.removeParticipant(id, participantId);
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @DELETE
+    @Path("/{id}/participants/users/{userId}")
+    public Response leaveTournament(@PathParam("id") long id, @PathParam("userId") long userId) {
+        if (id <= 0 || userId <= 0) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
+        participantService.leaveTournament(userId, id);
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @GET
+    @Path("/{id}/matches")
+    @Produces(value = {Vendor.APPLICATION_MATCH_STAGE_LIST})
+    public Response getMatches(@PathParam("id") long id, @QueryParam("group") Integer group) {
+        if (id <= 0) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
+        Map<Integer, List<Match>> matchesByStage = matchService.getTournamentMatchesByStage(id, group);
+        List<MatchStageDTO> response = matchesByStage.entrySet().stream()
+                .sorted(Comparator.comparingInt(Map.Entry::getKey))
+                .map(entry -> new MatchStageDTO(
+                        entry.getKey(),
+                        entry.getValue().stream().map(MatchDTO.mapper(uriInfo)).toList()
+                ))
+                .toList();
+
+        return Response.ok(new GenericEntity<>(response) {}).build();
+    }
+
+    @GET
+    @Path("/{id}/matches/{matchId}")
+    @Produces(value = {Vendor.APPLICATION_MATCH})
+    public Response getMatch(@PathParam("id") long id, @PathParam("matchId") long matchId) {
+        if (id <= 0 || matchId <= 0) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
+        Map<Integer, List<Match>> matchesByStage = matchService.getTournamentMatchesByStage(id, null);
+        Optional<Match> match = matchesByStage.values().stream()
+                .flatMap(List::stream)
+                .filter(item -> item.getId() == matchId)
+                .findFirst();
+
+        if (match.isEmpty()) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        return Response.ok(MatchDTO.fromMatch(uriInfo, match.get())).build();
+    }
+
+    @PUT
+    @Path("/{id}/matches/{matchId}/results")
+    @Consumes(value = {Vendor.APPLICATION_MATCH_RESULTS})
+    public Response setMatchResults(@PathParam("id") long id,
+                                    @PathParam("matchId") long matchId,
+                                    @Valid SetMatchResultsRequest request) {
+        if (id <= 0 || matchId <= 0) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
+        matchService.setMatchResults(matchId, id, request.getLocalScore(), request.getVisitorScore());
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @PUT
+    @Path("/{id}/status")
+    @Consumes(value = {Vendor.APPLICATION_TOURNAMENT_STATUS})
+    public Response updateTournamentStatus(@PathParam("id") long id, @Valid TournamentStatusRequest request) {
+        if (id <= 0) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
+        Optional<Tournament> tournament = tournamentService.findById(id);
+        if (tournament.isEmpty()) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        if (request.getTournamentStarted() == null && request.getOpenInscriptions() == null) {
+            return badRequest("status update must include tournamentStarted or openInscriptions");
+        }
+
+        if (Boolean.TRUE.equals(request.getTournamentStarted())) {
+            tournamentService.startTournament(id);
+        } else if (Boolean.FALSE.equals(request.getTournamentStarted())) {
+            return badRequest("tournamentStarted can only transition to true");
+        }
+
+        if (Boolean.FALSE.equals(request.getOpenInscriptions())) {
+            tournamentService.closeInscriptions(id);
+        } else if (Boolean.TRUE.equals(request.getOpenInscriptions())) {
+            return badRequest("openInscriptions can only transition to false");
+        }
+
+        Optional<Tournament> updated = tournamentService.findById(id);
+        if (updated.isEmpty()) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+
+        return Response.ok(TournamentDTO.fromTournament(uriInfo, updated.get())).build();
+    }
+
+    private int resolveTeamSize(long tournamentId, Integer requestedTeamSize) {
+        if (requestedTeamSize != null && requestedTeamSize > 0) {
+            return requestedTeamSize;
+        }
+
+        GameFormat format = tournamentService.getFormat(tournamentId);
+        if (format == null) {
+            return 1;
+        }
+
+        return format.getPlayersPerTeam();
+    }
+
+    private Response badRequest(String detail) {
+        return Response.status(Response.Status.BAD_REQUEST)
+                .entity(ErrorDTO.of(Response.Status.BAD_REQUEST, detail))
+                .build();
+    }
+
+    private byte[] decodeBase64(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        try {
+            return Base64.getDecoder().decode(value.getBytes(StandardCharsets.UTF_8));
+        } catch (IllegalArgumentException ex) {
+            return null;
+        }
+    }
+
+    private boolean hasPayload(String value) {
+        return value != null && !value.isBlank();
+    }
+
+    private void addPaginationLinks(Response.ResponseBuilder responseBuilder, int page, int totalPages) {
+        if (totalPages <= 0) {
+            return;
+        }
+        responseBuilder.link(buildPageUri(page), "self");
+        responseBuilder.link(buildPageUri(0), "first");
+        responseBuilder.link(buildPageUri(totalPages - 1), "last");
+        if (page > 0) {
+            responseBuilder.link(buildPageUri(page - 1), "prev");
+        }
+        if (page + 1 < totalPages) {
+            responseBuilder.link(buildPageUri(page + 1), "next");
+        }
+    }
+
+    private URI buildPageUri(int page) {
+        return uriInfo.getRequestUriBuilder()
+                .replaceQueryParam("page", page)
+                .build();
+    }
+
+    private int adjustPage(int page, int totalPages) {
+        if (totalPages <= 0) {
+            return 0;
+        }
+        if (page < 0) {
+            return 0;
+        }
+        if (page >= totalPages) {
+            return totalPages - 1;
+        }
+        return page;
+    }
+}

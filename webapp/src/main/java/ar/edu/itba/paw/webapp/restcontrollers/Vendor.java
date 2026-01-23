@@ -22,4 +22,28 @@ public class Vendor {
 
     public static final String APPLICATION_TEAM_LIST = "application/vnd.teamlist.v1+json";
 
+    public static final String APPLICATION_TOURNAMENT = "application/vnd.tournament.v1+json";
+
+    public static final String APPLICATION_TOURNAMENT_LIST = "application/vnd.tournamentlist.v1+json";
+
+    public static final String APPLICATION_PARTICIPANT_LIST = "application/vnd.participantlist.v1+json";
+
+    public static final String APPLICATION_MATCH_STAGE_LIST = "application/vnd.matchstagelist.v1+json";
+
+    public static final String APPLICATION_MATCH = "application/vnd.match.v1+json";
+
+    public static final String APPLICATION_TOURNAMENT_CREATE = "application/vnd.tournament.create.v1+json";
+
+    public static final String APPLICATION_TOURNAMENT_UPDATE = "application/vnd.tournament.update.v1+json";
+
+    public static final String APPLICATION_TOURNAMENT_STATUS = "application/vnd.tournament.status.v1+json";
+
+    public static final String APPLICATION_TOURNAMENT_JOIN_USER = "application/vnd.tournament.join-user.v1+json";
+
+    public static final String APPLICATION_TOURNAMENT_JOIN_TEAM = "application/vnd.tournament.join-team.v1+json";
+
+    public static final String APPLICATION_TOURNAMENT_LEAVE = "application/vnd.tournament.leave.v1+json";
+
+    public static final String APPLICATION_MATCH_RESULTS = "application/vnd.match.results.v1+json";
 }
+
