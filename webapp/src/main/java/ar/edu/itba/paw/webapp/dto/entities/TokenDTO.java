@@ -25,13 +25,10 @@ public class TokenDTO {
         toReturn.token = token.getToken();
         toReturn.expiryDate = token.getExpiryDate();
 
-        toReturn.addLink("assignedTo", uriInfo.getAbsolutePathBuilder().path("users")
-                .path(String.valueOf(token.getUserId()))
-                .build().toString());
-
         toReturn.addLink("self", uriInfo.getAbsolutePathBuilder().path("tokens")
-                .path(String.valueOf(token.getToken()))
-                .build().toString());
+                .path(String.valueOf(token.getToken())).build().toString());
+        toReturn.addLink("assignedTo", uriInfo.getAbsolutePathBuilder().path("users")
+                .path(String.valueOf(token.getUserId())).build().toString());
 
         return toReturn;
     }

@@ -10,6 +10,14 @@ public class Vendor {
 
     public static final String APPLICATION_TOKEN = "application/vnd.token.v1+json";
 
+    public static final String APPLICATION_USER_CREATE = "application/vnd.user.create.v1+json";
+
+    public static final String APPLICATION_USER_VERIFICATION = "application/vnd.user.verification.v1+json";
+
+    public static final String APPLICATION_PASSWORD_RESET_REQUEST = "application/vnd.user.password-request.v1+json";
+
+    public static final String APPLICATION_PASSWORD_RESET = "application/vnd.user.password-reset.v1+json";
+
     public static final String APPLICATION_GAME = "application/vnd.game.v1+json";
 
     public static final String APPLICATION_GAME_LIST = "application/vnd.gamelist.v1+json";
@@ -45,5 +53,5 @@ public class Vendor {
     public static final String APPLICATION_TOURNAMENT_LEAVE = "application/vnd.tournament.leave.v1+json";
 
     public static final String APPLICATION_MATCH_RESULTS = "application/vnd.match.results.v1+json";
-}
 
+}

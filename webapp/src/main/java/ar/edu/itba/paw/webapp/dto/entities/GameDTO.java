@@ -12,7 +12,6 @@ public class GameDTO {
     private long id;
     private String name;
     private String genre;
-    private String imageUrl;
 
     private List<LinkDTO> links = new ArrayList<>();
 
@@ -23,29 +22,20 @@ public class GameDTO {
     public static GameDTO fromGame(final UriInfo uriInfo, final Game game) {
         GameDTO toReturn = new GameDTO();
 
-        toReturn.id = game.getId();
-        toReturn.genre = game.getGenre().name();
-        toReturn.name = game.getName();
-
-        toReturn.imageUrl = uriInfo.getAbsolutePathBuilder().path("images")
-                .path(game.getImageId().toString()).toTemplate();
+        toReturn.setId(game.getId());
+        toReturn.setGenre(game.getGenre().name());
+        toReturn.setName(game.getName());
 
         toReturn.addLink("self", uriInfo.getAbsolutePathBuilder().path("games")
-                .path(String.valueOf(game.getId()))
-                .build().toString());
-
+                .path(String.valueOf(game.getId())).build().toString());
         toReturn.addLink("formats", uriInfo.getAbsolutePathBuilder().path("games")
-                .path(String.valueOf(game.getId()))
-                .path("formats")
-                .build().toString());
-
+                .path(String.valueOf(game.getId())).path("formats").build().toString());
         toReturn.addLink("tournaments", uriInfo.getAbsolutePathBuilder().path("tournaments")
-                .queryParam("gameId", game.getId())
-                .build().toString());
-
-        toReturn.addLink("image", uriInfo.getAbsolutePathBuilder().path("images")
-                .path(game.getImageId().toString())
-                .build().toString());
+                .queryParam("gameId", game.getId()).build().toString());
+        if (game.getImageId() != null) {
+            toReturn.addLink("image", uriInfo.getAbsolutePathBuilder().path("images")
+                    .path(String.valueOf(game.getImageId())).build().toString());
+        }
 
         return toReturn;
     }
@@ -76,14 +66,6 @@ public class GameDTO {
 
     public void setGenre(String genre) {
         this.genre = genre;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
     }
 
     public List<LinkDTO> getLinks() {

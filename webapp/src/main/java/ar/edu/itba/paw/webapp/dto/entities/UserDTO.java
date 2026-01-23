@@ -35,52 +35,33 @@ public class UserDTO {
         toReturn.rating = user.getRating();
 
         toReturn.addLink("self", uriInfo.getAbsolutePathBuilder().path("users")
-                .path(String.valueOf(user.getId()))
-                .build().toString());
-
+                .path(String.valueOf(user.getId())).build().toString());
         toReturn.addLink("createdTournaments", uriInfo.getAbsolutePathBuilder().path("tournaments")
-                .queryParam("createdBy", user.getId())
-                .build().toString());
-
+                .queryParam("createdBy", user.getId()).build().toString());
         toReturn.addLink("favoriteGames", uriInfo.getAbsolutePathBuilder().path("games")
-                .queryParam("favouritedBy", user.getId())
-                .build().toString());
-
+                .queryParam("favouritedBy", user.getId()).build().toString());
         toReturn.addLink("tournamentsParticipatedIn", uriInfo.getAbsolutePathBuilder().path("tournaments")
-                .queryParam("hasUser", user.getId())
-                .build().toString());
-
+                .queryParam("hasUser", user.getId()).build().toString());
         toReturn.addLink("commentsReceived", uriInfo.getAbsolutePathBuilder().path("comments")
-                .queryParam("receivedBy", user.getId())
-                .build().toString());
-
+                .queryParam("receivedBy", user.getId()).build().toString());
         toReturn.addLink("matchesParticipatedIn", uriInfo.getAbsolutePathBuilder().path("matches")
-                .queryParam("hasUser", user.getId())
-                .build().toString());
-
+                .queryParam("hasUser", user.getId()).build().toString());
         toReturn.addLink("teamsCreated", uriInfo.getAbsolutePathBuilder().path("teams")
-                .queryParam("createdBy", user.getId())
-                .build().toString());
-
+                .queryParam("createdBy", user.getId()).build().toString());
         toReturn.addLink("partOfTeam", uriInfo.getAbsolutePathBuilder().path("teams")
-                .queryParam("hasUser", user.getId())
-                .build().toString());
-
-        toReturn.addLink("profilePicture", uriInfo.getAbsolutePathBuilder().path("images")
-                .path(String.valueOf(user.getPfpId()))
-                .build().toString());
-
-        toReturn.addLink("banner", uriInfo.getAbsolutePathBuilder().path("images")
-                .path(String.valueOf(user.getBannerId()))
-                .build().toString());
-
+                .queryParam("hasUser", user.getId()).build().toString());
+        if (user.getPfpId() != null) {
+            toReturn.addLink("profilePicture", uriInfo.getAbsolutePathBuilder().path("images")
+                    .path(String.valueOf(user.getPfpId())).build().toString());
+        }
+        if (user.getBannerId() != null) {
+            toReturn.addLink("banner", uriInfo.getAbsolutePathBuilder().path("images")
+                    .path(String.valueOf(user.getBannerId())).build().toString());
+        }
         toReturn.addLink("assignedTokens", uriInfo.getAbsolutePathBuilder().path("tokens")
-                .queryParam("assignedTo", user.getId())
-                .build().toString());
-
+                .queryParam("assignedTo", user.getId()).build().toString());
         toReturn.addLink("userAccounts", uriInfo.getAbsolutePathBuilder().path("user-accounts")
-                .queryParam("ofUser", user.getId())
-                .build().toString());
+                .queryParam("ofUser", user.getId()).build().toString());
 
         return toReturn;
     }
