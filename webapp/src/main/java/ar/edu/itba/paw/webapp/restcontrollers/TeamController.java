@@ -10,6 +10,7 @@ import ar.edu.itba.paw.webapp.dto.params.ForTournamentParams;
 import ar.edu.itba.paw.webapp.dto.params.PaginationParams;
 import ar.edu.itba.paw.webapp.dto.params.SearchNameParams;
 import ar.edu.itba.paw.webapp.dto.params.UserIdParams;
+import ar.edu.itba.paw.webapp.dto.requests.CreateTeamRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.parameters.P;
@@ -19,10 +20,11 @@ import org.springframework.web.servlet.HandlerMapping;
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -110,16 +112,31 @@ public class TeamController {
 
     //TODO set up auth to get user from request, then use as owner id
     @POST
-    @Consumes(value = {Vendor.APPLICATION_TEAM})
+    @Consumes(value = {Vendor.APPLICATION_TEAM_CREATE})
     @Produces(value = {Vendor.APPLICATION_TEAM})
-    public Response createTeam(@Valid TeamDTO teamDTO){
+    public Response createTeam(@Valid CreateTeamRequest request){
+        byte[] profilePicture = decodeBase64(request.getProfilePictureBase64());
+        byte[] banner = decodeBase64(request.getBannerBase64());
 
-        return Response.ok().build();
+        if (profilePicture == null && hasPayload(request.getProfilePictureBase64())) {
+            return badRequest("Invalid profilePictureBase64 payload");
+        }
+        if (banner == null && hasPayload(request.getBannerBase64())) {
+            return badRequest("Invalid bannerBase64 payload");
+        }
+
+        List<String> members = request.getMembers() == null ? List.of() : request.getMembers();
+        Team team = ts.create(request.getName(), profilePicture, banner, request.getOwnerId(), members);
+
+        URI location = uriInfo.getAbsolutePathBuilder()
+                .path(String.valueOf(team.getId()))
+                .build();
+
+        return Response.created(location).entity(TeamDTO.fromTeam(uriInfo, team)).build();
     }
 
     @GET
     @Path("/{id}/members")
-    @Consumes(value = {MediaType.APPLICATION_JSON})
     @Produces(value = {Vendor.APPLICATION_USER_LIST})
     public Response getTeamMembers(@PathParam("id") long id){
         if (id <= 0){
@@ -190,4 +207,18 @@ public class TeamController {
                 .build();
     }
 
+    private byte[] decodeBase64(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        try {
+            return Base64.getDecoder().decode(value.getBytes(StandardCharsets.UTF_8));
+        } catch (IllegalArgumentException ex) {
+            return null;
+        }
+    }
+
+    private boolean hasPayload(String value) {
+        return value != null && !value.isBlank();
+    }
 }

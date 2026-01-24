@@ -30,6 +30,8 @@ public class Vendor {
 
     public static final String APPLICATION_TEAM_LIST = "application/vnd.teamlist.v1+json";
 
+    public static final String APPLICATION_TEAM_CREATE = "application/vnd.team.create.v1+json";
+
     public static final String APPLICATION_TOURNAMENT = "application/vnd.tournament.v1+json";
 
     public static final String APPLICATION_TOURNAMENT_LIST = "application/vnd.tournamentlist.v1+json";
