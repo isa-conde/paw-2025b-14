@@ -1,11 +1,11 @@
 package ar.edu.itba.paw.webapp.dto.entities;
 
 import ar.edu.itba.paw.model.Token;
-import ar.edu.itba.paw.model.User;
 
 import javax.ws.rs.core.UriInfo;
-import java.net.URI;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
 public class TokenDTO {
@@ -13,9 +13,9 @@ public class TokenDTO {
     private long token;
     private LocalDate expiryDate;
 
-    private URI assignedTo;
+    private List<LinkDTO> links = new ArrayList<>();
 
-    public static Function<Token, TokenDTO> mapper(UriInfo uriInfo) {
+    public static Function<Token, TokenDTO> mapper(final UriInfo uriInfo) {
         return (t) -> fromToken(uriInfo, t);
     }
 
@@ -25,10 +25,16 @@ public class TokenDTO {
         toReturn.token = token.getToken();
         toReturn.expiryDate = token.getExpiryDate();
 
-        toReturn.assignedTo = uriInfo.getAbsolutePathBuilder().path("users")
-                .path("/" + token.getUserId()).build();
+        toReturn.addLink("self", uriInfo.getAbsolutePathBuilder().path("tokens")
+                .path(String.valueOf(token.getToken())).build().toString());
+        toReturn.addLink("assignedTo", uriInfo.getAbsolutePathBuilder().path("users")
+                .path(String.valueOf(token.getUserId())).build().toString());
 
         return toReturn;
+    }
+
+    private void addLink(String rel, String href) {
+        links.add(new LinkDTO(rel, href));
     }
 
     public long getToken() {
@@ -45,5 +51,13 @@ public class TokenDTO {
 
     public void setExpiryDate(LocalDate expiryDate) {
         this.expiryDate = expiryDate;
+    }
+
+    public List<LinkDTO> getLinks() {
+        return links;
+    }
+
+    public void setLinks(List<LinkDTO> links) {
+        this.links = links;
     }
 }

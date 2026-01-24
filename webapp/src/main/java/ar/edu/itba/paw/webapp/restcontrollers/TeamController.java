@@ -22,6 +22,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,7 +41,6 @@ public class TeamController {
 
     @GET
     @Path("/{id}")
-    @Consumes(value = {MediaType.APPLICATION_JSON})
     @Produces(value = {Vendor.APPLICATION_TEAM})
     public Response getTeam(@PathParam("id") long id){
         if (id <= 0) {
@@ -58,7 +58,6 @@ public class TeamController {
     }
 
     @GET
-    @Consumes(value = {MediaType.APPLICATION_JSON})
     @Produces(value = {Vendor.APPLICATION_TEAM_LIST})
     public Response searchTeams(@BeanParam SearchNameParams searchNameParams,
                                 @BeanParam PaginationParams paginationParams,
@@ -85,10 +84,15 @@ public class TeamController {
         List<TeamDTO> result;
 
         if (byName) {
+            int totalPages = ts.countSearchByNameTeam(searchNameParams.getName());
+            int page = adjustPage(paginationParams.getPage(), totalPages);
             result = ts.searchByName(
                     searchNameParams.getName(),
-                    paginationParams.getPage()
+                    page
             ).stream().map(TeamDTO.mapper(uriInfo)).toList();
+            Response.ResponseBuilder responseBuilder = Response.ok(result);
+            addPaginationLinks(responseBuilder, page, totalPages);
+            return responseBuilder.build();
 
         } else if (forTournament) {
             result = ts.getUserTeamsBySizeNotInTournament(
@@ -106,7 +110,7 @@ public class TeamController {
 
     //TODO set up auth to get user from request, then use as owner id
     @POST
-    @Consumes(value = {MediaType.APPLICATION_JSON})
+    @Consumes(value = {Vendor.APPLICATION_TEAM})
     @Produces(value = {Vendor.APPLICATION_TEAM})
     public Response createTeam(@Valid TeamDTO teamDTO){
 
@@ -155,6 +159,34 @@ public class TeamController {
     private Response badRequest(String detail) {
         return Response.status(Response.Status.BAD_REQUEST)
                 .entity(ErrorDTO.of(Response.Status.BAD_REQUEST, detail))
+                .build();
+    }
+
+    private int adjustPage(int page, int totalPages) {
+        if (totalPages <= 0) return 0;
+        if (page < 0) return 0;
+        if (page >= totalPages) return totalPages - 1;
+        return page;
+    }
+
+    private void addPaginationLinks(Response.ResponseBuilder responseBuilder, int page, int totalPages) {
+        if (totalPages <= 0) {
+            return;
+        }
+        responseBuilder.link(buildPageUri(page), "self");
+        responseBuilder.link(buildPageUri(0), "first");
+        responseBuilder.link(buildPageUri(totalPages - 1), "last");
+        if (page > 0) {
+            responseBuilder.link(buildPageUri(page - 1), "prev");
+        }
+        if (page + 1 < totalPages) {
+            responseBuilder.link(buildPageUri(page + 1), "next");
+        }
+    }
+
+    private URI buildPageUri(int page) {
+        return uriInfo.getRequestUriBuilder()
+                .replaceQueryParam("page", page)
                 .build();
     }
 

@@ -31,7 +31,6 @@ public class UserController {
     @Autowired
     private JwtTokenService jwtTokenService;
 
-    //TODO AGREGAR HEADERS DE PAGINACION
     @GET
     @Produces(value = {Vendor.APPLICATION_USER_LIST})
     public Response listUsersByName(@Valid @BeanParam ListUsersByNameParams params) {
@@ -41,7 +40,9 @@ public class UserController {
 
         List<UserDTO> users = us.searchByName(name, params.getPage()).stream().map(UserDTO.mapper(uriInfo)).toList();
 
-        return Response.ok(new GenericEntity<>(users) {}).build();
+        Response.ResponseBuilder responseBuilder = Response.ok(new GenericEntity<>(users) {});
+        addPaginationLinks(responseBuilder, params.getPage(), totalPages);
+        return responseBuilder.build();
     }
 
     @GET
@@ -54,7 +55,7 @@ public class UserController {
     }
 
     @POST
-    @Consumes(value = {MediaType.APPLICATION_JSON})
+    @Consumes(value = {Vendor.APPLICATION_USER_CREATE})
     @Produces(value = {Vendor.APPLICATION_USER})
     public Response createUser(@Valid UserDTO userDto) {
         User user = us.create(userDto.getUsername(), userDto.getEmail(), userDto.getPassword());
@@ -67,7 +68,7 @@ public class UserController {
 
     @POST
     @Path("/verifications")
-    @Consumes(value = {MediaType.APPLICATION_JSON})
+    @Consumes(value = {Vendor.APPLICATION_USER_VERIFICATION})
     @Produces(value = {Vendor.APPLICATION_TOKEN})
     public Response resendVerificationEmail(@Valid UserDTO userDto) {
         User user = us.findByEmail(userDto.getEmail()).orElseThrow(UserNotFoundException::new);
@@ -99,7 +100,7 @@ public class UserController {
     // TODO: do the same for this function as mentioned in resendVerificationEmail
     @POST
     @Path("/password-requests")
-    @Consumes(value = {MediaType.APPLICATION_JSON})
+    @Consumes(value = {Vendor.APPLICATION_PASSWORD_RESET_REQUEST})
     @Produces(value = {Vendor.APPLICATION_TOKEN})
     public Response requestPasswordReset(@Valid UserDTO userDto) {
         String userEmail = userDto.getEmail();
@@ -115,7 +116,7 @@ public class UserController {
 
     @PUT
     @Path("/password-requests")
-    @Consumes(value = {MediaType.APPLICATION_JSON})
+    @Consumes(value = {Vendor.APPLICATION_PASSWORD_RESET})
     @Produces(value = {Vendor.APPLICATION_USER})
     public Response resetPassword(@Valid UserDTO userDto, @QueryParam("token") long token) {
         us.resetPassword(token, userDto.getPassword()); // TODO: check if this works by only populating the 'password' field of UserDTO
@@ -127,8 +128,6 @@ public class UserController {
                 .build();
     }
 
-
-
     private int adjustPage(int page, int totalPages) {
         if (totalPages <= 0) return 0;
         if (page < 0) return 0;
@@ -136,6 +135,26 @@ public class UserController {
         return page;
     }
 
+    private void addPaginationLinks(Response.ResponseBuilder responseBuilder, int page, int totalPages) {
+        if (totalPages <= 0) {
+            return;
+        }
+        responseBuilder.link(buildPageUri(page), "self");
+        responseBuilder.link(buildPageUri(0), "first");
+        responseBuilder.link(buildPageUri(totalPages - 1), "last");
+        if (page > 0) {
+            responseBuilder.link(buildPageUri(page - 1), "prev");
+        }
+        if (page + 1 < totalPages) {
+            responseBuilder.link(buildPageUri(page + 1), "next");
+        }
+    }
+
+    private URI buildPageUri(int page) {
+        return uriInfo.getRequestUriBuilder()
+                .replaceQueryParam("page", page)
+                .build();
+    }
 }
 
 
