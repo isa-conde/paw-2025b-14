@@ -5,22 +5,19 @@ import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.HashSet;
 
 @Component
-public class PawUserDetailsService implements UserDetailsService {
+public class UserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
 
     @Autowired
     private UserService us;
 
     @Override
-    public UserDetails loadUserByUsername(String s) throws UserNotFoundException {
+    public org.springframework.security.core.userdetails.UserDetails loadUserByUsername(String s) throws UserNotFoundException {
         final User user = us.findByUsername(s).orElseThrow(UserNotFoundException::new);
 
         Collection<SimpleGrantedAuthority> authorities = new HashSet<>();
@@ -31,6 +28,6 @@ public class PawUserDetailsService implements UserDetailsService {
             authorities.add(new SimpleGrantedAuthority("ROLE_VERIFIED"));
         }
 
-        return new PawUserDetails(user, authorities);
+        return new UserDetails(user, authorities);
     }
 }

@@ -64,4 +64,5 @@ tmp/
 
 .env
 **/out/
+jwt.key
 

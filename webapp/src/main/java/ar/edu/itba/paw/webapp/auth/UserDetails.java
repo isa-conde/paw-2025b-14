@@ -5,17 +5,17 @@ import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
 
-public class PawUserDetails extends org.springframework.security.core.userdetails.User {
+public class UserDetails extends org.springframework.security.core.userdetails.User {
 
-    private User pawUser;
+    private final User user;
 
-    public PawUserDetails(User user, Collection<? extends GrantedAuthority> authorities) {
+    public UserDetails(User user, Collection<? extends GrantedAuthority> authorities) {
         super(user.getUsername(), user.getPassword(), authorities);
-        this.pawUser = user;
+        this.user = user;
     }
 
-    public User getPawUser() {
-        return pawUser;
+    public User getUser() {
+        return user;
     }
 
 }

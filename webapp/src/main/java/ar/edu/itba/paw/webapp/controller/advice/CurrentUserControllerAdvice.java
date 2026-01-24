@@ -1,6 +1,6 @@
 package ar.edu.itba.paw.webapp.controller.advice;
 
-import ar.edu.itba.paw.webapp.auth.PawUserDetails;
+import ar.edu.itba.paw.webapp.auth.UserDetails;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -12,15 +12,15 @@ import java.util.Optional;
 public class CurrentUserControllerAdvice {
 
     @ModelAttribute("user")
-    public Optional<PawUserDetails> getCurrentUser() {
+    public Optional<UserDetails> getCurrentUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated() || auth.getPrincipal() instanceof String) {
             return Optional.empty();
         }
 
         Object principal = auth.getPrincipal();
-        if (principal instanceof PawUserDetails) {
-            return Optional.of((PawUserDetails) principal);
+        if (principal instanceof UserDetails) {
+            return Optional.of((UserDetails) principal);
         }
 
         return Optional.empty();

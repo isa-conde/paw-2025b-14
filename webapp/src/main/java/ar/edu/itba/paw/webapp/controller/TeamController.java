@@ -6,7 +6,7 @@ import ar.edu.itba.paw.interfaces.services.TeamService;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.Team;
 import ar.edu.itba.paw.model.User;
-import ar.edu.itba.paw.webapp.auth.PawUserDetails;
+import ar.edu.itba.paw.webapp.auth.UserDetails;
 import ar.edu.itba.paw.webapp.form.CreateTeamForm;
 import ar.edu.itba.paw.webapp.form.EditTeamForm;
 import org.springframework.stereotype.Controller;
@@ -31,12 +31,12 @@ public class TeamController {
     }
 
     @RequestMapping("/team/create")
-    public ModelAndView teamForm(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+    public ModelAndView teamForm(@ModelAttribute("user") Optional<UserDetails> currentUser,
                                  @ModelAttribute("teamForm") CreateTeamForm form,
                                  @RequestParam(value = "returnUrl", required = false) String returnUrl) {
         ModelAndView mav = new ModelAndView("createTeam");
 
-        currentUser.ifPresent(u -> mav.addObject("user", u.getPawUser()));
+        currentUser.ifPresent(u -> mav.addObject("user", u.getUser()));
         if (returnUrl != null) {
             mav.addObject("returnUrl", returnUrl);
         }
@@ -44,7 +44,7 @@ public class TeamController {
     }
 
     @RequestMapping(value = "/team/create", method = { RequestMethod.POST })
-    public ModelAndView createTeam(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+    public ModelAndView createTeam(@ModelAttribute("user") Optional<UserDetails> currentUser,
                                    @Valid @ModelAttribute("teamForm") CreateTeamForm form,
                                    final BindingResult result,
                                    HttpServletRequest request) {
@@ -53,7 +53,7 @@ public class TeamController {
         }
 
         if (currentUser.isPresent()) {
-            User user = currentUser.get().getPawUser();
+            User user = currentUser.get().getUser();
 
             byte[] pfpBytes = null;
             try {
@@ -107,7 +107,7 @@ public class TeamController {
     }
 
     @RequestMapping("/team/profile/{id}")
-    public ModelAndView teamProfile(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+    public ModelAndView teamProfile(@ModelAttribute("user") Optional<UserDetails> currentUser,
                                     @PathVariable long id,
                                     @ModelAttribute("teamForm") EditTeamForm editTeamForm,
                                     @RequestParam(defaultValue = "0") int page1,
@@ -115,7 +115,7 @@ public class TeamController {
         final ModelAndView mav = new ModelAndView("teamProfile");
 
         if (currentUser.isPresent()) {
-            User user = currentUser.get().getPawUser();
+            User user = currentUser.get().getUser();
             mav.addObject("user", user);
         }
 
@@ -136,7 +136,7 @@ public class TeamController {
     }
 
     @RequestMapping(value = "/team/update", method = { RequestMethod.POST })
-    public ModelAndView updateProfile(@ModelAttribute("user") Optional<PawUserDetails> currentUser,
+    public ModelAndView updateProfile(@ModelAttribute("user") Optional<UserDetails> currentUser,
                                       @RequestParam("teamId") final long teamId,
                                       @Valid @ModelAttribute("teamForm") final EditTeamForm form,
                                       final BindingResult result){
