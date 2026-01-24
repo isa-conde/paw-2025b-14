@@ -5,6 +5,7 @@ import ar.edu.itba.paw.interfaces.exception.UserNotFoundException;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.Token;
 import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.webapp.auth.JwtTokenService;
 import ar.edu.itba.paw.webapp.dto.entities.UserDTO;
 import ar.edu.itba.paw.webapp.dto.params.ListUsersByNameParams;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,8 @@ public class UserController {
 
     @Context
     private UriInfo uriInfo;
+    @Autowired
+    private JwtTokenService jwtTokenService;
 
     //TODO AGREGAR HEADERS DE PAGINACION
     @GET
@@ -88,7 +91,9 @@ public class UserController {
 
         us.verifyEmail(token, user.getId());
 
-        return Response.ok(UserDTO.fromUser(uriInfo, user)).build();
+        return Response.ok(UserDTO.fromUser(uriInfo, user))
+                .header(HttpHeaders.AUTHORIZATION, jwtTokenService.createJwsToken(user))
+                .build();
     }
 
     // TODO: do the same for this function as mentioned in resendVerificationEmail
@@ -117,7 +122,9 @@ public class UserController {
 
         User user = us.findUserByToken(token);
 
-        return Response.ok(UserDTO.fromUser(uriInfo, user)).build();
+        return Response.ok(UserDTO.fromUser(uriInfo, user))
+                .header(HttpHeaders.AUTHORIZATION, jwtTokenService.createJwsToken(user))
+                .build();
     }
 
 
