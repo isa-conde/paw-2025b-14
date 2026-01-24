@@ -24,18 +24,18 @@ public class TeamDTO {
         toReturn.id = team.getId();
         toReturn.name = team.getName();
 
-        toReturn.addLink("self", uriInfo.getAbsolutePathBuilder().path("teams")
+        toReturn.addLink("self", uriInfo.getBaseUriBuilder().path("teams")
                 .path(String.valueOf(team.getId())).build().toString());
         if (team.getPfpId() != null) {
-            toReturn.addLink("profilePicture", uriInfo.getAbsolutePathBuilder().path("images")
+            toReturn.addLink("profilePicture", uriInfo.getBaseUriBuilder().path("images")
                     .path(String.valueOf(team.getPfpId())).build().toString());
         }
         if (team.getBannerId() != null) {
-            toReturn.addLink("banner", uriInfo.getAbsolutePathBuilder().path("images")
+            toReturn.addLink("banner", uriInfo.getBaseUriBuilder().path("images")
                     .path(String.valueOf(team.getBannerId())).build().toString());
         }
         if (team.getOwner() != null) {
-            toReturn.addLink("owner", uriInfo.getAbsolutePathBuilder().path("users")
+            toReturn.addLink("owner", uriInfo.getBaseUriBuilder().path("users")
                     .path(String.valueOf(team.getOwner().getId())).build().toString());
         }
 

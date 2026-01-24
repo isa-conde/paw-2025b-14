@@ -35,21 +35,21 @@ public class MatchDTO {
         toReturn.groupStage = match.getGroupStage();
         toReturn.date = match.getDate();
 
-        toReturn.addLink("self", uriInfo.getAbsolutePathBuilder().path("tournaments")
+        toReturn.addLink("self", uriInfo.getBaseUriBuilder().path("tournaments")
                 .path(String.valueOf(match.getTournamentId()))
                 .path("matches")
                 .path(String.valueOf(match.getId()))
                 .build().toString());
-        toReturn.addLink("tournament", uriInfo.getAbsolutePathBuilder().path("tournaments")
+        toReturn.addLink("tournament", uriInfo.getBaseUriBuilder().path("tournaments")
                 .path(String.valueOf(match.getTournamentId())).build().toString());
 
         if (match.getLocalId() != null) {
-            toReturn.addLink("localParticipant", uriInfo.getAbsolutePathBuilder().path("participants")
+            toReturn.addLink("localParticipant", uriInfo.getBaseUriBuilder().path("participants")
                     .path(String.valueOf(match.getLocalId())).build().toString());
         }
 
         if (match.getVisitorId() != null) {
-            toReturn.addLink("visitorParticipant", uriInfo.getAbsolutePathBuilder().path("participants")
+            toReturn.addLink("visitorParticipant", uriInfo.getBaseUriBuilder().path("participants")
                     .path(String.valueOf(match.getVisitorId())).build().toString());
         }
 

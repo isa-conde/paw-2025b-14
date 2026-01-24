@@ -53,24 +53,24 @@ public class TournamentDTO {
         toReturn.serverName = tournament.getServerName();
         toReturn.discordChannel = tournament.getDiscordChannel();
 
-        toReturn.addLink("self", uriInfo.getAbsolutePathBuilder().path("tournaments")
+        toReturn.addLink("self", uriInfo.getBaseUriBuilder().path("tournaments")
                 .path(String.valueOf(tournament.getId())).build().toString());
-        toReturn.addLink("creator", uriInfo.getAbsolutePathBuilder().path("users")
+        toReturn.addLink("creator", uriInfo.getBaseUriBuilder().path("users")
                 .path(String.valueOf(tournament.getCreatorId())).build().toString());
-        toReturn.addLink("game", uriInfo.getAbsolutePathBuilder().path("games")
+        toReturn.addLink("game", uriInfo.getBaseUriBuilder().path("games")
                 .path(String.valueOf(tournament.getGameId())).build().toString());
-        toReturn.addLink("participants", uriInfo.getAbsolutePathBuilder().path("tournaments")
+        toReturn.addLink("participants", uriInfo.getBaseUriBuilder().path("tournaments")
                 .path(String.valueOf(tournament.getId()))
                 .path("participants").build().toString());
-        toReturn.addLink("matches", uriInfo.getAbsolutePathBuilder().path("tournaments")
+        toReturn.addLink("matches", uriInfo.getBaseUriBuilder().path("tournaments")
                 .path(String.valueOf(tournament.getId()))
                 .path("matches").build().toString());
-        toReturn.addLink("rules", uriInfo.getAbsolutePathBuilder().path("tournaments")
+        toReturn.addLink("rules", uriInfo.getBaseUriBuilder().path("tournaments")
                 .path(String.valueOf(tournament.getId()))
                 .path("rules").build().toString());
 
         if (tournament.getFormatId() != null) {
-            toReturn.addLink("format", uriInfo.getAbsolutePathBuilder().path("games")
+            toReturn.addLink("format", uriInfo.getBaseUriBuilder().path("games")
                     .path(String.valueOf(tournament.getGameId()))
                     .path("formats")
                     .path(String.valueOf(tournament.getFormatId()))
@@ -78,12 +78,12 @@ public class TournamentDTO {
         }
 
         if (tournament.getImageId() != null) {
-            toReturn.addLink("image", uriInfo.getAbsolutePathBuilder().path("images")
+            toReturn.addLink("image", uriInfo.getBaseUriBuilder().path("images")
                     .path(String.valueOf(tournament.getImageId())).build().toString());
         }
 
         if (tournament.getTournamentWinner() != null) {
-            toReturn.addLink("winner", uriInfo.getAbsolutePathBuilder().path("participants")
+            toReturn.addLink("winner", uriInfo.getBaseUriBuilder().path("participants")
                     .path(String.valueOf(tournament.getTournamentWinner())).build().toString());
         }
 

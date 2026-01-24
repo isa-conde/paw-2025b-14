@@ -26,14 +26,14 @@ public class GameDTO {
         toReturn.setGenre(game.getGenre().name());
         toReturn.setName(game.getName());
 
-        toReturn.addLink("self", uriInfo.getAbsolutePathBuilder().path("games")
+        toReturn.addLink("self", uriInfo.getBaseUriBuilder().path("games")
                 .path(String.valueOf(game.getId())).build().toString());
-        toReturn.addLink("formats", uriInfo.getAbsolutePathBuilder().path("games")
+        toReturn.addLink("formats", uriInfo.getBaseUriBuilder().path("games")
                 .path(String.valueOf(game.getId())).path("formats").build().toString());
-        toReturn.addLink("tournaments", uriInfo.getAbsolutePathBuilder().path("tournaments")
+        toReturn.addLink("tournaments", uriInfo.getBaseUriBuilder().path("tournaments")
                 .queryParam("gameId", game.getId()).build().toString());
         if (game.getImageId() != null) {
-            toReturn.addLink("image", uriInfo.getAbsolutePathBuilder().path("images")
+            toReturn.addLink("image", uriInfo.getBaseUriBuilder().path("image")
                     .path(String.valueOf(game.getImageId())).build().toString());
         }
 

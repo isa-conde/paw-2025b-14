@@ -16,6 +16,6 @@ public class SearchNameParams {
     }
 
     public Boolean isEmpty(){
-        return name.isEmpty() || name.isBlank();
+        return name == null || name.isBlank();
     }
 }

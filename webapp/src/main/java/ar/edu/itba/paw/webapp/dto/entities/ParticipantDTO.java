@@ -32,26 +32,26 @@ public class ParticipantDTO {
         toReturn.groupNumber = participant.getGroupNumber();
         toReturn.hasRated = Boolean.TRUE.equals(participant.getHasRated());
 
-        toReturn.addLink("self", uriInfo.getAbsolutePathBuilder().path("participants")
+        toReturn.addLink("self", uriInfo.getBaseUriBuilder().path("participants")
                 .path(String.valueOf(participant.getId())).build().toString());
 
         if (participant.getUser() != null) {
-            toReturn.addLink("user", uriInfo.getAbsolutePathBuilder().path("users")
+            toReturn.addLink("user", uriInfo.getBaseUriBuilder().path("users")
                     .path(String.valueOf(participant.getUser().getId())).build().toString());
         }
 
         if (participant.getTeam() != null) {
-            toReturn.addLink("team", uriInfo.getAbsolutePathBuilder().path("teams")
+            toReturn.addLink("team", uriInfo.getBaseUriBuilder().path("teams")
                     .path(String.valueOf(participant.getTeam().getId())).build().toString());
         }
 
         if (participant.getTournament() != null) {
-            toReturn.addLink("tournament", uriInfo.getAbsolutePathBuilder().path("tournaments")
+            toReturn.addLink("tournament", uriInfo.getBaseUriBuilder().path("tournaments")
                     .path(String.valueOf(participant.getTournament().getId())).build().toString());
         }
 
         if (participant.getPfpId() != null) {
-            toReturn.addLink("profilePicture", uriInfo.getAbsolutePathBuilder().path("images")
+            toReturn.addLink("profilePicture", uriInfo.getBaseUriBuilder().path("images")
                     .path(String.valueOf(participant.getPfpId())).build().toString());
         }
 

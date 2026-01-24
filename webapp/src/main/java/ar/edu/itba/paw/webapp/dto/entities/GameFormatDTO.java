@@ -26,9 +26,9 @@ public class GameFormatDTO {
         toReturn.name = gameFormat.getName();
         toReturn.playersPerTeam = gameFormat.getPlayersPerTeam();
 
-        toReturn.addLink("self", uriInfo.getAbsolutePathBuilder().path("games")
+        toReturn.addLink("self", uriInfo.getBaseUriBuilder().path("games")
                 .path(String.valueOf(gameFormat.getGameId())).path("formats").path(String.valueOf(gameFormat.getId())).build().toString());
-        toReturn.addLink("game", uriInfo.getAbsolutePathBuilder().path("games")
+        toReturn.addLink("game", uriInfo.getBaseUriBuilder().path("games")
                 .path(String.valueOf(gameFormat.getGameId())).build().toString());
 
         return toReturn;
