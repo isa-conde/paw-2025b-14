@@ -31,7 +31,7 @@ public class JwtTokenService {
     private final SecretKey jwtKey;
 
     public JwtTokenService(@Value("classpath:jwt.key") Resource jwtKeyResource) throws IOException {
-        String base64Key = new String(jwtKeyResource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+        String base64Key = new String(jwtKeyResource.getInputStream().readAllBytes(), StandardCharsets.UTF_8).trim();
         this.jwtKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(base64Key));
     }
 
