@@ -26,7 +26,7 @@ public class JwtTokenService {
     @Autowired
     private UserDetailsService uds;
 
-    private static final int EXPIRY_TIME = 86400;
+    private static final int EXPIRY_TIME = 86400000;
 
     private final SecretKey jwtKey;
 
@@ -38,7 +38,7 @@ public class JwtTokenService {
     public String createJwsToken(User user) {
         long currentTime = System.currentTimeMillis();
 
-        return "Bearer" + Jwts.builder()
+        return "Bearer " + Jwts.builder()
                 .subject(user.getUsername())
                 .issuedAt(new Date(currentTime))
                 .expiration(new Date(currentTime + EXPIRY_TIME))
@@ -46,10 +46,11 @@ public class JwtTokenService {
                 .compact();
     }
 
-    public void validateJwsToken(String jws) throws JwtException {
+    public UserDetails validateJwsToken(String jws) throws JwtException {
         JwtParser parser = Jwts.parser().verifyWith(jwtKey).build();
         Jws<Claims> readJwsToken = parser.parseSignedClaims(jws);
-        uds.loadUserByUsername(readJwsToken.getPayload().getSubject());
+        Claims claims = readJwsToken.getPayload();
+        return (UserDetails) uds.loadUserByUsername(claims.getSubject());
     }
 
 }
