@@ -33,6 +33,7 @@ public class GameController {
     public Response getGames(@BeanParam PaginationParams paginationParams, @BeanParam SearchNameParams searchNameParams, @BeanParam FavouriteParams favouriteParams) {
         List<GameDTO> games;
         int totalPages = 0;
+        int page = paginationParams.getPage();
         if (!searchNameParams.isEmpty() && !favouriteParams.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(
                     ErrorDTO.of(Response.Status.BAD_REQUEST,
@@ -41,20 +42,20 @@ public class GameController {
 
         if (!searchNameParams.isEmpty()) {
             totalPages = gs.countSearchByNameGame(searchNameParams.getName());
-            int page = adjustPage(totalPages, paginationParams.getPage());
+            page = adjustPage(page, totalPages);
             games = gs.searchByName(searchNameParams.getName(), page).stream().map(GameDTO.mapper(uriInfo)).toList();
         } else if (!favouriteParams.isEmpty()) {
             games = gs.getFavourites(favouriteParams.getUserId()).stream().map(GameDTO.mapper(uriInfo)).toList();
         } else if (paginationParams.isPaged()) {
             totalPages = gs.getPageAmount();
-            int page = adjustPage(paginationParams.getPage(), totalPages);
+            page = adjustPage(page, totalPages);
             games = gs.findAllPaged(page).stream().map(GameDTO.mapper(uriInfo)).toList();
         } else {
             games = gs.findAll().stream().map(GameDTO.mapper(uriInfo)).toList();
         }
         Response.ResponseBuilder responseBuilder = Response.ok(games);
         if (paginationParams.isPaged() && totalPages > 0) {
-            addPaginationLinks(responseBuilder, paginationParams.getPage(), totalPages);
+            addPaginationLinks(responseBuilder, page, totalPages);
         }
         return responseBuilder.build();
     }

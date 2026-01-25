@@ -8,6 +8,7 @@ import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.webapp.auth.JwtTokenService;
 import ar.edu.itba.paw.webapp.dto.entities.UserDTO;
 import ar.edu.itba.paw.webapp.dto.params.ListUsersByNameParams;
+import ar.edu.itba.paw.webapp.dto.requests.CreateUserRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -57,8 +58,8 @@ public class UserController {
     @POST
     @Consumes(value = {Vendor.APPLICATION_USER_CREATE})
     @Produces(value = {Vendor.APPLICATION_USER})
-    public Response createUser(@Valid UserDTO userDto) {
-        User user = us.create(userDto.getUsername(), userDto.getEmail(), userDto.getPassword());
+    public Response createUser(@Valid CreateUserRequest request) {
+        User user = us.create(request.getUsername(), request.getEmail(), request.getPassword());
 
         URI uri = uriInfo.getAbsolutePathBuilder()
                 .path(String.valueOf(user.getId())).build();

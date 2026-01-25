@@ -2,17 +2,984 @@ openapi: 3.0.0
 info:
   version: 1.0.0
   title: RankUp REST API
-  description: ''
+  description: REST API for RankUp
+servers:
+  - url: /api
 tags:
   - name: users
-    description: Manages the users of the RankUp application.
+    description: Manages users.
+  - name: teams
+    description: Manages teams.
+  - name: games
+    description: Manages games and formats.
+  - name: tournaments
+    description: Manages tournaments, participants, and matches.
+  - name: tokens
+    description: Manages verification/password tokens.
+
 paths:
   /users:
-    post:
-      tags:
-        - users
-      summary: Create a user.
-      description: Create a RankUp user.
+    get:
+      tags: [ users ]
+      summary: List users by name
+      parameters:
+        - in: query
+          name: name
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 0
       responses:
         '200':
-          description: Successful operation
+          description: User list
+          headers:
+            Link:
+              description: Pagination links
+              schema:
+                type: string
+          content:
+            application/vnd.userlist.v1+json:
+              schema:
+                $ref: '#/components/schemas/UserList'
+    post:
+      tags: [ users ]
+      summary: Create user
+      requestBody:
+        required: true
+        content:
+          application/vnd.user.create.v1+json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+      responses:
+        '201':
+          description: Created
+          headers:
+            Location:
+              schema:
+                type: string
+  /users/{id}:
+    get:
+      tags: [ users ]
+      summary: Get user
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '200':
+          description: User
+          content:
+            application/vnd.user.v1+json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Not found
+  /users/verifications:
+    post:
+      tags: [ users ]
+      summary: Resend verification email
+      requestBody:
+        required: true
+        content:
+          application/vnd.user.verification.v1+json:
+            schema:
+              $ref: '#/components/schemas/UserEmail'
+      responses:
+        '201':
+          description: Token created
+          headers:
+            Location:
+              schema:
+                type: string
+    put:
+      tags: [ users ]
+      summary: Verify user
+      parameters:
+        - in: query
+          name: token
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Verified user
+          headers:
+            Authorization:
+              schema:
+                type: string
+          content:
+            application/vnd.user.v1+json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /users/password-requests:
+    post:
+      tags: [ users ]
+      summary: Request password reset
+      requestBody:
+        required: true
+        content:
+          application/vnd.user.password-request.v1+json:
+            schema:
+              $ref: '#/components/schemas/UserEmail'
+      responses:
+        '201':
+          description: Token created
+          headers:
+            Location:
+              schema:
+                type: string
+    put:
+      tags: [ users ]
+      summary: Reset password
+      parameters:
+        - in: query
+          name: token
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/vnd.user.password-reset.v1+json:
+            schema:
+              $ref: '#/components/schemas/UserPassword'
+      responses:
+        '200':
+          description: Password reset
+          headers:
+            Authorization:
+              schema:
+                type: string
+          content:
+            application/vnd.user.v1+json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /teams:
+    get:
+      tags: [ teams ]
+      summary: Search teams
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
+        - in: query
+          name: userId
+          schema:
+            type: integer
+        - in: query
+          name: forTournament
+          schema:
+            type: integer
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        '200':
+          description: Team list
+          headers:
+            Link:
+              description: Pagination links
+              schema:
+                type: string
+          content:
+            application/vnd.teamlist.v1+json:
+              schema:
+                $ref: '#/components/schemas/TeamList'
+    post:
+      tags: [ teams ]
+      summary: Create team
+      requestBody:
+        required: true
+        content:
+          application/vnd.team.create.v1+json:
+            schema:
+              $ref: '#/components/schemas/TeamCreate'
+      responses:
+        '201':
+          description: Team created
+          headers:
+            Location:
+              schema:
+                type: string
+          content:
+            application/vnd.team.v1+json:
+              schema:
+                $ref: '#/components/schemas/Team'
+  /teams/{id}:
+    get:
+      tags: [ teams ]
+      summary: Get team
+      parameters:
+        - $ref: '#/components/parameters/TeamId'
+      responses:
+        '200':
+          description: Team
+          content:
+            application/vnd.team.v1+json:
+              schema:
+                $ref: '#/components/schemas/Team'
+        '404':
+          description: Not found
+    put:
+      tags: [ teams ]
+      summary: Update team
+      parameters:
+        - $ref: '#/components/parameters/TeamId'
+      requestBody:
+        required: true
+        content:
+          application/vnd.team.v1+json:
+            schema:
+              $ref: '#/components/schemas/Team'
+      responses:
+        '200':
+          description: Updated team
+          content:
+            application/vnd.team.v1+json:
+              schema:
+                $ref: '#/components/schemas/Team'
+  /teams/{id}/members:
+    get:
+      tags: [ teams ]
+      summary: Get team members
+      parameters:
+        - $ref: '#/components/parameters/TeamId'
+      responses:
+        '200':
+          description: Team members
+          content:
+            application/vnd.userlist.v1+json:
+              schema:
+                $ref: '#/components/schemas/UserList'
+
+  /games:
+    get:
+      tags: [ games ]
+      summary: List games
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
+        - in: query
+          name: favouritedBy
+          schema:
+            type: integer
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        '200':
+          description: Game list
+          headers:
+            Link:
+              description: Pagination links
+              schema:
+                type: string
+          content:
+            application/vnd.gamelist.v1+json:
+              schema:
+                $ref: '#/components/schemas/GameList'
+  /games/{gameId}/formats:
+    get:
+      tags: [ games ]
+      summary: List game formats
+      parameters:
+        - $ref: '#/components/parameters/GameId'
+      responses:
+        '200':
+          description: Game format list
+          content:
+            application/vnd.gameformatlist.v1+json:
+              schema:
+                $ref: '#/components/schemas/GameFormatList'
+  /games/{gameId}/formats/{formatId}:
+    get:
+      tags: [ games ]
+      summary: Get game format
+      parameters:
+        - $ref: '#/components/parameters/GameId'
+        - $ref: '#/components/parameters/FormatId'
+      responses:
+        '200':
+          description: Game format
+          content:
+            application/vnd.gameformat.v1+json:
+              schema:
+                $ref: '#/components/schemas/GameFormat'
+
+  /tournaments:
+    get:
+      tags: [ tournaments ]
+      summary: List tournaments
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
+        - in: query
+          name: gameId
+          schema:
+            type: integer
+        - in: query
+          name: region
+          schema:
+            type: string
+        - in: query
+          name: elo
+          schema:
+            type: string
+        - in: query
+          name: startDate
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: endDate
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: format
+          schema:
+            type: string
+        - in: query
+          name: structure
+          schema:
+            type: string
+        - in: query
+          name: genre
+          schema:
+            type: string
+        - in: query
+          name: playersPerTeam
+          schema:
+            type: integer
+        - in: query
+          name: page
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        '200':
+          description: Tournament list
+          headers:
+            Link:
+              description: Pagination links
+              schema:
+                type: string
+          content:
+            application/vnd.tournamentlist.v1+json:
+              schema:
+                $ref: '#/components/schemas/TournamentList'
+    post:
+      tags: [ tournaments ]
+      summary: Create tournament
+      requestBody:
+        required: true
+        content:
+          application/vnd.tournament.create.v1+json:
+            schema:
+              $ref: '#/components/schemas/TournamentCreate'
+      responses:
+        '201':
+          description: Tournament created
+          headers:
+            Location:
+              schema:
+                type: string
+          content:
+            application/vnd.tournament.v1+json:
+              schema:
+                $ref: '#/components/schemas/Tournament'
+  /tournaments/{id}:
+    get:
+      tags: [ tournaments ]
+      summary: Get tournament
+      parameters:
+        - $ref: '#/components/parameters/TournamentId'
+      responses:
+        '200':
+          description: Tournament
+          content:
+            application/vnd.tournament.v1+json:
+              schema:
+                $ref: '#/components/schemas/Tournament'
+        '404':
+          description: Not found
+    put:
+      tags: [ tournaments ]
+      summary: Update tournament
+      parameters:
+        - $ref: '#/components/parameters/TournamentId'
+      requestBody:
+        required: true
+        content:
+          application/vnd.tournament.update.v1+json:
+            schema:
+              $ref: '#/components/schemas/TournamentUpdate'
+      responses:
+        '200':
+          description: Updated tournament
+          content:
+            application/vnd.tournament.v1+json:
+              schema:
+                $ref: '#/components/schemas/Tournament'
+  /tournaments/{id}/participants:
+    get:
+      tags: [ tournaments ]
+      summary: Get participants
+      parameters:
+        - $ref: '#/components/parameters/TournamentId'
+        - in: query
+          name: teamSize
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Participant list
+          content:
+            application/vnd.participantlist.v1+json:
+              schema:
+                $ref: '#/components/schemas/ParticipantList'
+  /tournaments/{id}/participants/users:
+    post:
+      tags: [ tournaments ]
+      summary: Join tournament as user
+      parameters:
+        - $ref: '#/components/parameters/TournamentId'
+      requestBody:
+        required: true
+        content:
+          application/vnd.tournament.join-user.v1+json:
+            schema:
+              $ref: '#/components/schemas/JoinTournamentUser'
+      responses:
+        '204':
+          description: Joined
+  /tournaments/{id}/participants/teams:
+    post:
+      tags: [ tournaments ]
+      summary: Join tournament as team
+      parameters:
+        - $ref: '#/components/parameters/TournamentId'
+      requestBody:
+        required: true
+        content:
+          application/vnd.tournament.join-team.v1+json:
+            schema:
+              $ref: '#/components/schemas/JoinTournamentTeam'
+      responses:
+        '204':
+          description: Joined
+  /tournaments/{id}/participants/{participantId}:
+    delete:
+      tags: [ tournaments ]
+      summary: Remove participant
+      parameters:
+        - $ref: '#/components/parameters/TournamentId'
+        - $ref: '#/components/parameters/ParticipantId'
+      responses:
+        '204':
+          description: Removed
+  /tournaments/{id}/participants/users/{userId}:
+    delete:
+      tags: [ tournaments ]
+      summary: Leave tournament
+      parameters:
+        - $ref: '#/components/parameters/TournamentId'
+        - $ref: '#/components/parameters/UserIdPath'
+      responses:
+        '204':
+          description: Left
+  /tournaments/{id}/matches:
+    get:
+      tags: [ tournaments ]
+      summary: Get matches by stage
+      parameters:
+        - $ref: '#/components/parameters/TournamentId'
+        - in: query
+          name: group
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Match stages
+          content:
+            application/vnd.matchstagelist.v1+json:
+              schema:
+                $ref: '#/components/schemas/MatchStageList'
+  /tournaments/{id}/matches/{matchId}:
+    get:
+      tags: [ tournaments ]
+      summary: Get match
+      parameters:
+        - $ref: '#/components/parameters/TournamentId'
+        - $ref: '#/components/parameters/MatchId'
+      responses:
+        '200':
+          description: Match
+          content:
+            application/vnd.match.v1+json:
+              schema:
+                $ref: '#/components/schemas/Match'
+  /tournaments/{id}/matches/{matchId}/results:
+    put:
+      tags: [ tournaments ]
+      summary: Set match results
+      parameters:
+        - $ref: '#/components/parameters/TournamentId'
+        - $ref: '#/components/parameters/MatchId'
+      requestBody:
+        required: true
+        content:
+          application/vnd.match.results.v1+json:
+            schema:
+              $ref: '#/components/schemas/MatchResults'
+      responses:
+        '204':
+          description: Updated
+  /tournaments/{id}/status:
+    put:
+      tags: [ tournaments ]
+      summary: Update tournament status
+      parameters:
+        - $ref: '#/components/parameters/TournamentId'
+      requestBody:
+        required: true
+        content:
+          application/vnd.tournament.status.v1+json:
+            schema:
+              $ref: '#/components/schemas/TournamentStatus'
+      responses:
+        '200':
+          description: Updated status
+          content:
+            application/vnd.tournament.v1+json:
+              schema:
+                $ref: '#/components/schemas/Tournament'
+
+  /tokens:
+    get:
+      tags: [ tokens ]
+      summary: List user tokens
+      parameters:
+        - in: query
+          name: userId
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Token list
+          content:
+            application/vnd.tokenlist.v1+json:
+              schema:
+                $ref: '#/components/schemas/TokenList'
+  /tokens/{value}:
+    get:
+      tags: [ tokens ]
+      summary: Get token
+      parameters:
+        - $ref: '#/components/parameters/TokenValue'
+      responses:
+        '200':
+          description: Token
+          content:
+            application/vnd.token.v1+json:
+              schema:
+                $ref: '#/components/schemas/Token'
+
+components:
+  parameters:
+    UserId:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: integer
+    UserIdPath:
+      in: path
+      name: userId
+      required: true
+      schema:
+        type: integer
+    TeamId:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: integer
+    GameId:
+      in: path
+      name: gameId
+      required: true
+      schema:
+        type: integer
+    FormatId:
+      in: path
+      name: formatId
+      required: true
+      schema:
+        type: integer
+    TournamentId:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: integer
+    ParticipantId:
+      in: path
+      name: participantId
+      required: true
+      schema:
+        type: integer
+    MatchId:
+      in: path
+      name: matchId
+      required: true
+      schema:
+        type: integer
+    TokenValue:
+      in: path
+      name: value
+      required: true
+      schema:
+        type: integer
+
+  schemas:
+    Link:
+      type: object
+      properties:
+        rel:
+          type: string
+        href:
+          type: string
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        email:
+          type: string
+        verified:
+          type: boolean
+        bio:
+          type: string
+        rating:
+          type: number
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/Link'
+    UserCreate:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+      required: [ username, email, password ]
+    UserEmail:
+      type: object
+      properties:
+        email:
+          type: string
+      required: [ email ]
+    UserPassword:
+      type: object
+      properties:
+        password:
+          type: string
+      required: [ password ]
+    Team:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/Link'
+    TeamCreate:
+      type: object
+      properties:
+        name:
+          type: string
+        ownerId:
+          type: integer
+        profilePictureBase64:
+          type: string
+        bannerBase64:
+          type: string
+        members:
+          type: array
+          items:
+            type: string
+      required: [ name, ownerId ]
+    Game:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        genre:
+          type: string
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/Link'
+    GameFormat:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        playersPerTeam:
+          type: integer
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/Link'
+    Tournament:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        region:
+          type: string
+        elo:
+          type: string
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        format:
+          type: string
+        structure:
+          type: string
+        maxParticipants:
+          type: integer
+        openInscriptions:
+          type: boolean
+        finished:
+          type: boolean
+        groupStage:
+          type: boolean
+        tournamentStarted:
+          type: boolean
+        rating:
+          type: number
+        serverName:
+          type: string
+        discordChannel:
+          type: string
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/Link'
+    TournamentCreate:
+      type: object
+      properties:
+        creatorId:
+          type: integer
+        name:
+          type: string
+        gameId:
+          type: integer
+        region:
+          type: string
+        elo:
+          type: string
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        structure:
+          type: string
+        maxParticipants:
+          type: integer
+        formatId:
+          type: integer
+        imageBase64:
+          type: string
+        rulesBase64:
+          type: string
+        serverName:
+          type: string
+        serverPassword:
+          type: string
+        discordChannel:
+          type: string
+      required: [ creatorId, name, gameId, region, elo, startDate, endDate, structure, maxParticipants, formatId ]
+    TournamentUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        maxParticipants:
+          type: integer
+        imageBase64:
+          type: string
+        rulesBase64:
+          type: string
+        serverName:
+          type: string
+        serverPassword:
+          type: string
+        discordChannel:
+          type: string
+      required: [ name ]
+    Participant:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        points:
+          type: integer
+        scoreDifference:
+          type: integer
+        groupNumber:
+          type: integer
+        hasRated:
+          type: boolean
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/Link'
+    Match:
+      type: object
+      properties:
+        id:
+          type: integer
+        localScore:
+          type: integer
+        visitorScore:
+          type: integer
+        winner:
+          type: integer
+        stage:
+          type: integer
+        groupStage:
+          type: boolean
+        date:
+          type: string
+          format: date
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/Link'
+    MatchStage:
+      type: object
+      properties:
+        stage:
+          type: integer
+        matches:
+          type: array
+          items:
+            $ref: '#/components/schemas/Match'
+    Token:
+      type: object
+      properties:
+        token:
+          type: integer
+        expiryDate:
+          type: string
+          format: date
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/Link'
+    JoinTournamentUser:
+      type: object
+      properties:
+        userId:
+          type: integer
+      required: [ userId ]
+    JoinTournamentTeam:
+      type: object
+      properties:
+        teamId:
+          type: integer
+        members:
+          type: array
+          items:
+            type: integer
+      required: [ teamId, members ]
+    MatchResults:
+      type: object
+      properties:
+        localScore:
+          type: integer
+        visitorScore:
+          type: integer
+      required: [ localScore, visitorScore ]
+    TournamentStatus:
+      type: object
+      properties:
+        tournamentStarted:
+          type: boolean
+        openInscriptions:
+          type: boolean
+    UserList:
+      type: array
+      items:
+        $ref: '#/components/schemas/User'
+    TeamList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Team'
+    GameList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Game'
+    GameFormatList:
+      type: array
+      items:
+        $ref: '#/components/schemas/GameFormat'
+    TournamentList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Tournament'
+    ParticipantList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Participant'
+    MatchStageList:
+      type: array
+      items:
+        $ref: '#/components/schemas/MatchStage'
+    TokenList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Token'
