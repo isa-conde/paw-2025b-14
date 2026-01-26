@@ -1,6 +1,5 @@
 package ar.edu.itba.paw.webapp.auth;
 
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,7 +13,6 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Context;
 import java.io.IOException;
 
 @Component
@@ -30,6 +28,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader("Authorization");
         if(authHeader != null && authHeader.startsWith(BEARER_PREFIX)) {
             String jws = authHeader.substring(BEARER_PREFIX.length()).trim();
+            if(jws.isEmpty()) {
+                filterChain.doFilter(request, response);
+                return;
+            }
             UserDetails userDetails = null;
             try {
                 userDetails = jwtTokenService.validateJwsToken(jws);

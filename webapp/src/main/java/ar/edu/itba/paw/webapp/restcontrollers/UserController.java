@@ -10,6 +10,9 @@ import ar.edu.itba.paw.webapp.dto.entities.UserDTO;
 import ar.edu.itba.paw.webapp.dto.params.ListUsersByNameParams;
 import ar.edu.itba.paw.webapp.dto.requests.CreateUserRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import javax.validation.Valid;
@@ -27,8 +30,12 @@ public class UserController {
     @Autowired
     private UserService us;
 
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
     @Context
     private UriInfo uriInfo;
+
     @Autowired
     private JwtTokenService jwtTokenService;
 
@@ -124,6 +131,19 @@ public class UserController {
 
         User user = us.findUserByToken(token);
 
+        return Response.ok(UserDTO.fromUser(uriInfo, user))
+                .header(HttpHeaders.AUTHORIZATION, jwtTokenService.createJwsToken(user))
+                .build();
+    }
+
+    @POST
+    @Path("/sessions")
+    @Consumes(value = {Vendor.APPLICATION_USER_LOGIN})
+    @Produces(value = {Vendor.APPLICATION_USER})
+    public Response login(@Valid UserDTO userDto) {
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDto.getUsername(), userDto.getPassword());
+        authenticationManager.authenticate(authentication);
+        User user = us.findByUsername(userDto.getUsername()).orElseThrow(UserNotFoundException::new);
         return Response.ok(UserDTO.fromUser(uriInfo, user))
                 .header(HttpHeaders.AUTHORIZATION, jwtTokenService.createJwsToken(user))
                 .build();

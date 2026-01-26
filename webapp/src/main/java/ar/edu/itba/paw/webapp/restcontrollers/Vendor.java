@@ -2,9 +2,9 @@ package ar.edu.itba.paw.webapp.restcontrollers;
 
 public class Vendor {
 
-    public static final String APPLICATION_TOKEN_LIST = "application/vnd.tokenlist.v1+json";
+    public static final String APPLICATION_TOKEN_LIST = "application/vnd.token.list.v1+json";
 
-    public static final String APPLICATION_USER_LIST = "application/vnd.userlist.v1+json";
+    public static final String APPLICATION_USER_LIST = "application/vnd.user.list.v1+json";
 
     public static final String APPLICATION_USER = "application/vnd.user.v1+json";
 
@@ -20,23 +20,23 @@ public class Vendor {
 
     public static final String APPLICATION_GAME = "application/vnd.game.v1+json";
 
-    public static final String APPLICATION_GAME_LIST = "application/vnd.gamelist.v1+json";
+    public static final String APPLICATION_GAME_LIST = "application/vnd.game.list.v1+json";
 
-    public static final String APPLICATION_GAME_FORMAT = "application/vnd.gameformat.v1+json";
+    public static final String APPLICATION_GAME_FORMAT = "application/vnd.game-format.v1+json";
 
-    public static final String APPLICATION_GAME_FORMAT_LIST = "application/vnd.gameformatlist.v1+json";
+    public static final String APPLICATION_GAME_FORMAT_LIST = "application/vnd.game-format.list.v1+json";
 
     public static final String APPLICATION_TEAM = "application/vnd.team.v1+json";
 
-    public static final String APPLICATION_TEAM_LIST = "application/vnd.teamlist.v1+json";
+    public static final String APPLICATION_TEAM_LIST = "application/vnd.team.list.v1+json";
 
     public static final String APPLICATION_TEAM_CREATE = "application/vnd.team.create.v1+json";
 
     public static final String APPLICATION_TOURNAMENT = "application/vnd.tournament.v1+json";
 
-    public static final String APPLICATION_TOURNAMENT_LIST = "application/vnd.tournamentlist.v1+json";
+    public static final String APPLICATION_TOURNAMENT_LIST = "application/vnd.tournament.list.v1+json";
 
-    public static final String APPLICATION_PARTICIPANT_LIST = "application/vnd.participantlist.v1+json";
+    public static final String APPLICATION_PARTICIPANT_LIST = "application/vnd.participant.list.v1+json";
 
     public static final String APPLICATION_MATCH_STAGE_LIST = "application/vnd.matchstagelist.v1+json";
 
@@ -55,5 +55,7 @@ public class Vendor {
     public static final String APPLICATION_TOURNAMENT_LEAVE = "application/vnd.tournament.leave.v1+json";
 
     public static final String APPLICATION_MATCH_RESULTS = "application/vnd.match.results.v1+json";
+
+    public static final String APPLICATION_USER_LOGIN = "application/vnd.user.login.v1+json";
 
 }
