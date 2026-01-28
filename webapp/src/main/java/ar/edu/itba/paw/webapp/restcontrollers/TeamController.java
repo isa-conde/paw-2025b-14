@@ -169,7 +169,7 @@ public class TeamController {
         //TODO OBTENER EL USUARIO DE LA REQUEST Y VERIFICAR SI TIENE PERMISOS PARA REALIZAR EL UPDATE
 
         //TODO VERIFICAR
-        ts.updateTeam(teamId, dto.getName());
+        ts.updateTeam(teamId, dto.getName(), null, null, null);
         return Response.ok(dto).build();
     }
 

@@ -165,7 +165,7 @@ public class TournamentServiceImpl implements TournamentService {
         Tournament tournament = tournamentDao.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
         PointsPair maxPoints = participantDao.getTournamentMaxPointsPairGroup(tournamentId, null);
         if (maxPoints == null) return java.util.Collections.emptyList();
-        return participantDao.getTournamentParticipantsByPointsPair(tournamentId, null, maxPoints,  gameFormatDao.findById(tournament.getFormatId()).orElseThrow(GameFormatNotFoundException::new).getPlayersPerTeam());
+        return participantDao.getTournamentParticipantsByPointsPair(tournamentId, null, maxPoints,  gameFormatDao.findById(tournament.getFormatId()).getPlayersPerTeam());
     }
 
     @Transactional
@@ -475,7 +475,7 @@ public class TournamentServiceImpl implements TournamentService {
         Tournament tournament = optTournament.get();
         int teamSize;
         if(tournament.getFormatId() != null){
-            teamSize = gameFormatDao.findById(optTournament.get().getFormatId()).orElseThrow(GameFormatNotFoundException::new).getPlayersPerTeam();
+            teamSize = gameFormatDao.findById(optTournament.get().getFormatId()).getPlayersPerTeam();
         }else{
             teamSize = 1;
         }

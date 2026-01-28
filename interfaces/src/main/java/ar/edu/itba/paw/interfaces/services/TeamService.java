@@ -37,6 +37,4 @@ public interface TeamService {
 
     int countSearchByNameTeam(String name);
 
-    void updateTeam(long teamId, String name);
-
 }
