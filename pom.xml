@@ -252,6 +252,12 @@
             <version>${jjwt.version}</version>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>ar.edu.itba.paw</groupId>
+            <artifactId>frontend</artifactId>
+            <version>${project.parent.version}</version>
+            <type>pom</type>
+        </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -265,6 +271,7 @@
   </modules>
 
   <build>
+    <finalName>webapp</finalName>
     <pluginManagement>
       <plugins>
           <plugin>
@@ -273,6 +280,11 @@
               <version>${maven-war-plugin.version}</version>
               <configuration>
                   <packagingExcludes>**/logback-test.xml</packagingExcludes>
+                  <webResources>
+                      <resource>
+                          <directory>../frontend/dist/paw-catedra/browser</directory>
+                      </resource>
+                  </webResources>
               </configuration>
           </plugin>
           <plugin>
