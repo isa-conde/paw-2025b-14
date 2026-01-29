@@ -33,7 +33,7 @@ public class GameDTO {
         toReturn.addLink("tournaments", uriInfo.getBaseUriBuilder().path("tournaments")
                 .queryParam("gameId", game.getId()).build().toString());
         if (game.getImageId() != null) {
-            toReturn.addLink("image", uriInfo.getBaseUriBuilder().path("image")
+            toReturn.addLink("image", uriInfo.getBaseUriBuilder().path("images")
                     .path(String.valueOf(game.getImageId())).build().toString());
         }
 
