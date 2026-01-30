@@ -7,6 +7,8 @@ public class MatchStageDTO {
     private int stage;
     private List<MatchDTO> matches;
 
+    public MatchStageDTO() {}
+
     public MatchStageDTO(int stage, List<MatchDTO> matches) {
         this.stage = stage;
         this.matches = matches;

@@ -75,19 +75,23 @@ public class MatchServiceImpl implements MatchService {
         Tournament tournament = ts.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
         GameFormat format = tournament.getFormatEntity();
         int teamSize;
+        Structure structure = tournament.getStructure();
+        boolean isHybrid = structure == Structure.HYBRID;
+
         if(format == null) {
             teamSize = 1;
         }else{
             teamSize = format.getPlayersPerTeam();
         }
         Integer selectedGroup = group;
-        if(group == null && tournament.getIsGroupStage() != null && tournament.getIsGroupStage() && tournament.getStructure().equals(Structure.HYBRID)) {
+        if(group == null && tournament.getIsGroupStage() != null && tournament.getIsGroupStage() && isHybrid) {
             selectedGroup = 1;
         }
         List<Match> matches = matchDao.getTournamentMatches(tournamentId, selectedGroup);
         if (matches.isEmpty()) {
             return Collections.emptyMap();
         }
+        LOGGER.debug("Matches for tournament with ID {} have been correctly collected", tournamentId);
         matches.sort(Comparator.comparingLong(Match::getId));
         Map<Integer, List<Match>> result = new TreeMap<>();
         Boolean isGroupStage = tournament.getIsGroupStage();
@@ -100,6 +104,7 @@ public class MatchServiceImpl implements MatchService {
             }
             result.computeIfAbsent(stage, s -> new ArrayList<>()).add(m);
         }
+        LOGGER.debug("Matches correctly organized with no exceptions for tournament ID {}", tournamentId);
         return result;
     }
 

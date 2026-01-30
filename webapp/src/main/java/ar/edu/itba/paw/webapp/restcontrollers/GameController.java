@@ -1,5 +1,6 @@
 package ar.edu.itba.paw.webapp.restcontrollers;
 
+import ar.edu.itba.paw.interfaces.exception.GameNotFoundException;
 import ar.edu.itba.paw.interfaces.services.GameService;
 import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.Game.GameFormat;
@@ -61,14 +62,14 @@ public class GameController {
     }
 
     @GET
-    @Path("/{gameId}/formats")
+    @Path("/{id}/formats")
     @Produces(value = {Vendor.APPLICATION_GAME_FORMAT_LIST})
-    public Response getFormats(@PathParam("gameId") long gameId) {
-        if (gameId <= 0) {
+    public Response getFormats(@PathParam("id") long id) {
+        if (id <= 0) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
-        List<GameFormatDTO> gameFormats = gs.getFormats(gameId).stream().map(GameFormatDTO.mapper(uriInfo)).toList();
+        List<GameFormatDTO> gameFormats = gs.getFormats(id).stream().map(GameFormatDTO.mapper(uriInfo)).toList();
         return Response.ok(gameFormats).build();
     }
 
@@ -82,6 +83,18 @@ public class GameController {
 
         GameFormatDTO gf = GameFormatDTO.mapper(uriInfo).apply(gs.getFormat(formatId));
         return Response.ok(gf).build();
+    }
+
+    @GET
+    @Path("/{id}")
+    @Produces(value = {Vendor.APPLICATION_GAME})
+    public Response getGame(@PathParam("id") long id) {
+        if(id <= 0) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
+        GameDTO game = GameDTO.mapper(uriInfo).apply(gs.findById(id).orElseThrow(GameNotFoundException::new));
+        return Response.ok(game).build();
     }
 
     private int adjustPage(int page, int totalPages) {

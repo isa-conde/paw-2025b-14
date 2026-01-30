@@ -6,9 +6,9 @@ import ar.edu.itba.paw.interfaces.services.RulesService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.Game.GameFormat;
 import ar.edu.itba.paw.model.Match.Match;
-import ar.edu.itba.paw.model.Participant;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
+import ar.edu.itba.paw.webapp.auth.TournamentSecurity;
 import ar.edu.itba.paw.webapp.dto.entities.ErrorDTO;
 import ar.edu.itba.paw.webapp.dto.entities.MatchDTO;
 import ar.edu.itba.paw.webapp.dto.entities.MatchStageDTO;
@@ -22,6 +22,8 @@ import ar.edu.itba.paw.webapp.dto.requests.JoinTournamentUserRequest;
 import ar.edu.itba.paw.webapp.dto.requests.SetMatchResultsRequest;
 import ar.edu.itba.paw.webapp.dto.requests.TournamentStatusRequest;
 import ar.edu.itba.paw.webapp.dto.requests.UpdateTournamentRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -51,6 +53,8 @@ import java.util.Optional;
 @Path("tournaments")
 @Component
 public class TournamentController {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(TournamentController.class);
 
     private static final int PAGE_SIZE = 9;
 
@@ -279,6 +283,7 @@ public class TournamentController {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
+        LOGGER.debug("API correctly entered to /tournaments/{}/matches endpoint with group {}", id, group);
         Map<Integer, List<Match>> matchesByStage = matchService.getTournamentMatchesByStage(id, group);
         List<MatchStageDTO> response = matchesByStage.entrySet().stream()
                 .sorted(Comparator.comparingInt(Map.Entry::getKey))
