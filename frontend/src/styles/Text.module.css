@@ -1,0 +1,67 @@
+@import url('./variables.css');
+
+.title {
+    font-family: var(--font-titles), serif;
+    margin: 10px 0;
+    color: var(--primary-text);
+}
+
+.title.xl {
+    font-size: var(--text-64);
+    padding-bottom: 10px;
+}
+
+.title.l {
+    font-size: var(--text-40);
+}
+
+.title.m {
+    font-size: var(--text-36);
+}
+
+.title.s {
+    font-size: var(--text-24);
+}
+
+.title.xs {
+    font-size: var(--text-20);
+}
+
+.main-text {
+    font-weight: 700;
+    margin: 5px 0;
+    color: var(--primary-text);
+}
+
+.main-text.xl {
+    font-size: var(--text-32);
+}
+
+.main-text.l {
+    font-size: var(--text-24);
+    padding: 8px 0;
+}
+
+.main-text.m {
+    font-size: var(--text-20);
+}
+
+.main-text.s {
+    font-size: var(--text-18);
+}
+
+.main-text.xs {
+    font-size: var(--text-14);
+}
+
+.main-text.thin {
+    font-weight: 400;
+}
+
+.main-text.semi-bold {
+    font-weight: 600;
+}
+
+.text-stroke {
+    -webkit-text-stroke: 1px var(--background);
+}

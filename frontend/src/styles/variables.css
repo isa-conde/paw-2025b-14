@@ -1,0 +1,34 @@
+:root {
+    --background: #00070E;
+    --background-secondary: #001124;
+    --background-card: #00244D;
+
+    --primary-button: #005B99;
+    --primary-button-hover: #1971B8;
+
+    --primary-details: #005B99;
+    --secondary-details: #334A5C;
+    --secondary-details-hover: #45647D;
+
+    --primary-text: #E6F7FF;
+    --secondary-text: #B3C9D6;
+
+    --error: #D64545;
+    --error-hover: #B93737;
+
+    --font-main: 'Montserrat', sans-serif;
+    --font-titles: 'Russo One', sans-serif;
+
+    --text-12: 12px;
+    --text-14: 14px;
+    --text-15: 15px;
+    --text-16: 16px;
+    --text-18: 18px;
+    --text-20: 20px;
+    --text-22: 22px;
+    --text-24: 24px;
+    --text-32: 32px;
+    --text-36: 36px;
+    --text-40: 40px;
+    --text-64: 64px;
+}
