@@ -1,4 +1,4 @@
-import styles from "../styles/Text.module.css";
+import styles from "../styles/components/Text.module.css";
 
 export const Text = ({ type, size, weight, stroke, children }) => {
   const textType = type || "main-text";

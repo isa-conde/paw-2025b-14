@@ -1,4 +1,4 @@
-import styles from "../styles/Input.module.css"
+import styles from "../styles/components/Input.module.css"
 
 export const Input = ({   id,
                           name,

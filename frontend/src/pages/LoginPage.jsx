@@ -1,6 +1,6 @@
 import Text from "../components/Text.jsx";
-import FormLayout from "../components/FormLayout.jsx";
-import Form from "../components/Form.jsx"
+import { FormLayout } from "../components/FormLayout.jsx";
+import { Form } from "../components/Form.jsx"
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Input } from "../components/Input.jsx";

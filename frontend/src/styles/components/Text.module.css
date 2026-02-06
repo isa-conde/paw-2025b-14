@@ -1,4 +1,4 @@
-@import url('./variables.css');
+@import url('../variables.css');
 
 .title {
     font-family: var(--font-titles), serif;

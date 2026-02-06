@@ -1,0 +1,12 @@
+.link-btn {
+    font-family: var(--font-main) sans-serif;
+    color: var(--secondary-text);
+    font-size: var(--text-20);
+    font-weight: 600;
+    transition: 0.5s color;
+    margin: 20px 5% 0 5%;
+}
+
+.link-btn:hover {
+    color: var(--primary-button);
+}

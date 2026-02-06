@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Text } from "./Text.jsx";
-import styles from "../styles/Button.module.css";
+import styles from "../styles/components/Button.module.css";
 import starIcon from "../assets/roundedStarOn.png";
 
 export const Button = ({

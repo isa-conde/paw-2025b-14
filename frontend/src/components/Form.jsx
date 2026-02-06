@@ -1,4 +1,4 @@
-import styles from "../styles/Form.module.css"
+import styles from "../styles/components/Form.module.css"
 
 export const Form = ({ method, action, encType, children }) => {
     return (
