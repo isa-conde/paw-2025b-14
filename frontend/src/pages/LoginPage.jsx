@@ -1,22 +1,35 @@
-import Text from "../components/Text.jsx";
+import { Text } from "../components/Text.jsx";
 import { FormLayout } from "../components/FormLayout.jsx";
 import { Form } from "../components/Form.jsx"
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Input } from "../components/Input.jsx";
+import { Button } from "../components/Button.jsx"
+import { LinkButton } from "../components/LinkButton.jsx"
+import styles from "../styles/pages/LoginPage.module.css"
 
 export const LoginPage = () => {
     const { t } = useTranslation();
 
-    const [values, setValues] = useState({ email: "", password: "" });
-    const [errors, setErrors] = useState({});
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [submitError, setSubmitError] = useState(null);
+    const title = t("login.title");
+    const usernameLabel = t("login.username");
+    const passwordLabel = t("login.password");
+    const registerNowLabel = t("login.registerNow");
+    const forgotPasswordLabel = t("login.forgotPassword");
+
+    const registerRef = "/register"
+    const forgotPasswordRef = "/forgotPassword"
 
     return (
         <FormLayout pageTitle={t("login.title")}>
+            <Text type="title" size="l">{title}</Text>
             <Form method="post">
-                <Input id="username" label={t("login.username")}/>
+                <Input id="username" label={usernameLabel}/>
+                <Input id="password" label={passwordLabel}/>
+                <Input type="submit" label={title}/>
+                <div className={styles.linkBtnContainer}>
+                    <LinkButton href={registerRef} text={registerNowLabel}/>
+                    <LinkButton href={forgotPasswordRef} text={forgotPasswordLabel}/>
+                </div>
             </Form>
         </FormLayout>
     );

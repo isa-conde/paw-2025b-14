@@ -4,7 +4,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
-<c:url var="starUrl" value="/images/roundedStarOn.png"/>
+<c:url var="starUrl" value="/src/assets/roundedStarOn.png"/>
 <c:url var="commentUrl" value="/profile/${profile.id}/comment"/>
 
 <paw:layout user="${user}" pageTitle="${profile.username}" function="${openModal}">

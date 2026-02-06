@@ -20,7 +20,7 @@
 <c:set var="emptyClass" value="${fill == 'false'? 'empty' : ''}" />
 <c:set var="secondaryClass" value="${secondary == 'true'? 'secondary' : ''}"/>
 
-<c:url var="starUrl" value="/images/roundedStarOn.png"/>
+<c:url var="starUrl" value="/src/assets/roundedStarOn.png"/>
 
 <button class="btn ${imgClass} ${emptyClass} ${secondaryClass}"
         onclick="${onclick}"
