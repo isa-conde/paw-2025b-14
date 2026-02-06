@@ -1,0 +1,46 @@
+@import url('./variables.css');
+
+.label {
+    font-size: 24px;
+    color: var(--primary-text);
+    font-weight: 600;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.inline-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 150px;
+    gap: 20px;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.half-container {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+}
+
+.input {
+    background-color: var(--background-secondary);
+    border: 2px solid var(--secondary-details);
+    border-radius: 12px;
+    color: var(--primary-text);
+    font-family: var(--font-main), serif;
+    font-size: 20px;
+    padding: 10px;
+}
+
+.error {
+    color: var(--error);
+    font-size: var(--text-16);
+    font-weight: 600;
+    margin: 5px 0;
+}
