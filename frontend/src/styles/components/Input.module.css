@@ -44,3 +44,43 @@
     font-weight: 600;
     margin: 5px 0;
 }
+
+.submit-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.inline-input-container.submit-container {
+    flex: 0 0 auto;
+    width: auto;
+}
+
+.submit {
+    margin-top: 20px;
+    padding: 15px 30px;
+    font-size: var(--text-24);
+    font-weight: 600;
+}
+
+.btn-submit {
+    font-family: var(--font-main), serif;
+    border-radius: 15px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-top: 20px;
+    padding: 15px 30px;
+    font-size: var(--text-24);
+    font-weight: 600;
+}
+
+.btn-submit.secondary {
+    background-color: var(--secondary-details);
+    color: var(--secondary-text);
+}
+
+.btn-submit.secondary:hover {
+    background-color: var(--secondary-details-hover);
+}
