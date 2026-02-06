@@ -1,6 +1,6 @@
 import styles from "../styles/components/Text.module.css";
 
-export const Text = ({ type, size, weight, stroke, children }) => {
+export const AppText = ({ type, size, weight, stroke, children }) => {
   const textType = type || "main-text";
   const fontSize = size || "m";
   const fontWeight = weight || "bold";

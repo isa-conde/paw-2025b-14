@@ -1,4 +1,4 @@
-export default {
+{
     "Size": "El largo máximo es de {1} caracteres.",
     "Min": "Debe ser al menos {1}.",
     "home.welcome.title": "¿Estás listo?",
@@ -479,5 +479,5 @@ export default {
     "email.tournamentAbandoned.title": "El usuario {0} ha abandonado {1}",
     "email.tournamentAbandoned.body": "Alguien acaba de abandonar {0}. Si crees que es un error, puedes contactarle con el siguiente correo electrónico: {1}",
     "email.tournamentAbandoned.greeting": "Hola {0},",
-    "email.tournamentAbandoned.buttonLabel": "Ir al torneo",
+    "email.tournamentAbandoned.buttonLabel": "Ir al torneo"
 }

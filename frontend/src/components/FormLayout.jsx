@@ -1,5 +1,5 @@
 import React from "react";
-import { Helmet } from "react-helmet";
+import { Helmet } from "@dr.pogodin/react-helmet";
 import styles from "../styles/components/Form.module.css";
 
 export const FormLayout = ({ pageTitle, children }) => {

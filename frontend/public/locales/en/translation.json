@@ -1,4 +1,4 @@
-export default {
+{
     "Size": "Max size is {1} characters long.",
     "DateTimeFormat": "Date format must be {0}.",
     "Required": "Some fields were left empty.",
@@ -16,7 +16,7 @@ export default {
     "login.usarnameFormat": "Username must start with a letter and contain only letters, numbers, hyphens or underscores",
     "login.rememberMe": "Remember Me:",
     "login.registerNow": "Register now",
-    "login.ForgotPassword": "Forgot password?",
+    "login.forgotPassword": "Forgot password?",
     "login.invalidCredentials": "Invalid login credentials",
     "register.page.header": "Register",
     "register.page.title": "Register Page",
@@ -478,5 +478,5 @@ export default {
     "email.tournamentAbandoned.title": "The user {0} has abandoned {1}",
     "email.tournamentAbandoned.body": "Someone has just abandoned {0}. If you think this is a mistake, you can contact them with the following email: {1}",
     "email.tournamentAbandoned.greeting": "Hello {0},",
-    "email.tournamentAbandoned.buttonLabel": "Go to tournament",
+    "email.tournamentAbandoned.buttonLabel": "Go to tournament"
 }

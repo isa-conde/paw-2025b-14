@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Text } from "./Text.jsx";
+import { AppText } from "./AppText.jsx";
 import styles from "../styles/components/Button.module.css";
 import starIcon from "../assets/roundedStarOn.png";
 
@@ -46,13 +46,13 @@ export const Button = ({
                     alt=""
                 />
             )}
-            {hasText && <Text size={size}>{buttonText}</Text>}
+            {hasText && <AppText size={size}>{buttonText}</AppText>}
             {rating !== null && rating !== 0 && (
                 <div className={styles.ratingContainer}>
                     <img src={starIcon} className={styles.bannerStar} alt="" />
-                    <Text size="s" weight="thin">
+                    <AppText size="s" weight="thin">
                         {rating}
-                    </Text>
+                    </AppText>
                 </div>
             )}
         </button>

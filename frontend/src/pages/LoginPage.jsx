@@ -1,10 +1,9 @@
-import { Text } from "../components/Text.jsx";
 import { FormLayout } from "../components/FormLayout.jsx";
 import { Form } from "../components/Form.jsx"
 import { useTranslation } from "react-i18next";
 import { Input } from "../components/Input.jsx";
-import { Button } from "../components/Button.jsx"
 import { LinkButton } from "../components/LinkButton.jsx"
+import { AppText } from "../components/AppText.jsx";
 import styles from "../styles/pages/LoginPage.module.css"
 
 export const LoginPage = () => {
@@ -21,7 +20,7 @@ export const LoginPage = () => {
 
     return (
         <FormLayout pageTitle={t("login.title")}>
-            <Text type="title" size="l">{title}</Text>
+            <AppText type="title" size="l">{title}</AppText>
             <Form method="post">
                 <Input id="username" label={usernameLabel}/>
                 <Input id="password" label={passwordLabel}/>

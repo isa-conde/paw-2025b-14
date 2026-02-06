@@ -1,4 +1,5 @@
 import styles from "../styles/components/Input.module.css"
+import { AppText } from "./AppText.jsx";
 
 export const Input = ({   id,
                           name,
@@ -23,7 +24,7 @@ export const Input = ({   id,
             return (
                 <label htmlFor={id} className={`${styles.label} ${containerClass}`}>
                     {label && (
-                        <Text size="l" weight="semi-bold">{label}</Text>
+                        <AppText size="l" weight="semi-bold">{label}</AppText>
                     )}
                     <input
                         id={id}
