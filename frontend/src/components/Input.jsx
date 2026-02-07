@@ -39,6 +39,44 @@ export const Input = ({   id,
                     {error && <p className={styles.error}>{error}</p>}
                 </label>
             )
+        } else if(type === "email") {
+            return (
+                <label htmlFor={id} className={`${styles.label} ${containerClass}`}>
+                    {label && (
+                        <AppText size="l" weight="semi-bold">{label}</AppText>
+                    )}
+                    <input
+                        id={id}
+                        name={name ?? id}
+                        type="email"
+                        className={styles.input}
+                        value={value}
+                        placeholder={placeholder}
+                        disabled={disabled}
+                        onChange={onChange}
+                    />
+                    {error && <p className={styles.error}>{error}</p>}
+                </label>
+            )
+        } else if(type === "password") {
+            return (
+                <label htmlFor={id} className={`${styles.label} ${containerClass}`}>
+                    {label && (
+                        <AppText size="l" weight="semi-bold">{label}</AppText>
+                    )}
+                    <input
+                        id={id}
+                        name={name ?? id}
+                        type="password"
+                        className={styles.input}
+                        value={value}
+                        placeholder={placeholder}
+                        disabled={disabled}
+                        onChange={onChange}
+                    />
+                    {error && <p className={styles.error}>{error}</p>}
+                </label>
+            )
         }
     } else {
         const submitBtnClassName = [ styles.btn,
