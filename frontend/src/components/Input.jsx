@@ -14,9 +14,9 @@ export const Input = ({   id,
                           error,
                           onChange }) => {
     const containerClass = inline
-        ? styles.inlineContainer
+        ? styles["inline-container"]
         : containerType === "half"
-        ? styles.halfContainer
+        ? styles["half-container"]
         : styles.container
 
     if(type !== "submit") {
@@ -41,14 +41,15 @@ export const Input = ({   id,
             )
         }
     } else {
-        const submitBtnClassName = [ styles.btnSubmit,
+        const submitBtnClassName = [ styles.btn,
+            styles.submit,
             secondary
                 ? styles.secondary
                 : "",
         ].filter(Boolean).join(" ");
 
         return (
-            <div className={`${styles.inlineContainer} ${styles.submitContainer}`}>
+            <div className={`${styles["inline-container"]}} ${styles["submit-container"]}`}>
                 <input type="submit" className={submitBtnClassName} value={label}/>
             </div>
         );

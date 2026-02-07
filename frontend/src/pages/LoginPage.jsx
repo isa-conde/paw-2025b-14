@@ -25,7 +25,7 @@ export const LoginPage = () => {
                 <Input id="username" label={usernameLabel}/>
                 <Input id="password" label={passwordLabel}/>
                 <Input type="submit" label={title}/>
-                <div className={styles.linkBtnContainer}>
+                <div className={styles["link-btn-container"]}>
                     <LinkButton href={registerRef} text={registerNowLabel}/>
                     <LinkButton href={forgotPasswordRef} text={forgotPasswordLabel}/>
                 </div>

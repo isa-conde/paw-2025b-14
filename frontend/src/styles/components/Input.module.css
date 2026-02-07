@@ -64,23 +64,38 @@
     font-weight: 600;
 }
 
-.btn-submit {
+.btn {
     font-family: var(--font-main), serif;
     border-radius: 15px;
     border: none;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--primary-button);
+    color: var(--primary-text);
+    padding: 8px 30px;
+    max-width: 350px;
+}
+
+.btn:hover:not(:disabled) {
+    background-color: var(--primary-button-hover);
+}
+
+.submit {
     margin-top: 20px;
     padding: 15px 30px;
     font-size: var(--text-24);
     font-weight: 600;
 }
 
-.btn-submit.secondary {
+.btn.secondary {
     background-color: var(--secondary-details);
     color: var(--secondary-text);
 }
 
-.btn-submit.secondary:hover {
+.btn.secondary:hover {
     background-color: var(--secondary-details-hover);
 }

@@ -1,0 +1,8 @@
+.link-btn-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.link-btn-container.single {
+    text-align: center;
+}
