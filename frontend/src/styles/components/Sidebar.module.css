@@ -1,0 +1,17 @@
+.sidebar {
+    height: 100%;
+    width: 110px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: var(--background-secondary);
+    border: var(--background);
+    border-width: 5px;
+    overflow-x: hidden;
+    padding-top: 20px;
+    grid-area: sidebar;
+}
+
+.sidebar-content {
+    margin: 70px 1px;
+}

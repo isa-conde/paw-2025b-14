@@ -1,0 +1,20 @@
+.container {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+            "sidebar header"
+            "sidebar content";
+    min-height: 100vh;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 10px; /* espacio entre botones */
+    align-items: center; /* opcional, centra vertical */
+}
+
+.main-content {
+    overflow-y: auto;
+    grid-area: content;
+}

@@ -4,20 +4,19 @@ import { LoginPage } from './pages/LoginPage.jsx'
 import { RegisterPage } from "./pages/RegisterPage.jsx";
 import { ForgotPasswordPage } from "./pages/ForgotPasswordPage.jsx";
 import { RequestPasswordResetPage } from "./pages/RequestPasswordResetPage.jsx";
-import {ResetPasswordPage} from "./pages/ResetPasswordPage.jsx";
-import {ResetPasswordSuccessPage} from "./pages/ResetPasswordSuccessPage.jsx";
+import { ResetPasswordPage } from "./pages/ResetPasswordPage.jsx";
+import { ResetPasswordSuccessPage } from "./pages/ResetPasswordSuccessPage.jsx";
+import { HomePage } from "./pages/HomePage.jsx";
 
 const App = () => (
     <Routes>
-        <Route path="/" element={<LoginPage />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgotPassword" element={<ForgotPasswordPage />} />
         <Route path="/requestPasswordReset" element={<RequestPasswordResetPage />} />
         <Route path="/resetPassword" element={<ResetPasswordPage />} />
         <Route path="/resetPasswordSuccess" element={<ResetPasswordSuccessPage />} />
-        <Route path="/tournaments/:tournamentId" element={<TournamentPage />} />
-        <Route path="*" element={<Navigate to="/tournaments/1" replace />} />
     </Routes>
 );
 

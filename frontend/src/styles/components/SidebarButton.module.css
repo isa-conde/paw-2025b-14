@@ -1,0 +1,38 @@
+.sidebar-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 20px 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    transition: background-color 0.2s ease;
+}
+
+.sidebar-button:hover {
+    background-color: var(--secondary-details);
+}
+
+.sidebar-button.active {
+    background-color: var(--background-card);
+}
+
+.sidebar-button.active .sidebar-text {
+    color: var(--primary-text);
+}
+
+.sidebar-text {
+    font-size: var(--text-15);
+    font-weight: 500;
+    color: var(--secondary-text);
+    padding: 15px 0;
+}
+
+.sidebar-icon {
+    width: 45px;
+    height: auto;
+}
