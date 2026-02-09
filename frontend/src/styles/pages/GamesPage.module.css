@@ -1,0 +1,15 @@
+.content-container {
+    margin: 50px 190px;
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.pagination {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
