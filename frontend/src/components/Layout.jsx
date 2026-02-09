@@ -32,7 +32,7 @@ export const Layout = ({ pageTitle, func, children }) => {
                 <title>{pageTitle ? `RankUp - ${pageTitle}` : "RankUp"}</title>
             </Helmet>
             <body>
-                <div>
+                <div className={styles.container}>
                     <Sidebar/>
                     <Header>
                         <SearchBar/>
@@ -42,7 +42,7 @@ export const Layout = ({ pageTitle, func, children }) => {
                                 <LogoutButton/>
                             </div>
                         ) : (
-                            <div>
+                            <div className={styles["header-buttons"]}>
                                 <Button text={loginLabel} size="m" onClick={handleRedirect(loginUrl)}/>
                                 <Button text={registerLabel} size="m" onClick={handleRedirect(registerUrl)}/>
                             </div>

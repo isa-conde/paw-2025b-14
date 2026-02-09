@@ -1,7 +1,12 @@
 import styles from "../styles/components/SearchBar.module.css"
+import {useTranslation} from "react-i18next";
 
 export const SearchBar = () => {
-    const searchPng = "/assets/search.png"
+    const { t } = useTranslation();
+
+    const searchBarPlaceholder = t("searchBar.placeHolder");
+
+    const searchPng = "../assets/search.png"
 
     return (
         <form method="get">
