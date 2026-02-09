@@ -38,6 +38,20 @@ export const GamesPage = () => {
                                 <AppText size="l" weight="thin"> > </AppText>
                             </PaginationLink>
                         }
+                        {[...Array(totalPages)].map((_, i) => (
+                            i === currentPage ? (
+                                <AppText weight="bold" size="xl">{i + 1}</AppText>
+                            ) : (
+                                <PaginationLink page={i} url={gamesPageUrl}>
+                                    <AppText weight="thin" size="l">{i + 1}</AppText>
+                                </PaginationLink>
+                            )
+                        ))}
+                        {currentPage < totalPages - 1 &&
+                            <PaginationLink page={currentPage + 1} url={gamesPageUrl}>
+                                <AppText size="l" weight="thin"> > </AppText>
+                            </PaginationLink>
+                        }
                     </div>
                 }
             </div>
