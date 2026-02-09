@@ -1,0 +1,46 @@
+.card {
+    background-color: var(--background-card);
+    border-radius: 15px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-width: 500px;
+    position: relative;
+}
+
+.card-content-container {
+    display: flex;
+    gap: 50px;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.card-title{
+    width: 60%;
+    margin: 0;
+    padding: 30px;
+}
+
+.card-text{
+    width: 80%;
+    margin: 0;
+    padding: 0 0 0 30px;
+}
+
+.card-button-container {
+    justify-self: flex-start;
+    bottom: 20px;
+    left: 20px;
+    padding: 30px;
+}
+
+.card .card-icon {
+    margin-right: 50px;
+}
+
+.card .card-icon img {
+    height: 300px;
+    width: auto;
+    display: block;
+}

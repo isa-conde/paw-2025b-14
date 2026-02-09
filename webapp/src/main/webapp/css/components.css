@@ -642,15 +642,6 @@ button:disabled {
 
 /* ------- CLICKABLE CARDS ------- */
 
-a.element-card {
-    text-decoration: none;
-    color: inherit;
-}
-
-a.element-card:hover {
-    text-decoration: none;
-}
-
 .element-card-image {
     width: 100%;
     min-height: 250px;
