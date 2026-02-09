@@ -36,19 +36,19 @@ export const Carrousel = ({ elements, isGame = false, isUserProfile = false, isT
     return (
     <div className={styles.container}>
         <button className={`${styles.arrow} ${styles["arrow-left"]}`} onClick={() => moveCarrousel(Direction.LEFT)}>
-            <img src={arrowImage} alt="Previous" className={`${styles["arrow-icon"]} ${styles["arrow-left"]}`}/>
+            <img src={arrowImage} alt="Previous" className={styles["arrow-icon"]}/>
         </button>
 
         <div className={styles.carrousel} ref={carrouselRef}>
             <div className={styles.track}>
-                {elements.map((element) => {
+                {elements.map((element, index) => {
                     if(isUserProfile) {
                         return <ProfileCard isUser={true}/>;
                     } else if(isTeamProfile) {
                         return <ProfileCard isTeam={true}/>;
                     } else {
                         return (
-                            <div className={styles["carrousel-item"]}>
+                            <div className={styles.item}>
                                 <ElementCard
                                     image={defaultElementImage}
                                     title={element.name}
