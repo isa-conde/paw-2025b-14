@@ -83,7 +83,55 @@ export const Input = ({   id,
                 </label>
             )
         } else if(type === "select") {
+            const mapEntries = itemMap instanceof Map
+                ? Array.from(itemMap.entries())
+                : Object.entries(itemMap ?? {})
 
+            return (
+                <label htmlFor={id} className={`${styles.label} ${containerClass}`}>
+                    {label && (
+                        <AppText size="l" weight="semi-bold">{label}</AppText>
+                    )}
+                    <select
+                        id={id}
+                        name={name ?? id}
+                        className={styles.input}
+                        value={value}
+                        disabled={disabled}
+                        onChange={onChange}
+                    >
+                        {emptyOption != null && <option value="">{emptyOption}</option>}
+
+                        {(itemLabel != null && itemValue != null) && items?.map((item) => (
+                            <option key={`${item[itemValue]}`} value={item[itemValue]}>
+                                {item[itemLabel]}
+                            </option>
+                        ))}
+
+                        {(itemLabel == null || itemValue == null) && itemMap != null && mapEntries.map(([key, optionLabel]) => (
+                            <option key={`${key}`} value={key}>
+                                {optionLabel}
+                            </option>
+                        ))}
+
+                        {(itemLabel == null || itemValue == null) && itemMap == null && items?.map((item) => (
+                            <option key={`${item}`} value={item}>
+                                {item}
+                            </option>
+                        ))}
+                    </select>
+                    {error && <p className={styles.error}>{error}</p>}
+                </label>
+            )
+        } else if(type === "date") {
+            return(
+                <label htmlFor={id} className={`${styles.label} ${containerClass}`}>
+                    {label && (
+                        <AppText size="l" weight="semi-bold">{label}</AppText>
+                    )}
+                    <input id={id} name={name ?? id} type="date" className={styles.input}/>
+                </label>
+            );
         }
     } else {
         const submitBtnClassName = [ styles.btn,
