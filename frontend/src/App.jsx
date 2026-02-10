@@ -8,6 +8,7 @@ import { ResetPasswordPage } from "./pages/ResetPasswordPage.jsx";
 import { ResetPasswordSuccessPage } from "./pages/ResetPasswordSuccessPage.jsx";
 import { HomePage } from "./pages/HomePage.jsx";
 import { GamesPage } from "./pages/GamesPage.jsx";
+import { TournamentsPage } from "./pages/TournamentsPage.jsx";
 
 const App = () => (
     <Routes>
@@ -19,6 +20,7 @@ const App = () => (
         <Route path="/resetPassword" element={<ResetPasswordPage />} />
         <Route path="/resetPasswordSuccess" element={<ResetPasswordSuccessPage />} />
         <Route path="/gamesPage" element={<GamesPage />} />
+        <Route path="/tournamentsPage" element={<TournamentsPage />} />
     </Routes>
 );
 

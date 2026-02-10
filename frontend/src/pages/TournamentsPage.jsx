@@ -10,13 +10,78 @@ import {RefreshButton} from "../components/RefreshButton.jsx";
 import {ElementsGrid} from "../components/ElementsGrid.jsx";
 import {Carrousel} from "../components/Carrousel.jsx";
 import {Pagination} from "../components/Pagination.jsx";
+import {useState} from "react";
 
 export const TournamentsPage = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const [ isFiltered, setIsFiltered ] = useState(false);
+
+    const playersPerTeamOptions = [1, 2, 3, 4, 5];
+
+    const hardcodedGames = [
+        { id: 1, name: "League of Legends" },
+        { id: 2, name: "Valorant" },
+        { id: 3, name: "Counter-Strike" },
+        { id: 4, name: "Dota 2" },
+        { id: 5, name: "Overwatch" },
+    ];
+
+    const hardcodedRegions = ["NA", "LAS", "LAN", "BR", "EUW", "EUNE", "OCE", "ASIA"];
+    const hardcodedElos = {
+        LOW: t("elo.LOW"),
+        MID: t("elo.MID"),
+        HIGH: t("elo.HIGH"),
+        FREE: t("elo.FREE"),
+    };
+    const hardcodedGenres = ["MOBA", "FPS", "Fighting", "TPS", "BattleRoyale", "RTS", "Sports", "DGC", "MOBILE"];
+
+    const hardcodedGameTournaments = [
+        {
+            game: hardcodedGames[0],
+            tournaments: [
+                { id: 101, name: "LoL Tournament 1" },
+                { id: 102, name: "LoL Tournament 2" },
+                { id: 103, name: "LoL Tournament 3" },
+            ],
+        },
+        {
+            game: hardcodedGames[1],
+            tournaments: [
+                { id: 201, name: "Valorant Tournament 1" },
+                { id: 202, name: "Valorant Tournament 2" },
+            ],
+        },
+        {
+            game: hardcodedGames[2],
+            tournaments: [
+                { id: 301, name: "CS:GO Tournament 1" },
+                { id: 302, name: "CS:GO Tournament 2" },
+                { id: 303, name: "CS:GO Tournament 3" },
+            ],
+        },
+        {
+            game: hardcodedGames[3],
+            tournaments: [
+                { id: 401, name: "Dota 2 Tournament 1" },
+                { id: 402, name: "Dota 2 Tournament 2" },
+            ],
+        },
+        {
+            game: hardcodedGames[4],
+            tournaments: [
+                { id: 501, name: "Overwatch Tournament 1" },
+            ],
+        },
+    ];
 
     const handleNavigate = (url) => {
         navigate(url);
+    };
+
+    const handleFilterSubmit = (event) => {
+        event.preventDefault();
+        setIsFiltered(true);
     };
 
     const createTournamentUrl = "/tournaments/new/step1";
@@ -54,17 +119,16 @@ export const TournamentsPage = () => {
                     <Button onClick={() => handleNavigate(createTournamentUrl)} text={createTournamentLabel} size="l"/>
                     <Button onClick={() => handleNavigate(createTeamUrl)} text={createTeamLabel} size="l"/>
                 </div>
-                <form className={styles.form} method="get">
+                <form className={styles.form} method="get" onSubmit={handleFilterSubmit}>
                     <div className={styles["filter-container"]}>
                         <div className={styles["filter-container"]}>
-                            <Input id="gameId" name="gameId" label={gameLabel} type="select" items={} itemValue="id" itemLabel="name" emptyOption={allGames} inline={true}/>
-                            <Input id="region" name="region" label={regionLabel} type="select" items={} emptyOption={allRegions} inline={true}/>
-                            <Input id="elo" name="elo" label={eloLabel} type="select" items={} itemMap={} emptyOption={allLevels} inline={true}/>
-                            <Input id="genre" name="genre" label={genreLabel} type="select" items={} emptyOption={allGenres} inline={true}/>
+                            <Input id="gameId" name="gameId" label={gameLabel} type="select" items={hardcodedGames} itemValue="id" itemLabel="name" emptyOption={allGames} inline={true}/>
+                            <Input id="region" name="region" label={regionLabel} type="select" items={hardcodedRegions} emptyOption={allRegions} inline={true}/>
+                            <Input id="elo" name="elo" label={eloLabel} type="select" itemMap={hardcodedElos} emptyOption={allLevels} inline={true}/>
+                            <Input id="genre" name="genre" label={genreLabel} type="select" items={hardcodedGenres} emptyOption={allGenres} inline={true}/>
                         </div>
                         <div className={styles["filter-container"]}>
-                            <Input id="playersPerTeam" name="playersPerTeam" label={playersPerTeamLabel} type="select" items={} emptyOption={allSizes} inline={true}/>
-                            <Input id="startDate" name="startDate" label={startDateLabel} type="date" inline={true}/>
+                            <Input id="playersPerTeam" name="playersPerTeam" label={playersPerTeamLabel} type="select" items={playersPerTeamOptions} emptyOption={allSizes} inline={true}/>                            <Input id="startDate" name="startDate" label={startDateLabel} type="date" inline={true}/>
                             <Input id="endDate" name="endDate" label={endDateLabel} type="date" inline={true}/>
                             <Input label={filterLabel} type="submit" inline={true}/>
                             <RefreshButton disabled={!isFiltered}/>
@@ -75,44 +139,7 @@ export const TournamentsPage = () => {
                 {isFiltered ?
                     <ElementsGrid elements={} id="tournaments-grid" headerElements={}/>
                     :
-                    [
-                        {
-                            game: { id: 1, name: "League of Legends" },
-                            tournaments: [
-                                { id: 101, name: "LoL Tournament 1" },
-                                { id: 102, name: "LoL Tournament 2" },
-                                { id: 103, name: "LoL Tournament 3" },
-                            ],
-                        },
-                        {
-                            game: { id: 2, name: "Valorant" },
-                            tournaments: [
-                                { id: 201, name: "Valorant Tournament 1" },
-                                { id: 202, name: "Valorant Tournament 2" },
-                            ],
-                        },
-                        {
-                            game: { id: 3, name: "Counter-Strike" },
-                            tournaments: [
-                                { id: 301, name: "CS:GO Tournament 1" },
-                                { id: 302, name: "CS:GO Tournament 2" },
-                                { id: 303, name: "CS:GO Tournament 3" },
-                            ],
-                        },
-                        {
-                            game: { id: 4, name: "Dota 2" },
-                            tournaments: [
-                                { id: 401, name: "Dota 2 Tournament 1" },
-                                { id: 402, name: "Dota 2 Tournament 2" },
-                            ],
-                        },
-                        {
-                            game: { id: 5, name: "Overwatch" },
-                            tournaments: [
-                                { id: 501, name: "Overwatch Tournament 1" },
-                            ],
-                        },
-                    ].map(({game, tournaments}) => (
+                    hardcodedGameTournaments.map(({game, tournaments}) => (
                         tournaments.length > 0 && (
                             <div key={game.id}>
                                 <div className={styles["carrousel-title"]}>
