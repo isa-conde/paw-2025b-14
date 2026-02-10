@@ -6,6 +6,11 @@ export const Input = ({   id,
                           label,
                           type = "input",
                           containerType,
+                          items,
+                          itemMap,
+                          itemValue,
+                          itemLabel,
+                          emptyOption,
                           inline,
                           value,
                           disabled,
@@ -77,6 +82,8 @@ export const Input = ({   id,
                     {error && <p className={styles.error}>{error}</p>}
                 </label>
             )
+        } else if(type === "select") {
+
         }
     } else {
         const submitBtnClassName = [ styles.btn,

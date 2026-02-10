@@ -9,7 +9,7 @@
 <%@ attribute name="containerType" required="false"%>
 <%@ attribute name="inputType" required="false"%>
 <%@ attribute name="items" type="java.util.List" required="false"%>
-<%@attribute name="itemMap" type="java.util.LinkedHashMap" required="false" %>
+<%@ attribute name="itemMap" type="java.util.LinkedHashMap" required="false" %>
 <%@ attribute name="itemValue" required="false"%>
 <%@ attribute name="itemLabel" required="false"%>
 <%@ attribute name="emptyOption" required="false"%>
