@@ -8,6 +8,8 @@ import {Button} from "../components/Button.jsx";
 import {Input} from "../components/Input.jsx";
 import {RefreshButton} from "../components/RefreshButton.jsx";
 import {ElementsGrid} from "../components/ElementsGrid.jsx";
+import {Carrousel} from "../components/Carrousel.jsx";
+import {Pagination} from "../components/Pagination.jsx";
 
 export const TournamentsPage = () => {
     const { t } = useTranslation();
@@ -19,6 +21,7 @@ export const TournamentsPage = () => {
 
     const createTournamentUrl = "/tournaments/new/step1";
     const createTeamUrl = "/team/create";
+    const tournamentsPageUrl = "/tournamentsPage"
 
     const tournamentImage = "/assets/tournament.jpeg"
 
@@ -72,10 +75,57 @@ export const TournamentsPage = () => {
                 {isFiltered ?
                     <ElementsGrid elements={} id="tournaments-grid" headerElements={}/>
                     :
-
+                    [
+                        {
+                            game: { id: 1, name: "League of Legends" },
+                            tournaments: [
+                                { id: 101, name: "LoL Tournament 1" },
+                                { id: 102, name: "LoL Tournament 2" },
+                                { id: 103, name: "LoL Tournament 3" },
+                            ],
+                        },
+                        {
+                            game: { id: 2, name: "Valorant" },
+                            tournaments: [
+                                { id: 201, name: "Valorant Tournament 1" },
+                                { id: 202, name: "Valorant Tournament 2" },
+                            ],
+                        },
+                        {
+                            game: { id: 3, name: "Counter-Strike" },
+                            tournaments: [
+                                { id: 301, name: "CS:GO Tournament 1" },
+                                { id: 302, name: "CS:GO Tournament 2" },
+                                { id: 303, name: "CS:GO Tournament 3" },
+                            ],
+                        },
+                        {
+                            game: { id: 4, name: "Dota 2" },
+                            tournaments: [
+                                { id: 401, name: "Dota 2 Tournament 1" },
+                                { id: 402, name: "Dota 2 Tournament 2" },
+                            ],
+                        },
+                        {
+                            game: { id: 5, name: "Overwatch" },
+                            tournaments: [
+                                { id: 501, name: "Overwatch Tournament 1" },
+                            ],
+                        },
+                    ].map(({game, tournaments}) => (
+                        tournaments.length > 0 && (
+                            <div key={game.id}>
+                                <div className={styles["carrousel-title"]}>
+                                    <a href={`/tournamentsPage?gameId=${game.id}`} className={styles["title-link"]}>
+                                        <AppText type="title" size="s">{game.name}</AppText>
+                                    </a>
+                                </div>
+                                <Carrousel id={`game-${game.id}-tournaments`} elements={tournaments}/>
+                            </div>
+                        )
+                    ))
                 }
-
-
+                <Pagination currentPage={currentPage} totalPages={totalPages} url={tournamentsPageUrl}/>
             </div>
         </Layout>
     );

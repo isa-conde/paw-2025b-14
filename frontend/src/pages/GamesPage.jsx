@@ -4,7 +4,7 @@ import {useTranslation} from "react-i18next";
 import {Banner} from "../components/Banner.jsx";
 import {AppText} from "../components/AppText.jsx";
 import {ElementsGrid} from "../components/ElementsGrid.jsx";
-import {PaginationLink} from "../components/PaginationLink.jsx";
+import {Pagination} from "../components/Pagination.jsx";
 
 export const GamesPage = () => {
     const { t } = useTranslation();
@@ -50,32 +50,11 @@ export const GamesPage = () => {
             <div className={styles["content-container"]}>
                 <ElementsGrid elements={pagedGames} id="games-grid" isGame={true}/>
             </div>
-
-            <div className={styles["pagination-container"]}>
-                {totalPages > 1 &&
-                    <div className={styles.pagination}>
-                        {currentPage > 0 &&
-                            <PaginationLink page={currentPage - 1} url={gamesPageUrl}>
-                                <AppText size="l" weight="thin"> &lt; </AppText>
-                            </PaginationLink>
-                        }
-                        {[...Array(totalPages)].map((_, i) => (
-                            i === currentPage ? (
-                                <AppText weight="bold" size="xl">{i + 1}</AppText>
-                            ) : (
-                                <PaginationLink page={i} url={gamesPageUrl}>
-                                    <AppText weight="thin" size="l">{i + 1}</AppText>
-                                </PaginationLink>
-                            )
-                        ))}
-                        {currentPage < totalPages - 1 &&
-                            <PaginationLink page={currentPage + 1} url={gamesPageUrl}>
-                                <AppText size="l" weight="thin"> &gt; </AppText>
-                            </PaginationLink>
-                        }
-                    </div>
-                }
-            </div>
+            <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                url={gamesPageUrl}
+            />
         </Layout>
     );
 }
