@@ -18,7 +18,7 @@ export const Sidebar = ({ user }) => {
     const myTourneysLabel = t("sidebar.myTourneys");
 
     const indexPath = "/";
-    const gamesPath = "/games";
+    const gamesPath = "/gamesPage";
     const tournamentsPath = "/tournaments";
     const profilePath = "/profile"
 
