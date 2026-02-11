@@ -19,7 +19,7 @@ export const Sidebar = ({ user }) => {
 
     const indexPath = "/";
     const gamesPath = "/gamesPage";
-    const tournamentsPath = "/tournaments";
+    const tournamentsPath = "/tournamentsPage";
     const profilePath = "/profile"
 
     const indexEnum = {

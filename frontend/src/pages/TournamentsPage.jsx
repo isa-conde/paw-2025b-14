@@ -75,6 +75,27 @@ export const TournamentsPage = () => {
         },
     ];
 
+    const hardcodedTournaments = hardcodedGameTournaments.flatMap(({ game, tournaments }) =>
+        tournaments.map((tournament) => ({
+            ...tournament,
+            gameId: game.id,
+        })),
+    );
+
+    const pageSize = 6;
+    const totalPages = Math.max(1, Math.ceil(hardcodedTournaments.length / pageSize));
+    const currentPageParam = Number.parseInt(
+        new URLSearchParams(window.location.search).get("page") ?? "0",
+        10,
+    );
+    const currentPage = Number.isNaN(currentPageParam)
+        ? 0
+        : Math.min(Math.max(currentPageParam, 0), totalPages - 1);
+    const pagedTournaments = hardcodedTournaments.slice(
+        currentPage * pageSize,
+        currentPage * pageSize + pageSize,
+    );
+
     const handleNavigate = (url) => {
         navigate(url);
     };
@@ -137,7 +158,7 @@ export const TournamentsPage = () => {
                 </form>
 
                 {isFiltered ?
-                    <ElementsGrid elements={} id="tournaments-grid" headerElements={}/>
+                    <ElementsGrid elements={pagedTournaments} id="tournaments-grid" headerElements={hardcodedGames}/>
                     :
                     hardcodedGameTournaments.map(({game, tournaments}) => (
                         tournaments.length > 0 && (
