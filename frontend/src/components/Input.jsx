@@ -129,7 +129,15 @@ export const Input = ({   id,
                     {label && (
                         <AppText size="l" weight="semi-bold">{label}</AppText>
                     )}
-                    <input id={id} name={name ?? id} type="date" className={styles.input}/>
+                    <input
+                        id={id}
+                        name={name ?? id}
+                        type="date"
+                        className={styles.input}
+                        value={value}
+                        disabled={disabled}
+                        onChange={onChange}
+                    />
                 </label>
             );
         }
@@ -142,7 +150,7 @@ export const Input = ({   id,
         ].filter(Boolean).join(" ");
 
         return (
-            <div className={`${styles["inline-container"]}} ${styles["submit-container"]}`}>
+            <div className={`${styles["inline-container"]} ${styles["submit-container"]}`}>
                 <input type="submit" className={submitBtnClassName} value={label}/>
             </div>
         );

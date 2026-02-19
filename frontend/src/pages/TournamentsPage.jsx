@@ -10,12 +10,26 @@ import {RefreshButton} from "../components/RefreshButton.jsx";
 import {ElementsGrid} from "../components/ElementsGrid.jsx";
 import {Carrousel} from "../components/Carrousel.jsx";
 import {Pagination} from "../components/Pagination.jsx";
-import {useState} from "react";
+import {useMemo, useState} from "react";
 
 export const TournamentsPage = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const [ isFiltered, setIsFiltered ] = useState(false);
+    const [isFiltered, setIsFiltered] = useState(false);
+    const [filterValues, setFilterValues] = useState({
+        gameId: "",
+        region: "",
+        elo: "",
+        genre: "",
+        playersPerTeam: "",
+        startDate: "",
+        endDate: "",
+    });
+
+    const hasAppliedFilters = useMemo(
+        () => Object.values(filterValues).some((value) => value !== ""),
+        [filterValues],
+    );
 
     const playersPerTeamOptions = [1, 2, 3, 4, 5];
 
@@ -102,8 +116,16 @@ export const TournamentsPage = () => {
 
     const handleFilterSubmit = (event) => {
         event.preventDefault();
-        setIsFiltered(true);
+        setIsFiltered(hasAppliedFilters);
     };
+
+    const handleFilterChange = (event) => {
+        const {name, value} = event.target;
+        setFilterValues((currentValues) => ({
+            ...currentValues,
+            [name]: value,
+        }));
+    }
 
     const createTournamentUrl = "/tournaments/new/step1";
     const createTeamUrl = "/team/create";
@@ -142,18 +164,85 @@ export const TournamentsPage = () => {
                 </div>
                 <form className={styles.form} method="get" onSubmit={handleFilterSubmit}>
                     <div className={styles["filter-container"]}>
-                        <div className={styles["filter-container"]}>
-                            <Input id="gameId" name="gameId" label={gameLabel} type="select" items={hardcodedGames} itemValue="id" itemLabel="name" emptyOption={allGames} inline={true}/>
-                            <Input id="region" name="region" label={regionLabel} type="select" items={hardcodedRegions} emptyOption={allRegions} inline={true}/>
-                            <Input id="elo" name="elo" label={eloLabel} type="select" itemMap={hardcodedElos} emptyOption={allLevels} inline={true}/>
-                            <Input id="genre" name="genre" label={genreLabel} type="select" items={hardcodedGenres} emptyOption={allGenres} inline={true}/>
-                        </div>
-                        <div className={styles["filter-container"]}>
-                            <Input id="playersPerTeam" name="playersPerTeam" label={playersPerTeamLabel} type="select" items={playersPerTeamOptions} emptyOption={allSizes} inline={true}/>                            <Input id="startDate" name="startDate" label={startDateLabel} type="date" inline={true}/>
-                            <Input id="endDate" name="endDate" label={endDateLabel} type="date" inline={true}/>
-                            <Input label={filterLabel} type="submit" inline={true}/>
-                            <RefreshButton disabled={!isFiltered}/>
-                        </div>
+                        <Input
+                            id="gameId"
+                            name="gameId"
+                            label={gameLabel}
+                            type="select"
+                            items={hardcodedGames}
+                            itemValue="id"
+                            itemLabel="name"
+                            emptyOption={allGames}
+                            inline={true}
+                            value={filterValues.gameId}
+                            onChange={handleFilterChange}
+                        />
+                        <Input
+                            id="region"
+                            name="region"
+                            label={regionLabel}
+                            type="select"
+                            items={hardcodedRegions}
+                            emptyOption={allRegions}
+                            inline={true}
+                            value={filterValues.region}
+                            onChange={handleFilterChange}
+                        />
+                        <Input
+                            id="elo"
+                            name="elo"
+                            label={eloLabel}
+                            type="select"
+                            itemMap={hardcodedElos}
+                            emptyOption={allLevels}
+                            inline={true}
+                            value={filterValues.elo}
+                            onChange={handleFilterChange}
+                        />
+                        <Input
+                            id="genre"
+                            name="genre"
+                            label={genreLabel}
+                            type="select"
+                            items={hardcodedGenres}
+                            emptyOption={allGenres}
+                            inline={true}
+                            value={filterValues.genre}
+                            onChange={handleFilterChange}
+                        />
+                    </div>
+                    <div className={styles["filter-container"]}>
+                        <Input
+                            id="playersPerTeam"
+                            name="playersPerTeam"
+                            label={playersPerTeamLabel}
+                            type="select"
+                            items={playersPerTeamOptions}
+                            emptyOption={allSizes}
+                            inline={true}
+                            value={filterValues.playersPerTeam}
+                            onChange={handleFilterChange}
+                        />
+                        <Input
+                            id="startDate"
+                            name="startDate"
+                            label={startDateLabel}
+                            type="date"
+                            inline={true}
+                            value={filterValues.startDate}
+                            onChange={handleFilterChange}
+                        />
+                        <Input
+                            id="endDate"
+                            name="endDate"
+                            label={endDateLabel}
+                            type="date"
+                            inline={true}
+                            value={filterValues.endDate}
+                            onChange={handleFilterChange}
+                        />
+                        <Input label={filterLabel} type="submit" inline={true}/>
+                        <RefreshButton disabled={!hasAppliedFilters}/>
                     </div>
                 </form>
 

@@ -52,7 +52,7 @@
     width: 100%;
 }
 
-.inline-input-container.submit-container {
+.inline-container.submit-container {
     flex: 0 0 auto;
     width: auto;
 }
@@ -98,4 +98,9 @@
 
 .btn.secondary:hover {
     background-color: var(--secondary-details-hover);
+}
+
+.input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 1;
 }

@@ -7,6 +7,14 @@ export const RefreshButton = ({ disabled = false }) => {
 
     const buttonClass = [ styles.btn, styles.submit, disabled ? "disabled" : "" ].filter(Boolean).join(" ");
 
+    if (disabled) {
+        return (
+            <button type="button" className={buttonClass} disabled>
+                <img src={refreshButtonImage} alt="Refresh"/>
+            </button>
+        );
+    }
+
     return (
         <a href={tournamentsPageUrl}>
             <button type="button" className={buttonClass}>
