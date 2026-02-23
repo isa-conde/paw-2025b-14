@@ -8,5 +8,5 @@ export const AppText = ({ type, size, weight, stroke, children }) => {
 
   const className = `${styles[textType]} ${styles[fontSize]} ${styles[fontWeight]} ${strokeClass}`;
 
-  return <p className={className}>{children}</p>;
+  return <p className={className}> {children} </p>;
 };
