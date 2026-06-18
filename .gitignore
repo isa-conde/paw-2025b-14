@@ -68,7 +68,6 @@ jwt.key
 
 # Frontend build output
 /frontend/build/
-/frontend/build/*
 
 # Node installed by frontend-maven-plugin
 /frontend/node/
