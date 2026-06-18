@@ -66,3 +66,17 @@ tmp/
 **/out/
 jwt.key
 
+# Frontend build output
+/frontend/build/
+
+# Node installed by frontend-maven-plugin
+/frontend/node/
+
+# JS dependencies
+/frontend/node_modules/
+
+# Accidental npm files at repo root
+/package-lock.json
+/node_modules/
+
+script

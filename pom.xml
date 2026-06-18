@@ -262,12 +262,12 @@
   </dependencyManagement>
 
   <modules>
-    <module>webapp</module>
+    <module>frontend</module>
     <module>model</module>
     <module>interfaces</module>
     <module>services</module>
     <module>persistence</module>
-    <module>frontend</module>
+    <module>webapp</module>
   </modules>
 
   <build>
