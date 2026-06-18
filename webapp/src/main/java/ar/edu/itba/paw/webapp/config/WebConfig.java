@@ -52,6 +52,7 @@ import javax.persistence.EntityManagerFactory;
 @EnableScheduling
 @ComponentScan({
         "ar.edu.itba.paw.webapp.controller",
+        "ar.edu.itba.paw.webapp.restcontrollers",
         "ar.edu.itba.paw.webapp.config",
         "ar.edu.itba.paw.services",
         "ar.edu.itba.paw.persistence"

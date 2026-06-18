@@ -51,7 +51,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Path("tournaments")
-@Component
+@Component("tournamentRestController")
 public class TournamentController {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(TournamentController.class);

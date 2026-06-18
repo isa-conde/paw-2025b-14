@@ -12,10 +12,7 @@ import ar.edu.itba.paw.webapp.dto.params.SearchNameParams;
 import ar.edu.itba.paw.webapp.dto.params.UserIdParams;
 import ar.edu.itba.paw.webapp.dto.requests.CreateTeamRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.HandlerMapping;
 
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -29,7 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Path("teams")
-@Component
+@Component("teamRestController")
 public class TeamController {
 
     @Autowired
@@ -37,9 +34,6 @@ public class TeamController {
 
     @Context
     private UriInfo uriInfo;
-    @Qualifier("resourceHandlerMapping")
-    @Autowired
-    private HandlerMapping resourceHandlerMapping;
 
     @GET
     @Path("/{id}")

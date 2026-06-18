@@ -24,7 +24,7 @@ import java.util.List;
 // TODO: general. We have to check if the logic behind profile that is in the old controller makes any sense here, taking into consideration that there's a hyperlink to user tournaments, favorite games, etc etc etc
 
 @Path("users")
-@Component
+@Component("userRestController")
 public class UserController {
 
     @Autowired
@@ -177,5 +177,4 @@ public class UserController {
                 .build();
     }
 }
-
 

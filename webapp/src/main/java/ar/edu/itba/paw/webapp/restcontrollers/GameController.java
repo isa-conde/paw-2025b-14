@@ -20,7 +20,7 @@ import java.net.URI;
 import java.util.List;
 
 @Path(("games"))
-@Component
+@Component("gameRestController")
 public class GameController {
 
     @Autowired
