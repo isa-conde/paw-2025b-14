@@ -1,6 +1,7 @@
 import { AppText } from "./AppText.jsx";
 import styles from "../styles/components/Button.module.css";
-import starIcon from "../../public/assets/roundedStarOn.png";
+
+const starIcon = "/assets/roundedStarOn.png";
 
 export const Button = ({
                            text,
