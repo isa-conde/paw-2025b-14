@@ -13,7 +13,7 @@ export const GamesPage = () => {
 
     const moonlightImage = "/assets/moonlight.jpg";
 
-    const gamesPageUrl = "/gamesPage";
+    const gamesPageUrl = "/games";
 
     const pageSize = 6;
 

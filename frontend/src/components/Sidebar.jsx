@@ -18,8 +18,8 @@ export const Sidebar = ({ user }) => {
     const myTourneysLabel = t("sidebar.myTourneys");
 
     const indexPath = "/";
-    const gamesPath = "/gamesPage";
-    const tournamentsPath = "/tournamentsPage";
+    const gamesPath = "/games";
+    const tournamentsPath = "/tournaments";
     const profilePath = "/profile"
 
     const indexEnum = {
@@ -31,8 +31,8 @@ export const Sidebar = ({ user }) => {
 
     const activeButtons = [
         window.location.pathname === indexPath,       // Home button
-        window.location.pathname === gamesPath,      // Games button
-        window.location.pathname === tournamentsPath, // Tournaments button
+        window.location.pathname.startsWith(gamesPath),      // Games button
+        window.location.pathname.startsWith(tournamentsPath), // Tournaments button
         window.location.pathname === profilePath     // My Tournaments button
     ];
 

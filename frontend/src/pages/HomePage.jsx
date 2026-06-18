@@ -16,9 +16,9 @@ export const HomePage = () => {
     };
 
     const createTournamentUrl = "/tournaments/new/step1";
-    const joinTournamentUrl = "/tournamentsPage";
-    const gamesPageUrl = "/gamesPage";
-    const tournamentsGameUrl = "/tournament/game";
+    const joinTournamentUrl = "/tournaments";
+    const gamesPageUrl = "/games";
+    const tournamentsGameUrl = "/tournaments";
 
     const bannerImage = "/assets/arcane.jpg";
 
@@ -97,7 +97,7 @@ export const HomePage = () => {
                 {hardcodedGames.map((game) => (
                     <div key={game.id}>
                         <div className={styles["content-title"]}>
-                            <a href={tournamentsGameUrl} className={styles["title-link"]}>
+                            <a href={`${tournamentsGameUrl}?gameId=${game.id}`} className={styles["title-link"]}>
                                 <AppText type="title" size="s">{game.name}</AppText>
                             </a>
                             <Carrousel elements={hardcodedTournaments[game.id]} isGame={false}/>
@@ -110,4 +110,4 @@ export const HomePage = () => {
 }
 
 // TODO: collect real games and tournaments, not hardcoded
-// TODO: change /tournament/game to queryparamd /tournamentsPage?gameId=...
+// TODO: change hardcoded tournament sections to API-driven data

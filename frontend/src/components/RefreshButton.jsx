@@ -3,7 +3,7 @@ import styles from "../styles/components/RefreshButton.module.css"
 export const RefreshButton = ({ disabled = false }) => {
     const refreshButtonImage = "/assets/refresh.png";
 
-    const tournamentsPageUrl = "/tournamentsPage";
+    const tournamentsPageUrl = "/tournaments";
 
     const buttonClass = [ styles.btn, styles.submit, disabled ? "disabled" : "" ].filter(Boolean).join(" ");
 

@@ -129,7 +129,7 @@ export const TournamentsPage = () => {
 
     const createTournamentUrl = "/tournaments/new/step1";
     const createTeamUrl = "/team/create";
-    const tournamentsPageUrl = "/tournamentsPage"
+    const tournamentsPageUrl = "/tournaments"
 
     const tournamentImage = "/assets/tournament.jpeg"
 
@@ -253,7 +253,7 @@ export const TournamentsPage = () => {
                         tournaments.length > 0 && (
                             <div key={game.id}>
                                 <div className={styles["carrousel-title"]}>
-                                    <a href={`/tournamentsPage?gameId=${game.id}`} className={styles["title-link"]}>
+                                    <a href={`/tournaments?gameId=${game.id}`} className={styles["title-link"]}>
                                         <AppText type="title" size="s">{game.name}</AppText>
                                     </a>
                                 </div>

@@ -7,7 +7,7 @@ export const ElementCard = ({ image, game, title, tags, id, isGame, started, fin
 
     const hasChip = started != null && finished != null && !isGame;
 
-    const url = isGame ? "/tournamentsPage/game" : "/tournament";
+    const url = isGame ? `/tournaments?gameId=${id}` : `/tournaments/${id}`;
 
     const inProgressLabel = t("card.inProgress");
     const finishedLabel = t("card.finished");

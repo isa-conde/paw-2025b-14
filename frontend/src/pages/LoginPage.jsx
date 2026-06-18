@@ -16,7 +16,7 @@ export const LoginPage = () => {
     const forgotPasswordLabel = t("login.forgotPassword");
 
     const registerRef = "/register"
-    const forgotPasswordRef = "/forgotPassword"
+    const forgotPasswordRef = "/forgot-password"
 
     return (
         <FormLayout pageTitle={t("login.title")}>

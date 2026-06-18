@@ -14,8 +14,10 @@ export const PaginationLink = ({ page, url, pageNumber = "", children }) => {
         }
     });
 
+    const href = `${newUrl.pathname}${newUrl.search}`;
+
     return (
-        <a href={newUrl.toString()} className={styles["title-link"]}>
+        <a href={href} className={styles["title-link"]}>
             {children}
         </a>
     );
