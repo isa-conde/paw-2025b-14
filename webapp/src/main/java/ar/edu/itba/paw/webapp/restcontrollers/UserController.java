@@ -5,6 +5,7 @@ import ar.edu.itba.paw.interfaces.exception.UserNotFoundException;
 import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.Token;
 import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.webapp.auth.CurrentUserProvider;
 import ar.edu.itba.paw.webapp.auth.JwtTokenService;
 import ar.edu.itba.paw.webapp.dto.entities.UserDTO;
 import ar.edu.itba.paw.webapp.dto.params.ListUsersByNameParams;
@@ -39,6 +40,9 @@ public class UserController {
     @Autowired
     private JwtTokenService jwtTokenService;
 
+    @Autowired
+    private CurrentUserProvider currentUserProvider;
+
     @GET
     @Produces(value = {Vendor.APPLICATION_USER_LIST})
     public Response listUsersByName(@Valid @BeanParam ListUsersByNameParams params) {
@@ -51,6 +55,13 @@ public class UserController {
         Response.ResponseBuilder responseBuilder = Response.ok(new GenericEntity<>(users) {});
         addPaginationLinks(responseBuilder, params.getPage(), totalPages);
         return responseBuilder.build();
+    }
+
+    @GET
+    @Path("/me")
+    @Produces(value = {Vendor.APPLICATION_USER})
+    public Response getCurrentUser() {
+        return Response.ok(UserDTO.fromUser(uriInfo, currentUserProvider.getCurrentUser())).build();
     }
 
     @GET
@@ -177,4 +188,3 @@ public class UserController {
                 .build();
     }
 }
-

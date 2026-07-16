@@ -1,18 +1,12 @@
 package ar.edu.itba.paw.webapp.dto.requests;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
 import java.util.List;
 
 public class CreateTeamRequest {
 
     @NotBlank
     private String name;
-
-    @NotNull
-    @Positive
-    private Long ownerId;
 
     private String profilePictureBase64;
     private String bannerBase64;
@@ -24,14 +18,6 @@ public class CreateTeamRequest {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Long getOwnerId() {
-        return ownerId;
-    }
-
-    public void setOwnerId(Long ownerId) {
-        this.ownerId = ownerId;
     }
 
     public String getProfilePictureBase64() {

@@ -78,6 +78,22 @@ paths:
         '400':
           $ref: '#/components/responses/EmptyOrErrorBadRequest'
 
+  /users/me:
+    get:
+      tags: [users]
+      summary: Get current authenticated user
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Current authenticated user
+          content:
+            application/vnd.user.v1+json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/UnauthorizedJson'
+
   /users/{id}:
     get:
       tags: [users]
@@ -587,16 +603,11 @@ paths:
     post:
       tags: [tournaments]
       summary: Join tournament as user
+      description: Joins the authenticated Bearer-token user; no user id is accepted in the request body.
       security:
         - bearerAuth: []
       parameters:
         - $ref: '#/components/parameters/TournamentId'
-      requestBody:
-        required: true
-        content:
-          application/vnd.tournament.join-user.v1+json:
-            schema:
-              $ref: '#/components/schemas/JoinTournamentUserRequest'
       responses:
         '204':
           description: Joined
@@ -631,6 +642,25 @@ paths:
         '403':
           $ref: '#/components/responses/ForbiddenJson'
 
+  /tournaments/{id}/participants/me:
+    delete:
+      tags: [tournaments]
+      summary: Leave tournament as current user
+      description: Removes the authenticated Bearer-token user from the tournament without accepting a user id from the client.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/TournamentId'
+      responses:
+        '204':
+          description: Left
+        '400':
+          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedJson'
+        '403':
+          $ref: '#/components/responses/ForbiddenJson'
+
   /tournaments/{id}/participants/{participantId}:
     delete:
       tags: [tournaments]
@@ -653,7 +683,8 @@ paths:
   /tournaments/{id}/participants/users/{userId}:
     delete:
       tags: [tournaments]
-      summary: Leave tournament as user
+      summary: Leave tournament as user by id
+      description: Legacy id-based endpoint retained for compatibility; SPA clients should use `/tournaments/{id}/participants/me`.
       security:
         - bearerAuth: []
       parameters:
@@ -1049,10 +1080,6 @@ components:
       properties:
         name:
           type: string
-        ownerId:
-          type: integer
-          format: int64
-          minimum: 1
         profilePictureBase64:
           type: string
         bannerBase64:
@@ -1061,7 +1088,7 @@ components:
           type: array
           items:
             type: string
-      required: [name, ownerId]
+      required: [name]
 
     Game:
       type: object
@@ -1140,10 +1167,6 @@ components:
     CreateTournamentRequest:
       type: object
       properties:
-        creatorId:
-          type: integer
-          format: int64
-          minimum: 1
         name:
           type: string
         gameId:
@@ -1179,7 +1202,7 @@ components:
           type: string
         discordChannel:
           type: string
-      required: [creatorId, name, gameId, region, elo, startDate, endDate, structure, maxParticipants, formatId]
+      required: [name, gameId, region, elo, startDate, endDate, structure, maxParticipants, formatId]
 
     UpdateTournamentRequest:
       type: object
@@ -1239,15 +1262,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Link'
-
-    JoinTournamentUserRequest:
-      type: object
-      properties:
-        userId:
-          type: integer
-          format: int64
-          minimum: 1
-      required: [userId]
 
     JoinTournamentTeamRequest:
       type: object

@@ -88,6 +88,7 @@ public class WebAuthConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and().authorizeRequests()
                         .antMatchers(OPTIONS, "/api/**").permitAll()
+                        .antMatchers(GET, "/api/users/me").authenticated()
                         .antMatchers(GET, "/api/**").permitAll()
                         .antMatchers(POST,
                                 "/api/users",

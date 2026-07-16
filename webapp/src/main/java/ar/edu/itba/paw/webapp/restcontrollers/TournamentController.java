@@ -8,6 +8,7 @@ import ar.edu.itba.paw.model.Game.GameFormat;
 import ar.edu.itba.paw.model.Match.Match;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
+import ar.edu.itba.paw.webapp.auth.CurrentUserProvider;
 import ar.edu.itba.paw.webapp.auth.TournamentSecurity;
 import ar.edu.itba.paw.webapp.dto.entities.ErrorDTO;
 import ar.edu.itba.paw.webapp.dto.entities.MatchDTO;
@@ -18,7 +19,6 @@ import ar.edu.itba.paw.webapp.dto.params.PaginationParams;
 import ar.edu.itba.paw.webapp.dto.params.TournamentFilterParams;
 import ar.edu.itba.paw.webapp.dto.requests.CreateTournamentRequest;
 import ar.edu.itba.paw.webapp.dto.requests.JoinTournamentTeamRequest;
-import ar.edu.itba.paw.webapp.dto.requests.JoinTournamentUserRequest;
 import ar.edu.itba.paw.webapp.dto.requests.SetMatchResultsRequest;
 import ar.edu.itba.paw.webapp.dto.requests.TournamentStatusRequest;
 import ar.edu.itba.paw.webapp.dto.requests.UpdateTournamentRequest;
@@ -70,6 +70,9 @@ public class TournamentController {
     @Autowired
     private MatchService matchService;
 
+    @Autowired
+    private CurrentUserProvider currentUserProvider;
+
     @Context
     private UriInfo uriInfo;
 
@@ -120,7 +123,7 @@ public class TournamentController {
         }
 
         Tournament tournament = tournamentService.create(
-                request.getCreatorId(),
+                currentUserProvider.getCurrentUserId(),
                 request.getName(),
                 request.getGameId(),
                 request.getRegion(),
@@ -231,13 +234,12 @@ public class TournamentController {
 
     @POST
     @Path("/{id}/participants/users")
-    @Consumes(value = {Vendor.APPLICATION_TOURNAMENT_JOIN_USER})
-    public Response joinTournamentUser(@PathParam("id") long id, @Valid JoinTournamentUserRequest request) {
+    public Response joinTournamentUser(@PathParam("id") long id) {
         if (id <= 0) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
-        participantService.joinTournamentUser(request.getUserId(), id);
+        participantService.joinTournamentUser(currentUserProvider.getCurrentUserId(), id);
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 
@@ -250,6 +252,17 @@ public class TournamentController {
         }
 
         participantService.joinTournamentTeam(id, request.getTeamId(), request.getMembers());
+        return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @DELETE
+    @Path("/{id}/participants/me")
+    public Response leaveTournamentAsCurrentUser(@PathParam("id") long id) {
+        if (id <= 0) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+
+        participantService.leaveTournament(currentUserProvider.getCurrentUserId(), id);
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 

@@ -11,10 +11,6 @@ import java.time.LocalDate;
 
 public class CreateTournamentRequest {
 
-    @NotNull
-    @Positive
-    private Long creatorId;
-
     @NotBlank
     private String name;
 
@@ -50,14 +46,6 @@ public class CreateTournamentRequest {
     private String serverName;
     private String serverPassword;
     private String discordChannel;
-
-    public Long getCreatorId() {
-        return creatorId;
-    }
-
-    public void setCreatorId(Long creatorId) {
-        this.creatorId = creatorId;
-    }
 
     public String getName() {
         return name;

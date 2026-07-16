@@ -3,6 +3,7 @@ package ar.edu.itba.paw.webapp.restcontrollers;
 import ar.edu.itba.paw.interfaces.exception.TeamNotFoundException;
 import ar.edu.itba.paw.interfaces.services.TeamService;
 import ar.edu.itba.paw.model.Team;
+import ar.edu.itba.paw.webapp.auth.CurrentUserProvider;
 import ar.edu.itba.paw.webapp.dto.entities.ErrorDTO;
 import ar.edu.itba.paw.webapp.dto.entities.TeamDTO;
 import ar.edu.itba.paw.webapp.dto.entities.UserDTO;
@@ -31,6 +32,9 @@ public class TeamController {
 
     @Autowired
     TeamService ts;
+
+    @Autowired
+    private CurrentUserProvider currentUserProvider;
 
     @Context
     private UriInfo uriInfo;
@@ -104,7 +108,6 @@ public class TeamController {
         return Response.ok(result).build();
     }
 
-    //TODO set up auth to get user from request, then use as owner id
     @POST
     @Consumes(value = {Vendor.APPLICATION_TEAM_CREATE})
     @Produces(value = {Vendor.APPLICATION_TEAM})
@@ -120,7 +123,7 @@ public class TeamController {
         }
 
         List<String> members = request.getMembers() == null ? List.of() : request.getMembers();
-        Team team = ts.create(request.getName(), profilePicture, banner, request.getOwnerId(), members);
+        Team team = ts.create(request.getName(), profilePicture, banner, currentUserProvider.getCurrentUserId(), members);
 
         URI location = uriInfo.getAbsolutePathBuilder()
                 .path(String.valueOf(team.getId()))
