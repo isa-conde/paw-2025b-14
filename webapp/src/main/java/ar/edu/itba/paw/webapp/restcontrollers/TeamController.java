@@ -4,7 +4,6 @@ import ar.edu.itba.paw.interfaces.exception.TeamNotFoundException;
 import ar.edu.itba.paw.interfaces.services.TeamService;
 import ar.edu.itba.paw.model.Team;
 import ar.edu.itba.paw.webapp.auth.CurrentUserProvider;
-import ar.edu.itba.paw.webapp.dto.entities.ErrorDTO;
 import ar.edu.itba.paw.webapp.dto.entities.TeamDTO;
 import ar.edu.itba.paw.webapp.dto.entities.UserDTO;
 import ar.edu.itba.paw.webapp.dto.params.ForTournamentParams;
@@ -12,6 +11,7 @@ import ar.edu.itba.paw.webapp.dto.params.PaginationParams;
 import ar.edu.itba.paw.webapp.dto.params.SearchNameParams;
 import ar.edu.itba.paw.webapp.dto.params.UserIdParams;
 import ar.edu.itba.paw.webapp.dto.requests.CreateTeamRequest;
+import ar.edu.itba.paw.webapp.exception.ApiErrorFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -50,7 +50,7 @@ public class TeamController {
         Optional<Team> team = ts.findById(id);
 
         if (team.isEmpty()){
-            return Response.status(Response.Status.NOT_FOUND).build();
+            return ApiErrorFactory.notFound("Team not found");
         }
 
         TeamDTO teamDTO = TeamDTO.fromTeam(uriInfo, team.get());
@@ -144,7 +144,7 @@ public class TeamController {
         try {
             toReturn = ts.getTeamMembers(id).stream().map(UserDTO.mapper(uriInfo)).toList();
         } catch (TeamNotFoundException t){
-            return Response.status(Response.Status.NOT_FOUND).build();
+            return ApiErrorFactory.notFound("Team not found");
         }
 
         return Response.ok(toReturn).build();
@@ -171,9 +171,7 @@ public class TeamController {
     }
 
     private Response badRequest(String detail) {
-        return Response.status(Response.Status.BAD_REQUEST)
-                .entity(ErrorDTO.of(Response.Status.BAD_REQUEST, detail))
-                .build();
+        return ApiErrorFactory.badRequest(detail);
     }
 
     private int adjustPage(int page, int totalPages) {

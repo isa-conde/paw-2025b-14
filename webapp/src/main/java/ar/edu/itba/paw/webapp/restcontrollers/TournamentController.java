@@ -9,8 +9,6 @@ import ar.edu.itba.paw.model.Match.Match;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
 import ar.edu.itba.paw.webapp.auth.CurrentUserProvider;
-import ar.edu.itba.paw.webapp.auth.TournamentSecurity;
-import ar.edu.itba.paw.webapp.dto.entities.ErrorDTO;
 import ar.edu.itba.paw.webapp.dto.entities.MatchDTO;
 import ar.edu.itba.paw.webapp.dto.entities.MatchStageDTO;
 import ar.edu.itba.paw.webapp.dto.entities.ParticipantDTO;
@@ -22,6 +20,7 @@ import ar.edu.itba.paw.webapp.dto.requests.JoinTournamentTeamRequest;
 import ar.edu.itba.paw.webapp.dto.requests.SetMatchResultsRequest;
 import ar.edu.itba.paw.webapp.dto.requests.TournamentStatusRequest;
 import ar.edu.itba.paw.webapp.dto.requests.UpdateTournamentRequest;
+import ar.edu.itba.paw.webapp.exception.ApiErrorFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -155,12 +154,12 @@ public class TournamentController {
     @Produces(value = {Vendor.APPLICATION_TOURNAMENT})
     public Response getTournament(@PathParam("id") long id) {
         if (id <= 0) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return badRequest("Invalid tournament id");
         }
 
         Optional<Tournament> tournament = tournamentService.findById(id);
         if (tournament.isEmpty()) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            return notFound("Tournament not found");
         }
 
         return Response.ok(TournamentDTO.fromTournament(uriInfo, tournament.get())).build();
@@ -172,12 +171,12 @@ public class TournamentController {
     @Produces(value = {Vendor.APPLICATION_TOURNAMENT})
     public Response updateTournament(@PathParam("id") long id, @Valid UpdateTournamentRequest request) {
         if (id <= 0) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return badRequest("Invalid tournament id");
         }
 
         Optional<Tournament> tournament = tournamentService.findById(id);
         if (tournament.isEmpty()) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            return notFound("Tournament not found");
         }
 
         byte[] image = decodeBase64(request.getImageBase64());
@@ -209,7 +208,7 @@ public class TournamentController {
 
         Optional<Tournament> updated = tournamentService.findById(id);
         if (updated.isEmpty()) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            return notFound("Tournament not found");
         }
 
         return Response.ok(TournamentDTO.fromTournament(uriInfo, updated.get())).build();
@@ -220,7 +219,7 @@ public class TournamentController {
     @Produces(value = {Vendor.APPLICATION_PARTICIPANT_LIST})
     public Response getParticipants(@PathParam("id") long id, @QueryParam("teamSize") Integer teamSize) {
         if (id <= 0) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return badRequest("Invalid tournament id");
         }
 
         int resolvedTeamSize = resolveTeamSize(id, teamSize);
@@ -236,7 +235,7 @@ public class TournamentController {
     @Path("/{id}/participants/users")
     public Response joinTournamentUser(@PathParam("id") long id) {
         if (id <= 0) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return badRequest("Invalid tournament id");
         }
 
         participantService.joinTournamentUser(currentUserProvider.getCurrentUserId(), id);
@@ -248,7 +247,7 @@ public class TournamentController {
     @Consumes(value = {Vendor.APPLICATION_TOURNAMENT_JOIN_TEAM})
     public Response joinTournamentTeam(@PathParam("id") long id, @Valid JoinTournamentTeamRequest request) {
         if (id <= 0) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return badRequest("Invalid tournament id");
         }
 
         participantService.joinTournamentTeam(id, request.getTeamId(), request.getMembers());
@@ -259,7 +258,7 @@ public class TournamentController {
     @Path("/{id}/participants/me")
     public Response leaveTournamentAsCurrentUser(@PathParam("id") long id) {
         if (id <= 0) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return badRequest("Invalid tournament id");
         }
 
         participantService.leaveTournament(currentUserProvider.getCurrentUserId(), id);
@@ -270,7 +269,7 @@ public class TournamentController {
     @Path("/{id}/participants/{participantId}")
     public Response removeParticipant(@PathParam("id") long id, @PathParam("participantId") long participantId) {
         if (id <= 0 || participantId <= 0) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return badRequest("Invalid tournament or participant id");
         }
 
         participantService.removeParticipant(id, participantId);
@@ -281,7 +280,7 @@ public class TournamentController {
     @Path("/{id}/participants/users/{userId}")
     public Response leaveTournament(@PathParam("id") long id, @PathParam("userId") long userId) {
         if (id <= 0 || userId <= 0) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return badRequest("Invalid tournament or user id");
         }
 
         participantService.leaveTournament(userId, id);
@@ -293,7 +292,7 @@ public class TournamentController {
     @Produces(value = {Vendor.APPLICATION_MATCH_STAGE_LIST})
     public Response getMatches(@PathParam("id") long id, @QueryParam("group") Integer group) {
         if (id <= 0) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return badRequest("Invalid tournament id");
         }
 
         LOGGER.debug("API correctly entered to /tournaments/{}/matches endpoint with group {}", id, group);
@@ -314,7 +313,7 @@ public class TournamentController {
     @Produces(value = {Vendor.APPLICATION_MATCH})
     public Response getMatch(@PathParam("id") long id, @PathParam("matchId") long matchId) {
         if (id <= 0 || matchId <= 0) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return badRequest("Invalid tournament or match id");
         }
 
         Map<Integer, List<Match>> matchesByStage = matchService.getTournamentMatchesByStage(id, null);
@@ -324,7 +323,7 @@ public class TournamentController {
                 .findFirst();
 
         if (match.isEmpty()) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            return notFound("Match not found");
         }
 
         return Response.ok(MatchDTO.fromMatch(uriInfo, match.get())).build();
@@ -337,7 +336,7 @@ public class TournamentController {
                                     @PathParam("matchId") long matchId,
                                     @Valid SetMatchResultsRequest request) {
         if (id <= 0 || matchId <= 0) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return badRequest("Invalid tournament or match id");
         }
 
         matchService.setMatchResults(matchId, id, request.getLocalScore(), request.getVisitorScore());
@@ -350,12 +349,12 @@ public class TournamentController {
     @Produces(value = {Vendor.APPLICATION_TOURNAMENT})
     public Response updateTournamentStatus(@PathParam("id") long id, @Valid TournamentStatusRequest request) {
         if (id <= 0) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return badRequest("Invalid tournament id");
         }
 
         Optional<Tournament> tournament = tournamentService.findById(id);
         if (tournament.isEmpty()) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            return notFound("Tournament not found");
         }
 
         if (request.getTournamentStarted() == null && request.getOpenInscriptions() == null) {
@@ -376,7 +375,7 @@ public class TournamentController {
 
         Optional<Tournament> updated = tournamentService.findById(id);
         if (updated.isEmpty()) {
-            return Response.status(Response.Status.NOT_FOUND).build();
+            return notFound("Tournament not found");
         }
 
         return Response.ok(TournamentDTO.fromTournament(uriInfo, updated.get())).build();
@@ -396,9 +395,11 @@ public class TournamentController {
     }
 
     private Response badRequest(String detail) {
-        return Response.status(Response.Status.BAD_REQUEST)
-                .entity(ErrorDTO.of(Response.Status.BAD_REQUEST, detail))
-                .build();
+        return ApiErrorFactory.badRequest(detail);
+    }
+
+    private Response notFound(String detail) {
+        return ApiErrorFactory.notFound(detail);
     }
 
     private byte[] decodeBase64(String value) {

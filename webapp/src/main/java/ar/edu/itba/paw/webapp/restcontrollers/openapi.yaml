@@ -10,10 +10,11 @@ info:
     standard `Link` response header with `self`, `first`, `last`, and, when
     applicable, `prev` and `next` relations.
 
-    Current error contract: some controller branches return `ErrorDTO` JSON for
-    bad requests, while several validation/not-found paths still return an empty
-    400/404 response through controller code or exception mappers. Normalizing
-    every API error as JSON is intentionally left as API debt.
+    Current error contract: known API errors return an `ErrorDTO` JSON body with
+    `status`, `error`, and `message`. Validation errors may also include a
+    `details` object keyed by field or parameter name. Authentication failures
+    return 401 JSON and authorization failures return 403 JSON. Jersey-generated
+    media type errors such as 406 and 415 use the same schema.
 
     HATEOAS links that currently point to resources or filters without a REST
     controller are not documented as available endpoints here. Known pending
@@ -59,7 +60,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserList'
         '400':
-          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+          $ref: '#/components/responses/BadRequestJson'
     post:
       tags: [users]
       summary: Create user
@@ -76,7 +77,9 @@ paths:
             Location:
               $ref: '#/components/headers/Location'
         '400':
-          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+          $ref: '#/components/responses/BadRequestJson'
+        '409':
+          $ref: '#/components/responses/ConflictJson'
 
   /users/me:
     get:
@@ -108,7 +111,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
         '404':
-          $ref: '#/components/responses/EmptyNotFound'
+          $ref: '#/components/responses/NotFoundJson'
 
   /users/sessions:
     post:
@@ -131,9 +134,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
         '400':
-          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+          $ref: '#/components/responses/BadRequestJson'
+        '401':
+          $ref: '#/components/responses/UnauthorizedJson'
         '404':
-          $ref: '#/components/responses/EmptyNotFound'
+          $ref: '#/components/responses/NotFoundJson'
 
   /users/verifications:
     post:
@@ -152,7 +157,7 @@ paths:
             Location:
               $ref: '#/components/headers/Location'
         '404':
-          $ref: '#/components/responses/EmptyNotFound'
+          $ref: '#/components/responses/NotFoundJson'
     put:
       tags: [users]
       summary: Verify user
@@ -174,9 +179,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
         '400':
-          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+          $ref: '#/components/responses/BadRequestJson'
         '404':
-          $ref: '#/components/responses/EmptyNotFound'
+          $ref: '#/components/responses/NotFoundJson'
 
   /users/password-requests:
     post:
@@ -195,9 +200,9 @@ paths:
             Location:
               $ref: '#/components/headers/Location'
         '400':
-          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+          $ref: '#/components/responses/BadRequestJson'
         '404':
-          $ref: '#/components/responses/EmptyNotFound'
+          $ref: '#/components/responses/NotFoundJson'
     put:
       tags: [users]
       summary: Reset password
@@ -225,9 +230,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
         '400':
-          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+          $ref: '#/components/responses/BadRequestJson'
         '404':
-          $ref: '#/components/responses/EmptyNotFound'
+          $ref: '#/components/responses/NotFoundJson'
 
   /teams:
     get:
@@ -263,7 +268,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/TeamList'
         '400':
-          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+          $ref: '#/components/responses/BadRequestJson'
     post:
       tags: [teams]
       summary: Create team
@@ -286,11 +291,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Team'
         '400':
-          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+          $ref: '#/components/responses/BadRequestJson'
         '401':
           $ref: '#/components/responses/UnauthorizedJson'
         '403':
           $ref: '#/components/responses/ForbiddenJson'
+        '409':
+          $ref: '#/components/responses/ConflictJson'
 
   /teams/{id}:
     get:
@@ -306,9 +313,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Team'
         '400':
-          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+          $ref: '#/components/responses/BadRequestJson'
         '404':
-          $ref: '#/components/responses/EmptyNotFound'
+          $ref: '#/components/responses/NotFoundJson'
     put:
       tags: [teams]
       summary: Update team
@@ -331,11 +338,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/Team'
         '400':
-          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+          $ref: '#/components/responses/BadRequestJson'
         '401':
           $ref: '#/components/responses/UnauthorizedJson'
         '403':
           $ref: '#/components/responses/ForbiddenJson'
+        '404':
+          $ref: '#/components/responses/NotFoundJson'
+        '409':
+          $ref: '#/components/responses/ConflictJson'
 
   /teams/{id}/members:
     get:
@@ -351,9 +362,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/UserList'
         '400':
-          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+          $ref: '#/components/responses/BadRequestJson'
         '404':
-          $ref: '#/components/responses/EmptyNotFound'
+          $ref: '#/components/responses/NotFoundJson'
 
   /games:
     get:
@@ -385,7 +396,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/GameList'
         '400':
-          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+          $ref: '#/components/responses/BadRequestJson'
 
   /games/{id}:
     get:
@@ -401,9 +412,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Game'
         '400':
-          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+          $ref: '#/components/responses/BadRequestJson'
         '404':
-          $ref: '#/components/responses/EmptyNotFound'
+          $ref: '#/components/responses/NotFoundJson'
 
   /games/{id}/formats:
     get:
@@ -419,7 +430,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/GameFormatList'
         '400':
-          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+          $ref: '#/components/responses/BadRequestJson'
 
   /games/{gameId}/formats/{formatId}:
     get:
@@ -436,9 +447,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/GameFormat'
         '400':
-          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+          $ref: '#/components/responses/BadRequestJson'
         '404':
-          $ref: '#/components/responses/EmptyNotFound'
+          $ref: '#/components/responses/NotFoundJson'
 
   /tournaments:
     get:
@@ -502,7 +513,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/TournamentList'
         '400':
-          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+          $ref: '#/components/responses/BadRequestJson'
     post:
       tags: [tournaments]
       summary: Create tournament
@@ -525,11 +536,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/Tournament'
         '400':
-          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+          $ref: '#/components/responses/BadRequestJson'
         '401':
           $ref: '#/components/responses/UnauthorizedJson'
         '403':
           $ref: '#/components/responses/ForbiddenJson'
+        '404':
+          $ref: '#/components/responses/NotFoundJson'
+        '409':
+          $ref: '#/components/responses/ConflictJson'
 
   /tournaments/{id}:
     get:
@@ -545,9 +560,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Tournament'
         '400':
-          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+          $ref: '#/components/responses/BadRequestJson'
         '404':
-          $ref: '#/components/responses/EmptyNotFound'
+          $ref: '#/components/responses/NotFoundJson'
     put:
       tags: [tournaments]
       summary: Update tournament
@@ -569,9 +584,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Tournament'
         '400':
-          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+          $ref: '#/components/responses/BadRequestJson'
         '404':
-          $ref: '#/components/responses/EmptyNotFound'
+          $ref: '#/components/responses/NotFoundJson'
         '401':
           $ref: '#/components/responses/UnauthorizedJson'
         '403':
@@ -597,7 +612,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ParticipantList'
         '400':
-          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+          $ref: '#/components/responses/BadRequestJson'
 
   /tournaments/{id}/participants/users:
     post:
@@ -612,11 +627,15 @@ paths:
         '204':
           description: Joined
         '400':
-          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+          $ref: '#/components/responses/BadRequestJson'
         '401':
           $ref: '#/components/responses/UnauthorizedJson'
         '403':
           $ref: '#/components/responses/ForbiddenJson'
+        '404':
+          $ref: '#/components/responses/NotFoundJson'
+        '409':
+          $ref: '#/components/responses/ConflictJson'
 
   /tournaments/{id}/participants/teams:
     post:
@@ -636,11 +655,13 @@ paths:
         '204':
           description: Joined
         '400':
-          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+          $ref: '#/components/responses/BadRequestJson'
         '401':
           $ref: '#/components/responses/UnauthorizedJson'
         '403':
           $ref: '#/components/responses/ForbiddenJson'
+        '404':
+          $ref: '#/components/responses/NotFoundJson'
 
   /tournaments/{id}/participants/me:
     delete:
@@ -655,11 +676,13 @@ paths:
         '204':
           description: Left
         '400':
-          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+          $ref: '#/components/responses/BadRequestJson'
         '401':
           $ref: '#/components/responses/UnauthorizedJson'
         '403':
           $ref: '#/components/responses/ForbiddenJson'
+        '404':
+          $ref: '#/components/responses/NotFoundJson'
 
   /tournaments/{id}/participants/{participantId}:
     delete:
@@ -674,11 +697,13 @@ paths:
         '204':
           description: Removed
         '400':
-          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+          $ref: '#/components/responses/BadRequestJson'
         '401':
           $ref: '#/components/responses/UnauthorizedJson'
         '403':
           $ref: '#/components/responses/ForbiddenJson'
+        '404':
+          $ref: '#/components/responses/NotFoundJson'
 
   /tournaments/{id}/participants/users/{userId}:
     delete:
@@ -694,7 +719,9 @@ paths:
         '204':
           description: Left
         '400':
-          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+          $ref: '#/components/responses/BadRequestJson'
+        '404':
+          $ref: '#/components/responses/NotFoundJson'
         '401':
           $ref: '#/components/responses/UnauthorizedJson'
         '403':
@@ -719,7 +746,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/MatchStageList'
         '400':
-          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+          $ref: '#/components/responses/BadRequestJson'
 
   /tournaments/{id}/matches/{matchId}:
     get:
@@ -736,9 +763,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Match'
         '400':
-          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+          $ref: '#/components/responses/BadRequestJson'
         '404':
-          $ref: '#/components/responses/EmptyNotFound'
+          $ref: '#/components/responses/NotFoundJson'
 
   /tournaments/{id}/matches/{matchId}/results:
     put:
@@ -759,11 +786,15 @@ paths:
         '204':
           description: Updated
         '400':
-          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+          $ref: '#/components/responses/BadRequestJson'
         '401':
           $ref: '#/components/responses/UnauthorizedJson'
         '403':
           $ref: '#/components/responses/ForbiddenJson'
+        '404':
+          $ref: '#/components/responses/NotFoundJson'
+        '409':
+          $ref: '#/components/responses/ConflictJson'
 
   /tournaments/{id}/status:
     put:
@@ -787,13 +818,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/Tournament'
         '400':
-          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+          $ref: '#/components/responses/BadRequestJson'
         '404':
-          $ref: '#/components/responses/EmptyNotFound'
+          $ref: '#/components/responses/NotFoundJson'
         '401':
           $ref: '#/components/responses/UnauthorizedJson'
         '403':
           $ref: '#/components/responses/ForbiddenJson'
+        '409':
+          $ref: '#/components/responses/ConflictJson'
 
   /tokens:
     get:
@@ -828,7 +861,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Token'
         '404':
-          $ref: '#/components/responses/EmptyNotFound'
+          $ref: '#/components/responses/NotFoundJson'
 
 components:
   securitySchemes:
@@ -942,14 +975,36 @@ components:
         format: int64
 
   responses:
-    EmptyOrErrorBadRequest:
-      description: Bad request. Current API may return an `ErrorDTO` JSON body or an empty body depending on code path.
+    BadRequestJson:
+      description: Invalid request syntax, parameters, DTO validation, or business input.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    EmptyNotFound:
-      description: Not found. Current exception mappers generally return an empty body.
+    NotFoundJson:
+      description: Requested resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    ConflictJson:
+      description: Request conflicts with the current resource state.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotAcceptableJson:
+      description: Requested response media type is not acceptable.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    UnsupportedMediaTypeJson:
+      description: Request media type is unsupported.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
     UnauthorizedJson:
       description: Missing, empty, or invalid Bearer token.
       content:
@@ -979,10 +1034,21 @@ components:
       properties:
         status:
           type: integer
+          example: 404
         error:
           type: string
+          example: Not Found
         message:
           type: string
+          example: Tournament not found
+        details:
+          type: object
+          additionalProperties:
+            type: string
+          description: Optional validation details keyed by field or parameter.
+          example:
+            name: must not be blank
+      required: [status, error, message]
 
     Region:
       type: string

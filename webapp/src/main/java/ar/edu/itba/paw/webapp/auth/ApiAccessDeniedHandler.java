@@ -1,6 +1,6 @@
 package ar.edu.itba.paw.webapp.auth;
 
-import ar.edu.itba.paw.webapp.dto.entities.ErrorDTO;
+import ar.edu.itba.paw.webapp.exception.ApiErrorFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -14,8 +14,6 @@ import java.io.IOException;
 @Component
 public class ApiAccessDeniedHandler implements AccessDeniedHandler {
 
-    private static final String APPLICATION_JSON = "application/json";
-
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
@@ -23,10 +21,10 @@ public class ApiAccessDeniedHandler implements AccessDeniedHandler {
                        HttpServletResponse response,
                        AccessDeniedException accessDeniedException) throws IOException {
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        response.setContentType(APPLICATION_JSON);
+        response.setContentType(ApiErrorFactory.APPLICATION_JSON);
         objectMapper.writeValue(
                 response.getOutputStream(),
-                ErrorDTO.of(Response.Status.FORBIDDEN, "You do not have permission to access this resource")
+                ApiErrorFactory.error(Response.Status.FORBIDDEN, "You do not have permission to access this resource")
         );
     }
 }

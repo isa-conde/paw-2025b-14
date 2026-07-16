@@ -1,6 +1,6 @@
 package ar.edu.itba.paw.webapp.auth;
 
-import ar.edu.itba.paw.webapp.dto.entities.ErrorDTO;
+import ar.edu.itba.paw.webapp.exception.ApiErrorFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -14,8 +14,6 @@ import java.io.IOException;
 @Component
 public class ApiAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-    private static final String APPLICATION_JSON = "application/json";
-
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
@@ -23,10 +21,10 @@ public class ApiAuthenticationEntryPoint implements AuthenticationEntryPoint {
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.setContentType(APPLICATION_JSON);
+        response.setContentType(ApiErrorFactory.APPLICATION_JSON);
         objectMapper.writeValue(
                 response.getOutputStream(),
-                ErrorDTO.of(Response.Status.UNAUTHORIZED, "Authentication is required to access this resource")
+                ApiErrorFactory.error(Response.Status.UNAUTHORIZED, "Authentication is required to access this resource")
         );
     }
 }

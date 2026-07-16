@@ -4,13 +4,12 @@ import ar.edu.itba.paw.interfaces.exception.GameNotFoundException;
 import ar.edu.itba.paw.interfaces.services.GameService;
 import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.Game.GameFormat;
-import ar.edu.itba.paw.webapp.dto.entities.ErrorDTO;
 import ar.edu.itba.paw.webapp.dto.entities.GameDTO;
 import ar.edu.itba.paw.webapp.dto.entities.GameFormatDTO;
 import ar.edu.itba.paw.webapp.dto.params.FavouriteParams;
 import ar.edu.itba.paw.webapp.dto.params.PaginationParams;
 import ar.edu.itba.paw.webapp.dto.params.SearchNameParams;
-import org.eclipse.persistence.internal.codegen.NonreflectiveMethodDefinition;
+import ar.edu.itba.paw.webapp.exception.ApiErrorFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,9 +35,7 @@ public class GameController {
         int totalPages = 0;
         int page = paginationParams.getPage();
         if (!searchNameParams.isEmpty() && !favouriteParams.isEmpty()) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(
-                    ErrorDTO.of(Response.Status.BAD_REQUEST,
-                            "Query parameters 'name' and 'favouritedBy' cannot be used together")).build();
+            return ApiErrorFactory.badRequest("Query parameters 'name' and 'favouritedBy' cannot be used together");
         }
 
         if (!searchNameParams.isEmpty()) {
@@ -66,7 +63,7 @@ public class GameController {
     @Produces(value = {Vendor.APPLICATION_GAME_FORMAT_LIST})
     public Response getFormats(@PathParam("id") long id) {
         if (id <= 0) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return ApiErrorFactory.badRequest("Invalid game id");
         }
 
         List<GameFormatDTO> gameFormats = gs.getFormats(id).stream().map(GameFormatDTO.mapper(uriInfo)).toList();
@@ -78,7 +75,7 @@ public class GameController {
     @Produces(value = {Vendor.APPLICATION_GAME_FORMAT})
     public Response getFormat(@PathParam("gameId") long gameId, @PathParam("formatId") long formatId){
         if (gameId <= 0 || formatId <= 0) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return ApiErrorFactory.badRequest("Invalid game or format id");
         }
 
         GameFormatDTO gf = GameFormatDTO.mapper(uriInfo).apply(gs.getFormat(formatId));
@@ -90,7 +87,7 @@ public class GameController {
     @Produces(value = {Vendor.APPLICATION_GAME})
     public Response getGame(@PathParam("id") long id) {
         if(id <= 0) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return ApiErrorFactory.badRequest("Invalid game id");
         }
 
         GameDTO game = GameDTO.mapper(uriInfo).apply(gs.findById(id).orElseThrow(GameNotFoundException::new));
