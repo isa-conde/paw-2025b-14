@@ -45,6 +45,9 @@ public class WebAuthConfig {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Value("${rankup.api.cors.allowed-origin-patterns}")
+    private String corsAllowedOriginPatterns;
+
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
@@ -53,11 +56,14 @@ public class WebAuthConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:5173"));
+        configuration.setAllowedOriginPatterns(Arrays.stream(corsAllowedOriginPatterns.split(","))
+                .map(String::trim)
+                .filter(origin -> !origin.isBlank())
+                .toList());
         configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE","OPTIONS","PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
         configuration.setExposedHeaders(Arrays.asList("Authorization", "Link", "Location", "ETag", "Total-Elements"));
-        configuration.setAllowCredentials(true);
+        configuration.setAllowCredentials(false);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
@@ -88,8 +94,29 @@ public class WebAuthConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                     .and().authorizeRequests()
                         .antMatchers(OPTIONS, "/api/**").permitAll()
+                        .antMatchers("/api/tokens", "/api/tokens/**").denyAll()
                         .antMatchers(GET, "/api/users/me").authenticated()
-                        .antMatchers(GET, "/api/**").permitAll()
+                        .antMatchers(GET,
+                                "/api/users",
+                                "/api/users/*",
+                                "/api/users/*/comments",
+                                "/api/users/*/accounts",
+                                "/api/users/*/accounts/*",
+                                "/api/teams",
+                                "/api/teams/*",
+                                "/api/teams/*/members",
+                                "/api/games",
+                                "/api/games/*",
+                                "/api/games/*/formats",
+                                "/api/games/*/formats/*",
+                                "/api/images/*",
+                                "/api/tournaments",
+                                "/api/tournaments/*",
+                                "/api/tournaments/*/participants",
+                                "/api/tournaments/*/participants/*",
+                                "/api/tournaments/*/matches",
+                                "/api/tournaments/*/matches/*",
+                                "/api/tournaments/*/rules").permitAll()
                         .antMatchers(POST,
                                 "/api/users",
                                 "/api/users/sessions",
@@ -102,6 +129,7 @@ public class WebAuthConfig {
                                 "/api/tournaments",
                                 "/api/tournaments/*/participants/users",
                                 "/api/tournaments/*/participants/teams",
+                                "/api/users/*/accounts",
                                 "/api/users/me/accounts",
                                 "/api/teams").hasRole("VERIFIED")
                         .antMatchers(PUT,
@@ -111,6 +139,7 @@ public class WebAuthConfig {
                                 "/api/teams/*").hasRole("VERIFIED")
                         .antMatchers(DELETE,
                                 "/api/tournaments/*/participants/**",
+                                "/api/users/*/accounts/*",
                                 "/api/users/me/accounts/*").hasRole("VERIFIED")
                         .anyRequest().authenticated()
                     .and().exceptionHandling()

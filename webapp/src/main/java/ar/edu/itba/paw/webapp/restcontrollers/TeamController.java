@@ -3,6 +3,7 @@ package ar.edu.itba.paw.webapp.restcontrollers;
 import ar.edu.itba.paw.interfaces.exception.TeamNotFoundException;
 import ar.edu.itba.paw.interfaces.services.TeamService;
 import ar.edu.itba.paw.model.Team;
+import ar.edu.itba.paw.webapp.auth.ApiAuthorizationService;
 import ar.edu.itba.paw.webapp.auth.CurrentUserProvider;
 import ar.edu.itba.paw.webapp.dto.entities.TeamDTO;
 import ar.edu.itba.paw.webapp.dto.entities.UserDTO;
@@ -11,6 +12,7 @@ import ar.edu.itba.paw.webapp.dto.params.PaginationParams;
 import ar.edu.itba.paw.webapp.dto.params.SearchNameParams;
 import ar.edu.itba.paw.webapp.dto.params.UserIdParams;
 import ar.edu.itba.paw.webapp.dto.requests.CreateTeamRequest;
+import ar.edu.itba.paw.webapp.dto.requests.UpdateTeamRequest;
 import ar.edu.itba.paw.webapp.exception.ApiErrorFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -35,6 +37,9 @@ public class TeamController {
 
     @Autowired
     private CurrentUserProvider currentUserProvider;
+
+    @Autowired
+    private ApiAuthorizationService apiAuthorizationService;
 
     @Context
     private UriInfo uriInfo;
@@ -151,23 +156,34 @@ public class TeamController {
     }
 
     @PUT
-    @Path("/{teamId}")
-    @Consumes(Vendor.APPLICATION_TEAM)
+    @Path("/{id}")
+    @Consumes(Vendor.APPLICATION_TEAM_UPDATE)
     @Produces(Vendor.APPLICATION_TEAM)
-    public Response updateTeam(@PathParam("teamId") long teamId, TeamDTO dto) {
-        if (teamId <= 0) {
+    public Response updateTeam(@PathParam("id") long id, @Valid UpdateTeamRequest request) {
+        if (id <= 0) {
             return badRequest("Invalid team id");
         }
 
-        if (teamId != dto.getId()) {
-            return badRequest("Team id in body does not match URI");
+        Optional<Team> team = ts.findById(id);
+        if (team.isEmpty()) {
+            return ApiErrorFactory.notFound("Team not found");
         }
 
-        //TODO OBTENER EL USUARIO DE LA REQUEST Y VERIFICAR SI TIENE PERMISOS PARA REALIZAR EL UPDATE
+        apiAuthorizationService.assertTeamOwner(id);
 
-        //TODO VERIFICAR
-        ts.updateTeam(teamId, dto.getName(), null, null, null);
-        return Response.ok(dto).build();
+        byte[] profilePicture = decodeBase64(request.getProfilePictureBase64());
+        byte[] banner = decodeBase64(request.getBannerBase64());
+
+        if (profilePicture == null && hasPayload(request.getProfilePictureBase64())) {
+            return badRequest("Invalid profilePictureBase64 payload");
+        }
+        if (banner == null && hasPayload(request.getBannerBase64())) {
+            return badRequest("Invalid bannerBase64 payload");
+        }
+
+        ts.updateTeam(id, request.getName(), profilePicture, banner, request.getMembers());
+        Team updated = ts.findById(id).orElseThrow(TeamNotFoundException::new);
+        return Response.ok(TeamDTO.fromTeam(uriInfo, updated)).build();
     }
 
     private Response badRequest(String detail) {

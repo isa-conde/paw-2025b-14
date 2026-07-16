@@ -11,12 +11,9 @@ public class UserDTO {
 
     private long id;
     private String username;
-    private String email;
     private boolean verified;
     private String bio;
     private Float rating;
-
-    private String password;
 
     private List<LinkDTO> links = new ArrayList<>();
 
@@ -29,7 +26,6 @@ public class UserDTO {
 
         toReturn.id = user.getId();
         toReturn.username = user.getUsername();
-        toReturn.email = user.getEmail();
         toReturn.verified = user.isVerified();
         toReturn.bio = user.getBio();
         toReturn.rating = user.getRating();
@@ -51,8 +47,6 @@ public class UserDTO {
             toReturn.addLink("banner", uriInfo.getBaseUriBuilder().path("images")
                     .path(String.valueOf(user.getBannerId())).build().toString());
         }
-        toReturn.addLink("assignedTokens", uriInfo.getBaseUriBuilder().path("tokens")
-                .queryParam("userId", user.getId()).build().toString());
         toReturn.addLink("userAccounts", uriInfo.getBaseUriBuilder().path("users")
                 .path(String.valueOf(user.getId()))
                 .path("accounts").build().toString());
@@ -70,14 +64,6 @@ public class UserDTO {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public boolean isVerified() {
@@ -102,14 +88,6 @@ public class UserDTO {
 
     public void setRating(Float rating) {
         this.rating = rating;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public long getId() {

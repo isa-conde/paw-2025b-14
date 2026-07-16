@@ -2,17 +2,15 @@ package ar.edu.itba.paw.webapp.restcontrollers;
 
 public class Vendor {
 
-    public static final String APPLICATION_TOKEN_LIST = "application/vnd.token.list.v1+json";
-
     public static final String APPLICATION_USER_LIST = "application/vnd.user.list.v1+json";
 
     public static final String APPLICATION_USER = "application/vnd.user.v1+json";
 
-    public static final String APPLICATION_TOKEN = "application/vnd.token.v1+json";
-
     public static final String APPLICATION_USER_CREATE = "application/vnd.user.create.v1+json";
 
     public static final String APPLICATION_USER_VERIFICATION = "application/vnd.user.verification.v1+json";
+
+    public static final String APPLICATION_USER_VERIFICATION_CONFIRM = "application/vnd.user.verification-confirm.v1+json";
 
     public static final String APPLICATION_PASSWORD_RESET_REQUEST = "application/vnd.user.password-request.v1+json";
 
@@ -31,6 +29,8 @@ public class Vendor {
     public static final String APPLICATION_TEAM_LIST = "application/vnd.team.list.v1+json";
 
     public static final String APPLICATION_TEAM_CREATE = "application/vnd.team.create.v1+json";
+
+    public static final String APPLICATION_TEAM_UPDATE = "application/vnd.team.update.v1+json";
 
     public static final String APPLICATION_TOURNAMENT = "application/vnd.tournament.v1+json";
 

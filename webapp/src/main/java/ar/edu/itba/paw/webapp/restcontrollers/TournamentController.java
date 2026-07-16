@@ -1,15 +1,21 @@
 package ar.edu.itba.paw.webapp.restcontrollers;
 
+import ar.edu.itba.paw.interfaces.exception.ParticipantNotFoundException;
+import ar.edu.itba.paw.interfaces.exception.UserNotFoundException;
 import ar.edu.itba.paw.interfaces.services.MatchService;
 import ar.edu.itba.paw.interfaces.services.ParticipantService;
 import ar.edu.itba.paw.interfaces.services.RulesService;
+import ar.edu.itba.paw.interfaces.services.TeamService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
+import ar.edu.itba.paw.interfaces.services.UserService;
 import ar.edu.itba.paw.model.Game.GameFormat;
 import ar.edu.itba.paw.model.Match.Match;
 import ar.edu.itba.paw.model.Participant;
 import ar.edu.itba.paw.model.Rules;
+import ar.edu.itba.paw.model.Team;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
+import ar.edu.itba.paw.webapp.auth.ApiAuthorizationService;
 import ar.edu.itba.paw.webapp.auth.CurrentUserProvider;
 import ar.edu.itba.paw.webapp.dto.entities.MatchDTO;
 import ar.edu.itba.paw.webapp.dto.entities.MatchStageDTO;
@@ -51,6 +57,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Path("tournaments")
 @Component("tournamentRestController")
@@ -73,7 +81,16 @@ public class TournamentController {
     private MatchService matchService;
 
     @Autowired
+    private UserService userService;
+
+    @Autowired
+    private TeamService teamService;
+
+    @Autowired
     private CurrentUserProvider currentUserProvider;
+
+    @Autowired
+    private ApiAuthorizationService apiAuthorizationService;
 
     @Context
     private UriInfo uriInfo;
@@ -182,6 +199,8 @@ public class TournamentController {
             return notFound("Tournament not found");
         }
 
+        apiAuthorizationService.assertTournamentCreator(id);
+
         byte[] image = decodeBase64(request.getImageBase64());
         byte[] rules = decodeBase64(request.getRulesBase64());
 
@@ -220,18 +239,28 @@ public class TournamentController {
     @GET
     @Path("/{id}/participants")
     @Produces(value = {Vendor.APPLICATION_PARTICIPANT_LIST})
-    public Response getParticipants(@PathParam("id") long id, @QueryParam("teamSize") Integer teamSize) {
+    public Response getParticipants(@PathParam("id") long id,
+                                    @QueryParam("teamSize") Integer teamSize,
+                                    @QueryParam("userId") Long userId) {
         if (id <= 0) {
             return badRequest("Invalid tournament id");
         }
 
+        if (userId != null && userId <= 0) {
+            return badRequest("Invalid user id");
+        }
+
         int resolvedTeamSize = resolveTeamSize(id, teamSize);
-        List<ParticipantDTO> participants = participantService.getTournamentParticipants(id, resolvedTeamSize)
-                .stream()
+        List<Participant> participants = participantService.getTournamentParticipants(id, resolvedTeamSize);
+        if (userId != null) {
+            participants = filterParticipantsByUser(participants, userId);
+        }
+
+        List<ParticipantDTO> response = participants.stream()
                 .map(ParticipantDTO.mapper(uriInfo))
                 .toList();
 
-        return Response.ok(new GenericEntity<>(participants) {}).build();
+        return Response.ok(new GenericEntity<>(response) {}).build();
     }
 
     @GET
@@ -265,18 +294,22 @@ public class TournamentController {
             return badRequest("Invalid tournament id");
         }
 
+        apiAuthorizationService.assertTeamOwner(request.getTeamId());
+
         participantService.joinTournamentTeam(id, request.getTeamId(), request.getMembers());
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 
     @DELETE
     @Path("/{id}/participants/me")
+    @Deprecated
     public Response leaveTournamentAsCurrentUser(@PathParam("id") long id) {
         if (id <= 0) {
             return badRequest("Invalid tournament id");
         }
 
-        participantService.leaveTournament(currentUserProvider.getCurrentUserId(), id);
+        Participant participant = findCurrentUserParticipant(id);
+        participantService.removeParticipant(id, participant.getId());
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 
@@ -287,15 +320,22 @@ public class TournamentController {
             return badRequest("Invalid tournament or participant id");
         }
 
+        apiAuthorizationService.assertCanDeleteParticipant(id, participantId);
+
         participantService.removeParticipant(id, participantId);
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 
     @DELETE
     @Path("/{id}/participants/users/{userId}")
+    @Deprecated
     public Response leaveTournament(@PathParam("id") long id, @PathParam("userId") long userId) {
         if (id <= 0 || userId <= 0) {
             return badRequest("Invalid tournament or user id");
+        }
+
+        if (currentUserProvider.getCurrentUserId() != userId) {
+            apiAuthorizationService.assertTournamentCreator(id);
         }
 
         participantService.leaveTournament(userId, id);
@@ -382,6 +422,8 @@ public class TournamentController {
             return badRequest("Invalid tournament or match id");
         }
 
+        apiAuthorizationService.assertTournamentCreator(id);
+
         matchService.setMatchResults(matchId, id, request.getLocalScore(), request.getVisitorScore());
         return Response.status(Response.Status.NO_CONTENT).build();
     }
@@ -399,6 +441,8 @@ public class TournamentController {
         if (tournament.isEmpty()) {
             return notFound("Tournament not found");
         }
+
+        apiAuthorizationService.assertTournamentCreator(id);
 
         if (request.getTournamentStarted() == null && request.getOpenInscriptions() == null) {
             return badRequest("status update must include tournamentStarted or openInscriptions");
@@ -435,6 +479,26 @@ public class TournamentController {
         }
 
         return format.getPlayersPerTeam();
+    }
+
+    private List<Participant> filterParticipantsByUser(List<Participant> participants, long userId) {
+        userService.findById(userId).orElseThrow(UserNotFoundException::new);
+        Set<Long> userTeamIds = teamService.getUserTeams(userId).stream()
+                .map(Team::getId)
+                .collect(Collectors.toSet());
+
+        return participants.stream()
+                .filter(participant -> (participant.getUser() != null && participant.getUser().getId() == userId)
+                        || (participant.getTeam() != null && userTeamIds.contains(participant.getTeam().getId())))
+                .toList();
+    }
+
+    private Participant findCurrentUserParticipant(long tournamentId) {
+        int teamSize = resolveTeamSize(tournamentId, null);
+        return participantService.getTournamentParticipants(tournamentId, teamSize).stream()
+                .filter(apiAuthorizationService::ownsParticipant)
+                .findFirst()
+                .orElseThrow(ParticipantNotFoundException::new);
     }
 
     private Response badRequest(String detail) {

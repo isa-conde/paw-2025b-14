@@ -207,7 +207,7 @@ public class ParticipantServiceImpl implements ParticipantService {
         Tournament tournament = tournamentDao.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
         if(!tournament.getOpenInscriptions()){
             LOGGER.warn("Cannot remove participant from a closed tournament");
-            return;
+            throw new TournamentAlreadyClosedException();
         }
         GameFormat format = tournament.getFormatEntity();
         int playersPerTeam;
@@ -220,7 +220,7 @@ public class ParticipantServiceImpl implements ParticipantService {
 
         if(participant == null){
             LOGGER.warn("Participant with ID {} not found in tournament with ID {}", participantId, tournamentId);
-            return;
+            throw new ParticipantNotFoundException();
         }
 
         if(playersPerTeam > 1){

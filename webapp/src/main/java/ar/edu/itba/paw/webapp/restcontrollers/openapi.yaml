@@ -31,8 +31,6 @@ tags:
     description: Manages games and formats.
   - name: tournaments
     description: Manages tournaments, participants, matches, and status.
-  - name: tokens
-    description: Manages verification/password tokens.
   - name: images
     description: Serves binary images referenced by DTO links.
 
@@ -80,22 +78,6 @@ paths:
           $ref: '#/components/responses/BadRequestJson'
         '409':
           $ref: '#/components/responses/ConflictJson'
-
-  /users/me:
-    get:
-      tags: [users]
-      summary: Get current authenticated user
-      security:
-        - bearerAuth: []
-      responses:
-        '200':
-          description: Current authenticated user
-          content:
-            application/vnd.user.v1+json:
-              schema:
-                $ref: '#/components/schemas/User'
-        '401':
-          $ref: '#/components/responses/UnauthorizedJson'
 
   /users/{id}:
     get:
@@ -153,32 +135,14 @@ paths:
           $ref: '#/components/responses/BadRequestJson'
         '404':
           $ref: '#/components/responses/NotFoundJson'
-
-  /users/{id}/accounts/{platform}:
-    get:
-      tags: [users]
-      summary: Get user account by platform
-      parameters:
-        - $ref: '#/components/parameters/UserId'
-        - $ref: '#/components/parameters/PlatformPath'
-      responses:
-        '200':
-          description: User account
-          content:
-            application/vnd.user-account.v1+json:
-              schema:
-                $ref: '#/components/schemas/UserAccount'
-        '400':
-          $ref: '#/components/responses/BadRequestJson'
-        '404':
-          $ref: '#/components/responses/NotFoundJson'
-
-  /users/me/accounts:
     post:
       tags: [users]
-      summary: Add an account to the current user
+      summary: Add an account to a user
+      description: Only the authenticated owner of `{id}` may mutate accounts.
       security:
         - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserId'
       requestBody:
         required: true
         content:
@@ -203,14 +167,35 @@ paths:
           $ref: '#/components/responses/ForbiddenJson'
         '404':
           $ref: '#/components/responses/NotFoundJson'
+        '409':
+          $ref: '#/components/responses/ConflictJson'
 
-  /users/me/accounts/{platform}:
+  /users/{id}/accounts/{platform}:
+    get:
+      tags: [users]
+      summary: Get user account by platform
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+        - $ref: '#/components/parameters/PlatformPath'
+      responses:
+        '200':
+          description: User account
+          content:
+            application/vnd.user-account.v1+json:
+              schema:
+                $ref: '#/components/schemas/UserAccount'
+        '400':
+          $ref: '#/components/responses/BadRequestJson'
+        '404':
+          $ref: '#/components/responses/NotFoundJson'
     delete:
       tags: [users]
-      summary: Delete an account from the current user
+      summary: Delete an account from a user
+      description: Only the authenticated owner of `{id}` may mutate accounts.
       security:
         - bearerAuth: []
       parameters:
+        - $ref: '#/components/parameters/UserId'
         - $ref: '#/components/parameters/PlatformPath'
       responses:
         '204':
@@ -221,6 +206,8 @@ paths:
           $ref: '#/components/responses/UnauthorizedJson'
         '403':
           $ref: '#/components/responses/ForbiddenJson'
+        '404':
+          $ref: '#/components/responses/NotFoundJson'
 
   /users/sessions:
     post:
@@ -231,7 +218,7 @@ paths:
         content:
           application/vnd.user.login.v1+json:
             schema:
-              $ref: '#/components/schemas/UserLoginRequest'
+              $ref: '#/components/schemas/LoginUserRequest'
       responses:
         '200':
           description: Logged-in user
@@ -258,25 +245,23 @@ paths:
         content:
           application/vnd.user.verification.v1+json:
             schema:
-              $ref: '#/components/schemas/UserEmailRequest'
+              $ref: '#/components/schemas/ResendVerificationRequest'
       responses:
-        '201':
-          description: Verification token created. Current controller returns only `Location`.
-          headers:
-            Location:
-              $ref: '#/components/headers/Location'
+        '204':
+          description: Verification email resent. Token is delivered out-of-band by email and is never exposed by this response.
+        '400':
+          $ref: '#/components/responses/BadRequestJson'
         '404':
           $ref: '#/components/responses/NotFoundJson'
     put:
       tags: [users]
       summary: Verify user
-      parameters:
-        - in: query
-          name: token
-          required: true
-          schema:
-            type: integer
-            format: int64
+      requestBody:
+        required: true
+        content:
+          application/vnd.user.verification-confirm.v1+json:
+            schema:
+              $ref: '#/components/schemas/ConfirmVerificationRequest'
       responses:
         '200':
           description: Verified user
@@ -301,13 +286,10 @@ paths:
         content:
           application/vnd.user.password-request.v1+json:
             schema:
-              $ref: '#/components/schemas/UserEmailRequest'
+              $ref: '#/components/schemas/RequestPasswordResetRequest'
       responses:
-        '201':
-          description: Password-reset token created. Current controller returns only `Location`.
-          headers:
-            Location:
-              $ref: '#/components/headers/Location'
+        '204':
+          description: Password-reset email sent. Token is delivered out-of-band by email and is never exposed by this response.
         '400':
           $ref: '#/components/responses/BadRequestJson'
         '404':
@@ -315,19 +297,12 @@ paths:
     put:
       tags: [users]
       summary: Reset password
-      parameters:
-        - in: query
-          name: token
-          required: true
-          schema:
-            type: integer
-            format: int64
       requestBody:
         required: true
         content:
           application/vnd.user.password-reset.v1+json:
             schema:
-              $ref: '#/components/schemas/UserPasswordRequest'
+              $ref: '#/components/schemas/ResetPasswordRequest'
       responses:
         '200':
           description: Password reset user
@@ -428,7 +403,7 @@ paths:
     put:
       tags: [teams]
       summary: Update team
-      description: Controller path parameter is named `teamId`; URI shape is `/teams/{id}`.
+      description: Only the authenticated team owner may update the team.
       security:
         - bearerAuth: []
       parameters:
@@ -436,9 +411,9 @@ paths:
       requestBody:
         required: true
         content:
-          application/vnd.team.v1+json:
+          application/vnd.team.update.v1+json:
             schema:
-              $ref: '#/components/schemas/Team'
+              $ref: '#/components/schemas/UpdateTeamRequest'
       responses:
         '200':
           description: Updated team
@@ -711,6 +686,7 @@ paths:
     put:
       tags: [tournaments]
       summary: Update tournament
+      description: Only the authenticated tournament creator may update the tournament.
       security:
         - bearerAuth: []
       parameters:
@@ -741,13 +717,19 @@ paths:
     get:
       tags: [tournaments]
       summary: Get tournament participants
-      description: Not paginated in the current controller.
+      description: Not paginated in the current controller. Use `userId` to discover the stable participant resource for a user or one of their teams.
       parameters:
         - $ref: '#/components/parameters/TournamentId'
         - in: query
           name: teamSize
           schema:
             type: integer
+            minimum: 1
+        - in: query
+          name: userId
+          schema:
+            type: integer
+            format: int64
             minimum: 1
       responses:
         '200':
@@ -805,6 +787,7 @@ paths:
     post:
       tags: [tournaments]
       summary: Join tournament as team
+      description: Only the authenticated owner of `teamId` may enroll that team.
       security:
         - bearerAuth: []
       parameters:
@@ -826,27 +809,8 @@ paths:
           $ref: '#/components/responses/ForbiddenJson'
         '404':
           $ref: '#/components/responses/NotFoundJson'
-
-  /tournaments/{id}/participants/me:
-    delete:
-      tags: [tournaments]
-      summary: Leave tournament as current user
-      description: Removes the authenticated Bearer-token user from the tournament without accepting a user id from the client.
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/TournamentId'
-      responses:
-        '204':
-          description: Left
-        '400':
-          $ref: '#/components/responses/BadRequestJson'
-        '401':
-          $ref: '#/components/responses/UnauthorizedJson'
-        '403':
-          $ref: '#/components/responses/ForbiddenJson'
-        '404':
-          $ref: '#/components/responses/NotFoundJson'
+        '409':
+          $ref: '#/components/responses/ConflictJson'
 
   /tournaments/{id}/participants/{participantId}:
     get:
@@ -869,6 +833,7 @@ paths:
     delete:
       tags: [tournaments]
       summary: Remove participant
+      description: Tournament creators may remove any participant. The owner of a participant may leave through this stable participant resource while business rules allow it.
       security:
         - bearerAuth: []
       parameters:
@@ -885,28 +850,8 @@ paths:
           $ref: '#/components/responses/ForbiddenJson'
         '404':
           $ref: '#/components/responses/NotFoundJson'
-
-  /tournaments/{id}/participants/users/{userId}:
-    delete:
-      tags: [tournaments]
-      summary: Leave tournament as user by id
-      description: Legacy id-based endpoint retained for compatibility; SPA clients should use `/tournaments/{id}/participants/me`.
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: '#/components/parameters/TournamentId'
-        - $ref: '#/components/parameters/UserIdPath'
-      responses:
-        '204':
-          description: Left
-        '400':
-          $ref: '#/components/responses/BadRequestJson'
-        '404':
-          $ref: '#/components/responses/NotFoundJson'
-        '401':
-          $ref: '#/components/responses/UnauthorizedJson'
-        '403':
-          $ref: '#/components/responses/ForbiddenJson'
+        '409':
+          $ref: '#/components/responses/ConflictJson'
 
   /tournaments/{id}/matches:
     get:
@@ -952,6 +897,7 @@ paths:
     put:
       tags: [tournaments]
       summary: Set match results
+      description: Only the authenticated tournament creator may set match results.
       security:
         - bearerAuth: []
       parameters:
@@ -981,6 +927,7 @@ paths:
     put:
       tags: [tournaments]
       summary: Update tournament status
+      description: Only the authenticated tournament creator may update tournament status.
       security:
         - bearerAuth: []
       parameters:
@@ -1009,41 +956,6 @@ paths:
         '409':
           $ref: '#/components/responses/ConflictJson'
 
-  /tokens:
-    get:
-      tags: [tokens]
-      summary: List tokens assigned to a user
-      description: Uses real controller query parameter `userId`.
-      parameters:
-        - in: query
-          name: userId
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Token list
-          content:
-            application/vnd.token.list.v1+json:
-              schema:
-                $ref: '#/components/schemas/TokenList'
-
-  /tokens/{value}:
-    get:
-      tags: [tokens]
-      summary: Get token
-      parameters:
-        - $ref: '#/components/parameters/TokenValue'
-      responses:
-        '200':
-          description: Token
-          content:
-            application/vnd.token.v1+json:
-              schema:
-                $ref: '#/components/schemas/Token'
-        '404':
-          $ref: '#/components/responses/NotFoundJson'
-
 components:
   securitySchemes:
     bearerAuth:
@@ -1057,7 +969,7 @@ components:
       schema:
         type: string
     Location:
-      description: Absolute URI of the created resource/token.
+      description: Absolute URI of the created resource.
       schema:
         type: string
         format: uri
@@ -1155,13 +1067,6 @@ components:
         type: integer
         format: int64
         minimum: 1
-    TokenValue:
-      in: path
-      name: value
-      required: true
-      schema:
-        type: integer
-        format: int64
     PlatformPath:
       in: path
       name: platform
@@ -1269,8 +1174,6 @@ components:
           format: int64
         username:
           type: string
-        email:
-          type: string
         verified:
           type: boolean
         bio:
@@ -1278,10 +1181,6 @@ components:
         rating:
           type: number
           format: float
-        password:
-          type: string
-          writeOnly: true
-          description: Present only when `UserDTO` is reused as an input DTO.
         links:
           type: array
           items:
@@ -1340,7 +1239,7 @@ components:
           type: string
       required: [username, email, password, repeatPassword]
 
-    UserEmailRequest:
+    ResendVerificationRequest:
       type: object
       properties:
         email:
@@ -1348,14 +1247,35 @@ components:
           format: email
       required: [email]
 
-    UserPasswordRequest:
+    ConfirmVerificationRequest:
       type: object
       properties:
+        token:
+          type: integer
+          format: int64
+          minimum: 1
+      required: [token]
+
+    RequestPasswordResetRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required: [email]
+
+    ResetPasswordRequest:
+      type: object
+      properties:
+        token:
+          type: integer
+          format: int64
+          minimum: 1
         password:
           type: string
-      required: [password]
+      required: [token, password]
 
-    UserLoginRequest:
+    LoginUserRequest:
       type: object
       properties:
         username:
@@ -1378,6 +1298,21 @@ components:
             $ref: '#/components/schemas/Link'
 
     CreateTeamRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        profilePictureBase64:
+          type: string
+        bannerBase64:
+          type: string
+        members:
+          type: array
+          items:
+            type: string
+      required: [name]
+
+    UpdateTeamRequest:
       type: object
       properties:
         name:
@@ -1630,20 +1565,6 @@ components:
           type: integer
       required: [localScore, visitorScore]
 
-    Token:
-      type: object
-      properties:
-        token:
-          type: integer
-          format: int64
-        expiryDate:
-          type: string
-          format: date
-        links:
-          type: array
-          items:
-            $ref: '#/components/schemas/Link'
-
     UserList:
       type: array
       items:
@@ -1672,10 +1593,6 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/MatchStage'
-    TokenList:
-      type: array
-      items:
-        $ref: '#/components/schemas/Token'
     CommentList:
       type: array
       items:
