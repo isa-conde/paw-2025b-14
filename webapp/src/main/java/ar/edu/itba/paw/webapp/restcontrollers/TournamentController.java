@@ -334,6 +334,7 @@ public class TournamentController {
     @PUT
     @Path("/{id}/status")
     @Consumes(value = {Vendor.APPLICATION_TOURNAMENT_STATUS})
+    @Produces(value = {Vendor.APPLICATION_TOURNAMENT})
     public Response updateTournamentStatus(@PathParam("id") long id, @Valid TournamentStatusRequest request) {
         if (id <= 0) {
             return Response.status(Response.Status.BAD_REQUEST).build();

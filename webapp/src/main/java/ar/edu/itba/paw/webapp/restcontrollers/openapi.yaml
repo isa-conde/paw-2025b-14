@@ -2,68 +2,85 @@ openapi: 3.0.0
 info:
   version: 1.0.0
   title: RankUp REST API
-  description: REST API for RankUp
+  description: |
+    REST API for RankUp.
+
+    Current pagination contract: paginated endpoints accept a zero-based `page`
+    query parameter. When pagination links are emitted, they are returned in the
+    standard `Link` response header with `self`, `first`, `last`, and, when
+    applicable, `prev` and `next` relations.
+
+    Current error contract: some controller branches return `ErrorDTO` JSON for
+    bad requests, while several validation/not-found paths still return an empty
+    400/404 response through controller code or exception mappers. Normalizing
+    every API error as JSON is intentionally left as API debt.
+
+    HATEOAS links that currently point to resources or filters without a REST
+    controller are not documented as available endpoints here. Known pending
+    links include `images`, `comments`, top-level `participants`, top-level
+    `matches`, `user-accounts`, `/tournaments?createdBy=...`,
+    `/tournaments?hasUser=...`, `/teams?createdBy=...`, `/teams?hasUser=...`,
+    and `/tokens?assignedTo=...`.
 servers:
   - url: /api
 tags:
   - name: users
-    description: Manages users.
+    description: Manages users, sessions, verification, and password reset.
   - name: teams
-    description: Manages teams.
+    description: Manages teams and team members.
   - name: games
     description: Manages games and formats.
   - name: tournaments
-    description: Manages tournaments, participants, and matches.
+    description: Manages tournaments, participants, matches, and status.
   - name: tokens
     description: Manages verification/password tokens.
 
 paths:
   /users:
     get:
-      tags: [ users ]
+      tags: [users]
       summary: List users by name
+      description: Requires `name`. Results are paginated with zero-based `page`.
       parameters:
         - in: query
           name: name
           required: true
           schema:
             type: string
-        - in: query
-          name: page
-          schema:
-            type: integer
-            minimum: 0
+        - $ref: '#/components/parameters/Page'
       responses:
         '200':
           description: User list
           headers:
             Link:
-              description: Pagination links
-              schema:
-                type: string
+              $ref: '#/components/headers/PaginationLink'
           content:
-            application/vnd.userlist.v1+json:
+            application/vnd.user.list.v1+json:
               schema:
                 $ref: '#/components/schemas/UserList'
+        '400':
+          $ref: '#/components/responses/EmptyOrErrorBadRequest'
     post:
-      tags: [ users ]
+      tags: [users]
       summary: Create user
       requestBody:
         required: true
         content:
           application/vnd.user.create.v1+json:
             schema:
-              $ref: '#/components/schemas/UserCreate'
+              $ref: '#/components/schemas/CreateUserRequest'
       responses:
         '201':
-          description: Created
+          description: User created. Current controller returns only `Location`.
           headers:
             Location:
-              schema:
-                type: string
+              $ref: '#/components/headers/Location'
+        '400':
+          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+
   /users/{id}:
     get:
-      tags: [ users ]
+      tags: [users]
       summary: Get user
       parameters:
         - $ref: '#/components/parameters/UserId'
@@ -75,26 +92,53 @@ paths:
               schema:
                 $ref: '#/components/schemas/User'
         '404':
-          description: Not found
+          $ref: '#/components/responses/EmptyNotFound'
+
+  /users/sessions:
+    post:
+      tags: [users]
+      summary: Login user session
+      requestBody:
+        required: true
+        content:
+          application/vnd.user.login.v1+json:
+            schema:
+              $ref: '#/components/schemas/UserLoginRequest'
+      responses:
+        '200':
+          description: Logged-in user
+          headers:
+            Authorization:
+              $ref: '#/components/headers/Authorization'
+          content:
+            application/vnd.user.v1+json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+        '404':
+          $ref: '#/components/responses/EmptyNotFound'
+
   /users/verifications:
     post:
-      tags: [ users ]
+      tags: [users]
       summary: Resend verification email
       requestBody:
         required: true
         content:
           application/vnd.user.verification.v1+json:
             schema:
-              $ref: '#/components/schemas/UserEmail'
+              $ref: '#/components/schemas/UserEmailRequest'
       responses:
         '201':
-          description: Token created
+          description: Verification token created. Current controller returns only `Location`.
           headers:
             Location:
-              schema:
-                type: string
+              $ref: '#/components/headers/Location'
+        '404':
+          $ref: '#/components/responses/EmptyNotFound'
     put:
-      tags: [ users ]
+      tags: [users]
       summary: Verify user
       parameters:
         - in: query
@@ -102,36 +146,44 @@ paths:
           required: true
           schema:
             type: integer
+            format: int64
       responses:
         '200':
           description: Verified user
           headers:
             Authorization:
-              schema:
-                type: string
+              $ref: '#/components/headers/Authorization'
           content:
             application/vnd.user.v1+json:
               schema:
                 $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+        '404':
+          $ref: '#/components/responses/EmptyNotFound'
+
   /users/password-requests:
     post:
-      tags: [ users ]
+      tags: [users]
       summary: Request password reset
       requestBody:
         required: true
         content:
           application/vnd.user.password-request.v1+json:
             schema:
-              $ref: '#/components/schemas/UserEmail'
+              $ref: '#/components/schemas/UserEmailRequest'
       responses:
         '201':
-          description: Token created
+          description: Password-reset token created. Current controller returns only `Location`.
           headers:
             Location:
-              schema:
-                type: string
+              $ref: '#/components/headers/Location'
+        '400':
+          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+        '404':
+          $ref: '#/components/responses/EmptyNotFound'
     put:
-      tags: [ users ]
+      tags: [users]
       summary: Reset password
       parameters:
         - in: query
@@ -139,28 +191,35 @@ paths:
           required: true
           schema:
             type: integer
+            format: int64
       requestBody:
         required: true
         content:
           application/vnd.user.password-reset.v1+json:
             schema:
-              $ref: '#/components/schemas/UserPassword'
+              $ref: '#/components/schemas/UserPasswordRequest'
       responses:
         '200':
-          description: Password reset
+          description: Password reset user
           headers:
             Authorization:
-              schema:
-                type: string
+              $ref: '#/components/headers/Authorization'
           content:
             application/vnd.user.v1+json:
               schema:
                 $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+        '404':
+          $ref: '#/components/responses/EmptyNotFound'
 
   /teams:
     get:
-      tags: [ teams ]
+      tags: [teams]
       summary: Search teams
+      description: |
+        Supports either `name` or `userId`. `forTournament` can be combined only
+        with `userId`. Name searches are paginated and may emit `Link` headers.
       parameters:
         - in: query
           name: name
@@ -170,50 +229,50 @@ paths:
           name: userId
           schema:
             type: integer
+            format: int64
         - in: query
           name: forTournament
           schema:
             type: integer
-        - in: query
-          name: page
-          schema:
-            type: integer
-            minimum: 0
+            format: int64
+        - $ref: '#/components/parameters/Page'
       responses:
         '200':
           description: Team list
           headers:
             Link:
-              description: Pagination links
-              schema:
-                type: string
+              $ref: '#/components/headers/PaginationLink'
           content:
-            application/vnd.teamlist.v1+json:
+            application/vnd.team.list.v1+json:
               schema:
                 $ref: '#/components/schemas/TeamList'
+        '400':
+          $ref: '#/components/responses/EmptyOrErrorBadRequest'
     post:
-      tags: [ teams ]
+      tags: [teams]
       summary: Create team
       requestBody:
         required: true
         content:
           application/vnd.team.create.v1+json:
             schema:
-              $ref: '#/components/schemas/TeamCreate'
+              $ref: '#/components/schemas/CreateTeamRequest'
       responses:
         '201':
           description: Team created
           headers:
             Location:
-              schema:
-                type: string
+              $ref: '#/components/headers/Location'
           content:
             application/vnd.team.v1+json:
               schema:
                 $ref: '#/components/schemas/Team'
+        '400':
+          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+
   /teams/{id}:
     get:
-      tags: [ teams ]
+      tags: [teams]
       summary: Get team
       parameters:
         - $ref: '#/components/parameters/TeamId'
@@ -224,11 +283,14 @@ paths:
             application/vnd.team.v1+json:
               schema:
                 $ref: '#/components/schemas/Team'
+        '400':
+          $ref: '#/components/responses/EmptyOrErrorBadRequest'
         '404':
-          description: Not found
+          $ref: '#/components/responses/EmptyNotFound'
     put:
-      tags: [ teams ]
+      tags: [teams]
       summary: Update team
+      description: Controller path parameter is named `teamId`; URI shape is `/teams/{id}`.
       parameters:
         - $ref: '#/components/parameters/TeamId'
       requestBody:
@@ -244,9 +306,12 @@ paths:
             application/vnd.team.v1+json:
               schema:
                 $ref: '#/components/schemas/Team'
+        '400':
+          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+
   /teams/{id}/members:
     get:
-      tags: [ teams ]
+      tags: [teams]
       summary: Get team members
       parameters:
         - $ref: '#/components/parameters/TeamId'
@@ -254,14 +319,22 @@ paths:
         '200':
           description: Team members
           content:
-            application/vnd.userlist.v1+json:
+            application/vnd.user.list.v1+json:
               schema:
                 $ref: '#/components/schemas/UserList'
+        '400':
+          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+        '404':
+          $ref: '#/components/responses/EmptyNotFound'
 
   /games:
     get:
-      tags: [ games ]
-      summary: List games
+      tags: [games]
+      summary: List or search games
+      description: |
+        `name` and `favouritedBy` are mutually exclusive. Listing/searching by
+        `page` may emit pagination `Link` headers. Favourite lists are returned
+        without pagination links by the current controller.
       parameters:
         - in: query
           name: name
@@ -271,26 +344,42 @@ paths:
           name: favouritedBy
           schema:
             type: integer
-        - in: query
-          name: page
-          schema:
-            type: integer
-            minimum: 0
+            format: int64
+        - $ref: '#/components/parameters/Page'
       responses:
         '200':
           description: Game list
           headers:
             Link:
-              description: Pagination links
-              schema:
-                type: string
+              $ref: '#/components/headers/PaginationLink'
           content:
-            application/vnd.gamelist.v1+json:
+            application/vnd.game.list.v1+json:
               schema:
                 $ref: '#/components/schemas/GameList'
-  /games/{gameId}/formats:
+        '400':
+          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+
+  /games/{id}:
     get:
-      tags: [ games ]
+      tags: [games]
+      summary: Get game
+      parameters:
+        - $ref: '#/components/parameters/GameId'
+      responses:
+        '200':
+          description: Game
+          content:
+            application/vnd.game.v1+json:
+              schema:
+                $ref: '#/components/schemas/Game'
+        '400':
+          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+        '404':
+          $ref: '#/components/responses/EmptyNotFound'
+
+  /games/{id}/formats:
+    get:
+      tags: [games]
       summary: List game formats
       parameters:
         - $ref: '#/components/parameters/GameId'
@@ -298,28 +387,36 @@ paths:
         '200':
           description: Game format list
           content:
-            application/vnd.gameformatlist.v1+json:
+            application/vnd.game-format.list.v1+json:
               schema:
                 $ref: '#/components/schemas/GameFormatList'
+        '400':
+          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+
   /games/{gameId}/formats/{formatId}:
     get:
-      tags: [ games ]
+      tags: [games]
       summary: Get game format
       parameters:
-        - $ref: '#/components/parameters/GameId'
+        - $ref: '#/components/parameters/GameIdForFormat'
         - $ref: '#/components/parameters/FormatId'
       responses:
         '200':
           description: Game format
           content:
-            application/vnd.gameformat.v1+json:
+            application/vnd.game-format.v1+json:
               schema:
                 $ref: '#/components/schemas/GameFormat'
+        '400':
+          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+        '404':
+          $ref: '#/components/responses/EmptyNotFound'
 
   /tournaments:
     get:
-      tags: [ tournaments ]
+      tags: [tournaments]
       summary: List tournaments
+      description: Results are paginated with zero-based `page`.
       parameters:
         - in: query
           name: name
@@ -329,14 +426,15 @@ paths:
           name: gameId
           schema:
             type: integer
+            format: int64
         - in: query
           name: region
           schema:
-            type: string
+            $ref: '#/components/schemas/Region'
         - in: query
           name: elo
           schema:
-            type: string
+            $ref: '#/components/schemas/Elo'
         - in: query
           name: startDate
           schema:
@@ -354,55 +452,54 @@ paths:
         - in: query
           name: structure
           schema:
-            type: string
+            $ref: '#/components/schemas/Structure'
         - in: query
           name: genre
           schema:
-            type: string
+            $ref: '#/components/schemas/Genre'
         - in: query
           name: playersPerTeam
           schema:
             type: integer
-        - in: query
-          name: page
-          schema:
-            type: integer
-            minimum: 0
+            minimum: 1
+        - $ref: '#/components/parameters/Page'
       responses:
         '200':
           description: Tournament list
           headers:
             Link:
-              description: Pagination links
-              schema:
-                type: string
+              $ref: '#/components/headers/PaginationLink'
           content:
-            application/vnd.tournamentlist.v1+json:
+            application/vnd.tournament.list.v1+json:
               schema:
                 $ref: '#/components/schemas/TournamentList'
+        '400':
+          $ref: '#/components/responses/EmptyOrErrorBadRequest'
     post:
-      tags: [ tournaments ]
+      tags: [tournaments]
       summary: Create tournament
       requestBody:
         required: true
         content:
           application/vnd.tournament.create.v1+json:
             schema:
-              $ref: '#/components/schemas/TournamentCreate'
+              $ref: '#/components/schemas/CreateTournamentRequest'
       responses:
         '201':
           description: Tournament created
           headers:
             Location:
-              schema:
-                type: string
+              $ref: '#/components/headers/Location'
           content:
             application/vnd.tournament.v1+json:
               schema:
                 $ref: '#/components/schemas/Tournament'
+        '400':
+          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+
   /tournaments/{id}:
     get:
-      tags: [ tournaments ]
+      tags: [tournaments]
       summary: Get tournament
       parameters:
         - $ref: '#/components/parameters/TournamentId'
@@ -413,10 +510,12 @@ paths:
             application/vnd.tournament.v1+json:
               schema:
                 $ref: '#/components/schemas/Tournament'
+        '400':
+          $ref: '#/components/responses/EmptyOrErrorBadRequest'
         '404':
-          description: Not found
+          $ref: '#/components/responses/EmptyNotFound'
     put:
-      tags: [ tournaments ]
+      tags: [tournaments]
       summary: Update tournament
       parameters:
         - $ref: '#/components/parameters/TournamentId'
@@ -425,7 +524,7 @@ paths:
         content:
           application/vnd.tournament.update.v1+json:
             schema:
-              $ref: '#/components/schemas/TournamentUpdate'
+              $ref: '#/components/schemas/UpdateTournamentRequest'
       responses:
         '200':
           description: Updated tournament
@@ -433,10 +532,16 @@ paths:
             application/vnd.tournament.v1+json:
               schema:
                 $ref: '#/components/schemas/Tournament'
+        '400':
+          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+        '404':
+          $ref: '#/components/responses/EmptyNotFound'
+
   /tournaments/{id}/participants:
     get:
-      tags: [ tournaments ]
-      summary: Get participants
+      tags: [tournaments]
+      summary: Get tournament participants
+      description: Not paginated in the current controller.
       parameters:
         - $ref: '#/components/parameters/TournamentId'
         - in: query
@@ -448,12 +553,15 @@ paths:
         '200':
           description: Participant list
           content:
-            application/vnd.participantlist.v1+json:
+            application/vnd.participant.list.v1+json:
               schema:
                 $ref: '#/components/schemas/ParticipantList'
+        '400':
+          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+
   /tournaments/{id}/participants/users:
     post:
-      tags: [ tournaments ]
+      tags: [tournaments]
       summary: Join tournament as user
       parameters:
         - $ref: '#/components/parameters/TournamentId'
@@ -462,13 +570,16 @@ paths:
         content:
           application/vnd.tournament.join-user.v1+json:
             schema:
-              $ref: '#/components/schemas/JoinTournamentUser'
+              $ref: '#/components/schemas/JoinTournamentUserRequest'
       responses:
         '204':
           description: Joined
+        '400':
+          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+
   /tournaments/{id}/participants/teams:
     post:
-      tags: [ tournaments ]
+      tags: [tournaments]
       summary: Join tournament as team
       parameters:
         - $ref: '#/components/parameters/TournamentId'
@@ -477,13 +588,16 @@ paths:
         content:
           application/vnd.tournament.join-team.v1+json:
             schema:
-              $ref: '#/components/schemas/JoinTournamentTeam'
+              $ref: '#/components/schemas/JoinTournamentTeamRequest'
       responses:
         '204':
           description: Joined
+        '400':
+          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+
   /tournaments/{id}/participants/{participantId}:
     delete:
-      tags: [ tournaments ]
+      tags: [tournaments]
       summary: Remove participant
       parameters:
         - $ref: '#/components/parameters/TournamentId'
@@ -491,20 +605,27 @@ paths:
       responses:
         '204':
           description: Removed
+        '400':
+          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+
   /tournaments/{id}/participants/users/{userId}:
     delete:
-      tags: [ tournaments ]
-      summary: Leave tournament
+      tags: [tournaments]
+      summary: Leave tournament as user
       parameters:
         - $ref: '#/components/parameters/TournamentId'
         - $ref: '#/components/parameters/UserIdPath'
       responses:
         '204':
           description: Left
+        '400':
+          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+
   /tournaments/{id}/matches:
     get:
-      tags: [ tournaments ]
-      summary: Get matches by stage
+      tags: [tournaments]
+      summary: Get tournament matches grouped by stage
+      description: Not paginated in the current controller.
       parameters:
         - $ref: '#/components/parameters/TournamentId'
         - in: query
@@ -518,10 +639,13 @@ paths:
             application/vnd.matchstagelist.v1+json:
               schema:
                 $ref: '#/components/schemas/MatchStageList'
+        '400':
+          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+
   /tournaments/{id}/matches/{matchId}:
     get:
-      tags: [ tournaments ]
-      summary: Get match
+      tags: [tournaments]
+      summary: Get tournament match
       parameters:
         - $ref: '#/components/parameters/TournamentId'
         - $ref: '#/components/parameters/MatchId'
@@ -532,9 +656,14 @@ paths:
             application/vnd.match.v1+json:
               schema:
                 $ref: '#/components/schemas/Match'
+        '400':
+          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+        '404':
+          $ref: '#/components/responses/EmptyNotFound'
+
   /tournaments/{id}/matches/{matchId}/results:
     put:
-      tags: [ tournaments ]
+      tags: [tournaments]
       summary: Set match results
       parameters:
         - $ref: '#/components/parameters/TournamentId'
@@ -544,13 +673,16 @@ paths:
         content:
           application/vnd.match.results.v1+json:
             schema:
-              $ref: '#/components/schemas/MatchResults'
+              $ref: '#/components/schemas/SetMatchResultsRequest'
       responses:
         '204':
           description: Updated
+        '400':
+          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+
   /tournaments/{id}/status:
     put:
-      tags: [ tournaments ]
+      tags: [tournaments]
       summary: Update tournament status
       parameters:
         - $ref: '#/components/parameters/TournamentId'
@@ -559,34 +691,41 @@ paths:
         content:
           application/vnd.tournament.status.v1+json:
             schema:
-              $ref: '#/components/schemas/TournamentStatus'
+              $ref: '#/components/schemas/TournamentStatusRequest'
       responses:
         '200':
-          description: Updated status
+          description: Updated tournament status
           content:
             application/vnd.tournament.v1+json:
               schema:
                 $ref: '#/components/schemas/Tournament'
+        '400':
+          $ref: '#/components/responses/EmptyOrErrorBadRequest'
+        '404':
+          $ref: '#/components/responses/EmptyNotFound'
 
   /tokens:
     get:
-      tags: [ tokens ]
-      summary: List user tokens
+      tags: [tokens]
+      summary: List tokens assigned to a user
+      description: Uses real controller query parameter `userId`; note that `UserDTO.assignedTokens` currently links with `assignedTo`.
       parameters:
         - in: query
           name: userId
           schema:
             type: integer
+            format: int64
       responses:
         '200':
           description: Token list
           content:
-            application/vnd.tokenlist.v1+json:
+            application/vnd.token.list.v1+json:
               schema:
                 $ref: '#/components/schemas/TokenList'
+
   /tokens/{value}:
     get:
-      tags: [ tokens ]
+      tags: [tokens]
       summary: Get token
       parameters:
         - $ref: '#/components/parameters/TokenValue'
@@ -597,63 +736,123 @@ paths:
             application/vnd.token.v1+json:
               schema:
                 $ref: '#/components/schemas/Token'
+        '404':
+          $ref: '#/components/responses/EmptyNotFound'
 
 components:
+  headers:
+    Authorization:
+      description: JWT returned by session, verification, and password-reset flows.
+      schema:
+        type: string
+    Location:
+      description: Absolute URI of the created resource/token.
+      schema:
+        type: string
+        format: uri
+    PaginationLink:
+      description: RFC 8288 pagination links with `self`, `first`, `last`, and optional `prev`/`next`.
+      schema:
+        type: string
+
   parameters:
+    Page:
+      in: query
+      name: page
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: Zero-based page index.
     UserId:
       in: path
       name: id
       required: true
       schema:
         type: integer
+        format: int64
+        minimum: 1
     UserIdPath:
       in: path
       name: userId
       required: true
       schema:
         type: integer
+        format: int64
+        minimum: 1
     TeamId:
       in: path
       name: id
       required: true
       schema:
         type: integer
+        format: int64
+        minimum: 1
     GameId:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
+    GameIdForFormat:
       in: path
       name: gameId
       required: true
       schema:
         type: integer
+        format: int64
+        minimum: 1
     FormatId:
       in: path
       name: formatId
       required: true
       schema:
         type: integer
+        format: int64
+        minimum: 1
     TournamentId:
       in: path
       name: id
       required: true
       schema:
         type: integer
+        format: int64
+        minimum: 1
     ParticipantId:
       in: path
       name: participantId
       required: true
       schema:
         type: integer
+        format: int64
+        minimum: 1
     MatchId:
       in: path
       name: matchId
       required: true
       schema:
         type: integer
+        format: int64
+        minimum: 1
     TokenValue:
       in: path
       name: value
       required: true
       schema:
         type: integer
+        format: int64
+
+  responses:
+    EmptyOrErrorBadRequest:
+      description: Bad request. Current API may return an `ErrorDTO` JSON body or an empty body depending on code path.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    EmptyNotFound:
+      description: Not found. Current exception mappers generally return an empty body.
 
   schemas:
     Link:
@@ -663,11 +862,38 @@ components:
           type: string
         href:
           type: string
+          format: uri
+      required: [rel, href]
+
+    Error:
+      type: object
+      properties:
+        status:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+
+    Region:
+      type: string
+      enum: [NA, LAS, LAN, BR, EUW, EUNE, OCE, ASIA]
+    Elo:
+      type: string
+      enum: [LOW, MID, HIGH, FREE]
+    Structure:
+      type: string
+      enum: [ELIMINATION, LEAGUE, HYBRID]
+    Genre:
+      type: string
+      enum: [MOBA, FPS, Fighting, TPS, BattleRoyale, RTS, Sports, DGC, MOBILE]
+
     User:
       type: object
       properties:
         id:
           type: integer
+          format: int64
         username:
           type: string
         email:
@@ -678,50 +904,77 @@ components:
           type: string
         rating:
           type: number
+          format: float
+        password:
+          type: string
+          writeOnly: true
+          description: Present only when `UserDTO` is reused as an input DTO.
         links:
           type: array
           items:
             $ref: '#/components/schemas/Link'
-    UserCreate:
+
+    CreateUserRequest:
       type: object
       properties:
         username:
           type: string
+          maxLength: 31
         email:
           type: string
+          format: email
         password:
           type: string
-      required: [ username, email, password ]
-    UserEmail:
+        repeatPassword:
+          type: string
+      required: [username, email, password, repeatPassword]
+
+    UserEmailRequest:
       type: object
       properties:
         email:
           type: string
-      required: [ email ]
-    UserPassword:
+          format: email
+      required: [email]
+
+    UserPasswordRequest:
       type: object
       properties:
         password:
           type: string
-      required: [ password ]
+      required: [password]
+
+    UserLoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required: [username, password]
+
     Team:
       type: object
       properties:
         id:
           type: integer
+          format: int64
         name:
           type: string
         links:
           type: array
           items:
             $ref: '#/components/schemas/Link'
-    TeamCreate:
+
+    CreateTeamRequest:
       type: object
       properties:
         name:
           type: string
         ownerId:
           type: integer
+          format: int64
+          minimum: 1
         profilePictureBase64:
           type: string
         bannerBase64:
@@ -730,12 +983,14 @@ components:
           type: array
           items:
             type: string
-      required: [ name, ownerId ]
+      required: [name, ownerId]
+
     Game:
       type: object
       properties:
         id:
           type: integer
+          format: int64
         name:
           type: string
         genre:
@@ -744,11 +999,13 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Link'
+
     GameFormat:
       type: object
       properties:
         id:
           type: integer
+          format: int64
         name:
           type: string
         playersPerTeam:
@@ -757,11 +1014,13 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Link'
+
     Tournament:
       type: object
       properties:
         id:
           type: integer
+          format: int64
         name:
           type: string
         region:
@@ -790,6 +1049,7 @@ components:
           type: boolean
         rating:
           type: number
+          format: float
         serverName:
           type: string
         discordChannel:
@@ -798,19 +1058,24 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Link'
-    TournamentCreate:
+
+    CreateTournamentRequest:
       type: object
       properties:
         creatorId:
           type: integer
+          format: int64
+          minimum: 1
         name:
           type: string
         gameId:
           type: integer
+          format: int64
+          minimum: 1
         region:
-          type: string
+          $ref: '#/components/schemas/Region'
         elo:
-          type: string
+          $ref: '#/components/schemas/Elo'
         startDate:
           type: string
           format: date
@@ -818,11 +1083,14 @@ components:
           type: string
           format: date
         structure:
-          type: string
+          $ref: '#/components/schemas/Structure'
         maxParticipants:
           type: integer
+          minimum: 1
         formatId:
           type: integer
+          format: int64
+          minimum: 1
         imageBase64:
           type: string
         rulesBase64:
@@ -833,8 +1101,9 @@ components:
           type: string
         discordChannel:
           type: string
-      required: [ creatorId, name, gameId, region, elo, startDate, endDate, structure, maxParticipants, formatId ]
-    TournamentUpdate:
+      required: [creatorId, name, gameId, region, elo, startDate, endDate, structure, maxParticipants, formatId]
+
+    UpdateTournamentRequest:
       type: object
       properties:
         name:
@@ -847,6 +1116,7 @@ components:
           format: date
         maxParticipants:
           type: integer
+          minimum: 1
         imageBase64:
           type: string
         rulesBase64:
@@ -857,48 +1127,96 @@ components:
           type: string
         discordChannel:
           type: string
-      required: [ name ]
+      required: [name]
+
+    TournamentStatusRequest:
+      type: object
+      properties:
+        tournamentStarted:
+          type: boolean
+          description: May only transition to true in the current controller.
+        openInscriptions:
+          type: boolean
+          description: May only transition to false in the current controller.
+
     Participant:
       type: object
       properties:
         id:
           type: integer
+          format: int64
         name:
           type: string
         points:
           type: integer
         scoreDifference:
           type: integer
+          nullable: true
         groupNumber:
           type: integer
+          nullable: true
         hasRated:
           type: boolean
         links:
           type: array
           items:
             $ref: '#/components/schemas/Link'
+
+    JoinTournamentUserRequest:
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int64
+          minimum: 1
+      required: [userId]
+
+    JoinTournamentTeamRequest:
+      type: object
+      properties:
+        teamId:
+          type: integer
+          format: int64
+          minimum: 1
+        members:
+          type: array
+          minItems: 1
+          items:
+            type: integer
+            format: int64
+            minimum: 1
+      required: [teamId, members]
+
     Match:
       type: object
       properties:
         id:
           type: integer
+          format: int64
         localScore:
           type: integer
+          nullable: true
         visitorScore:
           type: integer
+          nullable: true
         winner:
           type: integer
+          nullable: true
         stage:
           type: integer
+          nullable: true
         groupStage:
           type: boolean
+          nullable: true
         date:
           type: string
           format: date
+          nullable: true
         links:
           type: array
           items:
             $ref: '#/components/schemas/Link'
+
     MatchStage:
       type: object
       properties:
@@ -908,11 +1226,22 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Match'
+
+    SetMatchResultsRequest:
+      type: object
+      properties:
+        localScore:
+          type: integer
+        visitorScore:
+          type: integer
+      required: [localScore, visitorScore]
+
     Token:
       type: object
       properties:
         token:
           type: integer
+          format: int64
         expiryDate:
           type: string
           format: date
@@ -920,37 +1249,7 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Link'
-    JoinTournamentUser:
-      type: object
-      properties:
-        userId:
-          type: integer
-      required: [ userId ]
-    JoinTournamentTeam:
-      type: object
-      properties:
-        teamId:
-          type: integer
-        members:
-          type: array
-          items:
-            type: integer
-      required: [ teamId, members ]
-    MatchResults:
-      type: object
-      properties:
-        localScore:
-          type: integer
-        visitorScore:
-          type: integer
-      required: [ localScore, visitorScore ]
-    TournamentStatus:
-      type: object
-      properties:
-        tournamentStarted:
-          type: boolean
-        openInscriptions:
-          type: boolean
+
     UserList:
       type: array
       items:
