@@ -83,7 +83,9 @@ public class TournamentDTO {
         }
 
         if (tournament.getTournamentWinner() != null) {
-            toReturn.addLink("winner", uriInfo.getBaseUriBuilder().path("participants")
+            toReturn.addLink("winner", uriInfo.getBaseUriBuilder().path("tournaments")
+                    .path(String.valueOf(tournament.getId()))
+                    .path("participants")
                     .path(String.valueOf(tournament.getTournamentWinner())).build().toString());
         }
 

@@ -32,8 +32,12 @@ public class ParticipantDTO {
         toReturn.groupNumber = participant.getGroupNumber();
         toReturn.hasRated = Boolean.TRUE.equals(participant.getHasRated());
 
-        toReturn.addLink("self", uriInfo.getBaseUriBuilder().path("participants")
-                .path(String.valueOf(participant.getId())).build().toString());
+        if (participant.getTournament() != null) {
+            toReturn.addLink("self", uriInfo.getBaseUriBuilder().path("tournaments")
+                    .path(String.valueOf(participant.getTournament().getId()))
+                    .path("participants")
+                    .path(String.valueOf(participant.getId())).build().toString());
+        }
 
         if (participant.getUser() != null) {
             toReturn.addLink("user", uriInfo.getBaseUriBuilder().path("users")

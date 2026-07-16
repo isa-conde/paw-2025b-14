@@ -79,6 +79,18 @@ public class ParticipantServiceImpl implements ParticipantService {
     }
 
     @Override
+    public Participant getTournamentParticipant(long tournamentId, long participantId) {
+        Tournament tournament = tournamentDao.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
+        GameFormat format = tournament.getFormatEntity();
+        int teamSize = format == null ? 1 : format.getPlayersPerTeam();
+        Participant participant = participantDao.getTournamentParticipantById(tournamentId, participantId, teamSize);
+        if (participant == null) {
+            throw new ParticipantNotFoundException();
+        }
+        return participant;
+    }
+
+    @Override
     public int getTournamentGroups(long tournamentId){
         return participantDao.getTournamentGroups(tournamentId);
     }

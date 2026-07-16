@@ -102,13 +102,16 @@ public class WebAuthConfig {
                                 "/api/tournaments",
                                 "/api/tournaments/*/participants/users",
                                 "/api/tournaments/*/participants/teams",
+                                "/api/users/me/accounts",
                                 "/api/teams").hasRole("VERIFIED")
                         .antMatchers(PUT,
                                 "/api/tournaments/*",
                                 "/api/tournaments/*/status",
                                 "/api/tournaments/*/matches/*/results",
                                 "/api/teams/*").hasRole("VERIFIED")
-                        .antMatchers(DELETE, "/api/tournaments/*/participants/**").hasRole("VERIFIED")
+                        .antMatchers(DELETE,
+                                "/api/tournaments/*/participants/**",
+                                "/api/users/me/accounts/*").hasRole("VERIFIED")
                         .anyRequest().authenticated()
                     .and().exceptionHandling()
                         .authenticationEntryPoint(apiAuthenticationEntryPoint)

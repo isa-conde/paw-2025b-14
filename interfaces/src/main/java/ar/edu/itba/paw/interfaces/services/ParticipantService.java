@@ -16,6 +16,8 @@ public interface ParticipantService {
 
     List<Participant> getTournamentParticipants(long tournamentId, int teamSize);
 
+    Participant getTournamentParticipant(long tournamentId, long participantId);
+
     int getTournamentGroups(long tournamentId);
 
     void joinTournamentTeam(long tournamentId, long teamId, List<Long> participants);

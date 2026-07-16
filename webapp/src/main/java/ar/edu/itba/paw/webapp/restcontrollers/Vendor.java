@@ -38,6 +38,8 @@ public class Vendor {
 
     public static final String APPLICATION_PARTICIPANT_LIST = "application/vnd.participant.list.v1+json";
 
+    public static final String APPLICATION_PARTICIPANT = "application/vnd.participant.v1+json";
+
     public static final String APPLICATION_MATCH_STAGE_LIST = "application/vnd.matchstagelist.v1+json";
 
     public static final String APPLICATION_MATCH = "application/vnd.match.v1+json";
@@ -57,5 +59,13 @@ public class Vendor {
     public static final String APPLICATION_MATCH_RESULTS = "application/vnd.match.results.v1+json";
 
     public static final String APPLICATION_USER_LOGIN = "application/vnd.user.login.v1+json";
+
+    public static final String APPLICATION_COMMENT_LIST = "application/vnd.comment.list.v1+json";
+
+    public static final String APPLICATION_USER_ACCOUNT = "application/vnd.user-account.v1+json";
+
+    public static final String APPLICATION_USER_ACCOUNT_LIST = "application/vnd.user-account.list.v1+json";
+
+    public static final String APPLICATION_USER_ACCOUNT_CREATE = "application/vnd.user-account.create.v1+json";
 
 }

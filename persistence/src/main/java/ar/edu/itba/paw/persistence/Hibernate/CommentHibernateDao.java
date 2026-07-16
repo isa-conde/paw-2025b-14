@@ -39,6 +39,9 @@ public class CommentHibernateDao implements CommentDao {
         @SuppressWarnings("unchecked")
         List<Number> rawIds = nativeQuery.getResultList();
         List<Long> ids = rawIds.stream().map(Number::longValue).toList();
+        if (ids.isEmpty()) {
+            return List.of();
+        }
 
         return em.createQuery("SELECT c FROM Comment c WHERE id in :ids", Comment.class)
                 .setParameter("ids", ids)

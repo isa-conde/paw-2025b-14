@@ -18,10 +18,8 @@ info:
 
     HATEOAS links that currently point to resources or filters without a REST
     controller are not documented as available endpoints here. Known pending
-    links include `images`, `comments`, top-level `participants`, top-level
-    `matches`, `user-accounts`, `/tournaments?createdBy=...`,
-    `/tournaments?hasUser=...`, `/teams?createdBy=...`, `/teams?hasUser=...`,
-    and `/tokens?assignedTo=...`.
+    resources/filters include user-created/user-participated tournament lists
+    and user-participated match lists.
 servers:
   - url: /api
 tags:
@@ -35,6 +33,8 @@ tags:
     description: Manages tournaments, participants, matches, and status.
   - name: tokens
     description: Manages verification/password tokens.
+  - name: images
+    description: Serves binary images referenced by DTO links.
 
 paths:
   /users:
@@ -112,6 +112,115 @@ paths:
                 $ref: '#/components/schemas/User'
         '404':
           $ref: '#/components/responses/NotFoundJson'
+
+  /users/{id}/comments:
+    get:
+      tags: [users]
+      summary: List comments received by a user
+      description: Results are paginated with zero-based `page`.
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+        - $ref: '#/components/parameters/Page'
+      responses:
+        '200':
+          description: Comment list
+          headers:
+            Link:
+              $ref: '#/components/headers/PaginationLink'
+          content:
+            application/vnd.comment.list.v1+json:
+              schema:
+                $ref: '#/components/schemas/CommentList'
+        '400':
+          $ref: '#/components/responses/BadRequestJson'
+        '404':
+          $ref: '#/components/responses/NotFoundJson'
+
+  /users/{id}/accounts:
+    get:
+      tags: [users]
+      summary: List user accounts
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '200':
+          description: User account list
+          content:
+            application/vnd.user-account.list.v1+json:
+              schema:
+                $ref: '#/components/schemas/UserAccountList'
+        '400':
+          $ref: '#/components/responses/BadRequestJson'
+        '404':
+          $ref: '#/components/responses/NotFoundJson'
+
+  /users/{id}/accounts/{platform}:
+    get:
+      tags: [users]
+      summary: Get user account by platform
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+        - $ref: '#/components/parameters/PlatformPath'
+      responses:
+        '200':
+          description: User account
+          content:
+            application/vnd.user-account.v1+json:
+              schema:
+                $ref: '#/components/schemas/UserAccount'
+        '400':
+          $ref: '#/components/responses/BadRequestJson'
+        '404':
+          $ref: '#/components/responses/NotFoundJson'
+
+  /users/me/accounts:
+    post:
+      tags: [users]
+      summary: Add an account to the current user
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/vnd.user-account.create.v1+json:
+            schema:
+              $ref: '#/components/schemas/AddUserAccountRequest'
+      responses:
+        '201':
+          description: Account added. Current controller returns the updated account list.
+          headers:
+            Location:
+              $ref: '#/components/headers/Location'
+          content:
+            application/vnd.user-account.list.v1+json:
+              schema:
+                $ref: '#/components/schemas/UserAccountList'
+        '400':
+          $ref: '#/components/responses/BadRequestJson'
+        '401':
+          $ref: '#/components/responses/UnauthorizedJson'
+        '403':
+          $ref: '#/components/responses/ForbiddenJson'
+        '404':
+          $ref: '#/components/responses/NotFoundJson'
+
+  /users/me/accounts/{platform}:
+    delete:
+      tags: [users]
+      summary: Delete an account from the current user
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PlatformPath'
+      responses:
+        '204':
+          description: Account deleted
+        '400':
+          $ref: '#/components/responses/BadRequestJson'
+        '401':
+          $ref: '#/components/responses/UnauthorizedJson'
+        '403':
+          $ref: '#/components/responses/ForbiddenJson'
 
   /users/sessions:
     post:
@@ -451,6 +560,42 @@ paths:
         '404':
           $ref: '#/components/responses/NotFoundJson'
 
+  /images/{id}:
+    get:
+      tags: [images]
+      summary: Get image bytes
+      description: Returns the stored image bytes. The controller infers common image content types from magic bytes and falls back to `application/octet-stream`.
+      parameters:
+        - $ref: '#/components/parameters/ImageId'
+      responses:
+        '200':
+          description: Image bytes
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+            image/gif:
+              schema:
+                type: string
+                format: binary
+            image/webp:
+              schema:
+                type: string
+                format: binary
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequestJson'
+        '404':
+          $ref: '#/components/responses/NotFoundJson'
+
   /tournaments:
     get:
       tags: [tournaments]
@@ -614,6 +759,25 @@ paths:
         '400':
           $ref: '#/components/responses/BadRequestJson'
 
+  /tournaments/{id}/rules:
+    get:
+      tags: [tournaments]
+      summary: Get tournament rules PDF
+      parameters:
+        - $ref: '#/components/parameters/TournamentId'
+      responses:
+        '200':
+          description: Tournament rules PDF
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '400':
+          $ref: '#/components/responses/BadRequestJson'
+        '404':
+          $ref: '#/components/responses/NotFoundJson'
+
   /tournaments/{id}/participants/users:
     post:
       tags: [tournaments]
@@ -685,6 +849,23 @@ paths:
           $ref: '#/components/responses/NotFoundJson'
 
   /tournaments/{id}/participants/{participantId}:
+    get:
+      tags: [tournaments]
+      summary: Get tournament participant
+      parameters:
+        - $ref: '#/components/parameters/TournamentId'
+        - $ref: '#/components/parameters/ParticipantId'
+      responses:
+        '200':
+          description: Participant
+          content:
+            application/vnd.participant.v1+json:
+              schema:
+                $ref: '#/components/schemas/Participant'
+        '400':
+          $ref: '#/components/responses/BadRequestJson'
+        '404':
+          $ref: '#/components/responses/NotFoundJson'
     delete:
       tags: [tournaments]
       summary: Remove participant
@@ -832,7 +1013,7 @@ paths:
     get:
       tags: [tokens]
       summary: List tokens assigned to a user
-      description: Uses real controller query parameter `userId`; note that `UserDTO.assignedTokens` currently links with `assignedTo`.
+      description: Uses real controller query parameter `userId`.
       parameters:
         - in: query
           name: userId
@@ -926,6 +1107,14 @@ components:
         type: integer
         format: int64
         minimum: 1
+    ImageId:
+      in: path
+      name: id
+      required: true
+      schema:
+        type: integer
+        format: int64
+        minimum: 1
     GameIdForFormat:
       in: path
       name: gameId
@@ -973,6 +1162,12 @@ components:
       schema:
         type: integer
         format: int64
+    PlatformPath:
+      in: path
+      name: platform
+      required: true
+      schema:
+        $ref: '#/components/schemas/Platform'
 
   responses:
     BadRequestJson:
@@ -1062,6 +1257,9 @@ components:
     Genre:
       type: string
       enum: [MOBA, FPS, Fighting, TPS, BattleRoyale, RTS, Sports, DGC, MOBILE]
+    Platform:
+      type: string
+      enum: [DISCORD, STEAM, EPIC_GAMES, RIOT_GAMES, PLAYSTATION, XBOX, NINTENDO, BATTLE_NET, UBISOFT_CONNECT, ROCKSTAR]
 
     User:
       type: object
@@ -1088,6 +1286,44 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Link'
+
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        comment:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/Link'
+
+    UserAccount:
+      type: object
+      properties:
+        platform:
+          $ref: '#/components/schemas/Platform'
+        username:
+          type: string
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/Link'
+
+    AddUserAccountRequest:
+      type: object
+      properties:
+        platform:
+          $ref: '#/components/schemas/Platform'
+        username:
+          type: string
+          maxLength: 100
+      required: [platform, username]
 
     CreateUserRequest:
       type: object
@@ -1440,3 +1676,11 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Token'
+    CommentList:
+      type: array
+      items:
+        $ref: '#/components/schemas/Comment'
+    UserAccountList:
+      type: array
+      items:
+        $ref: '#/components/schemas/UserAccount'

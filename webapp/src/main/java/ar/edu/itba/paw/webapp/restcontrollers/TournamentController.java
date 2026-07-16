@@ -6,6 +6,8 @@ import ar.edu.itba.paw.interfaces.services.RulesService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.Game.GameFormat;
 import ar.edu.itba.paw.model.Match.Match;
+import ar.edu.itba.paw.model.Participant;
+import ar.edu.itba.paw.model.Rules;
 import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.filters.TournamentFilter;
 import ar.edu.itba.paw.webapp.auth.CurrentUserProvider;
@@ -39,6 +41,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
@@ -231,6 +234,18 @@ public class TournamentController {
         return Response.ok(new GenericEntity<>(participants) {}).build();
     }
 
+    @GET
+    @Path("/{id}/participants/{participantId}")
+    @Produces(value = {Vendor.APPLICATION_PARTICIPANT})
+    public Response getParticipant(@PathParam("id") long id, @PathParam("participantId") long participantId) {
+        if (id <= 0 || participantId <= 0) {
+            return badRequest("Invalid tournament or participant id");
+        }
+
+        Participant participant = participantService.getTournamentParticipant(id, participantId);
+        return Response.ok(ParticipantDTO.fromParticipant(uriInfo, participant)).build();
+    }
+
     @POST
     @Path("/{id}/participants/users")
     public Response joinTournamentUser(@PathParam("id") long id) {
@@ -306,6 +321,34 @@ public class TournamentController {
                 .toList();
 
         return Response.ok(new GenericEntity<>(response) {}).build();
+    }
+
+    @GET
+    @Path("/{id}/rules")
+    @Produces(MediaType.WILDCARD)
+    public Response getRules(@PathParam("id") long id) {
+        if (id <= 0) {
+            return badRequest("Invalid tournament id");
+        }
+
+        Optional<Tournament> tournament = tournamentService.findById(id);
+        if (tournament.isEmpty()) {
+            return notFound("Tournament not found");
+        }
+
+        Rules tournamentRules = tournament.get().getRules();
+        if (tournamentRules == null) {
+            return notFound("Rules not found");
+        }
+
+        Optional<Rules> rules = rulesService.findById(tournamentRules.getId());
+        if (rules.isEmpty() || rules.get().getFile() == null) {
+            return notFound("Rules not found");
+        }
+
+        return Response.ok(rules.get().getFile())
+                .type("application/pdf")
+                .build();
     }
 
     @GET

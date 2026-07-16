@@ -36,20 +36,13 @@ public class UserDTO {
 
         toReturn.addLink("self", uriInfo.getBaseUriBuilder().path("users")
                 .path(String.valueOf(user.getId())).build().toString());
-        toReturn.addLink("createdTournaments", uriInfo.getBaseUriBuilder().path("tournaments")
-                .queryParam("createdBy", user.getId()).build().toString());
         toReturn.addLink("favoriteGames", uriInfo.getBaseUriBuilder().path("games")
                 .queryParam("favouritedBy", user.getId()).build().toString());
-        toReturn.addLink("tournamentsParticipatedIn", uriInfo.getBaseUriBuilder().path("tournaments")
-                .queryParam("hasUser", user.getId()).build().toString());
-        toReturn.addLink("commentsReceived", uriInfo.getBaseUriBuilder().path("comments")
-                .queryParam("receivedBy", user.getId()).build().toString());
-        toReturn.addLink("matchesParticipatedIn", uriInfo.getBaseUriBuilder().path("matches")
-                .queryParam("hasUser", user.getId()).build().toString());
-        toReturn.addLink("teamsCreated", uriInfo.getBaseUriBuilder().path("teams")
-                .queryParam("createdBy", user.getId()).build().toString());
+        toReturn.addLink("commentsReceived", uriInfo.getBaseUriBuilder().path("users")
+                .path(String.valueOf(user.getId()))
+                .path("comments").build().toString());
         toReturn.addLink("partOfTeam", uriInfo.getBaseUriBuilder().path("teams")
-                .queryParam("hasUser", user.getId()).build().toString());
+                .queryParam("userId", user.getId()).build().toString());
         if (user.getPfpId() != null) {
             toReturn.addLink("profilePicture", uriInfo.getBaseUriBuilder().path("images")
                     .path(String.valueOf(user.getPfpId())).build().toString());
@@ -59,9 +52,10 @@ public class UserDTO {
                     .path(String.valueOf(user.getBannerId())).build().toString());
         }
         toReturn.addLink("assignedTokens", uriInfo.getBaseUriBuilder().path("tokens")
-                .queryParam("assignedTo", user.getId()).build().toString());
-        toReturn.addLink("userAccounts", uriInfo.getBaseUriBuilder().path("user-accounts")
-                .queryParam("ofUser", user.getId()).build().toString());
+                .queryParam("userId", user.getId()).build().toString());
+        toReturn.addLink("userAccounts", uriInfo.getBaseUriBuilder().path("users")
+                .path(String.valueOf(user.getId()))
+                .path("accounts").build().toString());
 
         return toReturn;
     }
