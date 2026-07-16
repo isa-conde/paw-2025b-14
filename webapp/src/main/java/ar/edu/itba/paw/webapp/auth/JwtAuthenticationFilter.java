@@ -2,6 +2,7 @@ package ar.edu.itba.paw.webapp.auth;
 
 import io.jsonwebtoken.JwtException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -23,13 +24,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private JwtTokenService jwtTokenService;
 
+    @Autowired
+    private ApiAuthenticationEntryPoint apiAuthenticationEntryPoint;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
         if(authHeader != null && authHeader.startsWith(BEARER_PREFIX)) {
             String jws = authHeader.substring(BEARER_PREFIX.length()).trim();
             if(jws.isEmpty()) {
-                filterChain.doFilter(request, response);
+                rejectInvalidToken(request, response);
                 return;
             }
             UserDetails userDetails = null;
@@ -37,6 +41,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 userDetails = jwtTokenService.validateJwsToken(jws);
             } catch (JwtException e) {
                 SecurityContextHolder.clearContext();
+                rejectInvalidToken(request, response);
+                return;
             }
             Authentication authentication = null;
             if (userDetails != null) {
@@ -48,5 +54,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    private void rejectInvalidToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        apiAuthenticationEntryPoint.commence(
+                request,
+                response,
+                new BadCredentialsException("Invalid bearer token")
+        );
     }
 }

@@ -251,6 +251,8 @@ paths:
     post:
       tags: [teams]
       summary: Create team
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -269,6 +271,10 @@ paths:
                 $ref: '#/components/schemas/Team'
         '400':
           $ref: '#/components/responses/EmptyOrErrorBadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedJson'
+        '403':
+          $ref: '#/components/responses/ForbiddenJson'
 
   /teams/{id}:
     get:
@@ -291,6 +297,8 @@ paths:
       tags: [teams]
       summary: Update team
       description: Controller path parameter is named `teamId`; URI shape is `/teams/{id}`.
+      security:
+        - bearerAuth: []
       parameters:
         - $ref: '#/components/parameters/TeamId'
       requestBody:
@@ -308,6 +316,10 @@ paths:
                 $ref: '#/components/schemas/Team'
         '400':
           $ref: '#/components/responses/EmptyOrErrorBadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedJson'
+        '403':
+          $ref: '#/components/responses/ForbiddenJson'
 
   /teams/{id}/members:
     get:
@@ -478,6 +490,8 @@ paths:
     post:
       tags: [tournaments]
       summary: Create tournament
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -496,6 +510,10 @@ paths:
                 $ref: '#/components/schemas/Tournament'
         '400':
           $ref: '#/components/responses/EmptyOrErrorBadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedJson'
+        '403':
+          $ref: '#/components/responses/ForbiddenJson'
 
   /tournaments/{id}:
     get:
@@ -517,6 +535,8 @@ paths:
     put:
       tags: [tournaments]
       summary: Update tournament
+      security:
+        - bearerAuth: []
       parameters:
         - $ref: '#/components/parameters/TournamentId'
       requestBody:
@@ -536,6 +556,10 @@ paths:
           $ref: '#/components/responses/EmptyOrErrorBadRequest'
         '404':
           $ref: '#/components/responses/EmptyNotFound'
+        '401':
+          $ref: '#/components/responses/UnauthorizedJson'
+        '403':
+          $ref: '#/components/responses/ForbiddenJson'
 
   /tournaments/{id}/participants:
     get:
@@ -563,6 +587,8 @@ paths:
     post:
       tags: [tournaments]
       summary: Join tournament as user
+      security:
+        - bearerAuth: []
       parameters:
         - $ref: '#/components/parameters/TournamentId'
       requestBody:
@@ -576,11 +602,17 @@ paths:
           description: Joined
         '400':
           $ref: '#/components/responses/EmptyOrErrorBadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedJson'
+        '403':
+          $ref: '#/components/responses/ForbiddenJson'
 
   /tournaments/{id}/participants/teams:
     post:
       tags: [tournaments]
       summary: Join tournament as team
+      security:
+        - bearerAuth: []
       parameters:
         - $ref: '#/components/parameters/TournamentId'
       requestBody:
@@ -594,11 +626,17 @@ paths:
           description: Joined
         '400':
           $ref: '#/components/responses/EmptyOrErrorBadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedJson'
+        '403':
+          $ref: '#/components/responses/ForbiddenJson'
 
   /tournaments/{id}/participants/{participantId}:
     delete:
       tags: [tournaments]
       summary: Remove participant
+      security:
+        - bearerAuth: []
       parameters:
         - $ref: '#/components/parameters/TournamentId'
         - $ref: '#/components/parameters/ParticipantId'
@@ -607,11 +645,17 @@ paths:
           description: Removed
         '400':
           $ref: '#/components/responses/EmptyOrErrorBadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedJson'
+        '403':
+          $ref: '#/components/responses/ForbiddenJson'
 
   /tournaments/{id}/participants/users/{userId}:
     delete:
       tags: [tournaments]
       summary: Leave tournament as user
+      security:
+        - bearerAuth: []
       parameters:
         - $ref: '#/components/parameters/TournamentId'
         - $ref: '#/components/parameters/UserIdPath'
@@ -620,6 +664,10 @@ paths:
           description: Left
         '400':
           $ref: '#/components/responses/EmptyOrErrorBadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedJson'
+        '403':
+          $ref: '#/components/responses/ForbiddenJson'
 
   /tournaments/{id}/matches:
     get:
@@ -665,6 +713,8 @@ paths:
     put:
       tags: [tournaments]
       summary: Set match results
+      security:
+        - bearerAuth: []
       parameters:
         - $ref: '#/components/parameters/TournamentId'
         - $ref: '#/components/parameters/MatchId'
@@ -679,11 +729,17 @@ paths:
           description: Updated
         '400':
           $ref: '#/components/responses/EmptyOrErrorBadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedJson'
+        '403':
+          $ref: '#/components/responses/ForbiddenJson'
 
   /tournaments/{id}/status:
     put:
       tags: [tournaments]
       summary: Update tournament status
+      security:
+        - bearerAuth: []
       parameters:
         - $ref: '#/components/parameters/TournamentId'
       requestBody:
@@ -703,6 +759,10 @@ paths:
           $ref: '#/components/responses/EmptyOrErrorBadRequest'
         '404':
           $ref: '#/components/responses/EmptyNotFound'
+        '401':
+          $ref: '#/components/responses/UnauthorizedJson'
+        '403':
+          $ref: '#/components/responses/ForbiddenJson'
 
   /tokens:
     get:
@@ -740,6 +800,12 @@ paths:
           $ref: '#/components/responses/EmptyNotFound'
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   headers:
     Authorization:
       description: JWT returned by session, verification, and password-reset flows.
@@ -853,6 +919,18 @@ components:
             $ref: '#/components/schemas/Error'
     EmptyNotFound:
       description: Not found. Current exception mappers generally return an empty body.
+    UnauthorizedJson:
+      description: Missing, empty, or invalid Bearer token.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    ForbiddenJson:
+      description: Authenticated user does not have the required permission.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
 
   schemas:
     Link:
