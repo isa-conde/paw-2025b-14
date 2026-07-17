@@ -27,7 +27,8 @@ CREATE TABLE IF NOT EXISTS users(
     profile_picture_id integer,
     banner_id integer,
     locale varchar(100) not null ,
-    rating float
+    rating float,
+    rating_count integer default 0 not null
 );
 
 CREATE TABLE IF NOT EXISTS game(

@@ -200,6 +200,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<User> findAllByName(String name, int limit) {
+        return userDao.findAllByName(name, limit);
+    }
+
+    @Override
     public int countSearchByNameUser(String name) {
         return userDao.countSearchByNameUser(name);
     }
@@ -245,10 +250,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public List<UserAccount> getUserAccounts(long userId) {
-        User user = findById(userId).orElseThrow(UserNotFoundException::new);
-        List<UserAccount> accounts = user.getAccounts();
-        accounts.size();
-        return accounts;
+        findById(userId).orElseThrow(UserNotFoundException::new);
+        return userDao.getUserAccounts(userId);
     }
 
     @Transactional

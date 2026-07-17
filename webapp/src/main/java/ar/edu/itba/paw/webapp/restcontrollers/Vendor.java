@@ -2,17 +2,15 @@ package ar.edu.itba.paw.webapp.restcontrollers;
 
 public class Vendor {
 
-    public static final String APPLICATION_TOKEN_LIST = "application/vnd.token.list.v1+json";
-
     public static final String APPLICATION_USER_LIST = "application/vnd.user.list.v1+json";
 
     public static final String APPLICATION_USER = "application/vnd.user.v1+json";
 
-    public static final String APPLICATION_TOKEN = "application/vnd.token.v1+json";
-
     public static final String APPLICATION_USER_CREATE = "application/vnd.user.create.v1+json";
 
     public static final String APPLICATION_USER_VERIFICATION = "application/vnd.user.verification.v1+json";
+
+    public static final String APPLICATION_USER_VERIFICATION_CONFIRM = "application/vnd.user.verification-confirm.v1+json";
 
     public static final String APPLICATION_PASSWORD_RESET_REQUEST = "application/vnd.user.password-request.v1+json";
 
@@ -32,11 +30,15 @@ public class Vendor {
 
     public static final String APPLICATION_TEAM_CREATE = "application/vnd.team.create.v1+json";
 
+    public static final String APPLICATION_TEAM_UPDATE = "application/vnd.team.update.v1+json";
+
     public static final String APPLICATION_TOURNAMENT = "application/vnd.tournament.v1+json";
 
     public static final String APPLICATION_TOURNAMENT_LIST = "application/vnd.tournament.list.v1+json";
 
     public static final String APPLICATION_PARTICIPANT_LIST = "application/vnd.participant.list.v1+json";
+
+    public static final String APPLICATION_PARTICIPANT = "application/vnd.participant.v1+json";
 
     public static final String APPLICATION_MATCH_STAGE_LIST = "application/vnd.matchstagelist.v1+json";
 
@@ -57,5 +59,13 @@ public class Vendor {
     public static final String APPLICATION_MATCH_RESULTS = "application/vnd.match.results.v1+json";
 
     public static final String APPLICATION_USER_LOGIN = "application/vnd.user.login.v1+json";
+
+    public static final String APPLICATION_COMMENT_LIST = "application/vnd.comment.list.v1+json";
+
+    public static final String APPLICATION_USER_ACCOUNT = "application/vnd.user-account.v1+json";
+
+    public static final String APPLICATION_USER_ACCOUNT_LIST = "application/vnd.user-account.list.v1+json";
+
+    public static final String APPLICATION_USER_ACCOUNT_CREATE = "application/vnd.user-account.create.v1+json";
 
 }

@@ -83,7 +83,7 @@ public class Tournament {
     @Column(name = "tournament_started", nullable = false)
     private boolean tournamentStarted;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "format_id")
     private GameFormat formatEntity;
 
@@ -357,5 +357,4 @@ public class Tournament {
         this.discordChannel = discordChannel;
     }
 }
-
 

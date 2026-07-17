@@ -132,7 +132,8 @@ public class TeamServiceImpl implements TeamService {
         if(teamId == null) {
             throw new TeamNotFoundException();
         }
-        return teamDao.findById(teamId).orElseThrow(TeamNotFoundException::new).getMembers();
+        teamDao.findById(teamId).orElseThrow(TeamNotFoundException::new);
+        return teamDao.getTeamMembers(teamId);
     }
 
     @Override

@@ -7,6 +7,9 @@ import ar.edu.itba.paw.interfaces.persistence.UserDao;
 import ar.edu.itba.paw.interfaces.services.MailService;
 import ar.edu.itba.paw.interfaces.services.TournamentService;
 import ar.edu.itba.paw.model.Participant;
+import ar.edu.itba.paw.model.Team;
+import ar.edu.itba.paw.model.Tournament;
+import ar.edu.itba.paw.model.User;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,6 +20,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ParticipantServiceImplTest {
@@ -36,6 +40,7 @@ public class ParticipantServiceImplTest {
     private ParticipantServiceImpl participantService;
 
     private static final Long ID = 1L;
+    private static final Long OTHER_ID = 2L;
 
     @Test
     public void testGetTournamentParticipantsTeamsCase() {
@@ -103,6 +108,74 @@ public class ParticipantServiceImplTest {
         Assert.assertEquals(p1, result.get(1));
         Assert.assertEquals(p2, result.get(2));
         Assert.assertEquals(p3, result.get(3));
+    }
+
+    @Test
+    public void testJoinTournamentUserClosesInscriptionsWithCountQuery() {
+        Tournament tournament = Mockito.mock(Tournament.class);
+        User user = Mockito.mock(User.class);
+        User creator = Mockito.mock(User.class);
+
+        Mockito.when(participantDao.hasJoined(ID, OTHER_ID)).thenReturn(false);
+        Mockito.when(tournamentDao.findById(OTHER_ID)).thenReturn(Optional.of(tournament));
+        Mockito.when(tournament.getMaxParticipants()).thenReturn(4);
+        Mockito.when(tournament.getCreatorId()).thenReturn(OTHER_ID);
+        Mockito.when(tournament.getName()).thenReturn("Tournament");
+        Mockito.when(participantDao.countTournamentParticipantUsers(OTHER_ID)).thenReturn(4);
+        Mockito.when(userDao.findById(ID)).thenReturn(Optional.of(user));
+        Mockito.when(userDao.findById(OTHER_ID)).thenReturn(Optional.of(creator));
+        Mockito.when(user.getUsername()).thenReturn("player");
+        Mockito.when(user.getEmail()).thenReturn("player@mail.com");
+        Mockito.when(creator.getUsername()).thenReturn("creator");
+        Mockito.when(creator.getEmail()).thenReturn("creator@mail.com");
+
+        participantService.joinTournamentUser(ID, OTHER_ID);
+
+        Mockito.verify(ts).closeInscriptions(OTHER_ID);
+        Mockito.verify(participantDao, Mockito.never()).getTournamentParticipantUsers(OTHER_ID);
+    }
+
+    @Test
+    public void testJoinTournamentTeamClosesInscriptionsWithCountQuery() {
+        Tournament tournament = Mockito.mock(Tournament.class);
+        Team team = Mockito.mock(Team.class);
+        User creator = Mockito.mock(User.class);
+        User user = Mockito.mock(User.class);
+
+        Mockito.when(tournamentDao.findById(ID)).thenReturn(Optional.of(tournament));
+        Mockito.when(teamDao.findById(OTHER_ID)).thenReturn(Optional.of(team));
+        Mockito.when(tournament.getCreatorId()).thenReturn(ID);
+        Mockito.when(tournament.getName()).thenReturn("Tournament");
+        Mockito.when(tournament.getMaxParticipants()).thenReturn(2);
+        Mockito.when(tournament.getFormatEntity()).thenReturn(null);
+        Mockito.when(team.getName()).thenReturn("Team");
+        Mockito.when(userDao.findById(ID)).thenReturn(Optional.of(creator));
+        Mockito.when(userDao.findById(OTHER_ID)).thenReturn(Optional.of(user));
+        Mockito.when(creator.getUsername()).thenReturn("creator");
+        Mockito.when(creator.getEmail()).thenReturn("creator@mail.com");
+        Mockito.when(user.getUsername()).thenReturn("player");
+        Mockito.when(user.getEmail()).thenReturn("player@mail.com");
+        Mockito.when(participantDao.countTournamentParticipantTeams(ID)).thenReturn(2);
+
+        participantService.joinTournamentTeam(ID, OTHER_ID, List.of(OTHER_ID));
+
+        Mockito.verify(ts).closeInscriptions(ID);
+        Mockito.verify(participantDao, Mockito.never()).getTournamentParticipantTeams(ID);
+    }
+
+    @Test
+    public void testUpdateCreatorRatingUsesHistoricalCount() {
+        User creator = new User();
+        creator.setRating(4f);
+        creator.setRatingCount(2);
+
+        Mockito.when(participantDao.hasRated(OTHER_ID, ID)).thenReturn(false);
+        Mockito.when(userDao.findById(ID)).thenReturn(Optional.of(creator));
+
+        participantService.updateCreatorRating(ID, ID, OTHER_ID, 1f);
+
+        Mockito.verify(participantDao).updateHasRated(OTHER_ID, ID);
+        Mockito.verify(userDao).updateUserRating(ID, 3f, 3);
     }
 
     // Helper para crear mocks de Participant

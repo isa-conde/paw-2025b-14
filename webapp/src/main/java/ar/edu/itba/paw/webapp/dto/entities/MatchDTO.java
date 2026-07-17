@@ -44,12 +44,16 @@ public class MatchDTO {
                 .path(String.valueOf(match.getTournamentId())).build().toString());
 
         if (match.getLocalId() != null) {
-            toReturn.addLink("localParticipant", uriInfo.getBaseUriBuilder().path("participants")
+            toReturn.addLink("localParticipant", uriInfo.getBaseUriBuilder().path("tournaments")
+                    .path(String.valueOf(match.getTournamentId()))
+                    .path("participants")
                     .path(String.valueOf(match.getLocalId())).build().toString());
         }
 
         if (match.getVisitorId() != null) {
-            toReturn.addLink("visitorParticipant", uriInfo.getBaseUriBuilder().path("participants")
+            toReturn.addLink("visitorParticipant", uriInfo.getBaseUriBuilder().path("tournaments")
+                    .path(String.valueOf(match.getTournamentId()))
+                    .path("participants")
                     .path(String.valueOf(match.getVisitorId())).build().toString());
         }
 

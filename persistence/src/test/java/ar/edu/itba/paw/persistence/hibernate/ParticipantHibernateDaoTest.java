@@ -100,6 +100,13 @@ public class ParticipantHibernateDaoTest {
     }
 
     @Test
+    public void testCountUsers(){
+        int ans = participantHibernateDao.countTournamentParticipantUsers(ID);
+
+        Assert.assertEquals(2, ans);
+    }
+
+    @Test
     public void testGetTeams(){
         List<Participant> ans = participantHibernateDao.getTournamentParticipantTeams(ID+1);
 
@@ -117,6 +124,13 @@ public class ParticipantHibernateDaoTest {
 
         Assert.assertNotNull(empty);
         Assert.assertTrue(empty.isEmpty());
+    }
+
+    @Test
+    public void testCountTeams(){
+        int ans = participantHibernateDao.countTournamentParticipantTeams(ID);
+
+        Assert.assertEquals(2, ans);
     }
 
     @Test

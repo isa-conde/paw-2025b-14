@@ -11,12 +11,10 @@ public class UserDTO {
 
     private long id;
     private String username;
-    private String email;
     private boolean verified;
     private String bio;
     private Float rating;
-
-    private String password;
+    private int ratingCount;
 
     private List<LinkDTO> links = new ArrayList<>();
 
@@ -29,27 +27,20 @@ public class UserDTO {
 
         toReturn.id = user.getId();
         toReturn.username = user.getUsername();
-        toReturn.email = user.getEmail();
         toReturn.verified = user.isVerified();
         toReturn.bio = user.getBio();
         toReturn.rating = user.getRating();
+        toReturn.ratingCount = user.getRatingCount();
 
         toReturn.addLink("self", uriInfo.getBaseUriBuilder().path("users")
                 .path(String.valueOf(user.getId())).build().toString());
-        toReturn.addLink("createdTournaments", uriInfo.getBaseUriBuilder().path("tournaments")
-                .queryParam("createdBy", user.getId()).build().toString());
         toReturn.addLink("favoriteGames", uriInfo.getBaseUriBuilder().path("games")
                 .queryParam("favouritedBy", user.getId()).build().toString());
-        toReturn.addLink("tournamentsParticipatedIn", uriInfo.getBaseUriBuilder().path("tournaments")
-                .queryParam("hasUser", user.getId()).build().toString());
-        toReturn.addLink("commentsReceived", uriInfo.getBaseUriBuilder().path("comments")
-                .queryParam("receivedBy", user.getId()).build().toString());
-        toReturn.addLink("matchesParticipatedIn", uriInfo.getBaseUriBuilder().path("matches")
-                .queryParam("hasUser", user.getId()).build().toString());
-        toReturn.addLink("teamsCreated", uriInfo.getBaseUriBuilder().path("teams")
-                .queryParam("createdBy", user.getId()).build().toString());
+        toReturn.addLink("commentsReceived", uriInfo.getBaseUriBuilder().path("users")
+                .path(String.valueOf(user.getId()))
+                .path("comments").build().toString());
         toReturn.addLink("partOfTeam", uriInfo.getBaseUriBuilder().path("teams")
-                .queryParam("hasUser", user.getId()).build().toString());
+                .queryParam("userId", user.getId()).build().toString());
         if (user.getPfpId() != null) {
             toReturn.addLink("profilePicture", uriInfo.getBaseUriBuilder().path("images")
                     .path(String.valueOf(user.getPfpId())).build().toString());
@@ -58,10 +49,9 @@ public class UserDTO {
             toReturn.addLink("banner", uriInfo.getBaseUriBuilder().path("images")
                     .path(String.valueOf(user.getBannerId())).build().toString());
         }
-        toReturn.addLink("assignedTokens", uriInfo.getBaseUriBuilder().path("tokens")
-                .queryParam("assignedTo", user.getId()).build().toString());
-        toReturn.addLink("userAccounts", uriInfo.getBaseUriBuilder().path("user-accounts")
-                .queryParam("ofUser", user.getId()).build().toString());
+        toReturn.addLink("userAccounts", uriInfo.getBaseUriBuilder().path("users")
+                .path(String.valueOf(user.getId()))
+                .path("accounts").build().toString());
 
         return toReturn;
     }
@@ -76,14 +66,6 @@ public class UserDTO {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public boolean isVerified() {
@@ -110,12 +92,12 @@ public class UserDTO {
         this.rating = rating;
     }
 
-    public String getPassword() {
-        return password;
+    public int getRatingCount() {
+        return ratingCount;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setRatingCount(int ratingCount) {
+        this.ratingCount = ratingCount;
     }
 
     public long getId() {

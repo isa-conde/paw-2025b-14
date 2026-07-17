@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.interfaces.persistence;
 
 import ar.edu.itba.paw.model.Team;
+import ar.edu.itba.paw.model.User;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,6 +21,8 @@ public interface TeamDao {
     long getPastPages(long teamId);
 
     List<Team> getUserTeams(long userId);
+
+    List<User> getTeamMembers(long teamId);
 
     void updateTeam(long teamId, String name, Long pfpId, Long bannerId);
 

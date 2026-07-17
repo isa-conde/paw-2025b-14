@@ -93,7 +93,28 @@ public class TeamHibernateDao implements TeamDao {
 
     @Override
     public List<Team> getUserTeams(long userId) {
-        return em.find(User.class, userId).getTeams();
+        return em.createQuery("""
+                SELECT DISTINCT t
+                FROM Team t
+                JOIN t.teamMembers tm
+                WHERE tm.user.id = :userId
+                ORDER BY t.name
+                """, Team.class)
+                .setParameter("userId", userId)
+                .getResultList();
+    }
+
+    @Override
+    public List<User> getTeamMembers(long teamId) {
+        return em.createQuery("""
+                SELECT u
+                FROM TeamMember tm
+                JOIN tm.user u
+                WHERE tm.team.id = :teamId
+                ORDER BY u.username
+                """, User.class)
+                .setParameter("teamId", teamId)
+                .getResultList();
     }
 
     @Override

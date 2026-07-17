@@ -69,6 +69,16 @@ public class MatchServiceImpl implements MatchService {
         LOGGER.info("User {} and {} have been successfully swapped matches", user1, user2);
     }
 
+    @Override
+    public Match getMatch(long tournamentId, long matchId) {
+        ts.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
+        Match match = matchDao.getMatch(tournamentId, matchId);
+        if (match == null) {
+            throw new MatchNotFoundException();
+        }
+        return match;
+    }
+
     @Transactional
     @Override
     public Map<Integer, List<Match>> getTournamentMatchesByStage(long tournamentId, Integer group){
@@ -135,6 +145,9 @@ public class MatchServiceImpl implements MatchService {
             throw new DrawInEliminationMatchException();
         }
         Match match = matchDao.getMatch(tournamentId, matchId);
+        if (match == null) {
+            throw new MatchNotFoundException();
+        }
         Long localId = match.getLocalId();
         Long visitorId = match.getVisitorId();
         if (localId == null || visitorId == null) {
@@ -194,6 +207,9 @@ public class MatchServiceImpl implements MatchService {
 
     private boolean hasWinner(long matchId, long tournamentId) {
         Match match = matchDao.getMatch(tournamentId, matchId);
+        if (match == null) {
+            throw new MatchNotFoundException();
+        }
         return match.getWinner() != null;
     }
 }

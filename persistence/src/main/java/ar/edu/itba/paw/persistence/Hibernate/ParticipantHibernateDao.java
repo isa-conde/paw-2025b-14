@@ -333,6 +333,19 @@ public class ParticipantHibernateDao implements ParticipantDao{
     }
 
     @Override
+    public int countTournamentParticipantUsers(long tournamentId) {
+        Long count = em.createQuery("""
+                SELECT COUNT(p)
+                FROM Participant p
+                WHERE p.tournament.id = :tournamentId
+                  AND p.user IS NOT NULL
+                """, Long.class)
+                .setParameter("tournamentId", tournamentId)
+                .getSingleResult();
+        return count.intValue();
+    }
+
+    @Override
     public Integer getGroupNumber(long tournamentId, long userId) {
         String jpql = "SELECT p.groupNumber FROM Participant p WHERE p.id = :id AND p.tournament.id = :tournamentId";
         TypedQuery<Integer> query = em.createQuery(jpql, Integer.class);
@@ -379,6 +392,20 @@ public class ParticipantHibernateDao implements ParticipantDao{
 
         fillParticipantTransientFields(toReturn);
         return toReturn;
+    }
+
+    @Override
+    public int countTournamentParticipantTeams(long tournamentId) {
+        Long count = em.createQuery("""
+                SELECT COUNT(p)
+                FROM Participant p
+                WHERE p.tournament.id = :tournamentId
+                  AND p.team IS NOT NULL
+                  AND p.user IS NULL
+                """, Long.class)
+                .setParameter("tournamentId", tournamentId)
+                .getSingleResult();
+        return count.intValue();
     }
 
     @Override

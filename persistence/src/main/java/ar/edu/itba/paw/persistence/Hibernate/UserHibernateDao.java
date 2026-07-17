@@ -2,6 +2,7 @@ package ar.edu.itba.paw.persistence.Hibernate;
 
 import ar.edu.itba.paw.interfaces.persistence.UserDao;
 import ar.edu.itba.paw.model.User;
+import ar.edu.itba.paw.model.UserAccount;
 import ar.edu.itba.paw.model.enums.Platform;
 import org.springframework.stereotype.Repository;
 
@@ -14,6 +15,7 @@ import java.util.Optional;
 public class UserHibernateDao implements UserDao {
 
     private static final int PAGE_SIZE = 9;
+    private static final int DEFAULT_SUGGESTIONS_LIMIT = 10;
 
     @PersistenceContext
     private EntityManager em;
@@ -155,8 +157,14 @@ public class UserHibernateDao implements UserDao {
 
     @Override
     public List<User> findAllByName(String name) {
+        return findAllByName(name, DEFAULT_SUGGESTIONS_LIMIT);
+    }
+
+    @Override
+    public List<User> findAllByName(String name, int limit) {
         final TypedQuery<User> query = em.createQuery("SELECT u FROM User u WHERE LOWER(u.username) LIKE CONCAT('%', LOWER(:username), '%')", User.class);
         query.setParameter("username", name);
+        query.setMaxResults(Math.max(1, limit));
         return query.getResultList();
     }
 
@@ -170,11 +178,24 @@ public class UserHibernateDao implements UserDao {
     }
 
     @Override
-    public void updateUserRating(long userId, float rating) {
-        em.createQuery("UPDATE User u SET u.rating = :rating WHERE u.id = :userId")
+    public void updateUserRating(long userId, float rating, int ratingCount) {
+        em.createQuery("UPDATE User u SET u.rating = :rating, u.ratingCount = :ratingCount WHERE u.id = :userId")
                 .setParameter("rating", rating)
+                .setParameter("ratingCount", ratingCount)
                 .setParameter("userId", userId)
                 .executeUpdate();
+    }
+
+    @Override
+    public List<UserAccount> getUserAccounts(long userId) {
+        return em.createQuery("""
+                SELECT a
+                FROM UserAccount a
+                WHERE a.user.id = :userId
+                ORDER BY a.userAccountId.platform
+                """, UserAccount.class)
+                .setParameter("userId", userId)
+                .getResultList();
     }
 
     @Override
@@ -188,7 +209,7 @@ public class UserHibernateDao implements UserDao {
 
     @Override
     public void deleteUserAccount(long userId, Platform platform) {
-        em.createQuery("DELETE FROM UserAccount u WHERE u.id.userId = :userId AND u.id.platform = :platform")
+        em.createQuery("DELETE FROM UserAccount u WHERE u.userAccountId.userId = :userId AND u.userAccountId.platform = :platform")
                 .setParameter("userId", userId)
                 .setParameter("platform", platform)
                 .executeUpdate();

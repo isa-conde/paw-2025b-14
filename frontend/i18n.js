@@ -8,8 +8,11 @@ i18n
     .use(Backend)
     .use(initReactI18next)
     .init({
-        debug: true,
+        debug: import.meta.env.DEV,
         fallbackLng: "en",
+        supportedLngs: ["en", "es"],
+        nonExplicitSupportedLngs: true,
+        load: "languageOnly",
         backend: {
             loadPath: "/locales/{{lng}}/{{ns}}.json",
         },

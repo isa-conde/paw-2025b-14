@@ -10,5 +10,7 @@ public interface MatchService {
 
     void swapMatchesMembers(long tournamentId, long match1, long match2, long user1, long user2);
 
+    Match getMatch(long tournamentId, long matchId);
+
     Map<Integer, List<Match>> getTournamentMatchesByStage(long tournamentId, Integer group);
 }

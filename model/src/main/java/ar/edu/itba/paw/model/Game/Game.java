@@ -2,7 +2,6 @@ package ar.edu.itba.paw.model.Game;
 
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Genre;
-import org.hibernate.annotations.ColumnTransformer;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -32,7 +31,7 @@ public class Game {
     @ManyToMany(mappedBy = "favouriteGames", fetch = FetchType.LAZY)
     private List<User> likedByUsers = new ArrayList<>();
 
-    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<GameFormat> formats = new ArrayList<>();
 
     public Game(){}
