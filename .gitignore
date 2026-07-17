@@ -80,3 +80,4 @@ jwt.key
 /node_modules/
 
 script
+persistence/src/main/resources/db/dump.sql
