@@ -43,7 +43,14 @@ public class CommentHibernateDao implements CommentDao {
             return List.of();
         }
 
-        return em.createQuery("SELECT c FROM Comment c WHERE id in :ids", Comment.class)
+        return em.createQuery("""
+                SELECT c
+                FROM Comment c
+                JOIN FETCH c.commenter
+                JOIN FETCH c.receiver
+                WHERE c.id in :ids
+                ORDER BY c.createdAt DESC
+                """, Comment.class)
                 .setParameter("ids", ids)
                 .getResultList();
     }

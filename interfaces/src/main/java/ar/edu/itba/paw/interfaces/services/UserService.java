@@ -41,6 +41,8 @@ public interface UserService {
 
     List<User> findAllByName(String name);
 
+    List<User> findAllByName(String name, int limit);
+
     int countSearchByNameUser(String name);
 
     Float getUserRating(long userId);

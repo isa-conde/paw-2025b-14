@@ -47,9 +47,8 @@ public class ParticipantServiceImpl implements ParticipantService {
 
         participantDao.joinTournamentUser(userId, tournamentId);
 
-        List<Participant> participants = getTournamentParticipantUsers(tournamentId);
         Tournament tournament = tournamentDao.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
-        if (participants.size() == tournament.getMaxParticipants()) {
+        if (participantDao.countTournamentParticipantUsers(tournamentId) >= tournament.getMaxParticipants()) {
             ts.closeInscriptions(tournamentId);
             LOGGER.info("Max participant count has been reached. The inscriptions for tournament with ID {} have been closed", tournamentId);
         }
@@ -60,10 +59,6 @@ public class ParticipantServiceImpl implements ParticipantService {
         LOGGER.info("Tournament joined email correctly sent to the address {}", user.getEmail());
         ms.sendTournamentJoinedOwnerEmail(tournamentId, creator.getUsername(), user.getUsername(), tournament.getName(), creator.getEmail());
         LOGGER.info("Tournament joined notification email correctly sent to tournament owner with address {}", creator.getEmail());
-    }
-
-    private List<Participant> getTournamentParticipantUsers(long tournamentId) {
-        return participantDao.getTournamentParticipantUsers(tournamentId);
     }
 
     @Override
@@ -162,7 +157,6 @@ public class ParticipantServiceImpl implements ParticipantService {
         }else{
             teamSize = format.getPlayersPerTeam();
         }
-        List<Participant> currentParticipants = getTournamentParticipants(tournamentId, teamSize);
         for(Long p : participants){
             if(p == null) {
                 throw new ParticipantNotFoundException();
@@ -175,7 +169,7 @@ public class ParticipantServiceImpl implements ParticipantService {
         ms.sendTournamentTeamJoinedOwnerEmail(tournamentId, creator.getUsername(), team.getName(), tournament.getName(), creator.getEmail());
         LOGGER.info("Tournament joined notification email correctly sent to tournament owner with address {}", creator.getEmail());
         participantDao.joinTournamentTeam(tournamentId, teamId);
-        if (currentParticipants.size() + 1 == tournament.getMaxParticipants()) {
+        if (participantDao.countTournamentParticipantTeams(tournamentId) >= tournament.getMaxParticipants()) {
             ts.closeInscriptions(tournamentId);
             LOGGER.info("Max participant count has been reached. The inscriptions for tournament with ID {} have been closed", tournamentId);
         }
@@ -195,8 +189,11 @@ public class ParticipantServiceImpl implements ParticipantService {
         participantDao.updateHasRated(reviewerId, tournamentId);
         User user = userDao.findById(creatorId).orElseThrow(UserNotFoundException::new);
         Float currentRating = user.getRating();
-        float newRating = (currentRating == null) ? rating : (currentRating + rating) / 2;
-        userDao.updateUserRating(creatorId, newRating);
+        int currentRatingCount = user.getRatingCount();
+        int newRatingCount = currentRatingCount + 1;
+        float accumulatedRating = currentRating == null ? 0 : currentRating * currentRatingCount;
+        float newRating = (accumulatedRating + rating) / newRatingCount;
+        userDao.updateUserRating(creatorId, newRating, newRatingCount);
     }
 
     @Transactional

@@ -37,11 +37,15 @@ public interface ParticipantDao {
 
     List<Participant> getTournamentParticipantUsers(long tournamentId);
 
+    int countTournamentParticipantUsers(long tournamentId);
+
     Integer getGroupNumber(long tournamentId, long userId);
 
     void sumPoints(long tournamentId, long userId, int points, int scoreDifference, int teamSize);
 
     List<Participant> getTournamentParticipantTeams(long tournamentId);
+
+    int countTournamentParticipantTeams(long tournamentId);
 
     void updateHasRated(long userId, long tournamentId);
 }

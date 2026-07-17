@@ -1,6 +1,7 @@
 package ar.edu.itba.paw.services;
 
 import ar.edu.itba.paw.interfaces.exception.TournamentNotFoundException;
+import ar.edu.itba.paw.interfaces.exception.MatchNotFoundException;
 import ar.edu.itba.paw.interfaces.persistence.MatchDao;
 import ar.edu.itba.paw.interfaces.persistence.ParticipantDao;
 import ar.edu.itba.paw.interfaces.persistence.TournamentDao;
@@ -35,12 +36,32 @@ public class MatchServiceImplTest {
     private MatchServiceImpl matchService;
 
     private static final Long ID = 1L;
+    private static final Long OTHER_ID = 2L;
 
     @Test(expected = TournamentNotFoundException.class)
     public void testGetMatchesNoTournament(){
         Mockito.when(ts.findById(ID)).thenReturn(Optional.empty());
 
         matchService.getTournamentMatchesByStage(ID, null);
+    }
+
+    @Test
+    public void testGetMatch(){
+        Tournament tournament = Mockito.mock(Tournament.class);
+        Match match = Mockito.mock(Match.class);
+        Mockito.when(ts.findById(ID)).thenReturn(Optional.of(tournament));
+        Mockito.when(matchDao.getMatch(ID, OTHER_ID)).thenReturn(match);
+
+        Assert.assertSame(match, matchService.getMatch(ID, OTHER_ID));
+    }
+
+    @Test(expected = MatchNotFoundException.class)
+    public void testGetMatchNoMatch(){
+        Tournament tournament = Mockito.mock(Tournament.class);
+        Mockito.when(ts.findById(ID)).thenReturn(Optional.of(tournament));
+        Mockito.when(matchDao.getMatch(ID, OTHER_ID)).thenReturn(null);
+
+        matchService.getMatch(ID, OTHER_ID);
     }
 
     @Test

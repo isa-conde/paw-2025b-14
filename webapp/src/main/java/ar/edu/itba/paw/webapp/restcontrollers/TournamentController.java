@@ -399,17 +399,8 @@ public class TournamentController {
             return badRequest("Invalid tournament or match id");
         }
 
-        Map<Integer, List<Match>> matchesByStage = matchService.getTournamentMatchesByStage(id, null);
-        Optional<Match> match = matchesByStage.values().stream()
-                .flatMap(List::stream)
-                .filter(item -> item.getId() == matchId)
-                .findFirst();
-
-        if (match.isEmpty()) {
-            return notFound("Match not found");
-        }
-
-        return Response.ok(MatchDTO.fromMatch(uriInfo, match.get())).build();
+        Match match = matchService.getMatch(id, matchId);
+        return Response.ok(MatchDTO.fromMatch(uriInfo, match)).build();
     }
 
     @PUT

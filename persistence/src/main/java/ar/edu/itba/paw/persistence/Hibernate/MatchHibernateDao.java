@@ -16,7 +16,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -82,20 +81,26 @@ public class MatchHibernateDao implements MatchDao {
     }
 
     public List<Match> getTournamentMatches(long tournamentId, Integer group) {
-        Tournament tournament = em.find(Tournament.class, tournamentId);
+        String jpql = """
+                SELECT DISTINCT m
+                FROM Match m
+                LEFT JOIN FETCH m.local l
+                LEFT JOIN FETCH m.visitor v
+                WHERE m.tournament.id = :tournamentId
+                """;
 
-        if (group == null || tournament.getIsGroupStage() == null || !tournament.getIsGroupStage() ) {
-            return new ArrayList<>(tournament.getMatches());
+        if (group != null) {
+            jpql += " AND l.groupNumber = :group";
         }
 
-        return new ArrayList<>(
-                tournament.getMatches()
-                        .stream()
-                        .filter(m -> m.getLocal() != null &&
-                                m.getLocal().getGroupNumber() != null &&
-                                m.getLocal().getGroupNumber().equals(group))
-                        .toList()
-        );
+        jpql += " ORDER BY m.id.id";
+
+        TypedQuery<Match> query = em.createQuery(jpql, Match.class)
+                .setParameter("tournamentId", tournamentId);
+        if (group != null) {
+            query.setParameter("group", group);
+        }
+        return query.getResultList();
     }
 
     @Override

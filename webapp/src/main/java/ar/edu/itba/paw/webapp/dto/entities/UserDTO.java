@@ -14,6 +14,7 @@ public class UserDTO {
     private boolean verified;
     private String bio;
     private Float rating;
+    private int ratingCount;
 
     private List<LinkDTO> links = new ArrayList<>();
 
@@ -29,6 +30,7 @@ public class UserDTO {
         toReturn.verified = user.isVerified();
         toReturn.bio = user.getBio();
         toReturn.rating = user.getRating();
+        toReturn.ratingCount = user.getRatingCount();
 
         toReturn.addLink("self", uriInfo.getBaseUriBuilder().path("users")
                 .path(String.valueOf(user.getId())).build().toString());
@@ -88,6 +90,14 @@ public class UserDTO {
 
     public void setRating(Float rating) {
         this.rating = rating;
+    }
+
+    public int getRatingCount() {
+        return ratingCount;
+    }
+
+    public void setRatingCount(int ratingCount) {
+        this.ratingCount = ratingCount;
     }
 
     public long getId() {

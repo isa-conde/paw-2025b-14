@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.sql.DataSource;
+import java.util.List;
 import java.util.Optional;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -218,10 +219,18 @@ public class UserHibernateDaoTest {
 
     @Test
     public void testUpdateUserRating(){
-        userHibernateDao.updateUserRating(usedId, 5f);
+        userHibernateDao.updateUserRating(usedId, 5f, 1);
         em.flush();
 
         Assert.assertEquals(1, JdbcTestUtils.countRowsInTableWhere(jdbcTemplate,"users",
-                "id = " + usedId + " and rating = 5"));
+                "id = " + usedId + " and rating = 5 and rating_count = 1"));
+    }
+
+    @Test
+    public void testFindAllByNameIsLimited(){
+        List<User> ans = userHibernateDao.findAllByName("doe", 2);
+
+        Assert.assertNotNull(ans);
+        Assert.assertEquals(2, ans.size());
     }
 }

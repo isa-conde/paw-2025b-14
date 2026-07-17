@@ -1,7 +1,6 @@
 package ar.edu.itba.paw.model;
 
 import ar.edu.itba.paw.model.Game.Game;
-import ar.edu.itba.paw.model.enums.Platform;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -51,6 +50,9 @@ public class User {
 
     @Column(name = "rating")
     private Float rating;
+
+    @Column(name = "rating_count", nullable = false)
+    private int ratingCount;
 
     @OneToMany(mappedBy = "owner")
     private List<Team> ownedTeams = new ArrayList<>();
@@ -147,6 +149,14 @@ public class User {
 
     public void setRating(Float rating) {
         this.rating = rating;
+    }
+
+    public int getRatingCount() {
+        return ratingCount;
+    }
+
+    public void setRatingCount(int ratingCount) {
+        this.ratingCount = ratingCount;
     }
 
     public void setUsername(String username) {

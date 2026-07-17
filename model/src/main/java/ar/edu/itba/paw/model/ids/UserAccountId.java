@@ -1,7 +1,6 @@
 package ar.edu.itba.paw.model.ids;
 
 import ar.edu.itba.paw.model.enums.Platform;
-import org.hibernate.annotations.Type;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
