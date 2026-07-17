@@ -61,8 +61,23 @@ public class WebAuthConfig {
                 .filter(origin -> !origin.isBlank())
                 .toList());
         configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE","OPTIONS","PATCH"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
-        configuration.setExposedHeaders(Arrays.asList("Authorization", "Link", "Location", "ETag", "Total-Elements"));
+        configuration.setAllowedHeaders(Arrays.asList(
+                "Authorization",
+                "Content-Type",
+                "Accept",
+                "Origin",
+                "X-Requested-With",
+                "If-None-Match",
+                "If-Modified-Since"));
+        configuration.setExposedHeaders(Arrays.asList(
+                "Authorization",
+                "Link",
+                "Location",
+                "ETag",
+                "Last-Modified",
+                "Cache-Control",
+                "Content-Length",
+                "Total-Elements"));
         configuration.setAllowCredentials(false);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -176,7 +191,22 @@ public class WebAuthConfig {
                     .sessionManagement()
                         .invalidSessionUrl("/")
                     .and().authorizeRequests()
-                        .antMatchers("/login", "/register").anonymous()
+                        .antMatchers(GET,
+                                "/",
+                                "/index.html",
+                                "/login",
+                                "/register",
+                                "/forgot-password",
+                                "/forgot-password/**",
+                                "/reset-password",
+                                "/reset-password/**",
+                                "/games",
+                                "/tournaments",
+                                "/tournaments/*",
+                                "/tournament",
+                                "/tournament/*",
+                                "/403").permitAll()
+                        .antMatchers("/login", "/register").permitAll()
                         .antMatchers("/", "/verify", "/verify/confirm").permitAll()
                         .antMatchers("/tournament/update",
                                 "/tournament/startTournament",
@@ -201,6 +231,7 @@ public class WebAuthConfig {
                                 "/tournament/contactOwner",
                                 "/tournament/rate",
                                 "/profile/{id}/comment").hasRole("VERIFIED")
+                        .antMatchers(GET, "/**").permitAll()
                     .and().formLogin()
                         .defaultSuccessUrl("/", false)
                         .usernameParameter("j_username")
@@ -230,7 +261,17 @@ public class WebAuthConfig {
         @Override
         public void configure(WebSecurity web) {
             web.ignoring()
-                    .antMatchers("/css/**", "/js/**", "/images/**", "favicon.ico", "/fonts/**");
+                    .antMatchers(
+                            "/assets/**",
+                            "/locales/**",
+                            "/css/**",
+                            "/js/**",
+                            "/images/**",
+                            "/fonts/**",
+                            "/favicon.ico",
+                            "/vite.svg",
+                            "/public/**",
+                            "/index.html");
         }
     }
 }

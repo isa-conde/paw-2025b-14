@@ -9,7 +9,9 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import java.util.Optional;
 
@@ -28,7 +30,7 @@ public class ImageController {
     @GET
     @Path("/{id}")
     @Produces(MediaType.WILDCARD)
-    public Response getImage(@PathParam("id") long id) {
+    public Response getImage(@PathParam("id") long id, @Context Request request) {
         if (id <= 0) {
             return ApiErrorFactory.badRequest("Invalid image id");
         }
@@ -39,9 +41,7 @@ public class ImageController {
         }
 
         byte[] body = image.get();
-        return Response.ok(body)
-                .type(detectContentType(body))
-                .build();
+        return BinaryResponseSupport.conditionalOk(request, body, detectContentType(body), "image-" + id);
     }
 
     private String detectContentType(byte[] body) {

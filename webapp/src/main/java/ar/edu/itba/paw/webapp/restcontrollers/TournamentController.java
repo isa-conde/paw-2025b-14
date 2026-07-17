@@ -48,6 +48,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
@@ -366,7 +367,7 @@ public class TournamentController {
     @GET
     @Path("/{id}/rules")
     @Produces(MediaType.WILDCARD)
-    public Response getRules(@PathParam("id") long id) {
+    public Response getRules(@PathParam("id") long id, @Context Request request) {
         if (id <= 0) {
             return badRequest("Invalid tournament id");
         }
@@ -386,9 +387,8 @@ public class TournamentController {
             return notFound("Rules not found");
         }
 
-        return Response.ok(rules.get().getFile())
-                .type("application/pdf")
-                .build();
+        byte[] body = rules.get().getFile();
+        return BinaryResponseSupport.conditionalOk(request, body, "application/pdf", "tournament-rules-" + id);
     }
 
     @GET
