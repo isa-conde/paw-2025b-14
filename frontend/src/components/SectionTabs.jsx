@@ -1,11 +1,19 @@
-const SectionTabs = ({ sections, activeSection, onChange }) => (
-    <div className="tabs">
+const SectionTabs = ({
+    sections,
+    activeSection,
+    onChange,
+    className = 'tabs',
+    tabClassName = 'tab',
+    activeTabClassName = 'active',
+}) => (
+    <div className={className}>
         {sections.map((section) => (
             <button
                 key={section.id}
                 type="button"
-                className={`tab ${activeSection === section.id ? 'active' : ''}`}
+                className={`${tabClassName} ${activeSection === section.id ? activeTabClassName : ''}`}
                 onClick={() => onChange(section.id)}
+                aria-pressed={activeSection === section.id}
             >
                 {section.label}
             </button>

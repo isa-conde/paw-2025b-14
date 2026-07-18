@@ -54,8 +54,12 @@ export const LoginPage = () => {
 
         try {
             await login(formValues);
-            const from = location.state?.from?.pathname ?? "/";
-            navigate(from, { replace: true });
+            const from = location.state?.from;
+            const fromPath = from
+                ? `${from.pathname ?? "/"}${from.search ?? ""}${from.hash ?? ""}`
+                : "/";
+            const destination = typeof from === "string" ? from : fromPath;
+            navigate(destination, { replace: true });
         } catch (requestError) {
             setError(getErrorMessage(requestError));
         }

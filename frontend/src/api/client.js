@@ -164,6 +164,52 @@ export const fetchJson = async (pathOrUrl, options = {}) => {
     return data;
 };
 
+export const requestBlob = async (pathOrUrl, options = {}) => {
+    const {
+        method,
+        accept,
+        contentType,
+        headers,
+        body,
+        data,
+        token,
+        signal,
+    } = options;
+
+    const requestBody = data !== undefined ? JSON.stringify(data) : body;
+    const response = await fetch(buildUrl(pathOrUrl), {
+        method: method ?? (requestBody !== undefined ? 'POST' : 'GET'),
+        headers: buildHeaders({
+            accept,
+            contentType,
+            headers,
+            token,
+            hasBody: requestBody !== undefined,
+        }),
+        ...(signal ? { signal } : {}),
+        ...(requestBody !== undefined ? { body: requestBody } : {}),
+    });
+
+    if (!response.ok) {
+        const parsedBody = await parseResponseBody(response);
+        throw buildApiError(response, parsedBody);
+    }
+
+    if (response.status === 204 || response.status === 205) {
+        return {
+            data: null,
+            links: parseLinkHeader(response.headers.get('Link')),
+            response,
+        };
+    }
+
+    return {
+        data: await response.blob(),
+        links: parseLinkHeader(response.headers.get('Link')),
+        response,
+    };
+};
+
 export const getLink = (links, rel) => {
     if (Array.isArray(links)) {
         return links.find((link) => link.rel === rel)?.href ?? null;
