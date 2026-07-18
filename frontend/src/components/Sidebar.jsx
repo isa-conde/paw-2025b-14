@@ -1,9 +1,11 @@
 import styles from "../styles/components/Sidebar.module.css"
 import {SidebarButton} from "./SidebarButton.jsx";
 import {useTranslation} from "react-i18next";
+import {useLocation} from "react-router-dom";
 
 export const Sidebar = ({ user }) => {
     const { t } = useTranslation();
+    const location = useLocation();
 
     const isLoggedIn = false;
 
@@ -30,10 +32,10 @@ export const Sidebar = ({ user }) => {
     };
 
     const activeButtons = [
-        window.location.pathname === indexPath,       // Home button
-        window.location.pathname.startsWith(gamesPath),      // Games button
-        window.location.pathname.startsWith(tournamentsPath), // Tournaments button
-        window.location.pathname === profilePath     // My Tournaments button
+        location.pathname === indexPath,
+        location.pathname.startsWith(gamesPath),
+        location.pathname.startsWith(tournamentsPath),
+        location.pathname === profilePath
     ];
 
     return (
@@ -59,5 +61,3 @@ export const Sidebar = ({ user }) => {
       </aside>
     );
 }
-
-// TODO: make my tournaments button dependent on ongoing session

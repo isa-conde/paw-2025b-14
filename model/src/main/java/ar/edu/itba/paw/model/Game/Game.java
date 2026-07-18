@@ -2,6 +2,7 @@ package ar.edu.itba.paw.model.Game;
 
 import ar.edu.itba.paw.model.User;
 import ar.edu.itba.paw.model.enums.Genre;
+import org.hibernate.annotations.ColumnTransformer;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public class Game {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "genre", columnDefinition = "genre_enum")
-//    @ColumnTransformer(read = "genre::text", write = "?::genre_enum")
+    @ColumnTransformer(read = "CAST(genre AS varchar)", write = "CAST(? AS genre_enum)")
     private Genre genre;
 
     @Column(name = "image_id")

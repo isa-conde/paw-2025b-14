@@ -132,6 +132,9 @@ public class GameHibernateDao implements GameDao {
         List<Long> ids = idQuery.getResultList().stream()
                 .map(it -> ((Number) it).longValue()).toList();
 
+        if (ids.isEmpty()) {
+            return Collections.emptyList();
+        }
 
         return em.createQuery(
                         "SELECT g FROM Game g WHERE g.id IN (:ids) ORDER BY g.id", Game.class)

@@ -1,7 +1,6 @@
 package ar.edu.itba.paw.persistence.Hibernate;
 
 import ar.edu.itba.paw.interfaces.persistence.GameFormatDao;
-import ar.edu.itba.paw.model.Game.Game;
 import ar.edu.itba.paw.model.Game.GameFormat;
 import org.springframework.stereotype.Repository;
 
@@ -18,8 +17,11 @@ public class GameFormatHibernateDao implements GameFormatDao {
 
     @Override
     public List<GameFormat> getFormats(long gameId) {
-        Game g = em.find(Game.class, gameId);
-        return g.getFormats();
+        return em.createQuery(
+                        "SELECT gf FROM GameFormat gf WHERE gf.game.id = :gameId ORDER BY gf.id",
+                        GameFormat.class)
+                .setParameter("gameId", gameId)
+                .getResultList();
     }
 
     @Override

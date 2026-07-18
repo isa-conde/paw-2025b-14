@@ -3,112 +3,118 @@ import {useTranslation} from "react-i18next";
 import {Layout} from "../components/Layout.jsx";
 import {Banner} from "../components/Banner.jsx";
 import {AppText} from "../components/AppText.jsx";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useSearchParams} from "react-router-dom";
 import {Button} from "../components/Button.jsx";
 import {Input} from "../components/Input.jsx";
 import {RefreshButton} from "../components/RefreshButton.jsx";
 import {ElementsGrid} from "../components/ElementsGrid.jsx";
-import {Carrousel} from "../components/Carrousel.jsx";
 import {Pagination} from "../components/Pagination.jsx";
-import {useMemo, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
+import {listAllGames} from "../api/games.js";
+import {listTournaments} from "../api/tournaments.js";
+import {parsePageParam} from "../api/pagination.js";
+import {
+    getEloOptions,
+    getGenreOptions,
+    getRegionOptions,
+    PLAYERS_PER_TEAM_OPTIONS,
+    TOURNAMENT_FILTER_KEYS
+} from "../domain/tournamentFilters.js";
 
 export const TournamentsPage = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const [isFiltered, setIsFiltered] = useState(false);
-    const [filterValues, setFilterValues] = useState({
-        gameId: "",
-        region: "",
-        elo: "",
-        genre: "",
-        playersPerTeam: "",
-        startDate: "",
-        endDate: "",
-    });
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [games, setGames] = useState([]);
+    const [tournaments, setTournaments] = useState([]);
+    const [pagination, setPagination] = useState({currentPage: 0, totalPages: 0});
+    const [gamesLoading, setGamesLoading] = useState(true);
+    const [tournamentsLoading, setTournamentsLoading] = useState(true);
+    const [gamesError, setGamesError] = useState(null);
+    const [tournamentsError, setTournamentsError] = useState(null);
 
-    const hasAppliedFilters = useMemo(
-        () => Object.values(filterValues).some((value) => value !== ""),
-        [filterValues],
-    );
+    const filterValues = useMemo(() => TOURNAMENT_FILTER_KEYS.reduce((values, key) => ({
+        ...values,
+        [key]: searchParams.get(key) ?? "",
+    }), {}), [searchParams]);
 
-    const playersPerTeamOptions = [1, 2, 3, 4, 5];
+    const hasQueryParams = Array.from(searchParams.keys()).length > 0;
+    const currentPage = parsePageParam(searchParams.get("page"));
+    const regionOptions = useMemo(() => getRegionOptions(t), [t]);
+    const eloOptions = useMemo(() => getEloOptions(t), [t]);
+    const genreOptions = useMemo(() => getGenreOptions(t), [t]);
 
-    const hardcodedGames = [
-        { id: 1, name: "League of Legends" },
-        { id: 2, name: "Valorant" },
-        { id: 3, name: "Counter-Strike" },
-        { id: 4, name: "Dota 2" },
-        { id: 5, name: "Overwatch" },
-    ];
+    useEffect(() => {
+        let isMounted = true;
+        const controller = new AbortController();
 
-    const hardcodedRegions = ["NA", "LAS", "LAN", "BR", "EUW", "EUNE", "OCE", "ASIA"];
-    const hardcodedElos = {
-        LOW: t("elo.LOW"),
-        MID: t("elo.MID"),
-        HIGH: t("elo.HIGH"),
-        FREE: t("elo.FREE"),
-    };
-    const hardcodedGenres = ["MOBA", "FPS", "Fighting", "TPS", "BattleRoyale", "RTS", "Sports", "DGC", "MOBILE"];
+        const loadGames = async () => {
+            setGamesLoading(true);
+            setGamesError(null);
 
-    const hardcodedGameTournaments = [
-        {
-            game: hardcodedGames[0],
-            tournaments: [
-                { id: 101, name: "LoL Tournament 1" },
-                { id: 102, name: "LoL Tournament 2" },
-                { id: 103, name: "LoL Tournament 3" },
-            ],
-        },
-        {
-            game: hardcodedGames[1],
-            tournaments: [
-                { id: 201, name: "Valorant Tournament 1" },
-                { id: 202, name: "Valorant Tournament 2" },
-            ],
-        },
-        {
-            game: hardcodedGames[2],
-            tournaments: [
-                { id: 301, name: "CS:GO Tournament 1" },
-                { id: 302, name: "CS:GO Tournament 2" },
-                { id: 303, name: "CS:GO Tournament 3" },
-            ],
-        },
-        {
-            game: hardcodedGames[3],
-            tournaments: [
-                { id: 401, name: "Dota 2 Tournament 1" },
-                { id: 402, name: "Dota 2 Tournament 2" },
-            ],
-        },
-        {
-            game: hardcodedGames[4],
-            tournaments: [
-                { id: 501, name: "Overwatch Tournament 1" },
-            ],
-        },
-    ];
+            try {
+                const loadedGames = await listAllGames({signal: controller.signal});
+                if (isMounted) {
+                    setGames(loadedGames);
+                }
+            } catch (loadError) {
+                if (isMounted && loadError.name !== "AbortError") {
+                    setGamesError(loadError);
+                }
+            } finally {
+                if (isMounted) {
+                    setGamesLoading(false);
+                }
+            }
+        };
 
-    const hardcodedTournaments = hardcodedGameTournaments.flatMap(({ game, tournaments }) =>
-        tournaments.map((tournament) => ({
-            ...tournament,
-            gameId: game.id,
-        })),
-    );
+        loadGames();
 
-    const pageSize = 6;
-    const totalPages = Math.max(1, Math.ceil(hardcodedTournaments.length / pageSize));
-    const currentPageParam = Number.parseInt(
-        new URLSearchParams(window.location.search).get("page") ?? "0",
-        10,
-    );
-    const currentPage = Number.isNaN(currentPageParam)
-        ? 0
-        : Math.min(Math.max(currentPageParam, 0), totalPages - 1);
-    const pagedTournaments = hardcodedTournaments.slice(
-        currentPage * pageSize,
-        currentPage * pageSize + pageSize,
-    );
+        return () => {
+            isMounted = false;
+            controller.abort();
+        };
+    }, []);
+
+    useEffect(() => {
+        let isMounted = true;
+        const controller = new AbortController();
+
+        const loadTournaments = async () => {
+            setTournamentsLoading(true);
+            setTournamentsError(null);
+
+            try {
+                const response = await listTournaments({
+                    page: currentPage,
+                    ...filterValues,
+                    signal: controller.signal,
+                });
+
+                if (!isMounted) {
+                    return;
+                }
+
+                setTournaments(response.items);
+                setPagination(response.pagination);
+            } catch (loadError) {
+                if (isMounted && loadError.name !== "AbortError") {
+                    setTournamentsError(loadError);
+                }
+            } finally {
+                if (isMounted) {
+                    setTournamentsLoading(false);
+                }
+            }
+        };
+
+        loadTournaments();
+
+        return () => {
+            isMounted = false;
+            controller.abort();
+        };
+    }, [currentPage, filterValues]);
 
     const handleNavigate = (url) => {
         navigate(url);
@@ -116,16 +122,23 @@ export const TournamentsPage = () => {
 
     const handleFilterSubmit = (event) => {
         event.preventDefault();
-        setIsFiltered(hasAppliedFilters);
     };
 
     const handleFilterChange = (event) => {
         const {name, value} = event.target;
-        setFilterValues((currentValues) => ({
-            ...currentValues,
-            [name]: value,
-        }));
+        const nextParams = new URLSearchParams(searchParams);
+        if (value) {
+            nextParams.set(name, value);
+        } else {
+            nextParams.delete(name);
+        }
+        nextParams.delete("page");
+        setSearchParams(nextParams);
     }
+
+    const handleResetFilters = () => {
+        setSearchParams({});
+    };
 
     const createTournamentUrl = "/tournaments/new/step1";
     const createTeamUrl = "/team/create";
@@ -146,9 +159,11 @@ export const TournamentsPage = () => {
     const eloLabel = t("tournaments.skillLevel");
     const genreLabel = t("tournaments.genre");
     const playersPerTeamLabel = t("tournaments.playerAmount");
-    const startDateLabel = t("createTournament.startDate");
-    const endDateLabel = t("createTournament.endDate");
     const filterLabel = t("tournaments.filter");
+    const loadingLabel = t("tournaments.loading");
+    const errorLabel = t("tournaments.error");
+    const isLoading = tournamentsLoading;
+    const hasError = tournamentsError;
 
     return (
         <Layout pageTitle={pageTitle}>
@@ -169,12 +184,13 @@ export const TournamentsPage = () => {
                             name="gameId"
                             label={gameLabel}
                             type="select"
-                            items={hardcodedGames}
+                            items={games}
                             itemValue="id"
                             itemLabel="name"
                             emptyOption={allGames}
                             inline={true}
                             value={filterValues.gameId}
+                            disabled={gamesLoading || !!gamesError}
                             onChange={handleFilterChange}
                         />
                         <Input
@@ -182,7 +198,7 @@ export const TournamentsPage = () => {
                             name="region"
                             label={regionLabel}
                             type="select"
-                            items={hardcodedRegions}
+                            itemMap={regionOptions}
                             emptyOption={allRegions}
                             inline={true}
                             value={filterValues.region}
@@ -193,7 +209,7 @@ export const TournamentsPage = () => {
                             name="elo"
                             label={eloLabel}
                             type="select"
-                            itemMap={hardcodedElos}
+                            itemMap={eloOptions}
                             emptyOption={allLevels}
                             inline={true}
                             value={filterValues.elo}
@@ -204,7 +220,7 @@ export const TournamentsPage = () => {
                             name="genre"
                             label={genreLabel}
                             type="select"
-                            items={hardcodedGenres}
+                            itemMap={genreOptions}
                             emptyOption={allGenres}
                             inline={true}
                             value={filterValues.genre}
@@ -217,52 +233,29 @@ export const TournamentsPage = () => {
                             name="playersPerTeam"
                             label={playersPerTeamLabel}
                             type="select"
-                            items={playersPerTeamOptions}
+                            items={PLAYERS_PER_TEAM_OPTIONS}
                             emptyOption={allSizes}
                             inline={true}
                             value={filterValues.playersPerTeam}
                             onChange={handleFilterChange}
                         />
-                        <Input
-                            id="startDate"
-                            name="startDate"
-                            label={startDateLabel}
-                            type="date"
-                            inline={true}
-                            value={filterValues.startDate}
-                            onChange={handleFilterChange}
-                        />
-                        <Input
-                            id="endDate"
-                            name="endDate"
-                            label={endDateLabel}
-                            type="date"
-                            inline={true}
-                            value={filterValues.endDate}
-                            onChange={handleFilterChange}
-                        />
                         <Input label={filterLabel} type="submit" inline={true}/>
-                        <RefreshButton disabled={!hasAppliedFilters}/>
+                        <RefreshButton disabled={!hasQueryParams} onClick={handleResetFilters}/>
                     </div>
                 </form>
 
-                {isFiltered ?
-                    <ElementsGrid elements={pagedTournaments} id="tournaments-grid" headerElements={hardcodedGames}/>
-                    :
-                    hardcodedGameTournaments.map(({game, tournaments}) => (
-                        tournaments.length > 0 && (
-                            <div key={game.id}>
-                                <div className={styles["carrousel-title"]}>
-                                    <a href={`/tournaments?gameId=${game.id}`} className={styles["title-link"]}>
-                                        <AppText type="title" size="s">{game.name}</AppText>
-                                    </a>
-                                </div>
-                                <Carrousel id={`game-${game.id}-tournaments`} elements={tournaments}/>
-                            </div>
-                        )
-                    ))
-                }
-                <Pagination currentPage={currentPage} totalPages={totalPages} url={tournamentsPageUrl}/>
+                {isLoading && !hasError && <AppText size="l" weight="thin">{loadingLabel}</AppText>}
+                {hasError && (
+                    <div role="alert">
+                        <AppText size="l" weight="thin">{errorLabel}</AppText>
+                    </div>
+                )}
+                {!isLoading && !hasError && (
+                    <ElementsGrid elements={tournaments} id="tournaments-grid" headerElements={games}/>
+                )}
+                {!isLoading && !hasError && (
+                    <Pagination currentPage={pagination.currentPage} totalPages={pagination.totalPages} url={tournamentsPageUrl}/>
+                )}
             </div>
         </Layout>
     );

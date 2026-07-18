@@ -5,9 +5,18 @@ import {Banner} from "../components/Banner.jsx";
 import {AppText} from "../components/AppText.jsx";
 import {ElementsGrid} from "../components/ElementsGrid.jsx";
 import {Pagination} from "../components/Pagination.jsx";
+import {useEffect, useState} from "react";
+import {useSearchParams} from "react-router-dom";
+import {listGames} from "../api/games.js";
+import {parsePageParam} from "../api/pagination.js";
 
 export const GamesPage = () => {
     const { t } = useTranslation();
+    const [searchParams] = useSearchParams();
+    const [games, setGames] = useState([]);
+    const [pagination, setPagination] = useState({currentPage: 0, totalPages: 0});
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     const pageTitle = t("games.title");
 
@@ -15,32 +24,48 @@ export const GamesPage = () => {
 
     const gamesPageUrl = "/games";
 
-    const pageSize = 6;
+    const loadingLabel = t("games.loading");
+    const errorLabel = t("games.error");
+    const currentPage = parsePageParam(searchParams.get("page"));
 
-    const games = [
-        { id: 1, name: "League of Legends" },
-        { id: 2, name: "Valorant" },
-        { id: 3, name: "Counter-Strike 2" },
-        { id: 4, name: "Dota 2" },
-        { id: 5, name: "Overwatch 2" },
-        { id: 6, name: "Rocket League" },
-        { id: 7, name: "Fortnite" },
-        { id: 8, name: "Apex Legends" },
-        { id: 9, name: "Rainbow Six Siege" },
-        { id: 10, name: "Call of Duty: Warzone" },
-        { id: 11, name: "PUBG: Battlegrounds" },
-        { id: 12, name: "Teamfight Tactics" },
-    ];
+    useEffect(() => {
+        let isMounted = true;
+        const controller = new AbortController();
 
-    const totalPages = Math.max(1, Math.ceil(games.length / pageSize));
-    const currentPageParam = Number.parseInt(
-        new URLSearchParams(window.location.search).get("page") ?? "0",
-        10,
-    );
-    const currentPage = Number.isNaN(currentPageParam)
-        ? 0
-        : Math.min(Math.max(currentPageParam, 0), totalPages - 1);
-    const pagedGames = games.slice(currentPage * pageSize, currentPage * pageSize + pageSize);
+        const loadGames = async () => {
+            setLoading(true);
+            setError(null);
+
+            try {
+                const response = await listGames({
+                    page: currentPage,
+                    signal: controller.signal,
+                });
+
+                if (!isMounted) {
+                    return;
+                }
+
+                setGames(response.items);
+                setPagination(response.pagination);
+            } catch (loadError) {
+                if (isMounted && loadError.name !== "AbortError") {
+                    setError(loadError);
+                }
+            } finally {
+                if (isMounted) {
+                    setLoading(false);
+                }
+            }
+        };
+
+        loadGames();
+
+        return () => {
+            isMounted = false;
+            controller.abort();
+        };
+    }, [currentPage]);
 
     return (
         <Layout pageTitle={pageTitle}>
@@ -48,15 +73,17 @@ export const GamesPage = () => {
                 <AppText type="title" size="xl" stroke={true}>{pageTitle}</AppText>
             </Banner>
             <div className={styles["content-container"]}>
-                <ElementsGrid elements={pagedGames} id="games-grid" isGame={true}/>
+                {loading && <AppText size="l" weight="thin">{loadingLabel}</AppText>}
+                {error && <div role="alert"><AppText size="l" weight="thin">{errorLabel}</AppText></div>}
+                {!loading && !error && <ElementsGrid elements={games} id="games-grid" isGame={true}/>}
             </div>
-            <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                url={gamesPageUrl}
-            />
+            {!loading && !error && (
+                <Pagination
+                    currentPage={pagination.currentPage}
+                    totalPages={pagination.totalPages}
+                    url={gamesPageUrl}
+                />
+            )}
         </Layout>
     );
 }
-
-// TODO: un-hardcode the games and the pagination

@@ -1,24 +1,23 @@
 import styles from "../styles/components/PaginationLink.module.css"
+import {Link, useLocation} from "react-router-dom";
 
 export const PaginationLink = ({ page, url, pageNumber = "", children }) => {
+    const location = useLocation();
     const pageParamName = "page" + pageNumber;
+    const baseUrl = new URL(url, "http://localhost:5173");
+    const nextParams = new URLSearchParams(location.search);
 
-    const newUrl = new URL(url, "http://localhost:5173");
-
-    newUrl.searchParams.append(pageParamName, page);
-
-    const currentParams = new URLSearchParams(window.location.search);
-    currentParams.forEach((value, key) => {
-        if (key !== pageParamName) {
-            newUrl.searchParams.append(key, value);
-        }
+    baseUrl.searchParams.forEach((value, key) => {
+        nextParams.set(key, value);
     });
+    nextParams.set(pageParamName, page);
 
-    const href = `${newUrl.pathname}${newUrl.search}`;
+    const search = nextParams.toString();
+    const href = `${baseUrl.pathname}${search ? `?${search}` : ""}`;
 
     return (
-        <a href={href} className={styles["title-link"]}>
+        <Link to={href} className={styles["title-link"]}>
             {children}
-        </a>
+        </Link>
     );
 }

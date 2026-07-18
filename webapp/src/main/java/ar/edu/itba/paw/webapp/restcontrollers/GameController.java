@@ -51,7 +51,7 @@ public class GameController {
         } else {
             games = gs.findAll().stream().map(GameDTO.mapper(uriInfo)).toList();
         }
-        Response.ResponseBuilder responseBuilder = Response.ok(games);
+        Response.ResponseBuilder responseBuilder = Response.ok(new GenericEntity<>(games) {});
         if (paginationParams.isPaged() && totalPages > 0) {
             addPaginationLinks(responseBuilder, page, totalPages);
         }
@@ -67,7 +67,7 @@ public class GameController {
         }
 
         List<GameFormatDTO> gameFormats = gs.getFormats(id).stream().map(GameFormatDTO.mapper(uriInfo)).toList();
-        return Response.ok(gameFormats).build();
+        return Response.ok(new GenericEntity<>(gameFormats) {}).build();
     }
 
     @GET

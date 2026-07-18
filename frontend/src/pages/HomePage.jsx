@@ -4,16 +4,109 @@ import {AppText} from "../components/AppText.jsx";
 import {useTranslation} from "react-i18next";
 import styles from "../styles/pages/HomePage.module.css"
 import {ButtonCard} from "../components/ButtonCard.jsx";
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {Carrousel} from "../components/Carrousel.jsx";
+import {useEffect, useState} from "react";
+import {getGame, listGames} from "../api/games.js";
+import {listTournaments} from "../api/tournaments.js";
 
 export const HomePage = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
+    const [games, setGames] = useState([]);
+    const [tournamentSections, setTournamentSections] = useState([]);
+    const [gamesLoading, setGamesLoading] = useState(true);
+    const [gamesError, setGamesError] = useState(null);
+    const [tournamentsLoading, setTournamentsLoading] = useState(true);
+    const [tournamentsError, setTournamentsError] = useState(null);
 
     const handleNavigate = (url) => {
         navigate(url);
     };
+
+    useEffect(() => {
+        let isMounted = true;
+        const controller = new AbortController();
+
+        const loadGames = async () => {
+            setGamesLoading(true);
+            setGamesError(null);
+
+            try {
+                const gamesResponse = await listGames({page: 0, signal: controller.signal});
+                if (!isMounted) {
+                    return;
+                }
+
+                setGames(gamesResponse.items);
+            } catch (loadError) {
+                if (isMounted && loadError.name !== "AbortError") {
+                    setGamesError(loadError);
+                }
+            } finally {
+                if (isMounted) {
+                    setGamesLoading(false);
+                }
+            }
+        };
+
+        loadGames();
+
+        return () => {
+            isMounted = false;
+            controller.abort();
+        };
+    }, []);
+
+    useEffect(() => {
+        let isMounted = true;
+        const controller = new AbortController();
+
+        const loadTournaments = async () => {
+            setTournamentsLoading(true);
+            setTournamentsError(null);
+
+            try {
+                const tournamentsResponse = await listTournaments({page: 0, signal: controller.signal});
+                const tournaments = tournamentsResponse.items;
+                const gameIds = [...new Set(tournaments.map((tournament) => tournament.gameId).filter(Boolean))];
+                const gameResults = await Promise.allSettled(
+                    gameIds.map((gameId) => getGame(gameId, {signal: controller.signal})
+                        .then((game) => [gameId, game])),
+                );
+
+                if (!isMounted) {
+                    return;
+                }
+
+                const gamesById = new Map(gameResults
+                    .filter(({status}) => status === "fulfilled")
+                    .map(({value}) => value));
+
+                setTournamentSections(gameIds
+                    .map((gameId) => ({
+                        game: gamesById.get(gameId),
+                        tournaments: tournaments.filter((tournament) => tournament.gameId === gameId),
+                    }))
+                    .filter(({game, tournaments}) => game && tournaments.length > 0));
+            } catch (loadError) {
+                if (isMounted && loadError.name !== "AbortError") {
+                    setTournamentsError(loadError);
+                }
+            } finally {
+                if (isMounted) {
+                    setTournamentsLoading(false);
+                }
+            }
+        };
+
+        loadTournaments();
+
+        return () => {
+            isMounted = false;
+            controller.abort();
+        };
+    }, []);
 
     const createTournamentUrl = "/tournaments/new/step1";
     const joinTournamentUrl = "/tournaments";
@@ -30,38 +123,11 @@ export const HomePage = () => {
     const joinTournamentButtonText = t("home.joinTournament.butText");
     const gamesPageLabel = t("home.games");
     const tournamentsLabel = t("home.tournaments");
-
-    const hardcodedGames = [
-        { id: 1, name: "League of Legends" },
-        { id: 2, name: "Valorant" },
-        { id: 3, name: "Counter-Strike" },
-        { id: 4, name: "Dota 2" },
-        { id: 5, name: "Overwatch" },
-    ];
-
-    const hardcodedTournaments = {
-        1: [
-            { id: 101, name: "LoL Tournament 1" },
-            { id: 102, name: "LoL Tournament 2" },
-            { id: 103, name: "LoL Tournament 3" },
-        ],
-        2: [
-            { id: 201, name: "Valorant Tournament 1" },
-            { id: 202, name: "Valorant Tournament 2" },
-        ],
-        3: [
-            { id: 301, name: "CS:GO Tournament 1" },
-            { id: 302, name: "CS:GO Tournament 2" },
-            { id: 303, name: "CS:GO Tournament 3" },
-        ],
-        4: [
-            { id: 401, name: "Dota 2 Tournament 1" },
-            { id: 402, name: "Dota 2 Tournament 2" },
-        ],
-        5: [
-            { id: 501, name: "Overwatch Tournament 1" },
-        ],
-    };
+    const loadingLabel = t("home.loading");
+    const errorLabel = t("home.error");
+    const noGamesLabel = t("home.noGames");
+    const noTournamentsLabel = t("home.noTournaments");
+    const hasTournamentSections = tournamentSections.some(({tournaments}) => tournaments.length > 0);
     
     return (
         <Layout>
@@ -84,30 +150,39 @@ export const HomePage = () => {
                         texture={true}/>
                 </div>
                 <div className={styles["content-title"]}>
-                    <a href={gamesPageUrl} className={styles["title-link"]}>
+                    <Link to={gamesPageUrl} className={styles["title-link"]}>
                         <AppText type="title" size="l">{gamesPageLabel}</AppText>
-                    </a>
+                    </Link>
                 </div>
-                <Carrousel elements={hardcodedGames} isGame={true}/>
+                {gamesLoading && <AppText size="l" weight="thin">{loadingLabel}</AppText>}
+                {gamesError && <div role="alert"><AppText size="l" weight="thin">{errorLabel}</AppText></div>}
+                {!gamesLoading && !gamesError && games.length === 0 && (
+                    <AppText size="l" weight="thin">{noGamesLabel}</AppText>
+                )}
+                {!gamesLoading && !gamesError && games.length > 0 && <Carrousel elements={games} isGame={true}/>}
                 <div className={styles["content-title"]}>
-                    <a href={joinTournamentUrl} className={styles["title-link"]}>
+                    <Link to={joinTournamentUrl} className={styles["title-link"]}>
                         <AppText type="title" size="l">{tournamentsLabel}</AppText>
-                    </a>
+                    </Link>
                 </div>
-                {hardcodedGames.map((game) => (
-                    <div key={game.id}>
-                        <div className={styles["content-title"]}>
-                            <a href={`${tournamentsGameUrl}?gameId=${game.id}`} className={styles["title-link"]}>
-                                <AppText type="title" size="s">{game.name}</AppText>
-                            </a>
-                            <Carrousel elements={hardcodedTournaments[game.id]} isGame={false}/>
+                {tournamentsLoading && <AppText size="l" weight="thin">{loadingLabel}</AppText>}
+                {tournamentsError && <div role="alert"><AppText size="l" weight="thin">{errorLabel}</AppText></div>}
+                {!tournamentsLoading && !tournamentsError && !hasTournamentSections && (
+                    <AppText size="l" weight="thin">{noTournamentsLabel}</AppText>
+                )}
+                {!tournamentsLoading && !tournamentsError && tournamentSections.map(({game, tournaments}) => (
+                    tournaments.length > 0 && (
+                        <div key={game.id}>
+                            <div className={styles["content-title"]}>
+                                <Link to={`${tournamentsGameUrl}?gameId=${game.id}`} className={styles["title-link"]}>
+                                    <AppText type="title" size="s">{game.name}</AppText>
+                                </Link>
+                                <Carrousel elements={tournaments} isGame={false}/>
+                            </div>
                         </div>
-                    </div>
+                    )
                 ))}
             </div>
         </Layout>
     );
 }
-
-// TODO: collect real games and tournaments, not hardcoded
-// TODO: change hardcoded tournament sections to API-driven data

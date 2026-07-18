@@ -8,12 +8,12 @@ export const ElementsGrid = ({ elements, headerElements, isGame, id, isUser, isT
     const { t } = useTranslation();
 
     const hasHeader = !!headerElements;
-    const noElements = elements.length <= 0;
+    const noElements = (elements ?? []).length <= 0;
 
     const defaultElementCardImage = "/assets/arcane.jpg";
 
     const noGames = t("elementGrid.noGames");
-    const noTournaments = t("elementsGrid.noTournaments");
+    const noTournaments = t("elementGrid.noTournaments");
 
     return (
          noElements ?
@@ -27,29 +27,27 @@ export const ElementsGrid = ({ elements, headerElements, isGame, id, isUser, isT
                 {elements.map((element) => {
                     if(isGame) {
                         return <ElementCard
-                            image={defaultElementCardImage}
+                            key={element.id}
+                            image={element.image ?? defaultElementCardImage}
                             title={element.name}
                             id={element.id}
                             isGame={true}/>
                     } else if(isUser) {
-                        return <ProfileCard isUser={true}/>
+                        return <ProfileCard key={element.id} isUser={true}/>
                     } else if(isTeam) {
-                        return <ProfileCard isTeam={true}/>
+                        return <ProfileCard key={element.id} isTeam={true}/>
                     } else {
-                        let tournamentGame;
+                        let tournamentGame = null;
                         if(hasHeader) {
-                            headerElements.map((headerElement) => {
-                                if(headerElement.id === element.gameId) {
-                                    tournamentGame = headerElement;
-                                }
-                            })
+                            tournamentGame = headerElements.find((headerElement) => headerElement.id === element.gameId);
                         }
                         return <ElementCard
-                            image={defaultElementCardImage}
+                            key={element.id}
+                            image={element.image ?? defaultElementCardImage}
                             title={element.name}
                             started={element.tournamentStarted}
-                            finished={element.isFinished}
-                            game={hasHeader ? tournamentGame.name : ""}
+                            finished={element.finished ?? element.isFinished}
+                            game={element.gameName ?? tournamentGame?.name ?? ""}
                             id={element.id}
                             isGame={false}/>
                     }
@@ -57,5 +55,3 @@ export const ElementsGrid = ({ elements, headerElements, isGame, id, isUser, isT
             </div>
     );
 }
-
-// TODO: have to add actual games, tournaments and user/team profiles

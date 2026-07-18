@@ -11,5 +11,8 @@ export const VENDOR_TYPES = {
     userVerificationConfirm: 'application/vnd.user.verification-confirm.v1+json',
     passwordResetRequest: 'application/vnd.user.password-request.v1+json',
     passwordReset: 'application/vnd.user.password-reset.v1+json',
-    game: 'application/vnd.game.v1+json'
+    game: 'application/vnd.game.v1+json',
+    gameList: 'application/vnd.game.list.v1+json',
+    gameFormat: 'application/vnd.game-format.v1+json',
+    gameFormatList: 'application/vnd.game-format.list.v1+json'
 };

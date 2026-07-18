@@ -8,7 +8,6 @@ export const Carrousel = ({ elements, isGame = false, isUserProfile = false, isT
     const carrouselRef = useRef(null);
 
     useEffect(() => {
-        const totalItems = elements.length;
         setCurrentIndex(0);
     }, [elements]);
 
@@ -33,6 +32,10 @@ export const Carrousel = ({ elements, isGame = false, isUserProfile = false, isT
     const arrowImage = "/assets/arrow.png";
     const defaultElementImage = "/assets/arcane.jpg";
 
+    if ((elements ?? []).length === 0) {
+        return null;
+    }
+
     return (
     <div className={styles.container}>
         <button className={`${styles.arrow} ${styles["arrow-left"]}`} onClick={() => moveCarrousel(Direction.LEFT)}>
@@ -41,19 +44,20 @@ export const Carrousel = ({ elements, isGame = false, isUserProfile = false, isT
 
         <div className={styles.carrousel} ref={carrouselRef}>
             <div className={styles.track}>
-                {elements.map((element, index) => {
+                {elements.map((element) => {
                     if(isUserProfile) {
-                        return <ProfileCard isUser={true}/>;
+                        return <ProfileCard key={element.id} isUser={true}/>;
                     } else if(isTeamProfile) {
-                        return <ProfileCard isTeam={true}/>;
+                        return <ProfileCard key={element.id} isTeam={true}/>;
                     } else {
                         return (
-                            <div className={styles.item}>
+                            <div key={element.id} className={styles.item}>
                                 <ElementCard
-                                    image={defaultElementImage}
+                                    image={element.image ?? defaultElementImage}
                                     title={element.name}
                                     started={isGame ? null : element.tournamentStarted}
-                                    finished={isGame ? null : element.isFinished}
+                                    finished={isGame ? null : element.finished ?? element.isFinished}
+                                    game={element.gameName}
                                     id={element.id}
                                     isGame={isGame}/>
                             </div>

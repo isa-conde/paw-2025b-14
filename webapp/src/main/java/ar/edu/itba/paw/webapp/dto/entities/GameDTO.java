@@ -23,7 +23,7 @@ public class GameDTO {
         GameDTO toReturn = new GameDTO();
 
         toReturn.setId(game.getId());
-        toReturn.setGenre(game.getGenre().name());
+        toReturn.setGenre(game.getGenre() == null ? null : game.getGenre().name());
         toReturn.setName(game.getName());
 
         toReturn.addLink("self", uriInfo.getBaseUriBuilder().path("games")
