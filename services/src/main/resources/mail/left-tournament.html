@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tournament Left</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Russo+One&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #00070E;
+            color: #E6F7FF;
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            background-color: #00244D;
+            border-radius: 15px;
+            text-align: center;
+            min-width: 500px;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        h1 {
+            font-family: 'Russo One', sans-serif;
+            font-size: 40px;
+            margin: 10px 0;
+            color: #E6F7FF;
+        }
+
+        p {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 5px 0;
+            color: #E6F7FF;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            background-color: #005B99;
+            color: #E6F7FF !important;
+            padding: 8px 30px;
+            text-decoration: none !important;
+            border-radius: 15px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: #1971B8;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div th:insert="email-header :: header"></div>
+
+    <div class="content">
+        <h1 th:text="#{email.leftTournament.title(${tournamentName})}">You left the Tournament</h1>
+        <p th:text="#{email.leftTournament.greeting(${userName})}">Hello user,</p>
+        <p th:text="#{email.leftTournament.body(${tournamentName})}">
+            You left the tournament.
+        </p>
+        <a class="btn" th:href="${tournamentLink}" th:text="#{email.leftTournament.buttonLabel}">View Tournament</a>
+    </div>
+</div>
+</body>
+</html>

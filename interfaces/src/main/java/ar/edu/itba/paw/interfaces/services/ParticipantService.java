@@ -27,4 +27,6 @@ public interface ParticipantService {
     void updateCreatorRating(long tournamentId, long creatorId, long reviewerId, float rating);
 
     void removeParticipant(Long tournamentId, Long participantId);
+
+    void leaveParticipant(Long tournamentId, Long participantId);
 }

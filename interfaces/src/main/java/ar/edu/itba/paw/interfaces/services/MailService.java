@@ -30,6 +30,8 @@ public interface MailService {
 
     void sendRemovedFromTournamentEmail(long tournamentId, String userName, String tournamentName, String recipient);
 
+    void sendLeftTournamentEmail(long tournamentId, String userName, String tournamentName, String recipient);
+
     void sendServerInfoUpdated(Tournament tournament, String userName, String recipient);
 
     void sendDiscordLinkUpdated(Tournament tournament, String userName, String recipient);

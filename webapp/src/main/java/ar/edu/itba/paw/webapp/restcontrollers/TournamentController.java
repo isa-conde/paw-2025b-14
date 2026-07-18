@@ -310,7 +310,7 @@ public class TournamentController {
         }
 
         Participant participant = findCurrentUserParticipant(id);
-        participantService.removeParticipant(id, participant.getId());
+        participantService.leaveParticipant(id, participant.getId());
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 
@@ -322,8 +322,13 @@ public class TournamentController {
         }
 
         apiAuthorizationService.assertCanDeleteParticipant(id, participantId);
+        Participant participant = participantService.getTournamentParticipant(id, participantId);
 
-        participantService.removeParticipant(id, participantId);
+        if (apiAuthorizationService.ownsParticipant(participant)) {
+            participantService.leaveParticipant(id, participantId);
+        } else {
+            participantService.removeParticipant(id, participantId);
+        }
         return Response.status(Response.Status.NO_CONTENT).build();
     }
 

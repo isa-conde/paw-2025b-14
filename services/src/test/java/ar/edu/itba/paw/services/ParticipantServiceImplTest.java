@@ -178,6 +178,53 @@ public class ParticipantServiceImplTest {
         Mockito.verify(userDao).updateUserRating(ID, 3f, 3);
     }
 
+    @Test
+    public void testLeaveParticipantSendsLeftEmailAndNotifiesCreator() {
+        Tournament tournament = Mockito.mock(Tournament.class);
+        User participantUser = new User(ID, "player", "player@mail.com", "password", true, null, null, null, "en");
+        Participant participant = new Participant();
+        participant.setId(OTHER_ID);
+        participant.setUser(participantUser);
+
+        Mockito.when(tournamentDao.findById(ID)).thenReturn(Optional.of(tournament));
+        Mockito.when(tournament.getId()).thenReturn(ID);
+        Mockito.when(tournament.getOpenInscriptions()).thenReturn(true);
+        Mockito.when(tournament.getFormatEntity()).thenReturn(null);
+        Mockito.when(tournament.getName()).thenReturn("Tournament");
+        Mockito.when(tournament.getCreatorId()).thenReturn(OTHER_ID);
+        Mockito.when(participantDao.getTournamentParticipantById(ID, OTHER_ID, 1)).thenReturn(participant);
+
+        participantService.leaveParticipant(ID, OTHER_ID);
+
+        Mockito.verify(participantDao).leaveTournamentUser(ID, ID);
+        Mockito.verify(ms).sendLeftTournamentEmail(ID, "player", "Tournament", "player@mail.com");
+        Mockito.verify(ms, Mockito.never()).sendRemovedFromTournamentEmail(Mockito.anyLong(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+        Mockito.verify(ts).notifyCreatorOfLeavingUser(participantUser, ID);
+    }
+
+    @Test
+    public void testRemoveParticipantKeepsRemovedEmail() {
+        Tournament tournament = Mockito.mock(Tournament.class);
+        User participantUser = new User(ID, "player", "player@mail.com", "password", true, null, null, null, "en");
+        Participant participant = new Participant();
+        participant.setId(OTHER_ID);
+        participant.setUser(participantUser);
+
+        Mockito.when(tournamentDao.findById(ID)).thenReturn(Optional.of(tournament));
+        Mockito.when(tournament.getId()).thenReturn(ID);
+        Mockito.when(tournament.getOpenInscriptions()).thenReturn(true);
+        Mockito.when(tournament.getFormatEntity()).thenReturn(null);
+        Mockito.when(tournament.getName()).thenReturn("Tournament");
+        Mockito.when(participantDao.getTournamentParticipantById(ID, OTHER_ID, 1)).thenReturn(participant);
+
+        participantService.removeParticipant(ID, OTHER_ID);
+
+        Mockito.verify(participantDao).leaveTournamentUser(ID, ID);
+        Mockito.verify(ms).sendRemovedFromTournamentEmail(ID, "player", "Tournament", "player@mail.com");
+        Mockito.verify(ms, Mockito.never()).sendLeftTournamentEmail(Mockito.anyLong(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+        Mockito.verify(ts, Mockito.never()).notifyCreatorOfLeavingUser(Mockito.any(), Mockito.anyLong());
+    }
+
     // Helper para crear mocks de Participant
     private Participant mockParticipant(String name, int points, int scoreDifference) {
         Participant p = new Participant(); // Asumiendo constructor vacío; ajusta si necesita params

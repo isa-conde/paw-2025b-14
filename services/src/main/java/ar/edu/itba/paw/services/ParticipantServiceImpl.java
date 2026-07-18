@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 @Transactional(readOnly = true)
 @Service
@@ -199,26 +200,9 @@ public class ParticipantServiceImpl implements ParticipantService {
     @Transactional
     @Override
     public void removeParticipant(Long tournamentId, Long participantId){
-        if(tournamentId == null) throw new TournamentNotFoundException();
-        if(participantId == null) throw new ParticipantNotFoundException();
-        Tournament tournament = tournamentDao.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
-        if(!tournament.getOpenInscriptions()){
-            LOGGER.warn("Cannot remove participant from a closed tournament");
-            throw new TournamentAlreadyClosedException();
-        }
-        GameFormat format = tournament.getFormatEntity();
-        int playersPerTeam;
-        if(format == null){
-            playersPerTeam = 1;
-        }else{
-            playersPerTeam = format.getPlayersPerTeam();
-        }
-        Participant participant = participantDao.getTournamentParticipantById(tournamentId, participantId, playersPerTeam);
-
-        if(participant == null){
-            LOGGER.warn("Participant with ID {} not found in tournament with ID {}", participantId, tournamentId);
-            throw new ParticipantNotFoundException();
-        }
+        Tournament tournament = getOpenTournament(tournamentId);
+        Participant participant = getParticipantForRemoval(tournament, participantId);
+        int playersPerTeam = resolvePlayersPerTeam(tournament);
 
         if(playersPerTeam > 1){
             participantDao.leaveTournamentTeam(participant.getTeam().getId(), tournamentId);
@@ -231,5 +215,61 @@ public class ParticipantServiceImpl implements ParticipantService {
             ms.sendRemovedFromTournamentEmail(tournamentId, participant.getUser().getUsername(), tournament.getName(), participant.getUser().getEmail());
         }
         LOGGER.info("Participant with ID {} was successfully removed from tournament with ID {}", participantId, tournamentId);
+    }
+
+    @Transactional
+    @Override
+    public void leaveParticipant(Long tournamentId, Long participantId) {
+        Tournament tournament = getOpenTournament(tournamentId);
+        Participant participant = getParticipantForRemoval(tournament, participantId);
+        int playersPerTeam = resolvePlayersPerTeam(tournament);
+
+        if(playersPerTeam > 1){
+            participantDao.leaveTournamentTeam(participant.getTeam().getId(), tournamentId);
+            for(TeamMember teamMember : participant.getTeam().getTeamMembers()){
+                User user = teamMember.getUser();
+                ms.sendLeftTournamentEmail(tournamentId, user.getUsername(), tournament.getName(), user.getEmail());
+            }
+            User owner = participant.getTeam().getOwner();
+            if (owner != null && !Objects.equals(owner.getId(), tournament.getCreatorId())) {
+                ts.notifyCreatorOfLeavingUser(owner, tournamentId);
+            }
+        }else{
+            User user = participant.getUser();
+            participantDao.leaveTournamentUser(user.getId(), tournamentId);
+            ms.sendLeftTournamentEmail(tournamentId, user.getUsername(), tournament.getName(), user.getEmail());
+            if (!Objects.equals(user.getId(), tournament.getCreatorId())) {
+                ts.notifyCreatorOfLeavingUser(user, tournamentId);
+            }
+        }
+        LOGGER.info("Participant with ID {} successfully left tournament with ID {}", participantId, tournamentId);
+    }
+
+    private Tournament getOpenTournament(Long tournamentId) {
+        if(tournamentId == null) throw new TournamentNotFoundException();
+        Tournament tournament = tournamentDao.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
+        if(!tournament.getOpenInscriptions()){
+            LOGGER.warn("Cannot remove participant from a closed tournament");
+            throw new TournamentAlreadyClosedException();
+        }
+        return tournament;
+    }
+
+    private Participant getParticipantForRemoval(Tournament tournament, Long participantId) {
+        if(participantId == null) throw new ParticipantNotFoundException();
+        Participant participant = participantDao.getTournamentParticipantById(tournament.getId(), participantId, resolvePlayersPerTeam(tournament));
+        if(participant == null){
+            LOGGER.warn("Participant with ID {} not found in tournament with ID {}", participantId, tournament.getId());
+            throw new ParticipantNotFoundException();
+        }
+        return participant;
+    }
+
+    private int resolvePlayersPerTeam(Tournament tournament) {
+        GameFormat format = tournament.getFormatEntity();
+        if(format == null){
+            return 1;
+        }
+        return format.getPlayersPerTeam();
     }
 }

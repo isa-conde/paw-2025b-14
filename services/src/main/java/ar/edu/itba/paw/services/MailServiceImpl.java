@@ -334,6 +334,27 @@ public class MailServiceImpl implements MailService {
 
     @Async
     @Override
+    public void sendLeftTournamentEmail(long tournamentId, String userName, String tournamentName, String recipient){
+        User user = userDao.findByUsername(userName).orElseThrow(UserNotFoundException::new);
+        Locale locale = toLocale(user.getLocale());
+        Context ctx = new Context(locale);
+        ctx.setVariable("userName", userName);
+        ctx.setVariable("tournamentName", tournamentName);
+        ctx.setVariable("tournamentLink", baseUrl + "/tournament/" + tournamentId);
+        ctx.setVariable("crownCid", "cid:" + CROWN_CID);
+
+        String body = templateEngine.process("left-tournament", ctx);
+
+        String subject = messageSource.getMessage(
+                "email.leftTournament.subject",
+                new Object[]{tournamentName},
+                locale);
+
+        sendEmail(recipient, subject, body);
+    }
+
+    @Async
+    @Override
     public void sendServerInfoUpdated(Tournament tournament, String userName, String recipient){
         User user = userDao.findByUsername(userName).orElseThrow(UserNotFoundException::new);
         Locale locale = toLocale(user.getLocale());
