@@ -8,12 +8,12 @@ import {LogoutButton} from "./LogoutButton.jsx";
 import {useTranslation} from "react-i18next";
 import {Button} from "./Button.jsx";
 import {useNavigate} from "react-router-dom";
+import {useAuth} from "../auth/useAuth.js";
 
 export const Layout = ({ pageTitle, func, children }) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-
-    const isLoggedIn = false;
+    const { isAuthenticated, isVerified, user, loading } = useAuth();
 
     const profileUrl = "/profile";
     const loginUrl = "/login";
@@ -25,6 +25,7 @@ export const Layout = ({ pageTitle, func, children }) => {
 
     const loginLabel = t("layout.login");
     const registerLabel = t("layout.register");
+    const username = user?.username ?? t("layout.user");
 
     return (
         <>
@@ -35,9 +36,12 @@ export const Layout = ({ pageTitle, func, children }) => {
                 <Sidebar/>
                 <Header>
                     <SearchBar/>
-                    {isLoggedIn ? (
+                    {loading ? null : isAuthenticated ? (
                         <div className={styles["header-buttons"]}>
-                            <ProfileButton text="User" isNotSafe={true} size="m" onClick={() => handleRedirect(profileUrl)}/>
+                            {!isVerified && (
+                                <span className={styles["auth-status"]}>{t("layout.unverified")}</span>
+                            )}
+                            <ProfileButton text={username} isNotSafe={true} size="m" onClick={() => handleRedirect(profileUrl)}/>
                             <LogoutButton/>
                         </div>
                     ) : (
@@ -54,6 +58,3 @@ export const Layout = ({ pageTitle, func, children }) => {
         </>
     );
 }
-
-// TODO: make isLoggedIn dynamic
-// TODO: pass real parameters to ProfileButton

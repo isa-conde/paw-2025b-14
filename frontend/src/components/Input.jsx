@@ -151,7 +151,7 @@ export const Input = ({   id,
 
         return (
             <div className={`${styles["inline-container"]} ${styles["submit-container"]}`}>
-                <input type="submit" className={submitBtnClassName} value={label}/>
+                <input type="submit" className={submitBtnClassName} value={label} disabled={disabled}/>
             </div>
         );
     }

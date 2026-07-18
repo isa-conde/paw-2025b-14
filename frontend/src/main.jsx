@@ -5,6 +5,7 @@ import App from './App.jsx';
 import './styles/app.css';
 import '../i18n.js';
 import { HelmetProvider } from "@dr.pogodin/react-helmet"
+import { AuthProvider } from './auth/AuthContext.jsx';
 
 const rootElement = document.getElementById('root');
 
@@ -13,7 +14,9 @@ createRoot(rootElement).render(
         <HelmetProvider>
             <Suspense fallback={<div>Loading...</div>}>
                 <BrowserRouter>
-                    <App />
+                    <AuthProvider>
+                        <App />
+                    </AuthProvider>
                 </BrowserRouter>
             </Suspense>
         </HelmetProvider>

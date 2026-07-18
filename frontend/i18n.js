@@ -8,7 +8,7 @@ i18n
     .use(Backend)
     .use(initReactI18next)
     .init({
-        debug: import.meta.env.DEV,
+        debug: false,
         fallbackLng: "en",
         supportedLngs: ["en", "es"],
         nonExplicitSupportedLngs: true,

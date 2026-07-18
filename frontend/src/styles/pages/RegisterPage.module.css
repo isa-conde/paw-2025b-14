@@ -6,3 +6,10 @@
 .link-btn-container.single {
     text-align: center;
 }
+
+.error {
+    color: var(--error);
+    font-size: var(--text-16);
+    font-weight: 600;
+    text-align: center;
+}

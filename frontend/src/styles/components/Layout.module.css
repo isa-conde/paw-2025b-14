@@ -14,6 +14,12 @@
     align-items: center; /* opcional, centra vertical */
 }
 
+.auth-status {
+    color: var(--error);
+    font-size: var(--text-16);
+    font-weight: 600;
+}
+
 .main-content {
     overflow-y: auto;
     grid-area: content;
