@@ -2,9 +2,11 @@ import { FormLayout } from "../components/FormLayout.jsx";
 import { AppText } from "../components/AppText.jsx";
 import { useTranslation } from "react-i18next";
 import { Button } from "../components/Button.jsx";
+import { useNavigate } from "react-router-dom";
 
 export const ResetPasswordSuccessPage = () => {
     const { t } = useTranslation();
+    const navigate = useNavigate();
 
     const pageTitle = t("login.title");
     const title = t("passwordReset.success.title");
@@ -17,7 +19,7 @@ export const ResetPasswordSuccessPage = () => {
             <AppText type="title">{title}</AppText>
             <AppText size="l">{message}</AppText>
             <br />
-            <Button onClick={() => (window.location.href = homeUrl)} text={buttonText} />
+            <Button onClick={() => navigate(homeUrl)} text={buttonText} />
         </FormLayout>
     );
 };

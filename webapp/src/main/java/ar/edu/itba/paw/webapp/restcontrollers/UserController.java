@@ -251,9 +251,8 @@ public class UserController {
     @Produces(value = {Vendor.APPLICATION_USER})
     public Response resetPassword(@Valid ResetPasswordRequest request) {
         long token = request.getToken();
-        us.resetPassword(token, request.getPassword());
-
         User user = us.findUserByToken(token);
+        us.resetPassword(token, request.getPassword());
 
         return Response.ok(UserDTO.fromUser(uriInfo, user))
                 .header(HttpHeaders.AUTHORIZATION, jwtTokenService.createJwsToken(user))

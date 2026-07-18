@@ -176,7 +176,7 @@ public class MailServiceImpl implements MailService {
         User user = userDao.findById(userId).orElseThrow(UserNotFoundException::new);
         Locale locale = toLocale(user.getLocale());
         Context ctx = new Context(locale);
-        String resetPasswordUrl = baseUrl + "/forgotPassword/reset?token=" + token;
+        String resetPasswordUrl = baseUrl + "/reset-password?token=" + token;
         ctx.setVariable("resetPasswordUrl", resetPasswordUrl);
         ctx.setVariable("crownCid", "cid:" + CROWN_CID);
 
