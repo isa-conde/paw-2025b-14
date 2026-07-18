@@ -122,6 +122,9 @@ const getActionErrorMessage = (error, t) => {
     if (error?.status === 409) {
         return t('tournamentDetail.error.conflict');
     }
+    if (error?.status === 404) {
+        return t('tournamentDetail.error.notFound');
+    }
     if (error?.status === 400) {
         return t('tournamentDetail.error.badRequest');
     }
@@ -519,6 +522,7 @@ const TournamentPage = () => {
 
                     {activeTab === 'matches' && (
                         <TournamentMatches
+                            tournament={tournament}
                             stages={matches}
                             participantsById={participantsById}
                             isOwner={isOwner}

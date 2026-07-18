@@ -534,6 +534,7 @@
     "tournamentDetail.status.started": "In progress",
     "tournamentDetail.status.open": "Inscriptions open",
     "tournamentDetail.status.closed": "Inscriptions closed",
+    "tournamentDetail.status.pendingStart": "Inscriptions closed, pending start",
     "tournamentDetail.participantsCount": "{{current}} / {{max}}",
     "tournamentDetail.unknown.game": "Game pending",
     "tournamentDetail.unknown.creator": "Organizer",
@@ -549,6 +550,7 @@
     "tournamentDetail.matches.stage": "Stage {{stage}}",
     "tournamentDetail.matches.versus": "vs",
     "tournamentDetail.matches.played": "Played",
+    "tournamentDetail.matches.pendingStart": "Group-stage matches will be generated when the tournament starts.",
     "tournamentDetail.results.localScoreFor": "Local: {{participant}}",
     "tournamentDetail.results.visitorScoreFor": "Visitor: {{participant}}",
     "tournamentDetail.rules.loading": "Loading rules...",
@@ -574,6 +576,7 @@
     "tournamentDetail.error.load": "Please try again in a moment.",
     "tournamentDetail.error.generic": "We could not complete the action. Please try again.",
     "tournamentDetail.error.conflict": "The action could not be completed because of the current tournament state.",
+    "tournamentDetail.error.notFound": "We could not find the requested tournament resource.",
     "tournamentDetail.error.badRequest": "The request contains invalid data.",
     "tournamentDetail.error.missingParticipant": "We could not find your tournament entry."
 }

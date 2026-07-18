@@ -121,15 +121,20 @@ public class MatchServiceImpl implements MatchService {
     @Transactional
     @Override
     public void setMatchResults(long matchId, long tournamentId, Integer localScore, Integer visitorScore) {
-        if (localScore == null || visitorScore == null) {
+        if (localScore == null || visitorScore == null || localScore < 0 || visitorScore < 0) {
             throw new ScoresInvalidException();
         }
-        if(hasWinner(matchId, tournamentId)) {
+
+        Tournament tournament = ts.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
+        Match match = matchDao.getMatch(tournamentId, matchId);
+        if (match == null) {
+            throw new MatchNotFoundException();
+        }
+        if(hasWinner(match)) {
             LOGGER.warn("Match with ID {} already has a winner", matchId);
             throw new MatchWinnerAlreadySetException();
         }
 
-        Tournament tournament = ts.findById(tournamentId).orElseThrow(TournamentNotFoundException::new);
         GameFormat format = tournament.getFormatEntity();
         int teamSize;
         if(format == null) {
@@ -144,10 +149,6 @@ public class MatchServiceImpl implements MatchService {
         if(isElimination && localScore.equals(visitorScore)){
             throw new DrawInEliminationMatchException();
         }
-        Match match = matchDao.getMatch(tournamentId, matchId);
-        if (match == null) {
-            throw new MatchNotFoundException();
-        }
         Long localId = match.getLocalId();
         Long visitorId = match.getVisitorId();
         if (localId == null || visitorId == null) {
@@ -157,22 +158,27 @@ public class MatchServiceImpl implements MatchService {
         int winner = (localScore > visitorScore) ? 1 : (localScore < visitorScore ? 2 : -1);
         matchDao.setMatchResults(matchId, tournamentId, localScore, visitorScore, winner, LocalDate.now());
         Long winnerId = (winner == 1) ? localId : (winner == 2 ? visitorId : null);
-        int scoreDifference = (winner == 1) ? localScore - visitorScore : (winner == 2 ? visitorScore - localScore : 0);
+        int localScoreDifference = localScore - visitorScore;
+        int visitorScoreDifference = visitorScore - localScore;
 
-        boolean isFinished = matchDao.allMatchesPlayed(tournamentId);
+        boolean isFinished = allCurrentPhaseMatchesPlayed(tournament, tournamentId, match.getIsGroupStage());
         if(!isFinished && isElimination) {
-            setNextMatchInfo(matchId, tournamentId, winnerId);
+            setNextMatchInfo(matchId, tournamentId, winnerId, match.getIsGroupStage());
         }else if(structure.equals(Structure.LEAGUE) || ( structure.equals(Structure.HYBRID) && isGroupStage)){
             if(winner == -1) {
-                participantDao.sumPoints(tournamentId, localId, 1, scoreDifference, teamSize);
-                participantDao.sumPoints(tournamentId, visitorId, 1, scoreDifference, teamSize);
+                participantDao.sumPoints(tournamentId, localId, 1, localScoreDifference, teamSize);
+                participantDao.sumPoints(tournamentId, visitorId, 1, visitorScoreDifference, teamSize);
+            }else if(winner == 1) {
+                participantDao.sumPoints(tournamentId, localId, 3, localScoreDifference, teamSize);
+                participantDao.sumPoints(tournamentId, visitorId, 0, visitorScoreDifference, teamSize);
             }else {
-                participantDao.sumPoints(tournamentId, winnerId, 3, scoreDifference, teamSize);
+                participantDao.sumPoints(tournamentId, visitorId, 3, visitorScoreDifference, teamSize);
+                participantDao.sumPoints(tournamentId, localId, 0, localScoreDifference, teamSize);
             }
         }
         if (structure.equals(Structure.HYBRID) && isGroupStage && isFinished) {
             ts.createBracketFromGroups(tournamentId);
-            isFinished = matchDao.allMatchesPlayed(tournamentId);
+            isFinished = matchDao.allMatchesPlayed(tournamentId, false);
         }
         if (isFinished) {
             ts.setFinished(tournamentId, matchId);
@@ -180,16 +186,19 @@ public class MatchServiceImpl implements MatchService {
         LOGGER.info("The winner of match with ID {} has been correctly set", matchId);
     }
 
-    private void setNextMatchInfo(long matchId, long tournamentId, Long winnerId) {
+    private void setNextMatchInfo(long matchId, long tournamentId, Long winnerId, Boolean isGroupStage) {
         Integer currentStage = matchDao.getMatchStage(tournamentId, matchId);
         if(currentStage == null) {
             throw new StageIsNotSetException();
         }
 
-        List<Long> idsThisStage = matchDao.getStageMatchIds(currentStage, tournamentId).stream().sorted().toList();
-        List<Long> idsNextStage = matchDao.getStageMatchIds(currentStage + 1, tournamentId).stream().sorted().toList();
+        List<Long> idsThisStage = matchDao.getStageMatchIds(currentStage, tournamentId, isGroupStage).stream().sorted().toList();
+        List<Long> idsNextStage = matchDao.getStageMatchIds(currentStage + 1, tournamentId, isGroupStage).stream().sorted().toList();
 
         int indexInStage = idsThisStage.indexOf(matchId);
+        if(indexInStage < 0) {
+            throw new MatchNotFoundException();
+        }
         if(idsNextStage.isEmpty()){
             return;
         }
@@ -205,11 +214,14 @@ public class MatchServiceImpl implements MatchService {
         }
     }
 
-    private boolean hasWinner(long matchId, long tournamentId) {
-        Match match = matchDao.getMatch(tournamentId, matchId);
-        if (match == null) {
-            throw new MatchNotFoundException();
-        }
+    private boolean hasWinner(Match match) {
         return match.getWinner() != null;
+    }
+
+    private boolean allCurrentPhaseMatchesPlayed(Tournament tournament, long tournamentId, Boolean isGroupStage) {
+        if(tournament.getStructure().equals(Structure.HYBRID)) {
+            return matchDao.allMatchesPlayed(tournamentId, isGroupStage);
+        }
+        return matchDao.allMatchesPlayed(tournamentId);
     }
 }

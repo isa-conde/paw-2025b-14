@@ -25,9 +25,13 @@ public interface MatchDao {
 
     boolean allMatchesPlayed(long tournamentId);
 
+    boolean allMatchesPlayed(long tournamentId, Boolean isGroupStage);
+
     Integer getMatchStage(long tournamentId, long matchId);
 
     List<Long> getStageMatchIds(int stage, long tournamentId);
+
+    List<Long> getStageMatchIds(int stage, long tournamentId, Boolean isGroupStage);
 
     int getTournamentMaxStage(long tournamentId);
 

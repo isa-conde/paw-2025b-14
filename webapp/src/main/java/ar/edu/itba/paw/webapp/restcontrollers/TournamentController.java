@@ -444,16 +444,23 @@ public class TournamentController {
             return badRequest("status update must include tournamentStarted or openInscriptions");
         }
 
-        if (Boolean.TRUE.equals(request.getTournamentStarted())) {
-            tournamentService.startTournament(id);
-        } else if (Boolean.FALSE.equals(request.getTournamentStarted())) {
+        boolean closeInscriptions = Boolean.FALSE.equals(request.getOpenInscriptions());
+        boolean startTournament = Boolean.TRUE.equals(request.getTournamentStarted());
+
+        if (Boolean.FALSE.equals(request.getTournamentStarted())) {
             return badRequest("tournamentStarted can only transition to true");
         }
 
-        if (Boolean.FALSE.equals(request.getOpenInscriptions())) {
-            tournamentService.closeInscriptions(id);
-        } else if (Boolean.TRUE.equals(request.getOpenInscriptions())) {
+        if (Boolean.TRUE.equals(request.getOpenInscriptions())) {
             return badRequest("openInscriptions can only transition to false");
+        }
+
+        if (closeInscriptions) {
+            tournamentService.closeInscriptions(id);
+        }
+
+        if (startTournament) {
+            tournamentService.startTournament(id);
         }
 
         Optional<Tournament> updated = tournamentService.findById(id);

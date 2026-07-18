@@ -106,7 +106,10 @@ const jsonResponse = (body, mediaType = 'application/json', status = 200) => new
 const noContentResponse = () => new Response(null, { status: 204 });
 
 const createFetchMock = ({
+    tournamentBody = tournament,
+    matchesBody = matches,
     tournamentStatus = 200,
+    statusResponseStatus = 200,
     authenticatedParticipant = null,
     rulesStatus = 200,
     participantsBody = [currentParticipant, rivalParticipant],
@@ -114,6 +117,7 @@ const createFetchMock = ({
     let joined = false;
     let left = false;
     let uploadedRules = false;
+    let currentTournament = tournamentBody;
 
     return vi.fn((url, options = {}) => {
         const requestUrl = new URL(url, 'http://localhost');
@@ -121,12 +125,12 @@ const createFetchMock = ({
 
         if (path === '/api/tournaments/12' && options.method === 'PUT') {
             uploadedRules = true;
-            return Promise.resolve(jsonResponse(tournament, VENDOR_TYPES.tournament));
+            return Promise.resolve(jsonResponse(currentTournament, VENDOR_TYPES.tournament));
         }
 
         if (path === '/api/tournaments/12' && options.method !== 'PUT') {
             return Promise.resolve(jsonResponse(
-                tournamentStatus === 200 ? tournament : { message: 'not found' },
+                tournamentStatus === 200 ? currentTournament : { message: 'not found' },
                 tournamentStatus === 200 ? VENDOR_TYPES.tournament : 'application/json',
                 tournamentStatus,
             ));
@@ -155,7 +159,7 @@ const createFetchMock = ({
         }
 
         if (path === '/api/tournaments/12/matches') {
-            return Promise.resolve(jsonResponse(matches, VENDOR_TYPES.matchStageList));
+            return Promise.resolve(jsonResponse(matchesBody, VENDOR_TYPES.matchStageList));
         }
 
         if (path === '/api/tournaments/12/rules') {
@@ -179,10 +183,16 @@ const createFetchMock = ({
         }
 
         if (path === '/api/tournaments/12/status' && options.method === 'PUT') {
-            return Promise.resolve(jsonResponse({
-                ...tournament,
-                openInscriptions: false,
-            }, VENDOR_TYPES.tournament));
+            if (statusResponseStatus !== 200) {
+                return Promise.resolve(jsonResponse({ message: 'status error' }, 'application/json', statusResponseStatus));
+            }
+            const payload = JSON.parse(options.body ?? '{}');
+            currentTournament = {
+                ...currentTournament,
+                ...(payload.openInscriptions === false ? { openInscriptions: false } : {}),
+                ...(payload.tournamentStarted === true ? { tournamentStarted: true } : {}),
+            };
+            return Promise.resolve(jsonResponse(currentTournament, VENDOR_TYPES.tournament));
         }
 
         if (path === '/api/tournaments/12/matches/5/results' && options.method === 'PUT') {
@@ -385,8 +395,21 @@ describe('TournamentPage', () => {
         const ownerRender = renderTournamentPage();
 
         expect(await screen.findByRole('button', { name: 'tournament.closeInscriptions' })).toBeInTheDocument();
-        expect(screen.getByRole('button', { name: 'tournament.startTournament' })).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'tournament.startTournament' })).not.toBeInTheDocument();
         ownerRender.unmount();
+
+        vi.stubGlobal('fetch', createFetchMock({
+            tournamentBody: {
+                ...tournament,
+                openInscriptions: false,
+            },
+            authenticatedParticipant: [],
+        }));
+        const closedOwnerRender = renderTournamentPage();
+
+        expect(await screen.findByRole('button', { name: 'tournament.startTournament' })).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'tournament.closeInscriptions' })).not.toBeInTheDocument();
+        closedOwnerRender.unmount();
 
         localStorage.clear();
         setApiToken(null);
@@ -397,5 +420,152 @@ describe('TournamentPage', () => {
         await screen.findByRole('heading', { name: 'Autumn Open' });
         expect(screen.queryByRole('button', { name: 'tournament.closeInscriptions' })).not.toBeInTheDocument();
         expect(screen.queryByRole('button', { name: 'tournament.startTournament' })).not.toBeInTheDocument();
+    });
+
+    it('closes inscriptions through status and refreshes matches', async () => {
+        authenticate({ id: 7, username: 'owner-user', verified: true });
+        const fetchMock = createFetchMock({ authenticatedParticipant: [] });
+        vi.stubGlobal('fetch', fetchMock);
+
+        renderTournamentPage();
+
+        fireEvent.click(await screen.findByRole('button', { name: 'tournament.closeInscriptions' }));
+
+        await waitFor(() => {
+            const statusCall = fetchMock.mock.calls.find(([url, options]) => (
+                new URL(url, 'http://localhost').pathname === '/api/tournaments/12/status'
+                && options.method === 'PUT'
+            ));
+            expect(statusCall).toBeTruthy();
+            expect(JSON.parse(statusCall[1].body)).toEqual({ openInscriptions: false });
+        });
+        await waitFor(() => {
+            expect(fetchMock.mock.calls.filter(([url]) => (
+                new URL(url, 'http://localhost').pathname === '/api/tournaments/12/matches'
+            )).length).toBeGreaterThanOrEqual(2);
+        });
+    });
+
+    it('starts a closed tournament through status and refreshes matches', async () => {
+        authenticate({ id: 7, username: 'owner-user', verified: true });
+        const fetchMock = createFetchMock({
+            tournamentBody: {
+                ...tournament,
+                openInscriptions: false,
+            },
+            authenticatedParticipant: [],
+        });
+        vi.stubGlobal('fetch', fetchMock);
+
+        renderTournamentPage();
+
+        fireEvent.click(await screen.findByRole('button', { name: 'tournament.startTournament' }));
+
+        await waitFor(() => {
+            const statusCall = fetchMock.mock.calls.find(([url, options]) => (
+                new URL(url, 'http://localhost').pathname === '/api/tournaments/12/status'
+                && options.method === 'PUT'
+            ));
+            expect(statusCall).toBeTruthy();
+            expect(JSON.parse(statusCall[1].body)).toEqual({ tournamentStarted: true });
+        });
+        await waitFor(() => {
+            expect(fetchMock.mock.calls.filter(([url]) => (
+                new URL(url, 'http://localhost').pathname === '/api/tournaments/12/matches'
+            )).length).toBeGreaterThanOrEqual(2);
+        });
+    });
+
+    it('shows the pending-start empty state for a closed hybrid group stage', async () => {
+        vi.stubGlobal('fetch', createFetchMock({
+            tournamentBody: {
+                ...tournament,
+                structure: 'HYBRID',
+                openInscriptions: false,
+                groupStage: true,
+            },
+            matchesBody: [],
+            authenticatedParticipant: [],
+        }));
+
+        renderTournamentPage('/tournaments/12?tab=matches');
+
+        expect(await screen.findByText('tournamentDetail.matches.pendingStart')).toBeInTheDocument();
+    });
+
+    it('sets match results through the real endpoint', async () => {
+        authenticate({ id: 7, username: 'owner-user', verified: true });
+        const fetchMock = createFetchMock({
+            tournamentBody: {
+                ...tournament,
+                openInscriptions: false,
+                tournamentStarted: true,
+            },
+            authenticatedParticipant: [],
+        });
+        vi.stubGlobal('fetch', fetchMock);
+
+        renderTournamentPage('/tournaments/12?tab=matches');
+
+        fireEvent.change(await screen.findByLabelText('tournamentDetail.results.localScoreFor'), {
+            target: { value: '2' },
+        });
+        fireEvent.change(screen.getByLabelText('tournamentDetail.results.visitorScoreFor'), {
+            target: { value: '1' },
+        });
+        fireEvent.click(screen.getByRole('button', { name: 'tournament.setMatchResults.set' }));
+
+        await waitFor(() => {
+            const resultsCall = fetchMock.mock.calls.find(([url, options]) => (
+                new URL(url, 'http://localhost').pathname === '/api/tournaments/12/matches/5/results'
+                && options.method === 'PUT'
+            ));
+            expect(resultsCall).toBeTruthy();
+            expect(JSON.parse(resultsCall[1].body)).toEqual({ localScore: 2, visitorScore: 1 });
+        });
+    });
+
+    it('shows status errors without breaking the page', async () => {
+        authenticate({ id: 7, username: 'owner-user', verified: true });
+        vi.stubGlobal('fetch', createFetchMock({
+            authenticatedParticipant: [],
+            statusResponseStatus: 409,
+        }));
+
+        renderTournamentPage();
+
+        fireEvent.click(await screen.findByRole('button', { name: 'tournament.closeInscriptions' }));
+
+        expect(await screen.findByRole('alert')).toHaveTextContent('tournamentDetail.error.conflict');
+        expect(screen.getByRole('heading', { name: 'Autumn Open' })).toBeInTheDocument();
+    });
+
+    it('validates elimination ties before submitting results', async () => {
+        authenticate({ id: 7, username: 'owner-user', verified: true });
+        const fetchMock = createFetchMock({
+            tournamentBody: {
+                ...tournament,
+                structure: 'ELIMINATION',
+                openInscriptions: false,
+                tournamentStarted: true,
+            },
+            authenticatedParticipant: [],
+        });
+        vi.stubGlobal('fetch', fetchMock);
+
+        renderTournamentPage('/tournaments/12?tab=matches');
+
+        fireEvent.change(await screen.findByLabelText('tournamentDetail.results.localScoreFor'), {
+            target: { value: '1' },
+        });
+        fireEvent.change(screen.getByLabelText('tournamentDetail.results.visitorScoreFor'), {
+            target: { value: '1' },
+        });
+        fireEvent.click(screen.getByRole('button', { name: 'tournament.setMatchResults.set' }));
+
+        expect(await screen.findByRole('alert')).toHaveTextContent('setMatchResultsForm.noTieOnEliminationConstraint');
+        expect(fetchMock.mock.calls.some(([url]) => (
+            new URL(url, 'http://localhost').pathname === '/api/tournaments/12/matches/5/results'
+        ))).toBe(false);
     });
 });

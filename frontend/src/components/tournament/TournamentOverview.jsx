@@ -36,7 +36,7 @@ export const TournamentOverview = ({
             ? t('tournamentDetail.status.started')
             : tournament.openInscriptions
                 ? t('tournamentDetail.status.open')
-                : t('tournamentDetail.status.closed');
+                : t('tournamentDetail.status.pendingStart');
 
     return (
         <section className={styles.section}>

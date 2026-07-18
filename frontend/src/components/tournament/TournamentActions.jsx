@@ -24,6 +24,11 @@ export const TournamentActions = ({
         && !tournament.finished
         && !isParticipant
     );
+    const canStart = Boolean(
+        !tournament.openInscriptions
+        && !tournament.tournamentStarted
+        && !tournament.finished
+    );
 
     return (
         <section className={styles.section}>
@@ -87,7 +92,7 @@ export const TournamentActions = ({
                             onClick={onCloseInscriptions}
                         />
                     )}
-                    {!tournament.tournamentStarted && !tournament.finished && (
+                    {canStart && (
                         <Button
                             text={statusLoading === 'start' ? t('tournamentDetail.saving') : t('tournament.startTournament')}
                             size="m"

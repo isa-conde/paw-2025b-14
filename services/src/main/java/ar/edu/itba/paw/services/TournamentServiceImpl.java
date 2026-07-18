@@ -100,6 +100,7 @@ public class TournamentServiceImpl implements TournamentService {
             List<Participant> tops = getLeagueTournamentTopPositions(tournamentId);
             if(tops.isEmpty()) {
                 LOGGER.debug("Top positions list for league format is empty");
+                throw new MissingWinnerException();
             }
             if (tops.size() > 1) {
                 Long maxMatchId = matchDao.getMaxMatchId(tournamentId);
@@ -176,6 +177,14 @@ public class TournamentServiceImpl implements TournamentService {
             LOGGER.warn("The inscriptions for the tournament with ID {} have already been closed", tournamentId);
             throw new TournamentAlreadyClosedException();
         }
+        if(tournament.getTournamentStarted()) {
+            LOGGER.warn("Cannot close inscriptions for already started tournament with ID {}", tournamentId);
+            throw new TournamentAlreadyStartedException();
+        }
+        if(Boolean.TRUE.equals(tournament.getFinished())) {
+            LOGGER.warn("Cannot close inscriptions for already finished tournament with ID {}", tournamentId);
+            throw new BusinessException("Tournament is already finished");
+        }
         GameFormat format = tournament.getFormatEntity();
         int teamSize;
         if(format == null) {
@@ -213,11 +222,19 @@ public class TournamentServiceImpl implements TournamentService {
             LOGGER.warn("The tournament with ID {} has already started", tournamentId);
             throw new TournamentAlreadyStartedException();
         }
-        tournamentDao.startTournament(tournamentId);
-        LOGGER.info("The tournament with ID {} has successfully been started", tournamentId);
+        if(Boolean.TRUE.equals(tournament.getOpenInscriptions())) {
+            LOGGER.warn("Cannot start tournament with ID {} while inscriptions are still open", tournamentId);
+            throw new TournamentInscriptionsOpenException();
+        }
+        if(Boolean.TRUE.equals(tournament.getFinished())) {
+            LOGGER.warn("Cannot start already finished tournament with ID {}", tournamentId);
+            throw new BusinessException("Tournament is already finished");
+        }
         if(tournament.getStructure().equals(Structure.HYBRID) && tournament.getIsGroupStage()){
             createGroupStageMatches(tournament);
         }
+        tournamentDao.startTournament(tournamentId);
+        LOGGER.info("The tournament with ID {} has successfully been started", tournamentId);
         List<Participant> participants = participantDao.getTournamentParticipantUsers(tournamentId);
         Optional<User> optCreator = userDao.findById(tournament.getCreatorId());
         if(optCreator.isEmpty()) {
@@ -304,6 +321,7 @@ public class TournamentServiceImpl implements TournamentService {
     }
 
     private void createMatchesLeague(Tournament t, List<Participant> participants, long firstMatchId, int firstStage, Boolean isGroupStage) {
+        participants = new ArrayList<>(participants);
         int n = participants.size();
 
         if (n % 2 != 0) {

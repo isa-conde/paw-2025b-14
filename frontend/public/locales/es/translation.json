@@ -534,6 +534,7 @@
     "tournamentDetail.status.started": "En curso",
     "tournamentDetail.status.open": "Inscripciones abiertas",
     "tournamentDetail.status.closed": "Inscripciones cerradas",
+    "tournamentDetail.status.pendingStart": "Inscripciones cerradas, pendiente de iniciar",
     "tournamentDetail.participantsCount": "{{current}} / {{max}}",
     "tournamentDetail.unknown.game": "Juego por definir",
     "tournamentDetail.unknown.creator": "Organizador",
@@ -549,6 +550,7 @@
     "tournamentDetail.matches.stage": "Etapa {{stage}}",
     "tournamentDetail.matches.versus": "vs",
     "tournamentDetail.matches.played": "Jugado",
+    "tournamentDetail.matches.pendingStart": "Los partidos de grupos se van a generar cuando inicie el torneo.",
     "tournamentDetail.results.localScoreFor": "Local: {{participant}}",
     "tournamentDetail.results.visitorScoreFor": "Visitante: {{participant}}",
     "tournamentDetail.rules.loading": "Cargando reglas...",
@@ -574,6 +576,7 @@
     "tournamentDetail.error.load": "Intentalo nuevamente en unos instantes.",
     "tournamentDetail.error.generic": "No pudimos completar la acción. Intentalo nuevamente.",
     "tournamentDetail.error.conflict": "La acción no se pudo completar por el estado actual del torneo.",
+    "tournamentDetail.error.notFound": "No pudimos encontrar el recurso solicitado del torneo.",
     "tournamentDetail.error.badRequest": "La solicitud tiene datos inválidos.",
     "tournamentDetail.error.missingParticipant": "No encontramos tu inscripción en este torneo."
 }

@@ -136,14 +136,27 @@ public class MatchHibernateDao implements MatchDao {
 
     @Override
     public boolean allMatchesPlayed(long tournamentId) {
-        TypedQuery<Long> totalMatchesCountQuery = em.createQuery("SELECT COUNT(m) FROM Match m WHERE m.tournament = :tournament", Long.class);
+        return allMatchesPlayed(tournamentId, null, false);
+    }
+
+    @Override
+    public boolean allMatchesPlayed(long tournamentId, Boolean isGroupStage) {
+        return allMatchesPlayed(tournamentId, isGroupStage, true);
+    }
+
+    private boolean allMatchesPlayed(long tournamentId, Boolean isGroupStage, boolean filterByGroupStage) {
+        String phaseFilter = buildGroupStageFilter(filterByGroupStage, isGroupStage);
+
+        TypedQuery<Long> totalMatchesCountQuery = em.createQuery("SELECT COUNT(m) FROM Match m WHERE m.tournament = :tournament" + phaseFilter, Long.class);
         totalMatchesCountQuery.setParameter("tournament", em.getReference(Tournament.class, tournamentId));
+        setGroupStageParameter(totalMatchesCountQuery, filterByGroupStage, isGroupStage);
         Long totalMatches = totalMatchesCountQuery.getSingleResult();
 
         if(totalMatches == 0) return false;
 
-        TypedQuery<Long> playedMatchesCountQuery = em.createQuery("SELECT COUNT(m) FROM Match m WHERE m.tournament = :tournament AND m.winner IS NOT NULL", Long.class);
+        TypedQuery<Long> playedMatchesCountQuery = em.createQuery("SELECT COUNT(m) FROM Match m WHERE m.tournament = :tournament AND m.winner IS NOT NULL" + phaseFilter, Long.class);
         playedMatchesCountQuery.setParameter("tournament", em.getReference(Tournament.class, tournamentId));
+        setGroupStageParameter(playedMatchesCountQuery, filterByGroupStage, isGroupStage);
         Long playedMatches = playedMatchesCountQuery.getSingleResult();
 
         return totalMatches.equals(playedMatches);
@@ -159,9 +172,35 @@ public class MatchHibernateDao implements MatchDao {
 
     @Override
     public List<Long> getStageMatchIds(int stage, long tournamentId) {
-        TypedQuery<Long> query = em.createQuery("SELECT m.id.id FROM Match m WHERE m.stage = :stage AND m.tournament = :tournament", Long.class);
+        return getStageMatchIds(stage, tournamentId, null, false);
+    }
+
+    @Override
+    public List<Long> getStageMatchIds(int stage, long tournamentId, Boolean isGroupStage) {
+        return getStageMatchIds(stage, tournamentId, isGroupStage, true);
+    }
+
+    private List<Long> getStageMatchIds(int stage, long tournamentId, Boolean isGroupStage, boolean filterByGroupStage) {
+        TypedQuery<Long> query = em.createQuery("SELECT m.id.id FROM Match m WHERE m.stage = :stage AND m.tournament = :tournament" + buildGroupStageFilter(filterByGroupStage, isGroupStage), Long.class);
         query.setParameter("stage", stage).setParameter("tournament", em.getReference(Tournament.class, tournamentId));
+        setGroupStageParameter(query, filterByGroupStage, isGroupStage);
         return query.getResultList();
+    }
+
+    private String buildGroupStageFilter(boolean filterByGroupStage, Boolean isGroupStage) {
+        if (!filterByGroupStage) {
+            return "";
+        }
+        if (isGroupStage == null) {
+            return " AND m.isGroupStage IS NULL";
+        }
+        return " AND m.isGroupStage = :isGroupStage";
+    }
+
+    private void setGroupStageParameter(Query query, boolean filterByGroupStage, Boolean isGroupStage) {
+        if (filterByGroupStage && isGroupStage != null) {
+            query.setParameter("isGroupStage", isGroupStage);
+        }
     }
 
     @Override
