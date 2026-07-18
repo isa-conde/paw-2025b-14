@@ -1,37 +1,118 @@
-.container {
-    display: flex;
-    min-height: 100vh;
-    flex-direction: row;
+.page {
+    display: grid;
+    grid-template-columns: minmax(280px, 40%) 1fr;
+    min-height: calc(100vh - 80px);
 }
 
 .image {
-    flex: 1;             /* ocupa mitad exacta */
-    max-width: 50vw;     /* nunca más de la mitad */
-    height: 100vh;
+    min-height: 100%;
     overflow: hidden;
 }
 
 .image img {
     width: 100%;
     height: 100%;
-    object-fit: cover;   /* rellena toda la caja */
+    object-fit: cover;
     object-position: center;
     display: block;
 }
 
-.form {
-    margin: 0 10px 10px 10px;
-}
-
-.row.center {
-    margin: 20px 20px 20px;
-}
-
-.tournament-form {
-    flex: 1;
-    max-width: 50vw;
+.panel {
     padding: 40px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    gap: 18px;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+}
+
+.section {
+    border: 1px solid var(--secondary-details);
+    border-radius: 8px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.section:disabled {
+    opacity: 0.75;
+}
+
+.legend {
+    color: var(--primary-text);
+    font-size: var(--text-20);
+    font-weight: 700;
+    padding: 0 8px;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    align-items: start;
+}
+
+.actions {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.status {
+    color: var(--secondary-text);
+    font-size: var(--text-18);
+    font-weight: 600;
+    margin: 0;
+}
+
+.error,
+.fieldError {
+    color: var(--error);
+    font-size: var(--text-16);
+    font-weight: 600;
+    margin: 0;
+}
+
+.fileLabel {
+    color: var(--primary-text);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.fileInput {
+    background-color: var(--background-secondary);
+    border: 2px solid var(--secondary-details);
+    border-radius: 8px;
+    color: var(--primary-text);
+    font-family: var(--font-main), serif;
+    font-size: var(--text-18);
+    padding: 10px;
+}
+
+.fileName {
+    color: var(--secondary-text);
+    font-size: var(--text-16);
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 900px) {
+    .page {
+        grid-template-columns: 1fr;
+    }
+
+    .image {
+        max-height: 220px;
+    }
+
+    .panel {
+        padding: 24px;
+    }
 }

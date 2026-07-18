@@ -17,6 +17,9 @@ export const Input = ({   id,
                           placeholder,
                           secondary = false,
                           error,
+                          min,
+                          max,
+                          step,
                           onChange }) => {
     const containerClass = inline
         ? styles["inline-container"]
@@ -25,7 +28,8 @@ export const Input = ({   id,
         : styles.container
 
     if(type !== "submit") {
-        if(type === "input") {
+        if(["input", "email", "password", "number", "url"].includes(type)) {
+            const htmlType = type === "input" ? "text" : type;
             return (
                 <label htmlFor={id} className={`${styles.label} ${containerClass}`}>
                     {label && (
@@ -34,49 +38,14 @@ export const Input = ({   id,
                     <input
                         id={id}
                         name={name ?? id}
-                        type="text"
+                        type={htmlType}
                         className={styles.input}
                         value={value}
                         placeholder={placeholder}
                         disabled={disabled}
-                        onChange={onChange}
-                    />
-                    {error && <p className={styles.error}>{error}</p>}
-                </label>
-            )
-        } else if(type === "email") {
-            return (
-                <label htmlFor={id} className={`${styles.label} ${containerClass}`}>
-                    {label && (
-                        <AppText size="l" weight="semi-bold">{label}</AppText>
-                    )}
-                    <input
-                        id={id}
-                        name={name ?? id}
-                        type="email"
-                        className={styles.input}
-                        value={value}
-                        placeholder={placeholder}
-                        disabled={disabled}
-                        onChange={onChange}
-                    />
-                    {error && <p className={styles.error}>{error}</p>}
-                </label>
-            )
-        } else if(type === "password") {
-            return (
-                <label htmlFor={id} className={`${styles.label} ${containerClass}`}>
-                    {label && (
-                        <AppText size="l" weight="semi-bold">{label}</AppText>
-                    )}
-                    <input
-                        id={id}
-                        name={name ?? id}
-                        type="password"
-                        className={styles.input}
-                        value={value}
-                        placeholder={placeholder}
-                        disabled={disabled}
+                        min={min}
+                        max={max}
+                        step={step}
                         onChange={onChange}
                     />
                     {error && <p className={styles.error}>{error}</p>}
@@ -136,8 +105,11 @@ export const Input = ({   id,
                         className={styles.input}
                         value={value}
                         disabled={disabled}
+                        min={min}
+                        max={max}
                         onChange={onChange}
                     />
+                    {error && <p className={styles.error}>{error}</p>}
                 </label>
             );
         }

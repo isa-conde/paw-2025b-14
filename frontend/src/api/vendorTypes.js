@@ -1,6 +1,7 @@
 export const VENDOR_TYPES = {
     tournament: 'application/vnd.tournament.v1+json',
     tournamentList: 'application/vnd.tournament.list.v1+json',
+    tournamentCreate: 'application/vnd.tournament.create.v1+json',
     tournamentUpdate: 'application/vnd.tournament.update.v1+json',
     tournamentStatus: 'application/vnd.tournament.status.v1+json',
     tournamentJoinUser: 'application/vnd.tournament.join-user.v1+json',

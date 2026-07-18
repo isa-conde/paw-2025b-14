@@ -108,7 +108,7 @@ export const HomePage = () => {
         };
     }, []);
 
-    const createTournamentUrl = "/tournaments/new/step1";
+    const createTournamentUrl = "/tournaments/new";
     const joinTournamentUrl = "/tournaments";
     const gamesPageUrl = "/games";
     const tournamentsGameUrl = "/tournaments";

@@ -133,7 +133,7 @@ export const getTournamentRules = async (tournamentOrIdOrHref, { signal } = {}) 
     };
 };
 
-const readFileAsBase64 = (file) => new Promise((resolve, reject) => {
+export const readFileAsBase64 = (file) => new Promise((resolve, reject) => {
     if (!file) {
         reject(new Error('File is required'));
         return;
@@ -148,6 +148,18 @@ const readFileAsBase64 = (file) => new Promise((resolve, reject) => {
     reader.onerror = () => reject(reader.error ?? new Error('Could not read file'));
     reader.readAsDataURL(file);
 });
+
+export const createTournament = (payload, { signal } = {}) =>
+    requestJson('/tournaments', {
+        method: 'POST',
+        accept: VENDOR_TYPES.tournament,
+        contentType: VENDOR_TYPES.tournamentCreate,
+        data: payload,
+        signal,
+    }).then(({ data, response }) => ({
+        tournament: data ? normalizeTournament(data) : null,
+        location: response.headers.get('Location'),
+    }));
 
 export const updateTournament = (tournamentId, payload, { signal } = {}) =>
     requestJson(`/tournaments/${tournamentId}`, {

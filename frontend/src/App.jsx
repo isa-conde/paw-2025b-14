@@ -9,6 +9,7 @@ import { ResetPasswordSuccessPage } from "./pages/ResetPasswordSuccessPage.jsx";
 import { HomePage } from "./pages/HomePage.jsx";
 import { GamesPage } from "./pages/GamesPage.jsx";
 import { TournamentsPage } from "./pages/TournamentsPage.jsx";
+import { NewTournamentPage } from "./pages/NewTournamentPage.jsx";
 import { NotFoundPage } from "./pages/NotFoundPage.jsx";
 import { ForbiddenPage } from "./pages/ForbiddenPage.jsx";
 import { AccountVerificationPage } from "./pages/AccountVerificationPage.jsx";
@@ -42,10 +43,18 @@ const App = () => (
         <Route path="/games" element={<GamesPage />} />
         <Route path="/tournaments" element={<TournamentsPage />} />
         <Route
+            path="/tournaments/new"
+            element={(
+                <ProtectedRoute requireVerified>
+                    <NewTournamentPage />
+                </ProtectedRoute>
+            )}
+        />
+        <Route
             path="/tournaments/new/*"
             element={(
                 <ProtectedRoute requireVerified>
-                    <NotFoundPage />
+                    <Navigate to="/tournaments/new" replace />
                 </ProtectedRoute>
             )}
         />

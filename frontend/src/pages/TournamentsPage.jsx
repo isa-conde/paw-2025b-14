@@ -140,7 +140,7 @@ export const TournamentsPage = () => {
         setSearchParams({});
     };
 
-    const createTournamentUrl = "/tournaments/new/step1";
+    const createTournamentUrl = "/tournaments/new";
     const createTeamUrl = "/team/create";
     const tournamentsPageUrl = "/tournaments"
 
