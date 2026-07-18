@@ -2,13 +2,11 @@ package ar.edu.itba.paw.persistence.Hibernate;
 
 import ar.edu.itba.paw.interfaces.persistence.CommentDao;
 import ar.edu.itba.paw.model.Comment;
-import ar.edu.itba.paw.model.Tournament;
 import ar.edu.itba.paw.model.User;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.util.List;
 
@@ -31,27 +29,18 @@ public class CommentHibernateDao implements CommentDao {
         if (receiver == null) {
             return List.of();
         }
-        Query nativeQuery = em.createNativeQuery("SELECT c.id FROM comments c WHERE c.receiver_id = ?1");
-        nativeQuery.setParameter(1, receiver.getId());
-        nativeQuery.setMaxResults(COMMENTS_PAGE_SIZE);
-        nativeQuery.setFirstResult((int) (page * COMMENTS_PAGE_SIZE));
-
-        @SuppressWarnings("unchecked")
-        List<Number> rawIds = nativeQuery.getResultList();
-        List<Long> ids = rawIds.stream().map(Number::longValue).toList();
-        if (ids.isEmpty()) {
-            return List.of();
-        }
 
         return em.createQuery("""
                 SELECT c
                 FROM Comment c
                 JOIN FETCH c.commenter
                 JOIN FETCH c.receiver
-                WHERE c.id in :ids
-                ORDER BY c.createdAt DESC
+                WHERE c.receiver.id = :receiverId
+                ORDER BY c.createdAt DESC, c.id DESC
                 """, Comment.class)
-                .setParameter("ids", ids)
+                .setParameter("receiverId", receiver.getId())
+                .setMaxResults(COMMENTS_PAGE_SIZE)
+                .setFirstResult((int) (page * COMMENTS_PAGE_SIZE))
                 .getResultList();
     }
 
@@ -61,10 +50,10 @@ public class CommentHibernateDao implements CommentDao {
             return 0;
         }
         TypedQuery<Long> q = em.createQuery(
-                "SELECT COUNT(c) FROM Comment c WHERE c.receiver = :receiver",
+                "SELECT COUNT(c) FROM Comment c WHERE c.receiver.id = :receiverId",
                 Long.class
         );
-        q.setParameter("receiver", receiver);
+        q.setParameter("receiverId", receiver.getId());
         long count = q.getSingleResult();
         return (int) Math.ceil(count / (double) COMMENTS_PAGE_SIZE);
     }

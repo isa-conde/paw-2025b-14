@@ -82,11 +82,11 @@ public class CommentHibernateDaoTest {
 
         Assert.assertNotNull(ans);
         Assert.assertEquals(1,ans.size());
-        Assert.assertEquals(ID+6,ans.get(0).getId().longValue());
+        Assert.assertEquals(ID.longValue(),ans.get(0).getId().longValue());
         Assert.assertEquals(ID.longValue(),ans.get(0).getReceiver().getId().longValue());
         Assert.assertEquals(ID+1,ans.get(0).getCommenter().getId().longValue());
         Assert.assertEquals("First",ans.get(0).getComment());
-        Assert.assertEquals(LocalDateTime.of(2025,11,16,22,4,7),ans.get(0).getCreatedAt());
+        Assert.assertEquals(LocalDateTime.of(2025,11,16,22,4,1),ans.get(0).getCreatedAt());
     }
 
     @Test
@@ -96,11 +96,12 @@ public class CommentHibernateDaoTest {
         Assert.assertNotNull(ans);
         Assert.assertEquals(COMMENTS_PAGE_SIZE,ans.size());
         for (int i = 0; i < COMMENTS_PAGE_SIZE; i++) {
-            Assert.assertEquals(ID+i,ans.get(i).getId().longValue());
+            long commentId = ID + COMMENTS_PAGE_SIZE - i;
+            Assert.assertEquals(commentId, ans.get(i).getId().longValue());
             Assert.assertEquals(ID.longValue(),ans.get(i).getReceiver().getId().longValue());
             Assert.assertEquals(ID+1,ans.get(i).getCommenter().getId().longValue());
             Assert.assertEquals("First",ans.get(i).getComment());
-            Assert.assertEquals(LocalDateTime.of(2025,11,16,22,4,1+i),ans.get(i).getCreatedAt());
+            Assert.assertEquals(LocalDateTime.of(2025,11,16,22,4,(int) (commentId - ID + 1)),ans.get(i).getCreatedAt());
         }
     }
 
