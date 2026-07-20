@@ -45,6 +45,25 @@ const game = {
     links: [{ rel: 'self', href: 'http://localhost/api/games/1' }],
 };
 
+const teamFormat = {
+    id: 10,
+    name: '2v2',
+    playersPerTeam: 2,
+    links: [
+        { rel: 'self', href: 'http://localhost/api/games/1/formats/10' },
+        { rel: 'game', href: 'http://localhost/api/games/1' },
+    ],
+};
+
+const teamTournament = {
+    ...tournament,
+    format: '2v2',
+    links: [
+        ...tournament.links,
+        { rel: 'format', href: 'http://localhost/api/games/1/formats/10' },
+    ],
+};
+
 const creator = {
     id: 7,
     username: 'owner-user',
@@ -74,6 +93,30 @@ const rivalParticipant = {
         { rel: 'tournament', href: 'http://localhost/api/tournaments/12' },
     ],
 };
+
+const teamAlpha = {
+    id: 33,
+    name: 'Alpha',
+    links: [
+        { rel: 'self', href: 'http://localhost/api/teams/33' },
+        { rel: 'owner', href: 'http://localhost/api/users/42' },
+    ],
+};
+
+const teamMembers = [
+    {
+        id: 42,
+        username: 'isabel',
+        verified: true,
+        links: [{ rel: 'self', href: 'http://localhost/api/users/42' }],
+    },
+    {
+        id: 8,
+        username: 'bob',
+        verified: true,
+        links: [{ rel: 'self', href: 'http://localhost/api/users/8' }],
+    },
+];
 
 const matches = [
     {
@@ -113,6 +156,10 @@ const createFetchMock = ({
     authenticatedParticipant = null,
     rulesStatus = 200,
     participantsBody = [currentParticipant, rivalParticipant],
+    formatBody = null,
+    teamsBody = [],
+    teamMembersById = {},
+    teamJoinResponseStatus = 204,
 } = {}) => {
     let joined = false;
     let left = false;
@@ -142,6 +189,24 @@ const createFetchMock = ({
 
         if (path === '/api/games/1') {
             return Promise.resolve(jsonResponse(game, VENDOR_TYPES.game));
+        }
+
+        if (path === '/api/games/1/formats/10') {
+            return Promise.resolve(formatBody
+                ? jsonResponse(formatBody, VENDOR_TYPES.gameFormat)
+                : jsonResponse({ message: 'format not found' }, 'application/json', 404));
+        }
+
+        if (path === '/api/teams' && options.method !== 'POST') {
+            return Promise.resolve(jsonResponse(teamsBody, VENDOR_TYPES.teamList));
+        }
+
+        const teamMembersMatch = path.match(/^\/api\/teams\/(\d+)\/members$/);
+        if (teamMembersMatch) {
+            return Promise.resolve(jsonResponse(
+                teamMembersById[teamMembersMatch[1]] ?? [],
+                VENDOR_TYPES.userList,
+            ));
         }
 
         if (path === '/api/tournaments/12/participants' && options.method !== 'POST') {
@@ -174,6 +239,13 @@ const createFetchMock = ({
 
         if (path === '/api/tournaments/12/participants/users' && options.method === 'POST') {
             joined = true;
+            return Promise.resolve(noContentResponse());
+        }
+
+        if (path === '/api/tournaments/12/participants/teams' && options.method === 'POST') {
+            if (teamJoinResponseStatus !== 204) {
+                return Promise.resolve(jsonResponse({ message: 'team join error' }, 'application/json', teamJoinResponseStatus));
+            }
             return Promise.resolve(noContentResponse());
         }
 
@@ -318,7 +390,96 @@ describe('TournamentPage', () => {
                     && options.method === 'POST';
             })).toBe(true);
         });
-        expect(requestUrls(fetchMock).every((url) => !url.pathname.includes('/me'))).toBe(true);
+        expect(requestUrls(fetchMock).every((url) => (
+            !url.pathname.includes('/users/me')
+            && !url.pathname.includes('/participants/me')
+        ))).toBe(true);
+    });
+
+    it('shows team join only for team formats', async () => {
+        authenticate();
+        vi.stubGlobal('fetch', createFetchMock({
+            authenticatedParticipant: [],
+            participantsBody: [rivalParticipant],
+        }));
+        const individualRender = renderTournamentPage();
+
+        expect(await screen.findByRole('button', { name: 'tournament.join.button' })).toBeInTheDocument();
+        expect(screen.queryByText('tournament.join.chooseTeam')).not.toBeInTheDocument();
+        individualRender.unmount();
+
+        vi.stubGlobal('fetch', createFetchMock({
+            tournamentBody: teamTournament,
+            formatBody: teamFormat,
+            authenticatedParticipant: [],
+            participantsBody: [],
+            teamsBody: [],
+        }));
+        renderTournamentPage();
+
+        expect(await screen.findByText('tournament.join.noTeams')).toBeInTheDocument();
+        expect(screen.queryByRole('button', { name: 'tournament.join.button' })).not.toBeInTheDocument();
+    });
+
+    it('joins through the teams participant endpoint with teamId and selected member ids', async () => {
+        authenticate();
+        const fetchMock = createFetchMock({
+            tournamentBody: teamTournament,
+            formatBody: teamFormat,
+            authenticatedParticipant: [],
+            participantsBody: [],
+            teamsBody: [teamAlpha],
+            teamMembersById: { 33: teamMembers },
+        });
+        vi.stubGlobal('fetch', fetchMock);
+
+        renderTournamentPage();
+
+        fireEvent.click(await screen.findByLabelText(/Alpha/));
+        fireEvent.click(screen.getByLabelText('bob'));
+        fireEvent.click(screen.getByRole('button', { name: 'tournament.join.button' }));
+
+        await waitFor(() => {
+            const joinCall = fetchMock.mock.calls.find(([url, options]) => (
+                new URL(url, 'http://localhost').pathname === '/api/tournaments/12/participants/teams'
+                && options.method === 'POST'
+            ));
+            expect(joinCall).toBeTruthy();
+            expect(joinCall[1].headers['Content-Type']).toBe(VENDOR_TYPES.tournamentJoinTeam);
+            expect(joinCall[1].headers.Authorization).toBe('Bearer test-token');
+            expect(JSON.parse(joinCall[1].body)).toEqual({
+                teamId: 33,
+                members: [42, 8],
+            });
+            expect(JSON.parse(joinCall[1].body).userId).toBeUndefined();
+            expect(JSON.parse(joinCall[1].body).ownerId).toBeUndefined();
+        });
+        expect(requestUrls(fetchMock).some((url) => (
+            url.pathname === '/api/teams'
+            && url.searchParams.get('userId') === '42'
+            && url.searchParams.get('forTournament') === '12'
+        ))).toBe(true);
+        expect(requestUrls(fetchMock).every((url) => (
+            !url.pathname.includes('/users/me')
+            && !url.pathname.includes('/participants/me')
+        ))).toBe(true);
+        expect(fetchMock.mock.calls.every(([, callOptions = {}]) => callOptions.credentials === undefined)).toBe(true);
+    });
+
+    it('links to team creation with return path when no valid team is available', async () => {
+        authenticate();
+        vi.stubGlobal('fetch', createFetchMock({
+            tournamentBody: teamTournament,
+            formatBody: teamFormat,
+            authenticatedParticipant: [],
+            participantsBody: [],
+            teamsBody: [],
+        }));
+
+        renderTournamentPage();
+
+        const createTeamLink = await screen.findByRole('link', { name: 'tournamentDetail.teamJoin.createTeam' });
+        expect(createTeamLink).toHaveAttribute('href', '/teams/new?returnTo=%2Ftournaments%2F12');
     });
 
     it('leaves through the real participant id and never calls /me', async () => {

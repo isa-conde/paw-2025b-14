@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Button } from '../Button.jsx';
+import { TeamJoinPanel } from './TeamJoinPanel.jsx';
 import styles from '../../styles/pages/TournamentPage.module.css';
 
 export const TournamentActions = ({
@@ -8,11 +9,15 @@ export const TournamentActions = ({
     isVerified,
     isParticipant,
     isOwner,
+    tournamentId,
+    currentUserId,
+    playersPerTeam = 1,
     actionError,
     actionLoading,
     statusLoading,
     onLogin,
     onJoin,
+    onJoinTeam,
     onLeave,
     onCloseInscriptions,
     onStartTournament,
@@ -29,6 +34,7 @@ export const TournamentActions = ({
         && !tournament.tournamentStarted
         && !tournament.finished
     );
+    const isTeamTournament = Number(playersPerTeam) > 1;
 
     return (
         <section className={styles.section}>
@@ -65,12 +71,23 @@ export const TournamentActions = ({
                     </div>
                 )}
 
-                {!isParticipant && isAuthenticated && isVerified && canJoin && (
+                {!isParticipant && isAuthenticated && isVerified && canJoin && !isTeamTournament && (
                     <Button
                         text={actionLoading === 'join' ? t('tournamentDetail.joining') : t('tournament.join.button')}
                         size="m"
                         disabled={Boolean(actionLoading)}
                         onClick={onJoin}
+                    />
+                )}
+
+                {!isParticipant && isAuthenticated && isVerified && canJoin && isTeamTournament && (
+                    <TeamJoinPanel
+                        tournamentId={tournamentId}
+                        currentUserId={currentUserId}
+                        playersPerTeam={playersPerTeam}
+                        disabled={Boolean(actionLoading)}
+                        isSubmitting={actionLoading === 'joinTeam'}
+                        onJoinTeam={onJoinTeam}
                     />
                 )}
 

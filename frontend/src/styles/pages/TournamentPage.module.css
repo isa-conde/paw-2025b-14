@@ -71,7 +71,9 @@
 .actions,
 .ownerControls,
 .rulesLinks,
-.resultForm {
+.resultForm,
+.teamOptions,
+.memberOptions {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -323,6 +325,38 @@
     border: 1px dashed rgba(179, 201, 214, 0.35);
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.03);
+}
+
+.teamJoinBox {
+    display: grid;
+    gap: 14px;
+    width: min(100%, 760px);
+}
+
+.teamJoinFieldset {
+    border: 1px solid rgba(179, 201, 214, 0.22);
+    border-radius: 8px;
+    padding: 14px;
+}
+
+.teamJoinLegend {
+    color: var(--primary-text);
+    font-size: var(--text-16);
+    font-weight: 700;
+    padding: 0 8px;
+}
+
+.teamOption,
+.memberOption {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    border: 1px solid rgba(179, 201, 214, 0.26);
+    border-radius: 8px;
+    color: var(--primary-text);
+    font-weight: 700;
+    padding: 8px 10px;
 }
 
 .fileLabel {

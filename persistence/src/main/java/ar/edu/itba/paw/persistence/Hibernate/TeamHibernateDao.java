@@ -195,24 +195,25 @@ public class TeamHibernateDao implements TeamDao {
         String jpql = """
         SELECT DISTINCT t
         FROM Team t
+        JOIN FETCH t.owner
         WHERE EXISTS (
             SELECT 1
             FROM TeamMember tm
-            WHERE tm.team = t
+            WHERE tm.team.id = t.id
               AND tm.user.id = :userId
         )
         AND (
             SELECT COUNT(tm2)
             FROM TeamMember tm2
-            WHERE tm2.team = t
+            WHERE tm2.team.id = t.id
         ) >= :minSize
         AND NOT EXISTS (
             SELECT 1
             FROM Participant p
             WHERE p.tournament.id = :tournamentId
-              AND p.team = t
+              AND p.team.id = t.id
         )
-        ORDER BY t.id
+        ORDER BY t.name
     """;
 
         return em.createQuery(jpql, Team.class)

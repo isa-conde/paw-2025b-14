@@ -10,6 +10,8 @@ import { HomePage } from "./pages/HomePage.jsx";
 import { GamesPage } from "./pages/GamesPage.jsx";
 import { TournamentsPage } from "./pages/TournamentsPage.jsx";
 import { NewTournamentPage } from "./pages/NewTournamentPage.jsx";
+import { NewTeamPage } from "./pages/NewTeamPage.jsx";
+import { TeamPage } from "./pages/TeamPage.jsx";
 import { NotFoundPage } from "./pages/NotFoundPage.jsx";
 import { ForbiddenPage } from "./pages/ForbiddenPage.jsx";
 import { AccountVerificationPage } from "./pages/AccountVerificationPage.jsx";
@@ -50,6 +52,15 @@ const App = () => (
                 </ProtectedRoute>
             )}
         />
+        <Route
+            path="/teams/new"
+            element={(
+                <ProtectedRoute requireVerified>
+                    <NewTeamPage />
+                </ProtectedRoute>
+            )}
+        />
+        <Route path="/teams/:teamId" element={<TeamPage />} />
         <Route
             path="/tournaments/new/*"
             element={(

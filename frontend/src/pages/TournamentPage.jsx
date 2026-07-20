@@ -5,10 +5,12 @@ import {
     deleteParticipant,
     getTournament,
     getTournamentCreator,
+    getTournamentFormat,
     getTournamentGame,
     getTournamentMatches,
     getTournamentParticipants,
     getTournamentRules,
+    joinTournamentAsTeam,
     joinTournamentAsUser,
     setMatchResults,
     uploadTournamentRules,
@@ -73,12 +75,14 @@ const fetchTournamentDetail = async ({ tournamentId, currentUserId, signal }) =>
         matches,
         creator,
         game,
+        format,
         currentParticipants,
     ] = await Promise.all([
         getTournamentParticipants(tournament, { signal }),
         getTournamentMatches(tournament, { signal }),
         fetchOptional(getTournamentCreator(tournament, { signal })),
         fetchOptional(getTournamentGame(tournament, { signal })),
+        fetchOptional(getTournamentFormat(tournament, { signal })),
         fetchCurrentParticipants(tournament, currentUserId, signal),
     ]);
 
@@ -88,6 +92,7 @@ const fetchTournamentDetail = async ({ tournamentId, currentUserId, signal }) =>
         matches,
         creator,
         game,
+        format,
         currentParticipants,
     };
 };
@@ -131,6 +136,37 @@ const getActionErrorMessage = (error, t) => {
     return t('tournamentDetail.error.generic');
 };
 
+const getBackendDetailMessage = (error, t) => {
+    const details = error?.details;
+    if (!details || typeof details !== 'object') {
+        return null;
+    }
+
+    const firstDetail = Object.values(details).flat()[0];
+    if (firstDetail == null) {
+        return null;
+    }
+
+    const rawMessage = String(Array.isArray(firstDetail) ? firstDetail[0] : firstDetail);
+    const key = rawMessage.replace(/^\{(.+)}$/, '$1');
+    return t(key, { defaultValue: rawMessage });
+};
+
+const getTeamJoinErrorMessage = (error, t) => {
+    const detailMessage = getBackendDetailMessage(error, t);
+    if (detailMessage) {
+        return detailMessage;
+    }
+
+    if (error?.status === 400) {
+        return t('tournamentDetail.teamJoin.error.badRequest');
+    }
+    if (error?.status === 403) {
+        return t('tournamentDetail.teamJoin.error.forbidden');
+    }
+    return getActionErrorMessage(error, t);
+};
+
 const getRulesUploadErrorMessage = (error, t) => {
     if (error?.status === 401) {
         return t('errorExceptionPage.userNotAuthenticated.description');
@@ -163,6 +199,7 @@ const TournamentPage = () => {
     const [matches, setMatches] = useState([]);
     const [creator, setCreator] = useState(null);
     const [game, setGame] = useState(null);
+    const [format, setFormat] = useState(null);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
     const [actionError, setActionError] = useState(null);
@@ -189,6 +226,7 @@ const TournamentPage = () => {
         setMatches(detail.matches);
         setCreator(detail.creator);
         setGame(detail.game);
+        setFormat(detail.format);
         setCurrentParticipants(detail.currentParticipants);
     };
 
@@ -363,6 +401,19 @@ const TournamentPage = () => {
         }
     };
 
+    const handleJoinTeam = async (payload) => {
+        setActionError(null);
+        setActionLoading('joinTeam');
+        try {
+            await joinTournamentAsTeam(tournamentId, payload);
+            await refreshDetail();
+        } catch (joinError) {
+            setActionError(getTeamJoinErrorMessage(joinError, t));
+        } finally {
+            setActionLoading(null);
+        }
+    };
+
     const handleLeave = async () => {
         if (!currentParticipant) {
             setActionError(t('tournamentDetail.error.missingParticipant'));
@@ -458,6 +509,7 @@ const TournamentPage = () => {
     const bannerImage = tournament.image ?? defaultBanner;
     const gameName = game?.name ?? t('tournamentDetail.unknown.game');
     const creatorName = creator?.username ?? t('tournamentDetail.unknown.creator');
+    const playersPerTeam = Number(format?.playersPerTeam ?? tournament.playersPerTeam ?? 1);
 
     return (
         <Layout pageTitle={tournament.name}>
@@ -500,11 +552,15 @@ const TournamentPage = () => {
                         isVerified={isVerified}
                         isParticipant={Boolean(currentParticipant)}
                         isOwner={isOwner}
+                        tournamentId={tournamentId}
+                        currentUserId={currentUserId}
+                        playersPerTeam={playersPerTeam}
                         actionError={actionError}
                         actionLoading={actionLoading}
                         statusLoading={statusLoading}
                         onLogin={handleLogin}
                         onJoin={handleJoin}
+                        onJoinTeam={handleJoinTeam}
                         onLeave={handleLeave}
                         onCloseInscriptions={() => handleStatusUpdate({ openInscriptions: false }, 'close')}
                         onStartTournament={() => handleStatusUpdate({ tournamentStarted: true }, 'start')}

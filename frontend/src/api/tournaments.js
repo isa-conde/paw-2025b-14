@@ -200,6 +200,17 @@ export const getTournamentGame = (tournament, { signal } = {}) => {
     });
 };
 
+export const getTournamentFormat = (tournament, { signal } = {}) => {
+    const link = getLink(tournament.links, 'format');
+    if (!link) {
+        return Promise.resolve(null);
+    }
+    return fetchJson(link, {
+        accept: VENDOR_TYPES.gameFormat,
+        signal,
+    });
+};
+
 export const getGameTournaments = (game, { page = 0, signal } = {}) => {
     const href = getLink(game.links, 'tournaments') ?? game.tournamentsHref;
     return href
