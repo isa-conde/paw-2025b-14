@@ -49,7 +49,7 @@ public interface UserService {
 
     User findUserByToken(long token);
 
-    void commentOnProfile(User commenter, long receiverId, String comment);
+    Comment commentOnProfile(User commenter, long receiverId, String comment);
 
     List<Comment> getCommentsReceived(long receiverId, long page);
 

@@ -61,6 +61,8 @@ public class Vendor {
     public static final String APPLICATION_USER_LOGIN = "application/vnd.user.login.v1+json";
 
     public static final String APPLICATION_COMMENT_LIST = "application/vnd.comment.list.v1+json";
+    public static final String APPLICATION_COMMENT = "application/vnd.comment.v1+json";
+    public static final String APPLICATION_COMMENT_CREATE = "application/vnd.comment.create.v1+json";
 
     public static final String APPLICATION_USER_ACCOUNT = "application/vnd.user-account.v1+json";
 

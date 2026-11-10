@@ -7,8 +7,6 @@ export const Sidebar = ({ user }) => {
     const { t } = useTranslation();
     const location = useLocation();
 
-    const isLoggedIn = false;
-
     const homePng = "/assets/home.png";
     const joystickPng = "/assets/joystick.png";
     const cupPng = "/assets/cup.png";
@@ -35,7 +33,7 @@ export const Sidebar = ({ user }) => {
         location.pathname === indexPath,
         location.pathname.startsWith(gamesPath),
         location.pathname.startsWith(tournamentsPath),
-        location.pathname === profilePath
+        location.pathname === profilePath || location.pathname.startsWith('/users/')
     ];
 
     return (

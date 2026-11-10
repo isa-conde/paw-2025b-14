@@ -58,6 +58,10 @@ export const listTournaments = async ({
     elo,
     genre,
     playersPerTeam,
+    hasUser,
+    createdBy,
+    wonBy,
+    finished,
     signal,
 } = {}) => {
     const response = await requestJson(appendQueryParams(href ?? '/tournaments', {
@@ -67,6 +71,10 @@ export const listTournaments = async ({
         elo,
         genre,
         playersPerTeam,
+        hasUser,
+        createdBy,
+        wonBy,
+        finished,
     }), {
         accept: VENDOR_TYPES.tournamentList,
         signal,

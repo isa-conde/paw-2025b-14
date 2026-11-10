@@ -2,7 +2,7 @@ import { useContext } from "react";
 import {Button} from "./Button.jsx";
 import { AuthContext } from "../auth/AuthContext.jsx";
 
-export const ProfileButton  = ({ text, size = "m", onClick, imageId, fill = true, disabled = false, isNotSafe, rating }) => {
+export const ProfileButton  = ({ text, size = "m", onClick, image, imageId, fill = true, disabled = false, isNotSafe, rating }) => {
     const auth = useContext(AuthContext);
     const user = auth?.user;
     const defaultImage = "/assets/defaultPFP.jpg"
@@ -11,7 +11,7 @@ export const ProfileButton  = ({ text, size = "m", onClick, imageId, fill = true
         <Button
             text={text ?? user?.username}
             onClick={onClick}
-            image={defaultImage}
+            image={image ?? user?.profilePicture ?? defaultImage}
             disabled={disabled}
             size={size}
             fill={fill}

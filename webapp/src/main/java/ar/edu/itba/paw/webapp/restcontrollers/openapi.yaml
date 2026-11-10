@@ -117,6 +117,41 @@ paths:
           $ref: '#/components/responses/BadRequestJson'
         '404':
           $ref: '#/components/responses/NotFoundJson'
+    post:
+      tags: [users]
+      summary: Comment on a user's profile
+      description: Requires a verified user. The commenter is obtained from the Bearer token and cannot be the profile owner.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+      requestBody:
+        required: true
+        content:
+          application/vnd.comment.create.v1+json:
+            schema:
+              type: object
+              required: [comment]
+              properties:
+                comment:
+                  type: string
+                  minLength: 1
+                  maxLength: 1000
+      responses:
+        '201':
+          description: Comment created
+          content:
+            application/vnd.comment.v1+json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+        '400':
+          $ref: '#/components/responses/BadRequestJson'
+        '401':
+          $ref: '#/components/responses/UnauthorizedJson'
+        '404':
+          $ref: '#/components/responses/NotFoundJson'
+        '409':
+          $ref: '#/components/responses/ConflictJson'
 
   /users/{id}/accounts:
     get:
@@ -623,6 +658,22 @@ paths:
           schema:
             type: integer
             minimum: 1
+        - in: query
+          name: hasUser
+          description: Return tournaments in which this user participates.
+          schema: { type: integer, format: int64 }
+        - in: query
+          name: createdBy
+          description: Return tournaments created by this user.
+          schema: { type: integer, format: int64 }
+        - in: query
+          name: wonBy
+          description: Return finished tournaments won by this user.
+          schema: { type: integer, format: int64 }
+        - in: query
+          name: finished
+          description: Select active or finished user tournaments when a user filter is present.
+          schema: { type: boolean }
         - $ref: '#/components/parameters/Page'
       responses:
         '200':

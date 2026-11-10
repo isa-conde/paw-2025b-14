@@ -144,6 +144,7 @@ public class WebAuthConfig {
                                 "/api/tournaments",
                                 "/api/tournaments/*/participants/users",
                                 "/api/tournaments/*/participants/teams",
+                                "/api/users/*/comments",
                                 "/api/users/*/accounts",
                                 "/api/users/me/accounts",
                                 "/api/teams").hasRole("VERIFIED")

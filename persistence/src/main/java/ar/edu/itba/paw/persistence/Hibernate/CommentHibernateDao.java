@@ -19,9 +19,10 @@ public class CommentHibernateDao implements CommentDao {
     private static final int COMMENTS_PAGE_SIZE = 6;
 
     @Override
-    public void create(User commenter, User receiver, String comment) {
+    public Comment create(User commenter, User receiver, String comment) {
         Comment toPersist = new Comment(commenter, receiver, comment);
         em.persist(toPersist);
+        return toPersist;
     }
 
     @Override

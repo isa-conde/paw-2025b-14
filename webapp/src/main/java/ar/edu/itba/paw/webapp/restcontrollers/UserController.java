@@ -15,6 +15,7 @@ import ar.edu.itba.paw.webapp.dto.params.ListUsersByNameParams;
 import ar.edu.itba.paw.webapp.dto.params.PaginationParams;
 import ar.edu.itba.paw.webapp.dto.requests.AddUserAccountRequest;
 import ar.edu.itba.paw.webapp.dto.requests.ConfirmVerificationRequest;
+import ar.edu.itba.paw.webapp.dto.requests.CreateCommentRequest;
 import ar.edu.itba.paw.webapp.dto.requests.CreateUserRequest;
 import ar.edu.itba.paw.webapp.dto.requests.LoginUserRequest;
 import ar.edu.itba.paw.webapp.dto.requests.RequestPasswordResetRequest;
@@ -105,6 +106,18 @@ public class UserController {
         Response.ResponseBuilder responseBuilder = Response.ok(new GenericEntity<>(comments) {});
         addPaginationLinks(responseBuilder, page, totalPages);
         return responseBuilder.build();
+    }
+
+    @POST
+    @Path("/{id}/comments")
+    @Consumes(Vendor.APPLICATION_COMMENT_CREATE)
+    @Produces(Vendor.APPLICATION_COMMENT)
+    public Response createComment(@PathParam("id") long id, @Valid CreateCommentRequest request) {
+        if (id <= 0) return ApiErrorFactory.badRequest("Invalid user id");
+        CommentDTO created = CommentDTO.fromComment(uriInfo,
+                us.commentOnProfile(currentUserProvider.getCurrentUser(), id, request.getComment()));
+        URI location = uriInfo.getAbsolutePathBuilder().path(String.valueOf(created.getId())).build();
+        return Response.created(location).entity(created).build();
     }
 
     @GET

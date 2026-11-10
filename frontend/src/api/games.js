@@ -9,8 +9,8 @@ export const normalizeGame = (game) => ({
     formatsHref: getLink(game.links, 'formats'),
 });
 
-export const listGames = async ({ page, href, signal } = {}) => {
-    const response = await requestJson(appendQueryParams(href ?? '/games', { page }), {
+export const listGames = async ({ page, href, favouritedBy, signal } = {}) => {
+    const response = await requestJson(appendQueryParams(href ?? '/games', { page, favouritedBy }), {
         accept: VENDOR_TYPES.gameList,
         signal,
     });

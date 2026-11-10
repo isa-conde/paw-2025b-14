@@ -17,6 +17,7 @@ import { ForbiddenPage } from "./pages/ForbiddenPage.jsx";
 import { AccountVerificationPage } from "./pages/AccountVerificationPage.jsx";
 import { VerificationConfirmPage } from "./pages/VerificationConfirmPage.jsx";
 import { ProtectedRoute } from "./auth/ProtectedRoute.jsx";
+import { LegacyProfileRedirect, ProfilePage } from './pages/ProfilePage.jsx';
 
 const LegacyTournamentRedirect = () => {
     const { tournamentId } = useParams();
@@ -61,6 +62,11 @@ const App = () => (
             )}
         />
         <Route path="/teams/:teamId" element={<TeamPage />} />
+        <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+        <Route path="/users/:userId" element={<ProfilePage />} />
+        <Route path="/profile/:userId" element={<LegacyProfileRedirect />} />
+        <Route path="/profile/:userId/tournaments" element={<LegacyProfileRedirect tab="tournaments" />} />
+        <Route path="/profile/:userId/teams" element={<LegacyProfileRedirect tab="teams" />} />
         <Route
             path="/tournaments/new/*"
             element={(
@@ -71,6 +77,7 @@ const App = () => (
         />
         <Route path="/tournaments/:tournamentId" element={<TournamentPage />} />
         <Route path="/403" element={<ForbiddenPage />} />
+        <Route path="/404" element={<NotFoundPage />} />
 
         <Route path="/forgotPassword" element={<Navigate to="/forgot-password" replace />} />
         <Route path="/forgotPassword/reset" element={<LegacyResetPasswordRedirect />} />

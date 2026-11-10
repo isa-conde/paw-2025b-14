@@ -99,7 +99,27 @@ public class TournamentController {
     @GET
     @Produces(value = {Vendor.APPLICATION_TOURNAMENT_LIST})
     public Response listTournaments(@BeanParam TournamentFilterParams filterParams,
-                                    @BeanParam PaginationParams paginationParams) {
+                                    @BeanParam PaginationParams paginationParams,
+                                    @QueryParam("hasUser") Long hasUser,
+                                    @QueryParam("createdBy") Long createdBy,
+                                    @QueryParam("wonBy") Long wonBy,
+                                    @QueryParam("finished") Boolean finished) {
+        int userFilters = (hasUser != null ? 1 : 0) + (createdBy != null ? 1 : 0) + (wonBy != null ? 1 : 0);
+        if (userFilters > 1) return badRequest("hasUser, createdBy and wonBy are mutually exclusive");
+        Long selectedUser = hasUser != null ? hasUser : createdBy != null ? createdBy : wonBy;
+        if (selectedUser != null) {
+            if (selectedUser <= 0) return badRequest("Invalid user id");
+            boolean selectedFinished = wonBy != null || Boolean.TRUE.equals(finished);
+            int totalPages = tournamentService.countUserTournaments(selectedUser, selectedFinished,
+                    createdBy != null, wonBy != null);
+            int page = adjustPage(paginationParams.getPage(), totalPages);
+            List<TournamentDTO> tournaments = tournamentService.findUserTournaments(selectedUser,
+                    selectedFinished, createdBy != null, wonBy != null, page).stream()
+                    .map(TournamentDTO.mapper(uriInfo)).toList();
+            Response.ResponseBuilder response = Response.ok(new GenericEntity<>(tournaments) {});
+            addPaginationLinks(response, page, totalPages);
+            return response.build();
+        }
         if (filterParams.getGameId() != null && filterParams.getGameId() <= 0) {
             return badRequest("Invalid gameId");
         }

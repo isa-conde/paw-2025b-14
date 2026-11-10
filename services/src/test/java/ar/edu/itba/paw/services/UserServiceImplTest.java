@@ -80,4 +80,26 @@ public class UserServiceImplTest {
         Assert.assertSame(users, userService.findAllByName("us", 5));
         Mockito.verify(userDao).findAllByName("us", 5);
     }
+
+    @Test
+    public void testCommentReturnsTheCreatedComment() {
+        User author = new User(2L, "author", "author@mail.com", PASSWORD, true, null, null, null, "es");
+        User receiver = new User(USER_ID, "user", "user@mail.com", PASSWORD, true, null, null, null, "es");
+        ar.edu.itba.paw.model.Comment created = new ar.edu.itba.paw.model.Comment(author, receiver, "hello");
+        Mockito.when(userDao.findById(USER_ID)).thenReturn(Optional.of(receiver));
+        Mockito.when(commentDao.create(author, receiver, "hello")).thenReturn(created);
+
+        Assert.assertSame(created, userService.commentOnProfile(author, USER_ID, "hello"));
+        Mockito.verify(commentDao, Mockito.never()).getCommentsByReceived(Mockito.any(), Mockito.anyLong());
+    }
+
+    @Test(expected = ar.edu.itba.paw.interfaces.exception.InvalidCommentException.class)
+    public void testCannotCommentOnOwnProfile() {
+        User user = new User(USER_ID, "user", "user@mail.com", PASSWORD, true, null, null, null, "es");
+        try {
+            userService.commentOnProfile(user, USER_ID, "hello");
+        } finally {
+            Mockito.verifyZeroInteractions(commentDao);
+        }
+    }
 }
