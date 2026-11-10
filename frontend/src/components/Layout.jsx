@@ -33,7 +33,7 @@ export const Layout = ({ pageTitle, func, children }) => {
                 <title>{pageTitle ? `RankUp - ${pageTitle}` : "RankUp"}</title>
             </Helmet>
             <div className={styles.container}>
-                <Sidebar/>
+                <Sidebar user={isAuthenticated ? user : null}/>
                 <Header>
                     <SearchBar/>
                     {loading ? null : isAuthenticated ? (

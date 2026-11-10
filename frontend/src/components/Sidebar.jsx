@@ -51,10 +51,10 @@ export const Sidebar = ({ user }) => {
                              text={tourneysLabel}
                              href={tournamentsPath}
                              isActive={activeButtons[indexEnum.TOURNAMENTS]}/>
-              <SidebarButton icon={badgePng}
+              {user && <SidebarButton icon={badgePng}
                              text={myTourneysLabel}
                              href={profilePath}
-                             isActive={activeButtons[indexEnum.MY_TOURNAMENTS]}/>
+                             isActive={activeButtons[indexEnum.MY_TOURNAMENTS]}/>}
           </div>
       </aside>
     );
